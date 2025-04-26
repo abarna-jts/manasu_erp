@@ -1,0 +1,89 @@
+.accordion .accordion-item{
+    border: none !important;
+    border-radius: 0px !important;
+    background-color: transparent !important;
+}
+.accordion .accordion-item:hover a{
+    background-color: #363d5a !important;
+}
+.accordion .accordion-item a{
+    color: #fff !important;
+    background-color: #262b40 !important;
+    
+}
+
+.sidebar .nav-link .sidebar-icon {
+    margin-right: 0rem !important;
+    color: #ffffff;
+}
+.sidebar .multi-level .nav-link {
+    padding-left: 15px !important;
+}
+
+body{
+    background-color: #fff !important;
+}
+.navbar{
+    padding: 0px 10px;
+    background-color: #f0f0f0 !important;
+}
+.breadcrumb{
+    margin-bottom: 0px !important;
+}
+.section_title{
+    margin-bottom: 10px;
+    font-size: 2rem;
+    line-height: 1.16667em;
+    font-weight: 600;
+}
+
+.upload-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .custom-file-input {
+    border: 2px dashed #007bff;
+    padding: 10px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+  
+  .custom-file-input:hover {
+    border-color: #0056b3;
+  }
+
+  .me-2 {
+    margin-right: 10px !important;
+}
+
+@media(max-width:1300px) and (min-width:1000px){
+    .col-form-label {
+        font-size: 15px !important;
+    }
+    .section_title {
+        margin-bottom: 10px;
+        font-size: 1.4rem;
+        line-height: 1.16667em;
+        font-weight: 600;
+    }
+    .breadcrumb_title{
+        font-size: 14px !important;
+    }
+    .breadcrumb-item, .breadcrumb-item a {
+        font-size: 0.7rem;
+    }
+    .form-control {
+        font-size: 0.8rem;
+    }
+    .sidebar {
+        width: 100%;
+        max-width: 220px !important;
+    }
+    .sidebar-wrapper{
+        width: 220px !important;
+    }
+}
