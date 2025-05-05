@@ -43,8 +43,15 @@ function First_info_form(){
     const [symptoms, setSymptoms] = useState('');
     const [rescued_by, setRescuedBy] = useState('');
     const [information, setInformation] = useState('');
-
-
+    const [articles_carried, setArticlesCarried] = useState('');
+    const [rescue_relationship, setRescueRelationship] = useState('');
+    const [f_member_name,setFMemberName] = useState('');
+    const [f_member_phone, setFMemberPhone] = useState('');
+    const [f_member_address,setFMemberAddress]= useState('');
+    const [f_aadhar_card,setFAadharCard] = useState('');
+    const [f_ration_card,setRationCard] = useState('');
+    const [res_aadhar_card, setRescueAadharCard] = useState('');
+    const [police_station, setPoliceStation] = useState('');
 
     const AdmissionNumber = () => {
         const now = new Date();
@@ -131,16 +138,51 @@ function First_info_form(){
     
         setValidated(true);
       };
+
+      const handleMentalStatus = (event) =>{
+        const form = event.currentTarget;
+        event.preventDefault(); // stop default submit behavior
+        event.stopPropagation(); // stop bubbling
+    
+        if (form.checkValidity()) {
+          // Proceed to next form if valid
+          console.log("Form is valid, go to next step");
+          setStep(6);
+        }
+        else{
+            alert("Enter the Physical Apperance Correctly");
+        }
+    
+        setValidated(true);
+      }
+
+      const handleArticlesForm = (event) =>{
+        const form = event.currentTarget;
+        event.preventDefault(); // stop default submit behavior
+        event.stopPropagation(); // stop bubbling
+    
+        if (form.checkValidity()) {
+          // Proceed to next form if valid
+          console.log("Form is valid, go to next step");
+          setStep(7);
+        }
+        else{
+            alert("Enter the Physical Apperance Correctly");
+        }
+    
+        setValidated(true);
+      }
     
       const handleSubmitFinallForm  = async (e) => {
         e.preventDefault();
-        // Create a FormData object
+        
             const formData = new FormData();
             
             formData.append('referred_by', referred_by);
             formData.append('from_place', from_place);
             formData.append('date_time', date_time);
             formData.append('police_memo', police_memo);
+            formData.append('police_station',police_station);
             formData.append('information_public', information_public);
             formData.append('admission_date', admission_date);
             formData.append('admission_no', admission_no);
@@ -168,9 +210,17 @@ function First_info_form(){
             formData.append('symptoms', symptoms);
             formData.append('rescued_by', rescued_by);
             formData.append('information', information);
+            formData.append('articles_carried', articles_carried);
+            formData.append('f_member_name', f_member_name);
+            formData.append('f_member_phone', f_member_phone);
+            formData.append('f_member_address', f_member_address);
+            
             
             
             formData.append('rescue_image', rescue_image);
+            formData.append('f_aadhar_card', f_aadhar_card);
+            formData.append('f_ration_card',f_ration_card);
+            formData.append('res_aadhar_card',res_aadhar_card);
 
 
                 console.log("Submitting values:", admission_no, admission_date);
@@ -208,6 +258,14 @@ function First_info_form(){
 
     const handleBack3 = () =>{
         setStep(4);
+    };
+
+    const handleBack4 = () =>{
+        setStep(5);
+    };
+
+    const handleBack5 = () =>{
+        setStep(6);
     };
 
     useEffect(()=>{
@@ -284,6 +342,15 @@ function First_info_form(){
                                     name="police_memo"
                                     value={police_memo}
                                      onChange={(e) => setPoliceMemo(e.target.value)}
+                                    required/>
+                                </Form.Group>
+                                <Form.Group className="mb-3 text-start" controlId="formPoliceStation">
+                                    <Form.Label>Police Station : </Form.Label>
+                                    <Form.Control 
+                                    type="text" 
+                                    name="police_station"
+                                    value={police_station}
+                                     onChange={(e) => setPoliceStation(e.target.value)}
                                     required/>
                                 </Form.Group>
                                 <Form.Group className="mb-3 text-start" controlId="formPublicInfo">
@@ -733,7 +800,7 @@ function First_info_form(){
                         <Col md={12} className="text-start">
                             <h3 className="section_title">Mental Status</h3>
                         </Col>
-                        <Form noValidate validated={validated} onSubmit={handlePhysicalForm}>
+                        <Form noValidate validated={validated} onSubmit={handleMentalStatus}>
                             <Row className="d-flex justify-content-between">
                                 <Col md={6}>
                                     <Form.Group className="mb-3 text-start" controlId="formSymptoms">
@@ -800,7 +867,7 @@ function First_info_form(){
                                 <Button variant="outline-primary" className="m-1" onClick={handleBack3}>
                                     <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                 </Button>
-                                <Button variant="outline-primary" className="m-1" onClick={handleSubmitFinallForm}>
+                                <Button variant="outline-primary" className="m-1" type="submit">
                                     <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Submit
                                 </Button>
                             </Col>
@@ -820,16 +887,16 @@ function First_info_form(){
                         <Col md={12} className="text-start">
                             <h3 className="section_title">Articles carried from Rescue</h3>
                         </Col>
-                        <Form noValidate validated={validated} onSubmit={handlePhysicalForm}>
+                        <Form noValidate validated={validated} onSubmit={handleArticlesForm}>
                             <Row className="d-flex justify-content-between">
                                 <Col md={6}>
-                                    <Form.Group className="mb-3 text-start" controlId="formSymptoms">
-                                        <Form.Label>Symptoms : </Form.Label>
+                                    <Form.Group className="mb-3 text-start" controlId="formArticles">
+                                        <Form.Label>Items Found During Rescue : </Form.Label>
                                         <Form.Control 
                                         as="textarea" 
-                                        name="symptoms"
-                                        value={symptoms}
-                                        onChange={(e) => setSymptoms(e.target.value)}
+                                        name="articles_carried"
+                                        value={articles_carried}
+                                        onChange={(e) => setArticlesCarried(e.target.value)}
                                         rows={3}  
                                         required/>
                                     </Form.Group>
@@ -863,6 +930,129 @@ function First_info_form(){
                                     </Form.Group>
                                 </Col>
                             </Row>
+                            <Col md={11}>
+                                <Button variant="outline-primary" className="m-1" onClick={handleBack4}>
+                                    <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
+                                </Button>
+                                <Button variant="outline-primary" className="m-1" type="submit">
+                                    <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Submit
+                                </Button>
+                            </Col>
+                        </Form>
+                    </Row>
+                </Container>
+            )}
+
+            {step === 7 && (
+                <Container>
+                    <Row>
+                        <Col md={12} className="text-start">
+                            <h3 className="section_title">Family Member Identification</h3>
+                        </Col>
+                        <Form noValidate validated={validated}>
+                            <Row className="d-flex justify-content-between">
+                                <Col md={6}>
+                                    <Form.Group className="mb-3 text-start" controlId="formRelationship">
+                                        <Form.Label>Relationship :</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="rescue_relationship"
+                                        value={rescue_relationship}
+                                        onChange={(e) => setRescueRelationship(e.target.value)}
+                                        required/>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3 text-start" controlId="formMemberName">
+                                        <Form.Label>Family Member Name :</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="f_member_name"
+                                        value={f_member_name}
+                                        onChange={(e) => setFMemberName(e.target.value)}
+                                        required/>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3 text-start" controlId="formMemberPhone">
+                                        <Form.Label>Family Member Phone No. :</Form.Label>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="f_member_phone"
+                                        value={f_member_phone}
+                                        onChange={(e) => setFMemberPhone(e.target.value)}
+                                        required/>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3 text-start" controlId="formMemberAddress">
+                                        <Form.Label>Family Member Address :</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="f_member_address"
+                                        value={f_member_address}
+                                        onChange={(e) => setFMemberAddress(e.target.value)}
+                                        required/>
+                                    </Form.Group>
+                                    <Form.Group controlId="formAdharCard" className="mb-3">
+                                        <Form.Label>Family Member Aadhar Card Original :</Form.Label>
+                                        <Form.Control 
+                                        type="file"
+                                        name="f_aadhar_card"
+                                        onChange={(e) => setFAadharCard(e.target.files[0])} // Set the actual file object
+                                        required
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formRationCard" className="mb-3">
+                                        <Form.Label>Ration Card :</Form.Label>
+                                        <Form.Control 
+                                        type="file"
+                                        name="f_ration_card"
+                                        onChange={(e) => setRationCard(e.target.files[0])} // Set the actual file object
+                                        required
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formRationCard" className="mb-3">
+                                        <Form.Label>Rescue Aadhar Card :</Form.Label>
+                                        <Form.Control 
+                                        type="file"
+                                        name="res_aadhar_card"
+                                        onChange={(e) => setRescueAadharCard(e.target.files[0])} // Set the actual file object
+                                        required
+                                        />
+                                    </Form.Group>
+                                    
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
+                                    <Form.Label column sm={6}>Date :</Form.Label>
+                                    <Col sm={6}>
+                                        <Form.Control 
+                                            type="date" 
+                                            name="admission_date"
+                                            value={admission_date}
+                                            onChange={(e) => setAdmissionDate(e.target.value)}
+                                            readOnly
+                                        />
+                                    </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
+                                    <Form.Label column sm={6}>Admission No. :</Form.Label>
+                                    <Col sm={6}>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="admission_no"
+                                        value={admission_no}
+                                        onChange={(e) => setAdmisisonNo(e.target.value)}
+                                        placeholder={admissionNumber}  
+                                        readOnly/>
+                                    </Col>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Col md={11}>
+                                <Button variant="outline-primary" className="m-1" onClick={handleBack5}>
+                                    <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
+                                </Button>
+                                <Button variant="outline-primary" className="m-1" button="submit" onClick={handleSubmitFinallForm}>
+                                    <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Submit
+                                </Button>
+                            </Col>
                         </Form>
                     </Row>
                 </Container>

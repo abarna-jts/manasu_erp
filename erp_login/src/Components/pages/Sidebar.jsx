@@ -6,14 +6,8 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import {
   faBook,
   faUsers,
-  faBriefcase,
   faChartPie,
-  faCog,
   faFileAlt,
-  faHandHoldingUsd,
-  faSignOutAlt,
-  faTable,
-  faTimes,
   faCalendarAlt,
   faMapPin,
   faInbox,
@@ -75,7 +69,7 @@ const Sidebar = () => {
     <>
       
 
-      <SimpleBar className={`sidebar d-md-block bg-primary text-white ${show ? "show" : ""}`}>
+      <SimpleBar className={`sidebar d-md-block text-white ${show ? "show" : ""}`}>
         <div className="sidebar-inner px-4 pt-3">
           <div className="user-card d-flex d-md-none align-items-center justify-content-between pb-4">
             <div className="d-flex align-items-center">
@@ -97,7 +91,12 @@ const Sidebar = () => {
 
             <CollapsableNavItem title="Admission" icon={faBook}>
               <NavItem title="First Information Form" to="/first_info_form" icon={faFileAlt} />
-              <NavItem title="Rescue Articles Form" to="/rescue_articles" icon={faBriefcase} />
+              <CollapsableNavItem title="SCRB Form" icon={faBook}>
+              <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
+              <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
+              <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
+              <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
+            </CollapsableNavItem>
             </CollapsableNavItem>
 
             <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
