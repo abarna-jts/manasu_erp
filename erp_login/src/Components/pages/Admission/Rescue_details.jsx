@@ -104,7 +104,7 @@ function Rescue_details(){
         alert("Are you sure want to delete");
         try {
             const response = await axios.delete(`http://localhost:5000/admision/delete_first_form/${id}`);
-            
+            console.log(response);
             alert("First Form Details Deleted successfully");
             // Refresh data after deletion
             getRescueDetails(); // if this function fetches updated student list
@@ -425,9 +425,9 @@ function Rescue_details(){
                                     <td>{item.education}</td>
                                     <td>
                                     <button className="btn btn-primary mx-3"
-                                    onClick={() => {
-                                        handleInmateShow(item);
-                                    }}
+                                    // onClick={() => {
+                                    //     handleInmateShow(item);
+                                    // }}
                                     ><i className="fas fa-edit"></i></button>
                                     <button className="btn btn-danger"
                                     onClick={() => handleDelete(item.id)}

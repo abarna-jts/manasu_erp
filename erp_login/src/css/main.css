@@ -36,6 +36,28 @@ body{
     line-height: 1.16667em;
     font-weight: 600;
 }
+.section_title_1{
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    line-height: 1.16667em;
+    font-weight: 600;
+}
+.sub_title{
+    margin-bottom: 10px;
+    font-size: 1rem;
+    line-height: 1.16667em;
+    font-weight: 600;
+}
+.label_tamil{
+    font-size: 0.75rem;
+}
+.form_2_2 tr td{
+    border-right: 1px solid #8f8f8f;
+}
+
+.form_2A_table td, .form_2A_table th, .form_2A_table tr{
+    border: 1px solid #8f8f8f;
+}
 
 .upload-label {
     font-weight: bold;

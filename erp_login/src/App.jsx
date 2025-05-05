@@ -12,6 +12,10 @@ import MainLayout from './Components/layouts/MainLayout';
 import Rescue_details from './Components/pages/Admission/Rescue_details';
 import Rescue_articles_form from './Components/pages/Admission/Rescue_articles_form';
 import Rescue_details_1 from './Components/pages/Admission/Rescue_details_1';
+import SCRB_form from './Components/pages/Admission/SCRB_form';
+import SCRB_Form2A from './Components/pages/Admission/SCRB_Form2A';
+import SCRB_Form2B from './Components/pages/Admission/SCRB_Form2B';
+import SCRB_Form2C from './Components/pages/Admission/SCRB_Form2C';
 
 function App() {
 
@@ -44,6 +48,26 @@ function App() {
         <Route
           path='/rescue_articles_1'
           element={<MainLayout><Rescue_details_1 /></MainLayout>}
+        />
+
+        <Route
+          path='/scrb_form'
+          element={<MainLayout><SCRB_form /></MainLayout>}
+        />
+
+        <Route
+          path='/scrb_form2A'
+          element={<MainLayout><SCRB_Form2A /></MainLayout>}
+        />
+
+        <Route
+          path='/scrb_form2B'
+          element={<MainLayout><SCRB_Form2B /></MainLayout>}
+        />
+
+        <Route
+          path='/scrb_form2C'
+          element={<MainLayout><SCRB_Form2C /></MainLayout>}
         />
       </Routes>
     </BrowserRouter>

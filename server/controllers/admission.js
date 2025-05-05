@@ -1,111 +1,134 @@
-const db = require('../db');
-const path = require('path');
 const multer = require('multer');
-const fs = require('fs');
+const path = require('path');
+const db = require('../db');
 
+// Storage strategy based on fieldname
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, path.resolve("uploads/Rescue_Images/"));
+        if (file.fieldname === 'rescue_image') {
+            cb(null, path.resolve('uploads/Rescue_Images/'));
+        } else {
+            cb(null, path.resolve('uploads/FamilyDetails/'));
+        }
     },
     filename: function (req, file, cb) {
-      cb(null, Date.now() + "-" + file.originalname);
+        cb(null, Date.now() + '-' + file.originalname);
     },
-  });
+});
 
-  const upload = multer({ storage: storage }).single("rescue_image");
+// Multer upload instance
+const upload = multer({ storage: storage }).fields([
+    { name: 'rescue_image', maxCount: 1 },
+    { name: 'f_aadhar_card', maxCount: 1 },
+    { name: 'f_ration_card', maxCount: 1 },
+    { name: 'res_aadhar_card', maxCount: 1 }
+]);
 
-  const createFirstForm = (req, res) => {
-    upload(req, res, (err) => {
+
+const createFirstForm = (req, res) => {
+  upload(req, res, (err) => {
       if (err) {
-          return res
-            .status(500)
-            .json({ message: "File upload failed", error: err });
+          return res.status(500).json({ message: "File upload failed", error: err });
       }
-  
+
       const {
-        referred_by,
-        from_place,
-        date_time,
-        police_memo,
-        information_public,
-        admission_date,
-        admission_no,
-        rescue_name,
-        age,
-        rescue_status,
-        religion,
-        language,
-        education,
-        father,
-        mother,
-        other_relation,
-        place,
-        phone_no,
-        clothing,
-        dress_code,
-        complexion,
-        indentification_mark,
-        tattoo,
-        wound_infection,
-        height,
-        weight,
-        things_carried,
-        remark,
-        symptoms,
-        rescued_by,
-        information,
+          referred_by,
+          from_place,
+          date_time,
+          police_memo,
+          police_station,
+          information_public,
+          admission_date,
+          admission_no,
+          rescue_name,
+          age,
+          rescue_status,
+          religion,
+          language,
+          education,
+          father,
+          mother,
+          other_relation,
+          place,
+          phone_no,
+          clothing,
+          dress_code,
+          complexion,
+          indentification_mark,
+          tattoo,
+          wound_infection,
+          height,
+          weight,
+          things_carried,
+          remark,
+          symptoms,
+          rescued_by,
+          information,
+          articles_carried,
+          f_member_name,
+          f_member_phone,
+          f_member_address
       } = req.body;
-      
-      // Handling empty or undefined values as null
-      const rescue_image_path = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
-  
-      // Ensure all values are either filled or null if empty
-      const q =
-        "INSERT INTO first_information (referred_by, from_place, date_time, police_memo, information_public, admission_date, admission_no, rescue_name, age, rescue_status, religion, language, education, father, mother, other_relation, place, phone_no, clothing, dress_code, complexion, indentification_mark, tattoo, wound_infection, height, weight, things_carried, remark, symptoms, rescued_by, information, rescue_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
-  
+
+      // File paths
+      const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
+      const f_aadhar_card_path = req.files['f_aadhar_card'] ? `uploads/FamilyDetails/${req.files['f_aadhar_card'][0].filename}` : null;
+      const f_ration_card_path = req.files['f_ration_card'] ? `uploads/FamilyDetails/${req.files['f_ration_card'][0].filename}` : null;
+      const res_aadhar_card_path = req.files['res_aadhar_card'] ? `uploads/FamilyDetails/${req.files['res_aadhar_card'][0].filename}` : null;
+
+      const q = "INSERT INTO first_information (referred_by, from_place, date_time, police_memo, police_station, information_public, admission_date, admission_no, rescue_name, age, rescue_status, religion, language, education, father, mother, other_relation, place, phone_no, clothing, dress_code, complexion, indentification_mark, tattoo, wound_infection, height, weight, things_carried, remark, symptoms, rescued_by, information, rescue_image, articles_carried, f_member_name, f_member_phone, f_member_address, f_aadhar_card, f_ration_card, res_aadhar_card) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
       const values = [
-        referred_by,
-        from_place,
-        date_time,
-        police_memo,
-        information_public,
-        admission_date,
-        admission_no,
-        rescue_name,
-        age,
-        rescue_status,
-        religion,
-        language,
-        education,
-        father,
-        mother,
-        other_relation,
-        place,
-        phone_no,
-        clothing,
-        dress_code,
-        complexion,
-        indentification_mark,
-        tattoo , // If tattoo is not provided, set as null
-        wound_infection , // If wound_infection is not provided, set as null
-        height,
-        weight,
-        things_carried , // If things_carried is not provided, set as null
-        remark , // If remark is not provided, set as null
-        symptoms, // If symptoms is not provided, set as null
-        rescued_by,
-        information,
-        rescue_image_path
+          referred_by,
+          from_place,
+          date_time,
+          police_memo,
+          police_station,
+          information_public,
+          admission_date,
+          admission_no,
+          rescue_name,
+          age,
+          rescue_status,
+          religion,
+          language,
+          education,
+          father,
+          mother,
+          other_relation,
+          place,
+          phone_no,
+          clothing,
+          dress_code,
+          complexion,
+          indentification_mark,
+          tattoo || null,
+          wound_infection || null,
+          height,
+          weight,
+          things_carried || null,
+          remark || null,
+          symptoms || null,
+          rescued_by,
+          information,
+          rescue_image_path,
+          articles_carried,
+          f_member_name,
+          f_member_phone,
+          f_member_address,
+          f_aadhar_card_path,
+          f_ration_card_path,
+          res_aadhar_card_path
       ];
-  
-      db.query(q, values, (err, data) => {
-        if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
-        }
-        res.status(201).json({ message: "First Form Created Successfully", data: data });
+
+      db.query(q, values, (dbErr, data) => {
+          if (dbErr) {
+              return res.status(500).json({ message: "Database Error", error: dbErr });
+          }
+          res.status(201).json({ message: "First Form Created Successfully", data: data });
       });
-    });
-  };
+  });
+};
 
 
   const getFirstForm = (req, res) => {
@@ -209,11 +232,33 @@ const storage = multer.diskStorage({
       });
     });
   }
+
+
+  // getting scrb form data
+  const getSCRBFormDatta = (req,res) =>{
+    const { admissionNumber } = req.params;
+
+    const query = 'SELECT * FROM first_information WHERE admission_no = ?';
+    db.query(query, [admissionNumber], (err, result) => {
+      if (err) {
+        console.error('DB error:', err);
+        return res.status(500).send('Server error');
+      }
+
+      if (result.length === 0) {
+        return res.status(404).send('Admission number not found');
+      }
+
+      res.json(result[0]); // send back the found record
+    });
+    
+  }
   
   module.exports = {
     createFirstForm,
     getFirstForm,
     DeleteFirstForm,
-    UpdateFirstForm
+    UpdateFirstForm,
+    getSCRBFormDatta
   };
   
