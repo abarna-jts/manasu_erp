@@ -142,6 +142,21 @@ const createFirstForm = (req, res) => {
     });
   };
 
+  const getFirst2AForm = (req, res) => {
+    const admissionNumber = req.params.admissionNumber;
+    const query = "SELECT * FROM first_information WHERE admission_no = ?";
+  
+    db.query(query, [admissionNumber], (err, data) => {
+      if (err) {
+        return res.status(500).json({ message: "Database Error", error: err });
+      }
+      if (data.length === 0) {
+        return res.status(404).json({ message: "No data found for the given admission number" });
+      }
+      res.status(200).json({ message: "First Information form fetched successfully", data: data });
+    });
+  };
+
   const DeleteFirstForm = (req, res) =>{
     const rescueId = req.params.id;
 
@@ -254,11 +269,31 @@ const createFirstForm = (req, res) => {
     
   }
   
+const getRescueDetailsPDF =(req,res) =>{
+  const admissionNumber = req.params.admissionNumber;
+  const query = 'SELECT * FROM first_information WHERE admission_no = ?';
+
+  db.query(query, [admissionNumber], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Form 2B not found' });
+    }
+
+    res.json(results[0]);
+  });
+}
+
   module.exports = {
     createFirstForm,
     getFirstForm,
     DeleteFirstForm,
     UpdateFirstForm,
-    getSCRBFormDatta
+    getSCRBFormDatta,
+    getFirst2AForm,
+    getRescueDetailsPDF
   };
   

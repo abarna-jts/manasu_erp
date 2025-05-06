@@ -16,6 +16,7 @@ import SCRB_form from './Components/pages/Admission/SCRB_form';
 import SCRB_Form2A from './Components/pages/Admission/SCRB_Form2A';
 import SCRB_Form2B from './Components/pages/Admission/SCRB_Form2B';
 import SCRB_Form2C from './Components/pages/Admission/SCRB_Form2C';
+import ImagePDF from './Components/pages/Admission/ImagePDF';
 
 function App() {
 
@@ -68,6 +69,11 @@ function App() {
         <Route
           path='/scrb_form2C'
           element={<MainLayout><SCRB_Form2C /></MainLayout>}
+        />
+
+          <Route
+          path='/imagepdf'
+          element={<MainLayout><ImagePDF /></MainLayout>}
         />
       </Routes>
     </BrowserRouter>

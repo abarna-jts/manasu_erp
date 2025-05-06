@@ -154,32 +154,24 @@ function SCRB_Form2B() {
 
   const formRef = useRef();
 
-  const generatePDF = async (mode) => {
+  const generatePDF = async () => {
     const input = formRef.current;
-  
     if (!input) {
       console.error("Form reference is not defined");
       return;
     }
-  
-    // Ensure html2canvas renders the form
+
     const canvas = await html2canvas(input, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-  
-    const pdf = new jsPDF('p', 'mm', 'a4'); // portrait, millimeters, A4
-  
-    // Calculate width/height to fit A4 page
+    const pdf = new jsPDF('p', 'mm', 'a4');
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  
+
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-  
-    // Open PDF in a new tab
     const pdfBlob = pdf.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
-  
-    window.open(pdfUrl, '_blank'); // Full screen preview
+    window.open(pdfUrl, '_blank');
   };
   
 
@@ -189,8 +181,8 @@ function SCRB_Form2B() {
       const response = await axios.get(`http://localhost:5000/scrb_form/get_scrb_form2bdata/${admissionNumber}`);
       const data = response.data;
   
-      setFormData((formData) => ({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         file_no: data.file_no || '',
         addition_tatoo: data.addition_tatoo || '',
         scar: data.scar || '',
@@ -198,22 +190,18 @@ function SCRB_Form2B() {
         height: data.height || ''
       }));
   
-      setSelectedTattoos(data.selectedTattoos || []);
+      setSelectedTattoos(data.tatoo || []);
   
-      // Trigger PDF generation here after form data is fetched
-      generatePDF("preview");
+      // Wait for DOM update then generate PDF
+      setTimeout(() => {
+        generatePDF();
+      }, 300); // 300ms delay to allow state render
     } catch (error) {
       console.error("Error fetching form data:", error);
       alert("Admission Number not found");
     }
   };
   
-
-  useEffect(() => {
-    if (formData.file_no && selectedTattoos.length > 0) {
-      generatePDF("preview");
-    }
-  }, [formData, selectedTattoos]);
   
   
 
@@ -321,7 +309,7 @@ function SCRB_Form2B() {
                           <input
                             type="text"
                             name="file_no"
-                            value={fileNo}
+                            value={formData.file_no}
                             onChange={(e) => setFileNo(e.target.value)}
                             className="form-control text-center"
                             required
@@ -385,7 +373,7 @@ function SCRB_Form2B() {
                           className="form-control"
                           name="addition_tatoo"
                           rows="2"
-                          value={addition_tatoo}
+                          value={formData.addition_tatoo}
                           onChange={(e) => setAdditionTatoo(e.target.value)}
                           required
                         ></textarea>
@@ -396,7 +384,7 @@ function SCRB_Form2B() {
                           className="form-control"
                           name="scar"
                           rows="2"
-                          value={scar}
+                          value={formData.scar}
                           onChange={(e) => setScar(e.target.value)}
                           required
                         ></textarea>
@@ -406,7 +394,7 @@ function SCRB_Form2B() {
                         <textarea
                           className="form-control"
                           name="mole"
-                          value={mole}
+                          value={formData.mole}
                           onChange={(e) => setMole(e.target.value)}
                           rows="2"
                           required
@@ -418,7 +406,7 @@ function SCRB_Form2B() {
                         <textarea
                           className="form-control"
                           name="height"
-                          value={height}
+                          value={formData.height}
                           onChange={(e) => setHeight(e.target.value)}
                           rows="2"
                           required
@@ -483,7 +471,7 @@ function SCRB_Form2B() {
                           <input
                             type="text"
                             name="file_no"
-                            value={fileNo}
+                            value={formData.file_no}
                             onChange={(e) => setFileNo(e.target.value)}
                             className="form-control text-center"
                             required
@@ -547,7 +535,7 @@ function SCRB_Form2B() {
                           className="form-control"
                           name="addition_tatoo"
                           rows="2"
-                          value={addition_tatoo}
+                          value={formData.addition_tatoo}
                           onChange={(e) => setAdditionTatoo(e.target.value)}
                           required
                         ></textarea>
@@ -558,7 +546,7 @@ function SCRB_Form2B() {
                           className="form-control"
                           name="scar"
                           rows="2"
-                          value={scar}
+                          value={formData.scar}
                           onChange={(e) => setScar(e.target.value)}
                           required
                         ></textarea>
@@ -568,7 +556,7 @@ function SCRB_Form2B() {
                         <textarea
                           className="form-control"
                           name="mole"
-                          value={mole}
+                          value={formData.mole}
                           onChange={(e) => setMole(e.target.value)}
                           rows="2"
                           required
@@ -580,7 +568,7 @@ function SCRB_Form2B() {
                         <textarea
                           className="form-control"
                           name="height"
-                          value={height}
+                          value={formData.height}
                           onChange={(e) => setHeight(e.target.value)}
                           rows="2"
                           required

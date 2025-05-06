@@ -27,6 +27,7 @@ const createForm2 = (req, res) => {
     }
 
     const { name_ngo, 
+        admissionNumber,
         koppu_en,
         name_rescue, 
         phone_no,
@@ -57,8 +58,9 @@ const createForm2 = (req, res) => {
       ? `/uploads/form_2a/${req.files['new_photo'][0].filename}`
       : null;
 
-    const q = 'INSERT INTO form_2 (name_ngo, koppu_en,rescue_name, parent_name, gender, found_date, marital_status, language, district, police_station, addition_info, old_photo, new_photo, name_rescue, phone_no, signature, seal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const q = 'INSERT INTO form_2 (name_ngo, admissionNumber, koppu_en,rescue_name, parent_name, gender, found_date, marital_status, language, district, police_station, addition_info, old_photo, new_photo, name_rescue, phone_no, signature, seal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     const values = [name_ngo, 
+        admissionNumber,
         koppu_en,
         rescue_name,
         father,
@@ -216,6 +218,24 @@ const getForm2CPDF = (req,res) =>{
   });
 }
 
+const getForm2PDF = (req,res) =>{
+  const admissionNumber = req.params.admissionNumber;
+  const query = 'SELECT * FROM form_2 WHERE admissionNumber = ?';
+
+  db.query(query, [admissionNumber], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Form 2A not found' });
+    }
+
+    res.json(results[0]);
+  });
+}
+
 module.exports = {
   createForm2,
   createForm2A,
@@ -223,5 +243,6 @@ module.exports = {
   createForm2C,
   getForm2APDF,
   getForm2BPDF,
-  getForm2CPDF
+  getForm2CPDF,
+  getForm2PDF
 };

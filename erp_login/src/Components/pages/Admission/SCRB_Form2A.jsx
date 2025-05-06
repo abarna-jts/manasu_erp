@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Form, InputGroup } from 'react-bootstrap';
 import { Breadcrumb } from '@themesberg/react-bootstrap';
-import { useState, useEffect } from 'react';
+import { useState,useEffect } from 'react';
 import axios from 'axios';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -14,6 +14,8 @@ function SCRB_Form2A() {
   const [category, setCategory] = useState([]);
   const [complexion, setComplexion] = useState([]);
   const [face, setFace] = useState([]);
+  const [previewRequested, setPreviewRequested] = useState(false);
+
   
   const [formData, setFormData] = useState({
     name_ngo: 'MANASU (Mana Nala Sugalayam)',
@@ -27,29 +29,25 @@ function SCRB_Form2A() {
 
   const formRef = useRef();
 
-  const generatePDF = async (mode) => {
+  const generatePDF = async () => {
     const input = formRef.current;
+    if (!input) {
+      console.error("Form reference is not defined");
+      return;
+    }
 
-    // Make sure element is visible for html2canvas
     const canvas = await html2canvas(input, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF('p', 'mm', 'a4'); // portrait, millimeters, A4
-
-    // Calculate width/height to fit A4 page
+    const pdf = new jsPDF('p', 'mm', 'a4');
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-    // Open PDF in new tab
     const pdfBlob = pdf.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
-
-    window.open(pdfUrl, '_blank'); // Full screen preview
+    window.open(pdfUrl, '_blank');
   };
-
 
   const handleAdmissionChange = (e) => {
     setAdmissionNumber(e.target.value);
@@ -93,6 +91,8 @@ function SCRB_Form2A() {
       const response = await axios.post('http://localhost:5000/scrb_form/create_form_2A', payload);
       console.log(response.data);
       alert('Form submitted successfully');
+      // ✅ Refresh the page
+     window.location.reload();
     } catch (error) {
       console.error('Submission failed:', error);
     }
@@ -100,7 +100,7 @@ function SCRB_Form2A() {
 
   const fetchFormData = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/scrb_form/get_scrb_formdata/${admissionNumber}`);
+      const response = await axios.get(`http://localhost:5000/scrb_form/get_scrb_form2adata/${admissionNumber}`);
       const data = response.data;
   
       setFormData((formData) => ({
@@ -114,11 +114,23 @@ function SCRB_Form2A() {
       setCategory(data.category || []);
       setComplexion(data.complexion || []);
       setFace(data.face || []);
+  
+      setPreviewRequested(true); // trigger the effect after state updates
     } catch (error) {
       console.error("Error fetching form data:", error);
       alert("Admission Number not found");
     }
   };
+  
+  useEffect(() => {
+    if (previewRequested) {
+      // Delay slightly to allow DOM updates
+      setTimeout(() => {
+        generatePDF();
+        setPreviewRequested(false);
+      }, 100); // 100ms delay is often enough
+    }
+  }, [previewRequested]);
 
   const createFormData = () =>{
     const targetElement = document.querySelector('.form_2A');
@@ -126,12 +138,6 @@ function SCRB_Form2A() {
       targetElement.scrollIntoView({ behavior: 'smooth' });
     }
   }
-  
-  useEffect(() => {
-    if (formData.file_no && (category.length > 0 || complexion.length > 0 || face.length > 0)) {
-      generatePDF("preview");
-    }
-  }, [formData, category, complexion, face]);
 
   const rows = [
     { id: 1, category: 'Abandoned', complexion: 'Dark', face: 'Dimpled Cheek' },
@@ -285,45 +291,48 @@ function SCRB_Form2A() {
                   </tr>
                 </thead>
                 <tbody>
-                    {rows.map((row) => (
-                      <tr key={row.id}>
-                        <td>{row.id}</td>
-                        <td>{row.category}</td>
-                        <td>
-                          {row.category && (
-                            <input
-                              type="checkbox"
-                              onChange={() => handleCheckboxChange(row.category, 'category')}
-                              checked={category.includes(row.category)}
-                              
-                            />
-                          )}
-                        </td>
-                        <td>{row.complexion}</td>
-                        <td>
-                          {row.complexion && (
-                            <input
-                              type="checkbox"
-                              onChange={() => handleCheckboxChange(row.complexion, 'complexion')}
-                              checked={complexion.includes(row.complexion)}
-                              
-                            />
-                          )}
-                        </td>
-                        <td>{row.face}</td>
-                        <td>
-                          {row.face && (
-                            <input
-                              type="checkbox"
-                              onChange={() => handleCheckboxChange(row.face, 'face')}
-                              checked={face.includes(row.face)}
-                              
-                            />
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+                  {rows.map((row, index) => (
+                    <tr key={row.id}>
+                      <td>{row.id}</td>
+
+                      {/* CATEGORY */}
+                      <td>{row.category}</td>
+                      <td className="text-center">
+                        {row.category && (
+                          <Form.Check
+                            type="checkbox"
+                            checked={category.includes(row.category)}
+                            onChange={() => handleCheckboxChange(row.category, 'category')}
+                          />
+                        )}
+                      </td>
+
+                      {/* COMPLEXION */}
+                      <td>{row.complexion}</td>
+                      <td className="text-center">
+                        {row.complexion && (
+                          <Form.Check
+                            type="checkbox"
+                            checked={complexion.includes(row.complexion)}
+                            onChange={() => handleCheckboxChange(row.complexion, 'complexion')}
+                          />
+                        )}
+                      </td>
+
+                      {/* FACE */}
+                      <td>{row.face}</td>
+                      <td className="text-center">
+                        {row.face && (
+                          <Form.Check
+                            type="checkbox"
+                            checked={face.includes(row.face)}
+                            onChange={() => handleCheckboxChange(row.face, 'face')}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
               <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)" }}>
                 <tbody>
@@ -415,20 +424,20 @@ function SCRB_Form2A() {
                       </div>
                     </td>
                     <td style={{ width: '65%' }}>
-                      <div className="row">
-                        <div className="col-md-12">
-                          <input
-                            type="text"
-                            name="file_no"
-                            className="form-control text-center"
-                            onChange={handleInputChange}
-                            value={formData.file_no}
-                            required
-                          />
-                        </div>
+                        <div className="row">
+                          <div className="col-md-12">
+                            <input
+                              type="text"
+                              name="file_no"
+                              onChange={handleInputChange}
+                              value={formData.file_no}
+                              className="form-control text-center"
+                              required
+                            />
+                          </div>
 
-                      </div>
-                    </td>
+                        </div>
+                      </td>
                   </tr>
                 </tbody>
               </table>

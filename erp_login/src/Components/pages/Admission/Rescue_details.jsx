@@ -9,6 +9,44 @@ function Rescue_details(){
     const [rescue_details, setRescueDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [show, setShowEditModal] = useState(false); //modal show 
+    const [formData, setFormData] = useState({
+        referred_by: '',
+        from_place: '',
+        date_time: '',
+        police_memo: '',
+        police_station: '',
+        information_public: '',
+        admission_date: '',
+        admission_no: '',
+        rescue_name: '',
+        age: '',
+        rescue_status: '',
+        religion: '',
+        language: '',
+        education: '',
+        father: '',
+        mother: '',
+        other_relation: '',
+        place: '',
+        phone_no: '',
+        clothing: '',
+        dress_code: '',
+        complexion: '',
+        indentification_mark: '',
+        tattoo: '',
+        wound_infection: '',
+        height: '',
+        weight: '',
+        things_carried: '',
+        remark: '',
+        symptoms: '',
+        rescued_by: '',
+        information: '',
+        articles_carried: '',
+        f_member_name: '',
+        f_member_phone: '',
+        f_member_address: ''
+        });
 
     const [editData, setEditData] = useState({
         id: "",
@@ -167,6 +205,57 @@ function Rescue_details(){
           console.error("Error updating data", error);
         }
       };
+
+      const fetchFormData =async () =>{
+        try {
+
+            const response = await axios.get(`http://localhost:5000/admision/get_rescue_details/${admissionNumber}`);
+            const data = response.data;
+
+            setFormData((formData) => ({
+                ...formData,
+                referred_by: data.referred_by || '',
+                from_place: data.from_place || '',
+                date_time: data.date_time || '',
+                police_memo: data.police_memo || '',
+                police_station: data.police_station || '',
+                information_public: data.information_public || '',
+                admission_date: data.admission_date || '',
+                admission_no: data.admission_no || '',
+                rescue_name: data.rescue_name || '',
+                age: data.age || '',
+                rescue_status: data.rescue_status || '',
+                religion: data.religion || '',
+                language: data.language || '',
+                education: data.education || '',
+                father: data.father || '',
+                mother: data.mother || '',
+                other_relation: data.other_relation || '',
+                place: data.place || '',
+                phone_no: data.phone_no || '',
+                clothing: data.clothing || '',
+                dress_code: data.dress_code || '',
+                complexion: data.complexion || '',
+                indentification_mark: data.indentification_mark || '',
+                wound_infection: data.wound_infection || '',
+                height: data.height || '',
+                weight: data.weight || '',
+                things_carried: data.things_carried || '',
+                remark: data.remark || '',
+                symptoms: data.symptoms || '',
+                rescued_by: data.rescued_by || '',
+                information: data.information || '',
+                articles_carried: data.articles_carried || '',
+                f_member_name: data.f_member_name || '',
+                f_member_phone: data.f_member_phone || '',
+                f_member_address: data.f_member_address || '',
+              }));
+
+        }catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Admission Number not found");
+          }
+      }
       
       
       
@@ -212,14 +301,13 @@ function Rescue_details(){
                         <thead>
                         <tr>
                             <th>S.No</th>
-                            <th>Date</th>
                             <th>Admission Number</th>
                             <th>Rescue Photo</th>
                             <th>Rescued / Referred by</th>
+                            <th>Rescue Name</th>
                             <th>Taken from</th>
                             <th>Date & Time</th>
                             <th>Police Memo</th>
-                            <th>Information from Public / Spot</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -228,7 +316,6 @@ function Rescue_details(){
                                 filteredRescueDetails.map((item, index) => (
                                 <tr key={item.id}>
                                     <td>{index + 1}</td>
-                                    <td>{formatDate(item.admission_date)}</td>
                                     <td>{item.admission_no}</td>
                                     <td>
                                     <img 
@@ -238,17 +325,24 @@ function Rescue_details(){
                                     />
                                     </td>
                                     <td>{item.referred_by}</td>
+                                    <td>{item.rescue_name}</td>
                                     <td>{item.from_place}</td>
                                     <td>{formatDateTime(item.date_time)}</td>
                                     <td>{item.police_memo}</td>
-                                    <td>{item.information_public}</td>
                                     <td>
-                                    <button className="btn btn-primary mx-3"
+                                    <button className="btn btn-success icon_details"
+                                        onClick={() => {
+                                            fetchFormData(item);
+                                        }}
+                                    >
+                                        <i className="fas fa-eye"></i>
+                                    </button>   
+                                    <button className="btn btn-primary icon_details"
                                     onClick={() => {
                                         handleShow(item);
                                     }}
                                     ><i className="fas fa-edit"></i> </button>
-                                    <button className="btn btn-danger"
+                                    <button className="btn btn-danger icon_details"
                                     onClick={() => handleDelete(item.id)}
                                     ><i className="fas fa-trash"></i></button>
                                     </td>
@@ -395,55 +489,7 @@ function Rescue_details(){
             </div>
 
 
-            <div className="first_table mt-2 mb-4">
-                <Col md={12} className="text-start">
-                    <h3 className="section_title px-4">Inmate Details</h3>
-                </Col>
-                <Table responsive="sm">
-                    <thead>
-                        <tr>
-                            <th>S.No</th>
-                            <th>Name</th>
-                            <th>Age</th>
-                            <th>Status </th>
-                            <th>Religion </th>
-                            <th>Language </th>
-                            <th>Education </th>
-                            <th>Action </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {filteredRescueDetails.length > 0 ? (
-                                filteredRescueDetails.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.rescue_name}</td>
-                                    <td>{item.age}</td>
-                                    <td>{item.rescue_status}</td>
-                                    <td>{item.religion}</td>
-                                    <td>{item.language}</td>
-                                    <td>{item.education}</td>
-                                    <td>
-                                    <button className="btn btn-primary mx-3"
-                                    // onClick={() => {
-                                    //     handleInmateShow(item);
-                                    // }}
-                                    ><i className="fas fa-edit"></i></button>
-                                    <button className="btn btn-danger"
-                                    onClick={() => handleDelete(item.id)}
-                                    ><i className="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                <td colSpan="10" className="text-center text-danger">No data found</td>
-                                </tr>
-                            )}
-                    </tbody>
-                </Table>
-
-            </div>
+            
                 
       
         </>
