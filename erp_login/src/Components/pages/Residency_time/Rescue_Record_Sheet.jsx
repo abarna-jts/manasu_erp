@@ -290,6 +290,7 @@ function Rescue_Record_Sheet() {
                                             <td>{item.date}</td>
                                             <td>{item.admission_no}</td>
                                             <td>{item.resident_name}</td>
+                                             
                                             <td className='text-justify'>{item.follow_up}</td>
                                             <td>
                                                 <img

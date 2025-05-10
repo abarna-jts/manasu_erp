@@ -15,7 +15,9 @@ import {
   faRocket,
   faStethoscope,
   faUserMd ,
-  faUserNurse 
+  faUserNurse ,
+  faPenSquare,
+  faVideo 
 } from "@fortawesome/free-solid-svg-icons";
 
 import { Nav, Badge, Accordion} from "react-bootstrap";
@@ -106,8 +108,9 @@ const Sidebar = () => {
 
                 {/* Reunion Menus */}
                 <CollapsableNavItem title="Reunion" icon={faMapPin}>
-                  <NavItem title="Upcoming Events" icon={faCalendarAlt} />
-                  <NavItem title="Past Events" icon={faCalendarAlt} />
+                  <NavItem title="Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="Self Declaration Form" icon={faPenSquare} />
+                  <NavItem title="Media Consent" icon={faVideo } />
                 </CollapsableNavItem>
 
                 {/* Residency Details */}

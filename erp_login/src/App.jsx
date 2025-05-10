@@ -22,28 +22,29 @@ import Dr_consultants from './Components/pages/Residency_time/Dr_consultants';
 import Rescue_Record_Sheet from './Components/pages/Residency_time/Rescue_Record_Sheet';
 import Nurse_Record_sheet from './Components/pages/Residency_time/Nurse_Record_sheet';
 import Observation_report from './Components/pages/Residency_time/Observation_report';
+import Family_Request_form from './Components/pages/Reunion/Family_Request_form';
 
 function App() {
 
   const userType = Cookies.get('usertype');
 
   return (
-    
+
     <>
       <BrowserRouter>
-      <Routes>
-        {/* Routes without sidebar */}
-        <Route path='/' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/forgot_password' element={<LostPassword />} />
-        
-        <Route path='/dashboard' element={<MainLayout><Dashboard /></MainLayout>} />
+        <Routes>
+          {/* Routes without sidebar */}
+          <Route path='/' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/forgot_password' element={<LostPassword />} />
 
-        {userType === '1' && (
-          <>
+          <Route path='/dashboard' element={<MainLayout><Dashboard /></MainLayout>} />
+
+          {userType === '1' && (
+            <>
               <Route
-              path='/first_info_form'
-              element={<MainLayout><First_info_form /></MainLayout>}
+                path='/first_info_form'
+                element={<MainLayout><First_info_form /></MainLayout>}
               />
 
               <Route
@@ -54,7 +55,7 @@ function App() {
               <Route
                 path='/edit_rescue_details/:id'
                 element={<MainLayout><Edit_Rescue_details /></MainLayout>}
-                />
+              />
 
               <Route
                 path='/scrb_form'
@@ -76,48 +77,53 @@ function App() {
                 element={<MainLayout><SCRB_Form2C /></MainLayout>}
               />
 
-                <Route
+              <Route
+                path='/family_request_letter'
+                element={<MainLayout><Family_Request_form /></MainLayout>}
+              />
+
+              <Route
                 path='/imagepdf'
                 element={<MainLayout><ImagePDF /></MainLayout>}
               />
-          </>
-          
-        )}
+            </>
 
-        
-        {userType === '3' && (
-          <>
-            <Route
-              path='/Dr_consultant'
-              element={<MainLayout><Dr_consultants /></MainLayout>}
-            />
-            <Route
-              path='/rescue_record_sheet'
-              element={<MainLayout><Rescue_Record_Sheet /></MainLayout>}
-            />
-            <Route
-              path='/nurse_sheet'
-              element={<MainLayout><Nurse_Record_sheet /></MainLayout>}
-            />
-          </>
-          
-        )}
+          )}
 
-        {userType === '4' && (
-          <>
-           <Route
+
+          {userType === '3' && (
+            <>
+              <Route
+                path='/Dr_consultant'
+                element={<MainLayout><Dr_consultants /></MainLayout>}
+              />
+              <Route
+                path='/rescue_record_sheet'
+                element={<MainLayout><Rescue_Record_Sheet /></MainLayout>}
+              />
+              <Route
+                path='/nurse_sheet'
+                element={<MainLayout><Nurse_Record_sheet /></MainLayout>}
+              />
+            </>
+
+          )}
+
+          {userType === '4' && (
+            <>
+              <Route
                 path='/rescue_details'
                 element={<MainLayout><Rescue_details /></MainLayout>}
               />
-               <Route
+              <Route
                 path='/observation_report'
                 element={<MainLayout><Observation_report /></MainLayout>}
               />
-          </>
-        )}
-        
-      </Routes>
-    </BrowserRouter>
+            </>
+          )}
+
+        </Routes>
+      </BrowserRouter>
     </>
   )
 }

@@ -416,6 +416,7 @@ function SCRB_form() {
                                                             className="form-control text-center"
                                                             value={formData.rescue_name || ''}
                                                             onChange={handleInputChange}
+                                                            required
                                                             readOnly
 
                                                         />
