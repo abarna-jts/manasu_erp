@@ -87,7 +87,61 @@ body{
 .icon_details{
     margin: 0px 5px;
 }
+.pdf_heading{
+    font-size: 28px;
+    font-weight: 600;
+    font-family: 'Times New Roman', Times, serif;
+}
+.pdfsub_heading{
+    text-align: start;
+    font-size: 20px;
+    font-family: 600;
+    text-decoration: underline;
+    font-family: 'Times New Roman', Times, serif;
+}
+.dropdown-menu[data-bs-popper] {
+    left: -50px !important;
+}
+.navbar-nav .nav-link i {
+    margin-right: 0.3rem;
+    font-size: 1.3rem;
+    color: #84c342;
+}
+.sidebar-inner {
+    overflow: hidden !important;
+}
+.consultant_box{
+    border: 1px solid rgb(160 160 160);
+    border-radius: 10px;
+}
+.consultant_details{
+    padding: 15px;
+}
 
+.modal-dialog{
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    width: 100% !important;
+    height: 100vh !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+.modal-content {
+    height: 100vh !important;
+    display: flex;
+    justify-content: center;
+}
+.modal-backdrop.show {
+    opacity: 0 !important;
+}
+
+.rdrMonth {
+    width: 19.667em !important;
+}
+.rdrCalendarWrapper {
+    width: 100%;
+}
 @media(max-width:1300px) and (min-width:1000px){
     .col-form-label {
         font-size: 15px !important;

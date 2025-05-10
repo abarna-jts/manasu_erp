@@ -12,11 +12,16 @@ import { jsPDF } from 'jspdf';
 function SCRB_Form2B() {
   const [admissionNumber, setAdmissionNumber] = useState('');
   const [selectedTattoos, setSelectedTattoos] = useState('');
-  const [fileNo, setFileNo] = useState('');
-  const [addition_tatoo, setAdditionTatoo] = useState('');
-  const [scar, setScar] = useState('');
-  const [mole, setMole] = useState('');
-  const [height, setHeight] = useState('');
+  // const [fileNo, setFileNo] = useState('');
+  // const [addition_tatoo, setAdditionTatoo] = useState('');
+  // const [scar, setScar] = useState('');
+  // const [mole, setMole] = useState('');
+  // const [height, setHeight] = useState('');
+  const [previewRequested, setPreviewRequested] = useState(false);
+
+  const apiRoute = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+  });
 
   const [formData, setFormData] = useState({
       name_ngo: 'MANASU (Mana Nala Sugalayam)',
@@ -90,6 +95,20 @@ function SCRB_Form2B() {
     { id: 54, bodyPart: "Rib" }
   ];
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+
   const createFormData = () => {
     const targetElement = document.querySelector('.form_2B');
     if (targetElement) {
@@ -115,38 +134,30 @@ function SCRB_Form2B() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = {
-      name_ngo: "MANASU (Mana Nala Sugalayam)",
-      admissionNumber: admissionNumber,
-      file_no: fileNo,
-      addition_tatoo: addition_tatoo,
-      scar: scar,
-      mole: mole,
-      height: height,
-      tattoo: selectedTattoos,
+    const payload = {
+      ...formData,
+      admissionNumber,
+      tattoo:selectedTattoos,
     };
 
+    // const data = {
+    //   name_ngo: "MANASU (Mana Nala Sugalayam)",
+    //   admissionNumber: admissionNumber,
+    //   file_no: fileNo,
+    //   addition_tatoo: addition_tatoo,
+    //   scar: scar,
+    //   mole: mole,
+    //   height: height,
+    //   tattoo: selectedTattoos,
+    // };
+
     try {
-      const response = await fetch('http://localhost:5000/scrb_form/create_form_2B', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const text = await response.text(); // read plain text instead of JSON
-      console.log(text);
-
-      if (response.ok) {
-        alert(text);
-      } else {
-        alert('Submission failed!');
-      }
-
+      const response = await apiRoute.post('/scrb_form/create_form_2B', payload);
+      console.log(response.data);
+      alert('Form submitted successfully');
+      window.location.reload();
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred.');
+      console.error('Submission failed:', error);
     }
 
 
@@ -310,8 +321,7 @@ function SCRB_Form2B() {
                             type="text"
                             name="file_no"
                             value={formData.file_no}
-                            onChange={(e) => setFileNo(e.target.value)}
-                            className="form-control text-center"
+                            onChange={handleInputChange}                            className="form-control text-center"
                             required
                           />
                         </div>
@@ -374,8 +384,7 @@ function SCRB_Form2B() {
                           name="addition_tatoo"
                           rows="2"
                           value={formData.addition_tatoo}
-                          onChange={(e) => setAdditionTatoo(e.target.value)}
-                          required
+                          onChange={handleInputChange}                          required
                         ></textarea>
                       </div>
                       <div className="mb-3 text-start">
@@ -385,8 +394,7 @@ function SCRB_Form2B() {
                           name="scar"
                           rows="2"
                           value={formData.scar}
-                          onChange={(e) => setScar(e.target.value)}
-                          required
+                          onChange={handleInputChange}                          required
                         ></textarea>
                       </div>
                       <div className="mb-3 text-start">
@@ -395,8 +403,7 @@ function SCRB_Form2B() {
                           className="form-control"
                           name="mole"
                           value={formData.mole}
-                          onChange={(e) => setMole(e.target.value)}
-                          rows="2"
+                          onChange={handleInputChange}                          rows="2"
                           required
                         ></textarea>
 
@@ -407,8 +414,7 @@ function SCRB_Form2B() {
                           className="form-control"
                           name="height"
                           value={formData.height}
-                          onChange={(e) => setHeight(e.target.value)}
-                          rows="2"
+                          onChange={handleInputChange}                          rows="2"
                           required
                         ></textarea>
 

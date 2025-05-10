@@ -16,6 +16,9 @@ function SCRB_Form2A() {
   const [face, setFace] = useState([]);
   const [previewRequested, setPreviewRequested] = useState(false);
 
+  const apiRoute = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+  });
   
   const [formData, setFormData] = useState({
     name_ngo: 'MANASU (Mana Nala Sugalayam)',
@@ -88,7 +91,7 @@ function SCRB_Form2A() {
     };
 
     try {
-      const response = await axios.post('http://localhost:5000/scrb_form/create_form_2A', payload);
+      const response = await apiRoute.post('/scrb_form/create_form_2A', payload);
       console.log(response.data);
       alert('Form submitted successfully');
       // ✅ Refresh the page
@@ -100,7 +103,7 @@ function SCRB_Form2A() {
 
   const fetchFormData = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/scrb_form/get_scrb_form2adata/${admissionNumber}`);
+      const response = await apiRoute.get(`/scrb_form/get_scrb_form2adata/${admissionNumber}`);
       const data = response.data;
   
       setFormData((formData) => ({

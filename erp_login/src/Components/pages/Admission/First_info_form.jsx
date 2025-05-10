@@ -53,6 +53,12 @@ function First_info_form(){
     const [res_aadhar_card, setRescueAadharCard] = useState('');
     const [police_station, setPoliceStation] = useState('');
 
+
+    const apiRoute = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+      });
+
+
     const AdmissionNumber = () => {
         const now = new Date();
         const year = now.getFullYear();
@@ -211,6 +217,7 @@ function First_info_form(){
             formData.append('rescued_by', rescued_by);
             formData.append('information', information);
             formData.append('articles_carried', articles_carried);
+            formData.append('rescue_relationship',rescue_relationship);
             formData.append('f_member_name', f_member_name);
             formData.append('f_member_phone', f_member_phone);
             formData.append('f_member_address', f_member_address);
@@ -225,7 +232,7 @@ function First_info_form(){
 
                 console.log("Submitting values:", admission_no, admission_date);
             try{
-                const response = await axios.post("http://localhost:5000/admision/create_first_form", formData, {
+                const response = await apiRoute.post("http://localhost:5000/admision/create_first_form", formData, {
                     headers: {
                     'Content-Type': 'multipart/form-data', // Important for file uploads
                     }
@@ -1006,7 +1013,7 @@ function First_info_form(){
                                         required
                                         />
                                     </Form.Group>
-                                    <Form.Group controlId="formRationCard" className="mb-3">
+                                    <Form.Group controlId="formRescueAadhar" className="mb-3">
                                         <Form.Label>Rescue Aadhar Card :</Form.Label>
                                         <Form.Control 
                                         type="file"

@@ -13,6 +13,8 @@ function Nurse_Record_sheet() {
     const [currentMonth, setCurrentMonth] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [nurse_record, setNurseRecord] = useState([]);
 
     const [formData, setFormData] = useState({
         admission_no: '',
@@ -149,7 +151,29 @@ function Nurse_Record_sheet() {
           alert("An error occurred while submitting the form.");
         }
       };
+
+      useEffect(() => {
+              getNurseRecords();
+          }, []);
       
+          const getNurseRecords = async () => {
+              try {
+                  const response = await apiRoute.get('/residency/get_nurse_record');
+                  console.log("API response:", response.data);
+                  setNurseRecord(response.data.data);
+              } catch (error) {
+                  console.error('Error fetching Student:', error);
+              }
+          };
+      
+      const filteredRescueDetails = nurse_record.filter((item) => {
+        const searchTerm = searchQuery.toLowerCase();
+        return (
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.resident_name).toLowerCase().includes(searchTerm) ||
+            String(item.follow_up).toLowerCase().includes(searchTerm)
+        );
+    });
       
 
     return (
@@ -174,6 +198,8 @@ function Nurse_Record_sheet() {
                                     <Form.Control
                                         type="text"
                                         placeholder="Search"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                     <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
                                         <i className="fas fa-plus"></i>
@@ -206,10 +232,44 @@ function Nurse_Record_sheet() {
                                     <th scope="col">BP </th>
                                     <th scope="col">Pulse</th>
                                     <th scope="col">WT</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-
+                            {filteredRescueDetails.length > 0 ? (
+                                filteredRescueDetails.map((item, index) => (
+                                    <>
+                                        <tr key={item.id}>
+                                            <td rowSpan="2">{index + 1}</td>
+                                            <td rowSpan="2">{item.month}</td>
+                                            <td>{item.first_record_date}</td>
+                                            <td>{item.temperature}</td>
+                                            <td>{item.bp}</td>
+                                            <td>{item.pulse}</td>
+                                            <td>{item.weight}</td>
+                                            <td rowSpan="2">
+                                                <button className="btn btn-primary icon_details">
+                                                    <i className="fas fa-edit"></i>
+                                                </button>
+                                                <button className="btn btn-danger icon_details">
+                                                    <i className="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{item.second_record_date}</td>
+                                            <td>{item.temperature2}</td>
+                                            <td>{item.bp2}</td>
+                                            <td>{item.pulse2}</td>
+                                            <td>{item.weight2}</td>
+                                        </tr>
+                                    </>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="8" className="text-center text-danger">No data found</td>
+                                </tr>
+                            )}
                             </tbody>
                         </Table>
                     </Col>

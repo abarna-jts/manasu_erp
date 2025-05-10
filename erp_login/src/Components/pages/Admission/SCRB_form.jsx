@@ -28,6 +28,10 @@ function SCRB_form() {
         addition_info: '',
     });
 
+    const apiRoute = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+      });
+
     const [files, setFiles] = useState({
         old_photo: null,
         new_photo: null,
@@ -45,11 +49,12 @@ function SCRB_form() {
 
     const handleSearch = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/admision/get_scrb_formdata/${admissionNumber}`);
+            const response = await apiRoute.get(`http://localhost:5000/admision/get_scrb_formdata/${admissionNumber}`);
             setFormData(response.data.data[0]);
             console.log(response.data.data[0]);
         } catch (error) {
             console.error('Error fetching data', error);
+            alert("Admission Number Not found");
         }
     };
 
@@ -90,7 +95,7 @@ function SCRB_form() {
         data.append('phone_no', formData.phone_no);
 
         try {
-            const res = await axios.post('http://localhost:5000/scrb_form/create_form2', data, {
+            const res = await apiRoute.post('/scrb_form/create_form2', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log(res);
@@ -149,7 +154,7 @@ function SCRB_form() {
     
     const fetchFormData = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/scrb_form/get_scrb_form2/${admissionNumber}`);
+          const response = await apiRoute.get(`http://localhost:5000/scrb_form/get_scrb_form2/${admissionNumber}`);
           const data = response.data;
       
           // Update form fields
