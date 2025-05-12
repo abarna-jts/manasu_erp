@@ -109,8 +109,8 @@ const Sidebar = () => {
                 {/* Reunion Menus */}
                 <CollapsableNavItem title="Reunion" icon={faMapPin}>
                   <NavItem title="Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="Self Declaration Form" icon={faPenSquare} />
-                  <NavItem title="Media Consent" icon={faVideo } />
+                  <NavItem title="Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
+                  <NavItem title="Media Consent" to="/media_consent" icon={faVideo } />
                 </CollapsableNavItem>
 
                 {/* Residency Details */}

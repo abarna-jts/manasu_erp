@@ -234,65 +234,7 @@ const getDrConsultant = (req,res) =>{
 }
 
 const UpdateDrConsultant = (req, res) => {
-    const {
-        rescue_name,
-        rescue_age,
-        rescue_gender,
-        mfm_no,
-        ward_no,
-        bed_no,
-        consultants,
-        dr_name,
-        dr_qualification,
-        consult_dr_name,
-        consult_dr_quali,
-    } = req.body;
-
-    const admissionNumber = req.params.admissionNumber;
-
-    const query = `
-        UPDATE dr_consultancy SET
-            rescue_name = ?, 
-            rescue_age = ?, 
-            rescue_gender = ?, 
-            mfm_no = ?, 
-            ward_no = ?, 
-            bed_no = ?, 
-            consultants = ?,
-            dr_name = ?,
-            dr_qualification = ?,
-            consult_dr_name = ?,
-            consult_dr_quali = ?
-        WHERE admissionNumber = ?
-    `;
-
-    const values = [
-        rescue_name,
-        rescue_age,
-        rescue_gender,
-        mfm_no,
-        ward_no,
-        bed_no,
-        consultants,
-        dr_name,
-        dr_qualification,
-        consult_dr_name,
-        consult_dr_quali,
-        admissionNumber
-    ];
-
-    db.query(query, values, (err, result) => {
-        if (err) {
-            console.error("Database error:", err);
-            return res.status(500).json({ message: 'Database error', error: err });
-        }
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'No record found with that admission number.' });
-        }
-
-        res.status(200).json({ message: 'Data updated successfully' });
-    });
+    
 };
 
 const getNurseRecord = (req,res) =>{

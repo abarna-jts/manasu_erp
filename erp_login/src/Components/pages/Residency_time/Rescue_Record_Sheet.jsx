@@ -393,7 +393,7 @@ function Rescue_Record_Sheet() {
 
             <Modal show={editshow} onHide={handleEditClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Enter Rescue Condition</Modal.Title>
+                    <Modal.Title>Edit Rescue Condition</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
@@ -448,7 +448,7 @@ function Rescue_Record_Sheet() {
                                         type="file"
                                         onChange={handleFileChange}
                                         name="recovery_photo"
-                                        required={!formData.recovery_photo} // required only if there's no existing image
+                                        required={!formData.recovery_photo}
                                     />
                                 </div>
                                 

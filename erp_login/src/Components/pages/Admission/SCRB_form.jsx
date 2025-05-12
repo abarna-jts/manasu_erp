@@ -154,7 +154,7 @@ function SCRB_form() {
     
     const fetchFormData = async () => {
         try {
-          const response = await apiRoute.get(`http://localhost:5000/scrb_form/get_scrb_form2/${admissionNumber}`);
+          const response = await apiRoute.get(`/scrb_form/get_scrb_form2/${admissionNumber}`);
           const data = response.data;
       
           // Update form fields

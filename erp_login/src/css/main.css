@@ -142,6 +142,13 @@ body{
 .rdrCalendarWrapper {
     width: 100%;
 }
+.form-check{
+    display: flex !important;
+    align-items: center !important;
+}
+.form-check-label{
+    padding-left: 10px !important;
+}
 @media(max-width:1300px) and (min-width:1000px){
     .col-form-label {
         font-size: 15px !important;

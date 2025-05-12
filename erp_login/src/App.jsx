@@ -23,6 +23,8 @@ import Rescue_Record_Sheet from './Components/pages/Residency_time/Rescue_Record
 import Nurse_Record_sheet from './Components/pages/Residency_time/Nurse_Record_sheet';
 import Observation_report from './Components/pages/Residency_time/Observation_report';
 import Family_Request_form from './Components/pages/Reunion/Family_Request_form';
+import Self_Declaration_form from './Components/pages/Reunion/Self_Declaration_form';
+import Media_consent_form from './Components/pages/Reunion/Media_consent_form';
 
 function App() {
 
@@ -80,6 +82,16 @@ function App() {
               <Route
                 path='/family_request_letter'
                 element={<MainLayout><Family_Request_form /></MainLayout>}
+              />
+
+              <Route
+                path='/self_declaration'
+                element={<MainLayout><Self_Declaration_form /></MainLayout>}
+              />
+
+              <Route
+                path='/media_consent'
+                element={<MainLayout><Media_consent_form /></MainLayout>}
               />
 
               <Route
