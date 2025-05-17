@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Breadcrumb, Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPlus, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPlus, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Self_Declaration_form() {
     const [show, setShow] = useState(false);
     const [admission_no, setAdmissionNumber] = useState('');
     const [files, setFiles] = useState('');
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [rescueImage, setRescueImage] = useState(null);
+        const [rescueName, setRescueName] = useState("");
+        const [error, setError] = useState("");
 
     const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -34,7 +40,7 @@ function Self_Declaration_form() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >= 5) { // Adjust minimum length as needed
+        if (admission_no.trim().length >= 8) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
@@ -220,6 +226,56 @@ function Self_Declaration_form() {
         }
     };
 
+    const handleDelete = async (admission_no) => {
+        alert("Are you sure want to delete");
+        try {
+            const response = await apiRoute.delete(`/reunion/deleteSelfDecl/${admission_no}`);
+            console.log(response);
+            alert("Self Declaration Form Deleted successfully");
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to delete item:', error);
+        }
+    };
+
+    const fetchRescueDetails = async (admission_no) => {
+            try {
+                const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+                const result = response.data.data[0];
+                console.log("API Result:", result);
+    
+                if (result && result.rescue_image) {
+                    const imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5000/${result.rescue_image}`;
+    
+                    setRescueImage(imagePath);
+                    setRescueName(result.rescue_name || "");
+                    setError(""); // clear any previous error
+                } else {
+                    setRescueImage(null);
+                    setRescueName("");
+                    setError("Image not found for this admission number");
+                }
+            } catch (error) {
+                console.error("Error fetching data", error);
+                setRescueImage(null);
+                setRescueName("");
+                setError("Admission Number Not found");
+            }
+        };
+    
+        // Trigger when admission number changes
+        useEffect(() => {
+            if (admission_no.trim() !== "") {
+                fetchRescueDetails(admission_no);
+            } else {
+                setRescueImage(null);
+                setRescueName("");
+                setError("");
+            }
+        }, [admission_no]);
+
     return (
         <>
             <Container fluid>
@@ -232,8 +288,25 @@ function Self_Declaration_form() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Self Declaration</h6>
                     </Col>
-                    <Col md={7} className="text-start">
-                        <h3 className="section_title">Self Declaration Form</h3>
+                    <Col md={8} className="text-center">
+                        <h3 className="section_title">Self-Declaration Form for Discharge by Resident</h3>
+                    </Col>
+                    <Col md={2} className='text-center'>
+                        {error && <div className="text-danger mt-2">{error}</div>}
+
+                        {/* Rescue Name and Image */}
+                        {rescueImage && (
+                            <div>
+
+                                <img
+
+                                    alt={rescueName || "Rescue Image"}
+                                    style={{ width: "100px", height: "100px" }}
+                                    src={rescueImage}
+                                />
+                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                            </div>
+                        )}
                     </Col>
                 </Row>
             </Container>
@@ -274,6 +347,15 @@ function Self_Declaration_form() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        {userType === "2" && (
+                            <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                                if (!admission_no.trim()) {
+                                    alert("Please enter your admission number.");
+                                } else {
+                                    handleDelete(admission_no); // Fetch & populate data before generating PDF
+                                }
+                            }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
+                        )}
                     </Form.Group>
                 </Form>
                 <Row className='d-flex align-items-center justify-content-center'>
@@ -362,6 +444,7 @@ function Self_Declaration_form() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
+                <h3 className='section_title'>Self-Declaration Form for Discharge by Resident</h3>
                 <Form className='self_declaration'>
                     <Row>
                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">

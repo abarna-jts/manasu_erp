@@ -27,7 +27,7 @@ const createForm2 = (req, res) => {
     }
 
     const { name_ngo, 
-        admissionNumber,
+        admission_no,
         koppu_en,
         name_rescue, 
         phone_no,
@@ -36,7 +36,7 @@ const createForm2 = (req, res) => {
         gender,
         date_time,
         rescue_status,
-        language,
+        language1,
         place,
         police_station,
         addition_info,
@@ -58,16 +58,16 @@ const createForm2 = (req, res) => {
       ? `/uploads/form_2a/${req.files['new_photo'][0].filename}`
       : null;
 
-    const q = 'INSERT INTO form_2 (name_ngo, admissionNumber, koppu_en,rescue_name, parent_name, gender, found_date, marital_status, language, district, police_station, addition_info, old_photo, new_photo, name_rescue, phone_no, signature, seal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const q = 'INSERT INTO form_2 (name_ngo, admission_no, koppu_en,rescue_name, parent_name, gender, found_date, marital_status, language, district, police_station, addition_info, old_photo, new_photo, name_rescue, phone_no, signature, seal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     const values = [name_ngo, 
-        admissionNumber,
+        admission_no,
         koppu_en,
         rescue_name,
         father,
         gender,
         date_time,
         rescue_status,
-        language,
+        language1,
         place,
         police_station,
         addition_info,
@@ -88,18 +88,18 @@ const createForm2 = (req, res) => {
 };
 
 const createForm2A = (req,res) =>{
-  const { name_ngo,admissionNumber, file_no, category, complexion, face, addition_category, addition_complexion, addition_face } = req.body;
+  const { name_ngo,admission_no, file_no, category, complexion, face, addition_category, addition_complexion, addition_face } = req.body;
 
   const sql = 'INSERT INTO form_2A (name_ngo, admission_no, file_no, category, complexion, face, addition_category,addition_complexion,addition_face) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)';
   db.query(
     sql,
-    [name_ngo,admissionNumber, file_no, category.join(', '), complexion.join(', '), face.join(', '),addition_category,addition_complexion,addition_face],
+    [name_ngo,admission_no, file_no, category.join(', '), complexion.join(', '), face.join(', '),addition_category,addition_complexion,addition_face],
     (err, result) => {
       if (err) {
         console.error('Error inserting data:', err);
         return res.status(500).send('Database error');
       }
-      res.send('Form saved successfully');
+      res.send('Form 2A saved successfully');
     }
   );
 };
@@ -140,12 +140,12 @@ const createForm2B = (req, res) => {
 
 
 const createForm2C = (req, res) =>{
-  const { name_ngo,admissionNumber, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color } = req.body;
+  const { name_ngo,admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color } = req.body;
 
   const Csql = 'INSERT INTO form_2C (name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress,addition_lowerdress,upperdress_color, lowerdress_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
   db.query(
     Csql,
-    [name_ngo, admissionNumber, file_no, 
+    [name_ngo, admission_no, file_no, 
       (upperdress_1 || []).join(', '), 
       (upperdress_2 || []).join(', '), 
       (lowerdress || []).join(', '), 
@@ -164,10 +164,10 @@ const createForm2C = (req, res) =>{
 
 //pdf view controllers
 const getForm2APDF = (req,res) =>{
-  const admissionNumber = req.params.admissionNumber;
+  const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2a WHERE admission_no = ?';
 
-  db.query(query, [admissionNumber], (err, results) => {
+  db.query(query, [admission_no], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error' });
@@ -182,10 +182,10 @@ const getForm2APDF = (req,res) =>{
 }
 
 const getForm2BPDF = (req,res) =>{
-  const admissionNumber = req.params.admissionNumber;
+  const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2b WHERE admission_no = ?';
 
-  db.query(query, [admissionNumber], (err, results) => {
+  db.query(query, [admission_no], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error' });
@@ -201,10 +201,10 @@ const getForm2BPDF = (req,res) =>{
 
 
 const getForm2CPDF = (req,res) =>{
-  const admissionNumber = req.params.admissionNumber;
+  const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2c WHERE admission_no = ?';
 
-  db.query(query, [admissionNumber], (err, results) => {
+  db.query(query, [admission_no], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error' });
@@ -219,10 +219,10 @@ const getForm2CPDF = (req,res) =>{
 }
 
 const getForm2PDF = (req,res) =>{
-  const admissionNumber = req.params.admissionNumber;
-  const query = 'SELECT * FROM form_2 WHERE admissionNumber = ?';
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM form_2 WHERE admission_no = ?';
 
-  db.query(query, [admissionNumber], (err, results) => {
+  db.query(query, [admission_no], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error' });

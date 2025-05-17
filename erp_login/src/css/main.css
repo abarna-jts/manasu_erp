@@ -35,12 +35,14 @@ body{
     font-size: 2rem;
     line-height: 1.16667em;
     font-weight: 600;
+    color: #454545;
 }
 .section_title_1{
     margin-bottom: 10px;
     font-size: 1.5rem;
     line-height: 1.16667em;
     font-weight: 600;
+    color: #454545;
 }
 .sub_title{
     margin-bottom: 10px;
@@ -137,7 +139,7 @@ body{
 }
 
 .rdrMonth {
-    width: 19.667em !important;
+    width: 100% !important;
 }
 .rdrCalendarWrapper {
     width: 100%;
@@ -148,6 +150,182 @@ body{
 }
 .form-check-label{
     padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+.annual_section_title{
+     margin-bottom: 10px;
+    font-size: 1.6rem;
+    line-height: 1.16667em;
+    font-weight: 600;
+    color: #454545;
+}
+.profile-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.profile-img {
+  border: 3px solid #007bff;
+}
+.list-group-item {
+    border: none !important;
+}
+
+.dashboard_icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    text-align: center;
+    background: linear-gradient(to right, #84c342, #afe476) !important;
+    margin-right: 10px;
+}
+.homeIcon{
+    color: #fff;
+   
+}
+.dashboard_icon svg{
+     margin-right: 0rem !important;
+}
+.bg-gradient-danger {
+    background: linear-gradient(to right, #ffbf96, #fe7096) !important;
+}
+.bg-gradient-info {
+    background: linear-gradient(to right, #90caf9, #047edf 99%) !important;
+}
+.bg-gradient-success{
+    background: linear-gradient(to right, #84d9d2, #07cdae) !important;
+}
+.stretch-card {
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+}
+.card.card-img-holder {
+    position: relative;
+}
+.stretch-card > .card {
+    width: 100%;
+    min-width: 100%;
+}
+.card {
+    border: 0;
+    background: #fff;
+}
+.card .card-body {
+    padding: 0rem;
+    text-align: start;
+}
+.card-img-holder{
+    border: none !important;
+}
+.card-body {
+    flex: 1 1 auto;
+}
+.card.card-img-holder .card-img-absolute {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+}
+.font-weight-normal {
+    font-family: "ubuntu-regular", sans-serif;
+}
+.card-body h4{
+    font-size: 1.13rem;
+}
+.card-body h2{
+    font-size: 1.88rem;
+    font-family: "ubuntu-medium", sans-serif;
+}
+.card-body h6{
+    font-size: 0.9375rem;
+}
+.grid-margin {
+    margin-bottom: 2.5rem;
+}
+.recharts-legend-wrapper{
+    width: 263px !important;
+}
+
+/* step progress bar css */
+.step-progressbar {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto 5px;
+    border-radius: 50%;
+    background: #ccc;
+    color: #fff;
+    line-height: 30px;
+    font-weight: bold;
+    z-index: 1;
+    position: relative;
+}
+
+.step.completed .step-number {
+    background: #198754; /* Bootstrap success */
+}
+
+.step.active .step-number {
+    background: #0d6efd; /* Bootstrap primary */
+}
+
+.step-label {
+    font-size: 12px;
+}
+
+.step::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: -50%;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+    z-index: 0;
+}
+
+.step:first-child::before {
+    display: none;
+}
+
+.step.completed::before {
+    background: #198754;
+}
+
+@font-face {
+  font-family: "Future Bugler Upright W00 Bold";
+  src: url('/src/Components/img/font/Future Bugler Upright W00 Bold.ttf') format('truetype');
+}
+.logo_text{
+    text-align: start;
+    padding-left: 15px;
+}
+.logo_text h4{
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #55565b;
+}
+.logo_text h4 span{
+    color: #84c342;
+    font-size: 1.5rem;
+    font-family: "Future Bugler Upright W00 Bold", sans-serif;
 }
 @media(max-width:1300px) and (min-width:1000px){
     .col-form-label {
@@ -158,6 +336,7 @@ body{
         font-size: 1.4rem;
         line-height: 1.16667em;
         font-weight: 600;
+        color: #454545;
     }
     .breadcrumb_title{
         font-size: 14px !important;

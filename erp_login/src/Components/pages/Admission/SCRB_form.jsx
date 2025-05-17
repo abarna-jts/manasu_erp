@@ -5,32 +5,43 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faEye} from "@fortawesome/free-solid-svg-icons";
+import { faEye, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { useNavigate } from "react-router-dom";
+import { Alert } from "react-bootstrap";
 
 function SCRB_form() {
-     const [previewRequested, setPreviewRequested] = useState(false);
-    const [admissionNumber, setAdmissionNumber] = useState('');
+    const [previewRequested, setPreviewRequested] = useState(false);
+    const [admission_no, setAdmissionNumber] = useState('');
+    const [rescue_image, setRescueImage] = useState(null);
+    const [error, setError] = useState("");
+    const [rescue_name, setRescueName] = useState(null);
     const [formData, setFormData] = useState({
         koppu_en: '',
-        admissionNumber: '',
+        admission_no: '',
         name_rescue: '',
         phone_no: '',
         rescue_name: '',
         father: '',
         date_time: '',
         rescue_status: '',
-        language: '',
+        language1: '',
         place: '',
         police_station: '',
         addition_info: '',
     });
 
+    //alert box values
+    const [submissionMessage, setSubmissionMessage] = useState("");
+    const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
+
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
-      });
+    });
 
     const [files, setFiles] = useState({
         old_photo: null,
@@ -49,14 +60,32 @@ function SCRB_form() {
 
     const handleSearch = async () => {
         try {
-            const response = await apiRoute.get(`http://localhost:5000/admision/get_scrb_formdata/${admissionNumber}`);
-            setFormData(response.data.data[0]);
-            console.log(response.data.data[0]);
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            setFormData(result);
+            console.log("API Result:", result);
+
+            if (result && result.rescue_image) {
+                const imagePath = result.rescue_image.startsWith("http")
+                    ? result.rescue_image
+                    : `http://localhost:5000/${result.rescue_image}`;
+
+                console.log(imagePath);
+                setRescueImage(imagePath);
+
+                const name = result.rescue_name;
+                console.log(name);
+                setRescueName(name);  // <-- Set the name here
+            } else {
+                setRescueImage(null);
+                setError("Image not found for this admission number");
+            }
         } catch (error) {
-            console.error('Error fetching data', error);
+            console.error("Error fetching data", error);
             alert("Admission Number Not found");
         }
     };
+
 
     const formatDateOnly = (dateStr) => {
         const date = new Date(dateStr);
@@ -72,18 +101,18 @@ function SCRB_form() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const updatedFormData = { ...formData, admissionNumber };
+        const updatedFormData = { ...formData, admission_no };
 
         const data = new FormData();
-        data.append('name_ngo', 'MANASU (Mana Nala Sugalayam)');
-        data.append('admissionNumber', updatedFormData.admissionNumber);
+        data.append('name_ngo', 'MANASU (Mental Health Charity Home)');
+        data.append('admission_no', updatedFormData.admission_no);
         data.append('koppu_en', formData.koppu_en);
         data.append('rescue_name', formData.rescue_name);
         data.append('father', formData.father);
         data.append('date_time', formData.date_time);
         data.append('gender', 'Male');
         data.append('rescue_status', formData.rescue_status);
-        data.append('language', formData.language);
+        data.append('language1', formData.language1);
         data.append('police_station', formData.police_station);
         data.append('place', formData.place);
         data.append('addition_info', formData.addition_info);
@@ -99,118 +128,189 @@ function SCRB_form() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log(res);
-            alert('Form submitted successfully!');
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
-            alert('Submission failed.');
+            if (res.data.message === "SCRRB Form2 Created Successfully") {
+                setSubmissionMessage("Form submitted successfully!");
+                setMessageType("success");
+
+                // Optionally reload after 3 seconds
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
         }
     };
-    
-    
-    
+
+
+
 
     const formRef = useRef();
 
     const generatePDF = async () => {
-    const input = formRef.current;
-    if (!input) {
-        console.error("Form reference is not defined");
-        return;
-    }
-
-    try {
-        const canvas = await html2canvas(input, { scale: 2, useCORS: true });
-        const imgData = canvas.toDataURL("image/png");
-
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        let heightLeft = imgHeight;
-        let position = 0;
-
-        while (heightLeft > 0) {
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
-            if (heightLeft > 0) {
-                pdf.addPage();
-                position = -imgHeight + heightLeft;
-            }
+        const input = formRef.current;
+        if (!input) {
+            console.error("Form reference is not defined");
+            return;
         }
 
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
-    } catch (err) {
-        console.error("Error generating PDF:", err);
-        alert("Failed to generate PDF.");
-    }
-};
+        try {
+            const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/png");
 
-    
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            while (heightLeft > 0) {
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    position = -imgHeight + heightLeft;
+                }
+            }
+
+            const pdfBlob = pdf.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, '_blank');
+        } catch (err) {
+            console.error("Error generating PDF:", err);
+            alert("Failed to generate PDF.");
+        }
+    };
+
+
     const fetchFormData = async () => {
         try {
-          const response = await apiRoute.get(`/scrb_form/get_scrb_form2/${admissionNumber}`);
-          const data = response.data;
-      
-          // Update form fields
-          setFormData((formData) => ({
-            ...formData,
-            koppu_en: data.koppu_en || '',
-            name_rescue: data.name_rescue || '',
-            phone_no: data.phone_no || '',
-            rescue_name: data.rescue_name || '',
-            parent_name: data.parent_name || '',
-            found_date: data.found_date || '',
-            marital_status: data.marital_status || '',
-            language: data.language || '',
-            district: data.district || '',
-            police_station: data.police_station || '',
-            addition_info: data.addition_info || '',
-          }));
-      
-          // Base path for images
-          const basePath = "http://localhost:5000/uploads/form_2a";
-      
-          // Handle old and new photo paths correctly
-          const oldPhotoPath = data.old_photo ? `http://localhost:5000${data.old_photo}` : null;
-          const newPhotoPath = data.new_photo ? `http://localhost:5000${data.new_photo}` : null;
-          const signaturepath = data.signature ? `http://localhost:5000${data.signature}` : null;
-          const sealpath = data.seal ? `http://localhost:5000${data.seal}` : null;
-      
-        
-      
-          // Set files state
-          setFiles((files) => ({
-            ...files,
-            old_photo: oldPhotoPath,
-            new_photo: newPhotoPath,
-            signature: signaturepath,
-            seal: sealpath,
-          }));
-      
-          setPreviewRequested(true);
-        } catch (error) {
-          console.error("Error fetching form data:", error);
-          alert("Admission Number not found");
-        }
-      };
-      
+            const response = await apiRoute.get(`/scrb_form/get_scrb_form2/${admission_no}`);
+            const data = response.data;
 
-      useEffect(() => {
-          if (previewRequested) {
+            // Update form fields
+            setFormData((formData) => ({
+                ...formData,
+                koppu_en: data.koppu_en || '',
+                name_rescue: data.name_rescue || '',
+                phone_no: data.phone_no || '',
+                rescue_name: data.rescue_name || '',
+                parent_name: data.parent_name || '',
+                found_date: data.found_date || '',
+                marital_status: data.marital_status || '',
+                language1: data.language1 || '',
+                district: data.district || '',
+                police_station: data.police_station || '',
+                addition_info: data.addition_info || '',
+            }));
+
+            // Base path for images
+            const basePath = "http://localhost:5000/uploads/form_2a";
+
+            // Handle old and new photo paths correctly
+            const oldPhotoPath = data.old_photo ? `http://localhost:5000${data.old_photo}` : null;
+            const newPhotoPath = data.new_photo ? `http://localhost:5000${data.new_photo}` : null;
+            const signaturepath = data.signature ? `http://localhost:5000${data.signature}` : null;
+            const sealpath = data.seal ? `http://localhost:5000${data.seal}` : null;
+
+
+
+            // Set files state
+            setFiles((files) => ({
+                ...files,
+                old_photo: oldPhotoPath,
+                new_photo: newPhotoPath,
+                signature: signaturepath,
+                seal: sealpath,
+            }));
+
+            setPreviewRequested(true);
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Admission Number not found");
+        }
+    };
+
+
+    useEffect(() => {
+        if (previewRequested) {
             // Delay slightly to allow DOM updates
             setTimeout(() => {
-              generatePDF();
-              setPreviewRequested(false);
+                generatePDF();
+                setPreviewRequested(false);
             }, 100); // 100ms delay is often enough
-          }
-        }, [previewRequested]);
-      
+        }
+    }, [previewRequested]);
+
+    //excel sheet code 
+    const handleDownload = async () => {
+        if (!admission_no.trim()) {
+            alert("Please enter your admission number.");
+            return;
+        }
+
+        try {
+            const response = await apiRoute.get(`/admision/getSCRBFormData/${admission_no}`);
+            console.log("Full response:", response);
+
+            const fetchedData = response.data?.data;
+            console.log(fetchedData);
+
+            if (!fetchedData || typeof fetchedData !== "object") {
+                alert("Invalid or missing data from server.");
+                return;
+            }
+
+            exportToExcel(fetchedData);
+        } catch (error) {
+            console.error("Error fetching or downloading:", error);
+            alert("This form does not have a valid admission number.");
+        }
+    };
+
+    const exportToExcel = (data) => {
+        if (!data || (Array.isArray(data) && data.length === 0)) {
+            alert("Invalid data for Excel export.");
+            return;
+        }
+
+        // Ensure data is an array of objects
+        const rows = Array.isArray(data) ? data : [data];
+
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "SCRB Form");
+
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array",
+        });
+
+        const fileData = new Blob([excelBuffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        saveAs(fileData, `SCRB_Form2A_${rows[0].admission_no || "data"}.xlsx`);
+    };
+
+    const navigate = useNavigate();
+
+    const handleNextpage = () => {
+        if (!admission_no.trim()) {
+            alert("Please enter admission number.");
+        } else {
+            navigate("/scrb_form2A");
+        }
+
+    }
+
 
     return (
         <>
@@ -229,6 +329,23 @@ function SCRB_form() {
                     <h4 className="section_title_1">FORM - 2 FOUND PERSON PERSONAL DETAILS</h4>
                     <h5 className="sub_title">படிவம் - 2 மீட்கப்பட்டவர்களின் விவரங்கள்</h5>
                 </Col>
+                {error && <div className="text-danger mb-2">{error}</div>}
+                <Col md={1} className="d-flex align-items-center flex-column justify-content-end">
+                    {rescue_image ? (
+                        <>
+                            <img
+                                src={rescue_image}
+                                alt="Admission"
+                                className="img-fluid rounded"
+                                style={{ width: "100px", height: "100px" }}
+                            />
+                            <p className="mt-2 text-start">{rescue_name ? rescue_name : "No name available"}</p>  {/* display name below */}
+                        </>
+                    ) : (
+                        <p>{error || "No image to display"}</p>
+                    )}
+                </Col>
+
 
 
             </div>
@@ -237,32 +354,63 @@ function SCRB_form() {
             <Container>
                 <Row>
 
-                    <Col md={4}>
-                        <div className="d-flex align-items-center px-3">
-                            <form className="navbar-search d-flex " onSubmit={e => e.preventDefault()}>
-                                <div className="input-group">
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        placeholder="Enter Admission Number"
-                                        value={admissionNumber}
-                                        onChange={(e) => setAdmissionNumber(e.target.value)}
-                                    />
-                                    <button type="button" className="btn btn-primary" onClick={handleSearch}>
-                                        Enter
-                                    </button>
-                                    
+                    <Col md={12}>
+                        <Row>
+                            <Col md={8}>
+                                <div className="d-flex align-items-center px-3">
+                                    <form className="navbar-search d-flex" onSubmit={e => e.preventDefault()}>
+
+                                        <div className="input-group">
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                placeholder="Admission Number"
+                                                value={admission_no}
+                                                onChange={(e) => setAdmissionNumber(e.target.value)}
+                                            />
+                                            <button type="button" className="btn btn-primary" onClick={handleSearch}>
+                                                Enter
+                                            </button>
+
+                                        </div>
+                                        <button type="button" className="btn btn-secondary mx-3" onClick={() => {
+                                            if (!admission_no.trim()) {
+                                                alert("Please enter admission number.");
+                                            } else {
+                                                fetchFormData(); // Fetch & populate data before generating PDF
+                                            }
+                                        }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
+                                        {/* <Col md={4}>
+                                            <button type="button" className="btn btn-success" onClick={handleDownload}>
+                                                Import Excel Sheet
+                                            </button>
+                                        </Col> */}
+
+                                    </form>
+
                                 </div>
-                                <button type="button" className="btn btn-secondary mx-3" onClick={() => {
-                                        if (!admissionNumber.trim()) {
-                                            alert("Please enter your admission number.");
-                                        } else {
-                                            fetchFormData(); // Fetch & populate data before generating PDF
-                                        }
-                                    }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                            </form>
-                        </div>
+                            </Col>
+
+                            <Col md={4} className="d-flex align-items-center justify-content-end">
+                                <Button variant="outline-primary" className="m-1" type="button" onClick={handleNextpage}>
+                                    <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
+                                </Button>
+                            </Col>
+                        </Row>
+
+
                     </Col>
+
+                    <div>
+                        {/* Show success or error message box */}
+                        {submissionMessage && (
+                            <Alert variant={messageType} className="mt-3">
+                                {submissionMessage}
+                            </Alert>
+                        )}
+                    </div>
+
+
                     <div className="container mt-2">
                         <form onSubmit={handleSubmit}>
                             <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
@@ -284,7 +432,7 @@ function SCRB_form() {
                                                         type="text"
                                                         name="name_ngo"
                                                         className="form-control text-center"
-                                                        value={"MANASU (Mana Nala Sugalayam)"}
+                                                        value={"MANASU (Mental Health Charity Home)"}
                                                         readOnly
 
                                                     />
@@ -333,7 +481,8 @@ function SCRB_form() {
                                             <div className="d-flex justify-content-evenly">
                                                 {/* Old Photo */}
                                                 <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
-                                                    <label>Old Photo</label><br />
+                                                    <label>RECENT PHOTO</label>
+                                                    <h5 className="label_tamil">சமீபத்திய புகைப்படம்</h5>
                                                     <input
                                                         type="file"
                                                         name="old_photo"
@@ -346,7 +495,9 @@ function SCRB_form() {
 
                                                 {/* New Photo */}
                                                 <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
-                                                    <label>New Photo</label><br />
+                                                    <label>PHOTO AT TIME YOU FOUND</label>
+                                                    <h5 className="label_tamil">மீட்டகப்பட்டபொழுது எடுக்கப்பட்ட புகைப்படம்</h5>
+
                                                     <input
                                                         type="file"
                                                         name="new_photo"
@@ -373,7 +524,7 @@ function SCRB_form() {
                                             <td style={{ width: '3%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>1</label>
+                                                        <label>S.No</label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -417,7 +568,6 @@ function SCRB_form() {
                                                             value={formData.rescue_name || ''}
                                                             onChange={handleInputChange}
                                                             required
-                                                            readOnly
 
                                                         />
                                                     </div>
@@ -447,7 +597,7 @@ function SCRB_form() {
                                                             name="father"
                                                             className="form-control text-center"
                                                             value={formData.father || ''}
-                                                            readOnly
+                                                            required
                                                             onChange={handleInputChange}
 
                                                         />
@@ -479,7 +629,7 @@ function SCRB_form() {
                                                             className="form-control text-center"
                                                             value={"Male"}
                                                             onChange={handleInputChange}
-                                                            readOnly
+                                                            required
 
                                                         />
                                                     </div>
@@ -510,7 +660,7 @@ function SCRB_form() {
                                                             className="form-control text-center"
                                                             value={formatDateOnly(formData.date_time || '')}
                                                             onChange={handleInputChange}
-                                                            readOnly // Or use onChange if it's editable
+                                                            required // Or use onChange if it's editable
                                                         />
                                                     </div>
                                                 </div>
@@ -540,7 +690,7 @@ function SCRB_form() {
                                                             value={formData.rescue_status || ''}
                                                             onChange={handleInputChange}
                                                             className="form-control text-center"
-                                                            readOnly
+                                                            required
 
                                                         />
                                                     </div>
@@ -569,9 +719,9 @@ function SCRB_form() {
                                                             type="text"
                                                             name="language"
                                                             className="form-control text-center"
-                                                            value={formData.language || ''}
+                                                            value={formData.language1 || ''}
                                                             onChange={handleInputChange}
-                                                            readOnly
+                                                            required
 
                                                         />
                                                     </div>
@@ -602,7 +752,7 @@ function SCRB_form() {
                                                             className="form-control text-center"
                                                             onChange={handleInputChange}
                                                             value={formData.place || ''}
-                                                            readOnly
+                                                            required
 
                                                         />
                                                     </div>
@@ -745,6 +895,7 @@ function SCRB_form() {
                                 <button type="submit" className="btn btn-primary">
                                     Submit Form
                                 </button>
+
                             </div>
                         </form>
                     </div>
@@ -772,7 +923,7 @@ function SCRB_form() {
                                                         type="text"
                                                         name="name_ngo"
                                                         className="form-control text-center"
-                                                        value={"MANASU (Mana Nala Sugalayam)"}
+                                                        value={"MANASU (Mental Health Charity Home)"}
                                                         readOnly
 
                                                     />
@@ -822,37 +973,37 @@ function SCRB_form() {
                                             <div className="d-flex justify-content-evenly">
                                                 {/* Old Photo */}
                                                 <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
-                                                <label>Old Photo</label><br />
-                                                {files.old_photo ? (
-                                                    <>
-                                                    <img
-                                                        src={files.old_photo}
-                                                        alt="Old"
-                                                        style={{ width: "100px", height: "100px", marginTop: "10px" }}
-                                                    />
-                                                    </>
-                                                ) : (
-                                                    <p>No old photo available</p> // Display if no photo
-                                                )}
+                                                    <label>Old Photo</label><br />
+                                                    {files.old_photo ? (
+                                                        <>
+                                                            <img
+                                                                src={files.old_photo}
+                                                                alt="Old"
+                                                                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                            />
+                                                        </>
+                                                    ) : (
+                                                        <p>No old photo available</p> // Display if no photo
+                                                    )}
                                                 </div>
 
                                                 {/* New Photo */}
                                                 <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
-                                                <label>New Photo</label><br />
-                                                {files.new_photo ? (
-                                                    <>
-                                                    <img
-                                                        src={files.new_photo}
-                                                        alt="New"
-                                                        style={{ width: "100px", height: "100px", marginTop: "10px" }}
-                                                    />
-                                                    </>
-                                                ) : (
-                                                    <p>No new photo available</p> // Display if no photo
-                                                )}
+                                                    <label>New Photo</label><br />
+                                                    {files.new_photo ? (
+                                                        <>
+                                                            <img
+                                                                src={files.new_photo}
+                                                                alt="New"
+                                                                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                            />
+                                                        </>
+                                                    ) : (
+                                                        <p>No new photo available</p> // Display if no photo
+                                                    )}
                                                 </div>
                                             </div>
-                                            </td>
+                                        </td>
 
 
 
@@ -863,279 +1014,279 @@ function SCRB_form() {
                                 </tbody>
                             </table>
 
-                                <table className="table table-border form_2_2" style={{ border: "2px solid rgb(143 143 143)" }}>
-                                    <tbody>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>1</label>
-                                                    </div>
+                            <table className="table table-border form_2_2" style={{ border: "2px solid rgb(143 143 143)" }}>
+                                <tbody>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>1</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Description / விவரங்கள்</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Description / விவரங்கள்</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Details / விவரங்கள் </label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Details / விவரங்கள் </label>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>1</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>1</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Name of the Person / பெயர் :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Name of the Person / பெயர் :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="text"
-                                                            name="rescue_name"
-                                                            className="form-control text-center"
-                                                            value={formData.rescue_name}
-                                                            onChange={handleInputChange}
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="text"
+                                                        name="rescue_name"
+                                                        className="form-control text-center"
+                                                        value={formData.rescue_name}
+                                                        onChange={handleInputChange}
 
 
-                                                        />
-                                                    </div>
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>2</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>2</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Name of the Spouse/Parent :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Name of the Spouse/Parent :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="text"
-                                                            name="father"
-                                                            className="form-control text-center"
-                                                            value={formData.parent_name}
-                                                            readOnly
-                                                            onChange={handleInputChange}
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="text"
+                                                        name="father"
+                                                        className="form-control text-center"
+                                                        value={formData.parent_name}
+                                                        readOnly
+                                                        onChange={handleInputChange}
 
-                                                        />
-                                                    </div>
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>3</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>3</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Gendar / பாலினம் :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Gendar / பாலினம் :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="text"
-                                                            name="gender"
-                                                            className="form-control text-center"
-                                                            value={"Male"}
-                                                            onChange={handleInputChange}
-                                                            readOnly
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="text"
+                                                        name="gender"
+                                                        className="form-control text-center"
+                                                        value={"Male"}
+                                                        onChange={handleInputChange}
+                                                        readOnly
 
-                                                        />
-                                                    </div>
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>4</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>4</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Found Date :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Found Date :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="date"
-                                                            name="date_time"
-                                                            className="form-control text-center"
-                                                            value={formatDateOnly(formData.found_date)}
-                                                            onChange={handleInputChange}
-                                                            readOnly // Or use onChange if it's editable
-                                                        />
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="date"
+                                                        name="date_time"
+                                                        className="form-control text-center"
+                                                        value={formatDateOnly(formData.found_date)}
+                                                        onChange={handleInputChange}
+                                                        readOnly // Or use onChange if it's editable
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>5</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>5</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Marital Status :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Marital Status :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="text"
-                                                            name="rescue_status"
-                                                            value={formData.marital_status}
-                                                            onChange={handleInputChange}
-                                                            className="form-control text-center"
-                                                            readOnly
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="text"
+                                                        name="rescue_status"
+                                                        value={formData.marital_status}
+                                                        onChange={handleInputChange}
+                                                        className="form-control text-center"
+                                                        readOnly
 
-                                                        />
-                                                    </div>
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>6</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>6</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Language Known :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Language Known :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="text"
-                                                            name="language"
-                                                            className="form-control text-center"
-                                                            value={formData.language || ''}
-                                                            onChange={handleInputChange}
-                                                            readOnly
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="text"
+                                                        name="language1"
+                                                        className="form-control text-center"
+                                                        value={formData.language1 || ''}
+                                                        onChange={handleInputChange}
+                                                        readOnly
 
-                                                        />
-                                                    </div>
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>7</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>7</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>District :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>District :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="text"
-                                                            name="place"
-                                                            className="form-control text-center"
-                                                            onChange={handleInputChange}
-                                                            value={formData.district}
-                                                            readOnly
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="text"
+                                                        name="place"
+                                                        className="form-control text-center"
+                                                        onChange={handleInputChange}
+                                                        value={formData.district}
+                                                        readOnly
 
-                                                        />
-                                                    </div>
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ width: '3%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>8</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: '3%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>8</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '10%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <label>Police Station (காவல் நிலையம்) :</label>
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '10%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <label>Police Station (காவல் நிலையம்) :</label>
                                                 </div>
-                                            </td>
-                                            <td style={{ width: '35%' }}>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <input
-                                                            type="text"
-                                                            name="police_station"
-                                                            className="form-control text-center"
-                                                            onChange={handleInputChange}
-                                                            value={formData.police_station}
-                                                        />
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '35%' }}>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <input
+                                                        type="text"
+                                                        name="police_station"
+                                                        className="form-control text-center"
+                                                        onChange={handleInputChange}
+                                                        value={formData.police_station}
+                                                    />
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                                    </tbody>
-                                </table>
+                                </tbody>
+                            </table>
                             <table className="table table-border" style={{ border: "2px solid rgb(143 143 143)" }}>
                                 <tbody>
                                     <tr>
@@ -1168,16 +1319,16 @@ function SCRB_form() {
                                         </td>
                                         <td>
                                             {files.signature ? (
-                                                    <>
+                                                <>
                                                     <img
                                                         src={files.signature}
                                                         alt="Old"
-                                                        style={{ width: "80px", height: "80px"}}
+                                                        style={{ width: "80px", height: "80px" }}
                                                     />
-                                                    </>
-                                                ) : (
-                                                    <p>No signature available</p> // Display if no photo
-                                                )}
+                                                </>
+                                            ) : (
+                                                <p>No signature available</p> // Display if no photo
+                                            )}
                                         </td>
                                     </tr>
                                     <tr>
@@ -1229,26 +1380,26 @@ function SCRB_form() {
                                         </td>
                                         <td>
                                             {files.seal ? (
-                                                    <>
+                                                <>
                                                     <img
                                                         src={files.seal}
                                                         alt="Old"
-                                                        style={{ width: "80px", height: "80px"}}
+                                                        style={{ width: "80px", height: "80px" }}
                                                     />
-                                                    </>
-                                                ) : (
-                                                    <p>No seal available</p> // Display if no photo
-                                                )}
+                                                </>
+                                            ) : (
+                                                <p>No seal available</p> // Display if no photo
+                                            )}
                                         </td>
                                     </tr>
 
                                 </tbody>
                             </table>
 
-                            
+
                         </form>
                     </div>
-                    
+
                 </Row>
             </Container>
         </>

@@ -8,10 +8,14 @@ import { Row } from 'react-bootstrap';
 import axios from "axios";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import Cookies from 'js-cookie';
 
 function Rescue_details(){
     const [rescue_details, setRescueDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+
+     const userType = Cookies.get('usertype');
+     
     // const [show, setShowEditModal] = useState(false); 
     const [formData, setFormData] = useState({
         referred_by: '',
@@ -157,7 +161,7 @@ function Rescue_details(){
         try {
             const response = await axios.delete(`http://localhost:5000/admision/delete_first_form/${id}`);
             console.log(response);
-            alert("First Form Details Deleted successfully");
+            alert("Family Request Letter Form Deleted successfully");
             // Refresh data after deletion
             getRescueDetails(); // if this function fetches updated student list
         } catch (error) {
@@ -417,9 +421,11 @@ function Rescue_details(){
                                         handleEditform(item.id);
                                     }}
                                     ><i className="fas fa-edit"></i> </button>
+                                    {userType === "2" && (
                                     <button className="btn btn-danger icon_details"
                                     onClick={() => handleDelete(item.id)}
                                     ><i className="fas fa-trash"></i></button>
+                                    )}
                                     </td>
                                 </tr>
                                 ))

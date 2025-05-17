@@ -8,9 +8,9 @@ router.post("/create_form_2B",createForm2B);
 router.post("/create_form_2C",createForm2C);
 
 //pdf file get
-router.get('/get_scrb_form2/:admissionNumber', getForm2PDF);
-router.get('/get_scrb_form2adata/:admissionNumber', getForm2APDF);
-router.get('/get_scrb_form2bdata/:admissionNumber', getForm2BPDF);
-router.get('/get_scrb_form2cdata/:admissionNumber', getForm2CPDF);
+router.get('/get_scrb_form2/:admission_no', getForm2PDF);
+router.get('/get_scrb_form2adata/:admission_no', getForm2APDF);
+router.get('/get_scrb_form2bdata/:admission_no', getForm2BPDF);
+router.get('/get_scrb_form2cdata/:admission_no', getForm2CPDF);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 
-import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import { Route, HashRouter, Routes } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import './App.css'
 import Login from './Components/authentication/login';
@@ -25,6 +25,15 @@ import Observation_report from './Components/pages/Residency_time/Observation_re
 import Family_Request_form from './Components/pages/Reunion/Family_Request_form';
 import Self_Declaration_form from './Components/pages/Reunion/Self_Declaration_form';
 import Media_consent_form from './Components/pages/Reunion/Media_consent_form';
+import Formality_declaration from './Components/pages/Admin_Formality/Formality_declaration';
+import Essential_record from './Components/pages/Admin_Formality/Essential_record';
+import Annual_Report from './Components/pages/Admin_Formality/Annual_Report';
+import View_annualReport from './Components/pages/Admin_Formality/View_annualReport';
+import Edit_Annual_Report from './Components/pages/Admin_Formality/Edit_Annual_Report';
+import Admin_RescueDetails from './Components/pages/Admin_Formality/Admin_RescueDetails';
+import Profile from './Components/pages/Profile';
+import InternshipForm from './Components/pages/Admin_Formality/InternshipForm';
+import AllStudentDetails from './Components/pages/Admin_Formality/AllStudentDetails';
 
 function App() {
 
@@ -33,7 +42,7 @@ function App() {
   return (
 
     <>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           {/* Routes without sidebar */}
           <Route path='/' element={<Login />} />
@@ -41,8 +50,9 @@ function App() {
           <Route path='/forgot_password' element={<LostPassword />} />
 
           <Route path='/dashboard' element={<MainLayout><Dashboard /></MainLayout>} />
+          <Route path='/profile' element={<MainLayout><Profile /></MainLayout>} />
 
-          {userType === '1' && (
+          {(userType === '1' || userType === '2') && (
             <>
               <Route
                 path='/first_info_form'
@@ -95,6 +105,43 @@ function App() {
               />
 
               <Route
+                path='/formality_declaration'
+                element={<MainLayout><Formality_declaration /></MainLayout>}
+              />
+
+              <Route
+                path='/essential_record'
+                element={<MainLayout><Essential_record /></MainLayout>}
+              />
+
+               <Route
+                path='/annual_report'
+                element={<MainLayout><Annual_Report /></MainLayout>}
+              />
+              <Route
+                path='/internship_form'
+                element={<MainLayout><InternshipForm /></MainLayout>}
+              />
+              <Route
+                path='/allStudentDetails'
+                element={<MainLayout><AllStudentDetails /></MainLayout>}
+              />
+               <Route
+                path='/view_annualReport'
+                element={<MainLayout><View_annualReport /></MainLayout>}
+              />
+
+              <Route
+                path='/edit_annual_report/:id'
+                element={<MainLayout><Edit_Annual_Report /></MainLayout>}
+              />
+
+              <Route
+                path='/admin_rescueDetails'
+                element={<MainLayout><Admin_RescueDetails /></MainLayout>}
+              />
+
+              <Route
                 path='/imagepdf'
                 element={<MainLayout><ImagePDF /></MainLayout>}
               />
@@ -135,7 +182,7 @@ function App() {
           )}
 
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </>
   )
 }

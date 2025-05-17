@@ -2,19 +2,31 @@ import React from 'react';
 import { Breadcrumb, Container, Row, Table, Button } from 'react-bootstrap';
 import { Col, Form, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPlus, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPlus, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
+import { Alert } from "react-bootstrap";
 
 function Family_Request_form() {
     const [show, setShow] = useState(false);
     const [admissionNumber, setAdmissionNumber] = useState('');
     const [files, setFiles] = useState({});
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [rescueImage, setRescueImage] = useState(null);
+    const [rescueName, setRescueName] = useState("");
+    const [error, setError] = useState("");
+
+    //alert box values
+    const [submissionMessage, setSubmissionMessage] = useState("");
+    const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
+
+
+    const userType = Cookies.get('usertype');
 
     const handleClose = () => setShow(false);
 
@@ -86,14 +98,14 @@ function Family_Request_form() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admissionNumber.trim().length >= 5) { // Adjust minimum length as needed
+        if (admissionNumber.trim().length >= 8) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admissionNumber]);
 
     const fetchFormData = async () => {
         try {
-            const response = await apiRoute.get(`http://localhost:5000/admision/get_scrb_formdata/${admissionNumber}`);
+            const response = await apiRoute.get(`/admision/get_scrb_formdata/${admissionNumber}`);
             setStoreData(response.data.data[0]);
         } catch (error) {
             console.error('Error fetching data', error);
@@ -111,6 +123,7 @@ function Family_Request_form() {
         data.append('description', storeData.description);
         data.append('f_aadhar_card', files.f_aadhar_card);
         data.append('f_ration_card', files.f_ration_card);
+        data.append('govt_id', storeData.govt_id);
         data.append('rescue_relationship', storeData.rescue_relationship);
         data.append('f_member_name', storeData.f_member_name);
         data.append('f_member_phone', storeData.f_member_phone);
@@ -120,11 +133,20 @@ function Family_Request_form() {
             const res = await apiRoute.post('/reunion/create_family_letter', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Family Request Letter submitted successfully!');
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
-            alert('Submission failed.');
+            if (res.data.message === "Family Request Letter Form Created Successfully") {
+                setSubmissionMessage("Form submitted successfully!");
+                setMessageType("success");
+
+                // Optionally reload after 3 seconds
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
         }
     }
 
@@ -190,12 +212,13 @@ function Family_Request_form() {
             // Handle old and new photo paths correctly
             const aadharCardPath = data.f_aadhar_card ? `http://localhost:5000/${data.f_aadhar_card}` : null;
             const rationCardPath = data.f_ration_card ? `http://localhost:5000/${data.f_ration_card}` : null;
-
+            const govt_idPath = data.govt_id ? `http://localhost:5000/${data.govt_id}` : null;
             // Set files state
             setFiles((files) => ({
                 ...files,
                 f_aadhar_card: aadharCardPath,
                 f_ration_card: rationCardPath,
+                govt_id: govt_idPath,
             }));
 
             setPreviewRequested(true);
@@ -234,6 +257,7 @@ function Family_Request_form() {
             // Handle old and new photo paths correctly
             const aadharCardPath = data.f_aadhar_card ? `http://localhost:5000/${data.f_aadhar_card}` : null;
             const rationCardPath = data.f_ration_card ? `http://localhost:5000/${data.f_ration_card}` : null;
+            const govt_idPath = data.govt_id ? `http://localhost:5000/${data.govt_id}` : null;
 
 
             // Set files state
@@ -241,6 +265,7 @@ function Family_Request_form() {
                 ...files,
                 f_aadhar_card: aadharCardPath,
                 f_ration_card: rationCardPath,
+                govt_id: govt_idPath,
             }));
 
             setShow(true);
@@ -258,29 +283,100 @@ function Family_Request_form() {
     }
 
     const handleUpdate = async (e, admissionNumber) => {
-        e.preventDefault();
-      
-        const data = new FormData();
-        data.append('rescue_name', formData.rescue_name);
-        data.append('f_member_age', formData.f_member_age);
-        data.append('description',formData.description);
-        data.append('family_relationship',formData.family_relationship);
-        data.append('f_member_name',formData.f_member_name);
-        data.append('f_member_phone',formData.f_member_phone);
-        data.append('f_member_address',formData.f_member_address);
-        data.append('f_aadhar_card', files.f_aadhar_card);
-        data.append('f_ration_card', files.f_ration_card);
-      
-        try {
-          const res = await apiRoute.post(`/reunion/update_family_letter/${admissionNumber}`, data, {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append('rescue_name', formData.rescue_name);
+    data.append('f_member_age', formData.f_member_age);
+    data.append('description', formData.description);
+    data.append('phone_no', formData.phone_no);
+    data.append('family_relationship', formData.family_relationship);
+    data.append('f_member_name', formData.f_member_name);
+    data.append('f_member_phone', formData.f_member_phone);
+    data.append('f_member_address', formData.f_member_address);
+    data.append('f_aadhar_card', files.f_aadhar_card);
+    data.append('f_ration_card', files.f_ration_card);
+    data.append('govt_id', files.govt_id);
+
+    try {
+        const res = await apiRoute.post(`/reunion/update_family_letter/${admissionNumber}`, data, {
             headers: { 'Content-Type': 'multipart/form-data' },
-          });
-          alert('Family Resquest Letter updated successfully!');
-        } catch (err) {
-          console.error(err);
-          alert('Update failed.');
+        });
+
+        console.log("Update response:", res.data);
+
+        const message = res.data.message?.toLowerCase() || "";
+
+        if (message.includes("updated successfully")) {
+            setSubmissionMessage("Family Request Letter updated successfully!");
+            setMessageType("success");
+
+            // Optional: reload after 3s
+            setTimeout(() => window.location.reload(), 3000);
+        } else {
+            setSubmissionMessage(res.data.message || "Update failed.");
+            setMessageType("danger");
+        }
+    } catch (err) {
+        console.error("Update error:", err);
+        setSubmissionMessage("Something went wrong while updating the form.");
+        setMessageType("danger");
+    }
+};
+
+
+    const handleDelete = async (admissionNumber) => {
+        alert("Are you sure want to delete");
+        try {
+            const response = await axios.delete(`http://localhost:5000/reunion/deleteFamilyRequest/${admissionNumber}`);
+            console.log(response);
+            alert("First Form Details Deleted successfully");
+            // Refresh data after deletion
+            getRescueDetails(); // if this function fetches updated student list
+        } catch (error) {
+            console.error('Failed to delete item:', error);
         }
     };
+
+    const fetchRescueDetails = async (admissionNumber) => {
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admissionNumber}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_image) {
+                const imagePath = result.rescue_image.startsWith("http")
+                    ? result.rescue_image
+                    : `http://localhost:5000/${result.rescue_image}`;
+
+                setRescueImage(imagePath);
+                setRescueName(result.rescue_name || "");
+                setError(""); // clear any previous error
+            } else {
+                setRescueImage(null);
+                setRescueName("");
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueImage(null);
+            setRescueName("");
+            setError("Admission Number Not found");
+        }
+    };
+
+    // Trigger when admission number changes
+    useEffect(() => {
+        if (admissionNumber.trim() !== "") {
+            fetchRescueDetails(admissionNumber);
+        } else {
+            setRescueImage(null);
+            setRescueName("");
+            setError("");
+        }
+    }, [admissionNumber]);
+
+
 
     return (
         <div>
@@ -294,24 +390,25 @@ function Family_Request_form() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Rescue Reunion</h6>
                     </Col>
-                    <Col md={3} className="text-start">
-                        <h3 className="section_title">Family Request Letter</h3>
+                    <Col md={8} className="text-center">
+                        <h3 className="section_title">Family Request Form – Discharge of Resident</h3>
                     </Col>
-                    <Col md={2}>
-                        <Form className="navbar-search">
-                            <Form.Group id="topbarSearch">
-                                <InputGroup className="input-group-merge search-bar">
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Search"
-                                    />
-                                    <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }}>
-                                        <i className="fas fa-plus"></i>
-                                    </InputGroup.Text>
+                    <Col md={2} className='text-center'>
+                        {error && <div className="text-danger mt-2">{error}</div>}
 
-                                </InputGroup>
-                            </Form.Group>
-                        </Form>
+                        {/* Rescue Name and Image */}
+                        {rescueImage && (
+                            <div>
+
+                                <img
+
+                                    alt={rescueName || "Rescue Image"}
+                                    style={{ width: "100px", height: "100px" }}
+                                    src={rescueImage}
+                                />
+                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                            </div>
+                        )}
                     </Col>
                 </Row>
             </Container>
@@ -352,8 +449,26 @@ function Family_Request_form() {
                                 handleShow(admissionNumber); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        {userType === "2" && (
+                            <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                                if (!admissionNumber.trim()) {
+                                    alert("Please enter your admission number.");
+                                } else {
+                                    handleDelete(admissionNumber); // Fetch & populate data before generating PDF
+                                }
+                            }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
+                        )}
                     </Form.Group>
                 </Form>
+
+                <div>
+                    {/* Show success or error message box */}
+                    {submissionMessage && (
+                        <Alert variant={messageType} className="mt-3">
+                            {submissionMessage}
+                        </Alert>
+                    )}
+                </div>
 
                 <Row>
                     <Form className='d-flex align-items-center justify-content-center flex-column family_request_form' onSubmit={handleSubmit}>
@@ -417,7 +532,7 @@ function Family_Request_form() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                            <Form.Group as={Row} className="mb-1 text-start">
                                 <Form.Label column sm="4">
                                     Phone Number :
                                 </Form.Label>
@@ -528,6 +643,17 @@ function Family_Request_form() {
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Any other Government ID :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="file"
+                                        name="govt_id"
+                                        onChange={handleFileChange} />
+                                </Col>
+                            </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
@@ -553,6 +679,7 @@ function Family_Request_form() {
                     </Form>
 
                     <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
+                        <h4 className="text-center">Family Request Form – Discharge of Resident</h4>
                         <Form className='d-flex align-items-center justify-content-center flex-column'>
 
                             <Col md={8}>
@@ -717,7 +844,7 @@ function Family_Request_form() {
                                                 />
                                             </>
                                         ) : (
-                                            <p>No new photo available</p> // Display if no photo
+                                            <p>Unknown</p> // Display if no photo
                                         )}
                                     </Col>
                                 </Form.Group>
@@ -735,7 +862,25 @@ function Family_Request_form() {
                                                 />
                                             </>
                                         ) : (
-                                            <p>No new photo available</p> // Display if no photo
+                                            <p>Unknown</p> // Display if no photo
+                                        )}
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Any other Government ID :
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        {files.govt_id ? (
+                                            <>
+                                                <img
+                                                    src={files.govt_id}
+                                                    alt="New"
+                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                />
+                                            </>
+                                        ) : (
+                                            <p>Unknown</p> // Display if no photo
                                         )}
                                     </Col>
                                 </Form.Group>
@@ -805,13 +950,13 @@ function Family_Request_form() {
                                                 Age :
                                             </Form.Label>
                                             <Col sm="6">
-                                               <Form.Control
-                                                name="age"
-                                                type='text'
-                                                value={storeData.age} // ✅ use formData here
-                                                onChange={handleInputChange1}
-                                                required
-                                            />
+                                                <Form.Control
+                                                    name="age"
+                                                    type='text'
+                                                    value={storeData.age} // ✅ use formData here
+                                                    onChange={handleInputChange1}
+                                                    required
+                                                />
                                             </Col>
                                         </Form.Group>
 
@@ -966,6 +1111,30 @@ function Family_Request_form() {
                                                 />
                                             </Col>
                                         </Form.Group>
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
+                                                Any other Government ID :
+                                            </Form.Label>
+                                            <Col sm="6" className='d-flex align-items-center justify-content-center'>
+                                                {files.govt_id ? (
+                                                    <>
+                                                        <img
+                                                            src={files.govt_id}
+                                                            alt="Old"
+                                                            style={{ width: "100px", height: "80px", marginTop: "10px" }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <p>No old photo available</p> // Display if no photo
+                                                )}
+
+                                                <Form.Control
+                                                    type="file"
+                                                    onChange={handleFileChange}
+                                                    name="govt_id"
+                                                />
+                                            </Col>
+                                        </Form.Group>
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
@@ -989,7 +1158,7 @@ function Family_Request_form() {
                                             className="m-1"
                                             type="submit"
                                             onClick={(e) => handleUpdate(e, admissionNumber)}
-                                            >Update</Button>
+                                        >Update</Button>
                                         <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
                                     </div>
 

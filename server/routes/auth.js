@@ -38,7 +38,8 @@ router.post('/login', (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       token,
-      usertype: users[0].user_type // <- must exist
+      usertype: users[0].user_type 
+      // username:users[0].username
     });
   });
 });

@@ -11,13 +11,20 @@ import {
   faFileAlt,
   faCalendarAlt,
   faMapPin,
+  faClipboard,
   faInbox,
   faRocket,
+  faBrain,
+  faHome,
+  faSuitcase,
   faStethoscope,
   faUserMd ,
   faUserNurse ,
   faPenSquare,
-  faVideo 
+  faVideo,
+  faClipboardList,
+  faChartLine,
+  faUserGraduate
 } from "@fortawesome/free-solid-svg-icons";
 
 import { Nav, Badge, Accordion} from "react-bootstrap";
@@ -93,17 +100,28 @@ const Sidebar = () => {
                 </CollapsableNavItem>
 
                 {/* SCRB Form Menu */}
-                <CollapsableNavItem title="SCRB Form" icon={faBook}>
+                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} />
+                {/* <CollapsableNavItem title="SCRB Form" icon={faBook}>
                   <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
                     <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
                     <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
                     <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
-                </CollapsableNavItem>
+                </CollapsableNavItem> */}
 
                  {/* Residency Time menu */}
-                <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
-                  <NavItem title="Track Time" icon={faRocket} />
-                  <NavItem title="View History" icon={faInbox} />
+                {/* <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
+                  <NavItem title="Doctor Consultant Form" to="/Dr_consultant" icon={faUserMd} />
+                  <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
+                  <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faStethoscope} />
+                </CollapsableNavItem> */}
+
+                {/* Recovery menus */}
+                <CollapsableNavItem title="Recovery" icon={faHome}>
+                  <NavItem title="Family Identification Form" to="" icon={faFileAlt} />
+                  <NavItem title="Articles carried Form" to="" icon={faSuitcase} />
+                  <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
+                  <NavItem title="MSE Form" to="" icon={faVideo } />
+                  <NavItem title="Activity Details" to="" icon={faCalendarAlt } />
                 </CollapsableNavItem>
 
                 {/* Reunion Menus */}
@@ -111,6 +129,60 @@ const Sidebar = () => {
                   <NavItem title="Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
                   <NavItem title="Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
                   <NavItem title="Media Consent" to="/media_consent" icon={faVideo } />
+                </CollapsableNavItem>
+
+                {/* Fomality Menus */}
+                <CollapsableNavItem title="Admin Formality" icon={faMapPin}>
+                  <NavItem title="Formality Self Declaration" to="/formality_declaration" icon={faPenSquare} />
+                  <NavItem title="Essential Records" to="/essential_record" icon={faClipboardList} />
+                  <NavItem title="Annual Report" to="/annual_report" icon={faChartLine } />
+                  <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate } />
+                  <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers } />
+                </CollapsableNavItem>
+
+                {/* Residency Details */}
+                <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
+              </>
+            )}
+
+            {/* Directors menus */}
+            {userType === '2' && (
+              <>
+
+                {/* Admission Form Menu */}
+                <CollapsableNavItem title="Admission" icon={faBook}>
+                  <NavItem title="First Information Form" to="/first_info_form" icon={faFileAlt} />
+                </CollapsableNavItem>
+
+                {/* SCRB Form Menu */}
+                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} />
+                {/* <CollapsableNavItem title="SCRB Form" icon={faBook}>
+                  <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
+                    <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
+                    <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
+                    <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
+                </CollapsableNavItem> */}
+
+                 {/* Residency Time menu */}
+                {/* <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
+                  <NavItem title="Doctor Consultant Form" to="/Dr_consultant" icon={faUserMd} />
+                  <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
+                  <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faStethoscope} />
+                </CollapsableNavItem> */}
+
+                {/* Reunion Menus */}
+                <CollapsableNavItem title="Reunion" icon={faMapPin}>
+                  <NavItem title="Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
+                  <NavItem title="Media Consent" to="/media_consent" icon={faVideo } />
+                </CollapsableNavItem>
+
+                {/* Fomality Menus */}
+                <CollapsableNavItem title="Admin Formality" icon={faMapPin}>
+                  <NavItem title="Formality Self Declaration" to="/formality_declaration" icon={faPenSquare} />
+                  <NavItem title="Essential Records" to="/essential_record" icon={faClipboardList} />
+                  <NavItem title="Annual Report" to="/annual_report" icon={faChartLine } />
+                  <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers } />
                 </CollapsableNavItem>
 
                 {/* Residency Details */}

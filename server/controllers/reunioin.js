@@ -14,10 +14,14 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        if (['f_aadhar_card', 'f_ration_card'].includes(file.fieldname)) {
+        if (['f_aadhar_card', 'f_ration_card', 'govt_id'].includes(file.fieldname)) {
             cb(null, path.resolve('uploads/Reunion/Family_Details/'));
-        } else {
+        } else if (['signature', 'photo'].includes(file.fieldname)) {
             cb(null, path.resolve('uploads/Self_Declaration/'));
+        } else if (['scan_report']) {
+            cb(null, path.resolve('uploads/MediaConsent/'));
+        } else {
+            cb(null, path.resolve('uploads/others/')); // fallback (optional)
         }
     },
     filename: function (req, file, cb) {
@@ -25,14 +29,14 @@ const storage = multer.diskStorage({
     },
 });
 
-
-
 // Multer upload instance
 const upload = multer({ storage: storage }).fields([
     { name: 'f_aadhar_card', maxCount: 1 },
     { name: 'f_ration_card', maxCount: 1 },
+    { name: 'govt_id', maxCount: 1 },
     { name: 'signature', maxCount: 1 },
     { name: 'photo', maxCount: 1 },
+    { name: 'scan_report', maxCount: 1 }, // ✅ added
 ]);
 
 
@@ -57,15 +61,17 @@ const createFamilyLetter = (req, res) => {
         // File paths
         const aadharCardPath = req.files['f_aadhar_card'] ? `uploads/Reunion/Family_Details/${req.files['f_aadhar_card'][0].filename}` : null;
         const rationCardPath = req.files['f_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['f_ration_card'][0].filename}` : null;
+        const govt_idPath = req.files['govt_id'] ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
 
 
-        const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         const values = [
             admissionNumber,
             f_member_age,
             aadharCardPath,
             rationCardPath,
+            govt_idPath || null,
             description,
             rescue_name,
             rescue_relationship,
@@ -179,6 +185,24 @@ const UpdateFamilyRequestForm = (req, res) => {
         });
     });
 };
+
+const deleteFamilyRequest = (req,res) =>{
+    const admissionNumber = req.params.admissionNumber;
+
+    const deletequery = "DELETE FROM family_request_form WHERE admission_no = ?";
+    const values = [
+      admissionNumber
+    ];
+
+    db.query(deletequery, values, (err, data) => {
+        if (err) {
+          return res.status(500).json({ message: "Database Error", error: err });
+        }
+        res
+          .status(201)
+          .json({ message: "Family Request Letter Deleted Successfully", data: data });
+      });
+}
 
 const getInformation = (req, res) => {
     const admission_no = req.params.admission_no;
@@ -317,6 +341,24 @@ const UpdateSelfDeclaration = (req, res) => {
     });
 }
 
+const deleteSelfDeclaration = (req,res) =>{
+const admission_no = req.params.admission_no;
+
+    const deletequery = "DELETE FROM self_declaration WHERE admission_no = ?";
+    const values = [
+      admission_no
+    ];
+
+    db.query(deletequery, values, (err, data) => {
+        if (err) {
+          return res.status(500).json({ message: "Database Error", error: err });
+        }
+        res
+          .status(201)
+          .json({ message: "Self Declaration Deleted Successfully", data: data });
+      });
+}
+
 const createMediaConsent = (req, res) => {
     const {
         admission_no,
@@ -325,12 +367,15 @@ const createMediaConsent = (req, res) => {
         description
     } = req.body;
 
-    const q = "INSERT INTO media_consent (admission_no,rescue_name,social_media_consent,description) VALUES (?, ?, ?, ?)";
+    const scan_report = req.files && req.files.scan_report ? req.files.scan_report[0].path : null;
+
+    const q = "INSERT INTO media_consent (admission_no, rescue_name, social_media_consent, scan_report, description) VALUES (?, ?, ?, ?, ?)";
 
     const values = [
         admission_no,
         rescue_name,
         social_media_consent,
+        scan_report,
         description
     ];
 
@@ -340,16 +385,90 @@ const createMediaConsent = (req, res) => {
         }
         res.status(201).json({ message: "Media Consent Form Created Successfully", data: data });
     });
+};
+
+
+const getMediaConsent = (req,res) =>{
+const admission_no = req.params.admission_no;
+    const query = 'SELECT * FROM media_consent WHERE admission_no = ?';
+  
+    db.query(query, [admission_no], (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Database error' });
+      }
+  
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Media Consent not found' });
+      }
+  
+      res.json(results[0]);
+    });
 }
 
+const UpdateMediaConsent = (req,res) =>{
+const {
+    rescue_name,
+    social_media_consent,
+    description,
+  } = req.body;
+
+  const admission_no = req.params.admission_no;
+
+  const updateQuery = `
+    UPDATE media_consent SET 
+    rescue_name = ?, 
+    social_media_consent = ?, 
+    description = ?
+    WHERE admission_no = ?
+  `;
+
+  const values = [
+    rescue_name,
+    social_media_consent,
+    description,
+    admission_no
+  ];
+
+  db.query(updateQuery, values, (updateErr, result) => {
+    if (updateErr) {
+      return res.status(500).json({ message: "Update failed", error: updateErr });
+    }
+
+    return res.status(200).json({ message: "Media Consent updated successfully!" });
+  });
+}
+
+const deleteMediaConsent = (req,res) =>{
+    const admission_no = req.params.admission_no;
+
+    const deletequery = "DELETE FROM media_consent WHERE admission_no = ?";
+    const values = [
+      admission_no
+    ];
+
+    db.query(deletequery, values, (err, data) => {
+        if (err) {
+          return res.status(500).json({ message: "Database Error", error: err });
+        }
+        res
+          .status(201)
+          .json({ message: "First Form Deleted Successfully", data: data });
+      });
+}
 
 module.exports = {
     createFamilyLetter,
     getFamilyRequestForm,
     UpdateFamilyRequestForm,
+    deleteFamilyRequest,
     getInformation,
     createSelfDeclaration,
     getSelfDeclaration,
     UpdateSelfDeclaration,
-    createMediaConsent
+    deleteSelfDeclaration,
+    createMediaConsent,
+    getMediaConsent,
+    UpdateMediaConsent,
+    deleteMediaConsent
 };

@@ -32,6 +32,7 @@ function Login(){
             const userType = res.data.usertype;
             console.log("UserType:", userType);
             Cookies.set('usertype', userType);
+            // console.log("Name:",username);
             
         console.log(res.data);
 
