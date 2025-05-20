@@ -8,8 +8,6 @@ function Edit_Annual_Report() {
 
     const { id } = useParams();
 
-    
-
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });

@@ -1,5 +1,20 @@
 const db = require('../db');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.resolve("uploads/Resident_DocumentFile/"));
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + "-" + file.originalname);
+    },
+});
+
+
+const upload = multer({ storage: storage }).single("bank_passbook");
+
 
 const createSelfDeclaration = (req, res) => {
     const {
@@ -86,51 +101,80 @@ const updateFormalityForm = (req, res) => {
     });
 }
 
-const deleteFormalityForm = (req,res) =>{
+const deleteFormalityForm = (req, res) => {
     const admission_no = req.params.admission_no;
 
     const deletequery = "DELETE FROM formality_declaration WHERE admission_no = ?";
     const values = [
-      admission_no
+        admission_no
     ];
 
     db.query(deletequery, values, (err, data) => {
         if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Database Error", error: err });
         }
         res
-          .status(201)
-          .json({ message: "Self Declaration Form Deleted Successfully", data: data });
-      });
+            .status(201)
+            .json({ message: "Self Declaration Form Deleted Successfully", data: data });
+    });
 }
 
 const createRecords = (req, res) => {
-    const {
-        admission_no,
-        rescue_name,
-        passbook,
-        aadhar_card,
-        UDI,
-    } = req.body;
+    upload(req, res, (err) => {
+        const {
+            admission_no,
+            rescue_name,
+            aadhar_card,
+            udid_no,
+            disability_no,
+            bank_name,
+            account_no,
+            ifsc_code,
+            insurance_provider,
+            policy_no,
+            validity_period,
+            other_gvt_scheme,
+        } = req.body;
 
-
-    const q = "INSERT INTO essential_records (admission_no,rescue_name,passbook,aadhar_card,UDI) VALUES (?, ?, ?, ?, ?)";
-
-    const values = [
-        admission_no,
-        rescue_name,
-        passbook,
-        aadhar_card,
-        UDI
-    ];
-
-    db.query(q, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
+        if (!req.file) {
+            return res.status(400).json({ message: "Bank passbook upload required" });
         }
-        res.status(201).json({ message: "Essential Records Form Created Successfully", data: data });
+
+        const bank_passbookPath = req.file
+            ? `uploads/Resident_DocumentFile/${req.file.filename}`
+            : null;
+
+        const q = `INSERT INTO essential_records 
+        (admission_no, rescue_name, aadhar_card, udid_no, disability_no,
+         bank_name, account_no, ifsc_code, bank_passbook,
+         insurance_provider, policy_no, validity_period, other_gvt_scheme)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+        const values = [
+            admission_no,
+            rescue_name,
+            aadhar_card,
+            udid_no,
+            disability_no,
+            bank_name,
+            account_no,
+            ifsc_code,
+            bank_passbookPath,
+            insurance_provider,
+            policy_no,
+            validity_period,
+            other_gvt_scheme,
+        ];
+
+        db.query(q, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Essential Records Form Created Successfully", data: data });
+        });
     });
-}
+};
+
 
 const getEssentialRecords = (req, res) => {
     const admission_no = req.params.admission_no;
@@ -151,55 +195,107 @@ const getEssentialRecords = (req, res) => {
 }
 
 const updateEssentialRecords = (req, res) => {
-    const {
+    upload(req, res, (err) => {
+      if (err) {
+        return res.status(500).json({ message: "File upload failed", error: err });
+      }
+  
+      const {
         rescue_name,
-        passbook,
         aadhar_card,
-        UDI,
-    } = req.body;
-
-    const admission_no = req.params.admission_no;
-
-    const updateQuery = `UPDATE essential_records SET
-                            rescue_name = ?,
-                            passbook = ?,
-                            aadhar_card = ?,
-                            UDI = ?
-                        WHERE admission_no = ?`;
-
-    const values = [
-        rescue_name,
-        passbook,
-        aadhar_card,
-        UDI,
-        admission_no
-    ];
-
-    db.query(updateQuery, values, (updateErr, result) => {
-        if (updateErr) {
-            return res.status(500).json({ message: "Update failed", error: updateErr });
+        udid_no,
+        disability_no,
+        bank_name,
+        account_no,
+        ifsc_code,
+        insurance_provider,
+        policy_no,
+        validity_period,
+        other_gvt_scheme
+      } = req.body;
+  
+      const admission_no = req.params.admission_no;
+      const newBankPassbook = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
+  
+      // Fetch the existing logo path
+      const selectQuery = "SELECT bank_passbook FROM essential_records WHERE admission_no = ?";
+      db.query(selectQuery, [admission_no], (selectErr, selectData) => {
+        if (selectErr) {
+          return res.status(500).json({ message: "Failed to retrieve Bank passbook", error: selectErr });
         }
-
-        return res.status(200).json({ message: "Essential Records updated successfully!" });
+  
+        const existingBankPassbook = selectData[0]?.bank_passbook;
+        const finalBankPassbook = newBankPassbook || existingBankPassbook;
+  
+        // Update the catalogue
+        const updateQuery = `
+          UPDATE essential_records SET 
+            rescue_name = ?, 
+            aadhar_card = ?, 
+            udid_no = ?, 
+            disability_no = ?, 
+            bank_name = ?, 
+            account_no = ?, 
+            ifsc_code = ?,
+            bank_passbook = ?,
+            insurance_provider = ?,
+            policy_no = ?,
+            validity_period = ?,
+            other_gvt_scheme = ?
+          WHERE admission_no = ?`;
+  
+          const values = [
+            rescue_name,
+            aadhar_card,
+            udid_no,
+            disability_no,
+            bank_name,
+            account_no,
+            ifsc_code,
+            finalBankPassbook,
+            insurance_provider,
+            policy_no,
+            validity_period,
+            other_gvt_scheme,
+            admission_no             
+          ];
+          
+  
+        db.query(updateQuery, values, (updateErr, data) => {
+          if (updateErr) {
+            return res.status(500).json({ message: "Update failed", error: updateErr });
+          }
+        
+          if (newBankPassbook && existingBankPassbook) {
+            fs.unlink(existingBankPassbook, (fsErr) => {
+              if (fsErr) console.warn("Failed to delete Bank Passbook:", fsErr);
+            });
+          }
+        
+          res.status(200).json({ message: "Essential Record updated successfully" });
+        });
+        
+      });
     });
-}
+};
 
-const deleteEssentialRecord = (req,res) =>{
-const admission_no = req.params.admission_no;
+
+const deleteEssentialRecord = (req, res) => {
+    const admission_no = req.params.admission_no;
 
     const deletequery = "DELETE FROM essential_records WHERE admission_no = ?";
     const values = [
-      admission_no
+        admission_no
     ];
 
     db.query(deletequery, values, (err, data) => {
         if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Database Error", error: err });
         }
         res
-          .status(201)
-          .json({ message: "Family Request Letter Deleted Successfully", data: data });
-      });
+            .status(201)
+            .json({ message: "Family Request Letter Deleted Successfully", data: data });
+    });
 }
 
 const createAnnualReport = (req, res) => {
@@ -404,22 +500,22 @@ const updateAnnualReport = (req, res) => {
     });
 }
 
-const deleteAnnualReport = (req,res) =>{
+const deleteAnnualReport = (req, res) => {
     const rescueId = req.params.id;
 
     const deletequery = "DELETE FROM annual_report WHERE id = ?";
     const values = [
-      rescueId
+        rescueId
     ];
 
     db.query(deletequery, values, (err, data) => {
         if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Database Error", error: err });
         }
         res
-          .status(201)
-          .json({ message: "Annual Report Deleted Successfully", data: data });
-      });
+            .status(201)
+            .json({ message: "Annual Report Deleted Successfully", data: data });
+    });
 }
 
 const getRescueDetails = (req, res) => {
@@ -507,7 +603,7 @@ const updateDischargeSummary = (req, res) => {
                     death = ?, 
                     discharge = ?
                     WHERE id = ?`;
-                    
+
     const values = [
         rescue_name, referred_by, escape, death, discharge, rescueID
     ];
@@ -525,26 +621,26 @@ const updateDischargeSummary = (req, res) => {
     });
 };
 
-const deleteDischargeSummary = (req,res) =>{
+const deleteDischargeSummary = (req, res) => {
     const rescueId = req.params.id;
 
     const deletequery = "DELETE FROM discharge_summary WHERE id = ?";
     const values = [
-      rescueId
+        rescueId
     ];
 
     db.query(deletequery, values, (err, data) => {
         if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Database Error", error: err });
         }
         res
-          .status(201)
-          .json({ message: "Discharge Summary Deleted Successfully", data: data });
-      });
+            .status(201)
+            .json({ message: "Discharge Summary Deleted Successfully", data: data });
+    });
 }
 
-const createInternForm = (req,res) =>{
-    const{
+const createInternForm = (req, res) => {
+    const {
         stud_name,
         stud_id,
         department,
@@ -552,13 +648,13 @@ const createInternForm = (req,res) =>{
         duration,
         from_date,
         to_date
-    }=req.body;
+    } = req.body;
 
     const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, department, clg_name, duration,from_date, to_date)
                         VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
-        stud_name,stud_id,department,clg_name,duration,from_date,to_date
+        stud_name, stud_id, department, clg_name, duration, from_date, to_date
     ];
 
     db.query(insertQuery, values, (dbErr, data) => {
@@ -569,32 +665,61 @@ const createInternForm = (req,res) =>{
     });
 }
 
-const getStudentDetails = (req,res) =>{
-    const query="Select * from internship_form";
+const getStudentDetails = (req, res) => {
+    const query = "Select * from internship_form";
 
     db.query(query, (err, data) => {
-        if(err){
-            return res.status(500).json({message:"Database Error", error:err});
+        if (err) {
+            return res.status(500).json({ message: "Database Error", error: err });
         }
-        res.status(201).json({message:"Internship Student Details Get Successfully", data:data});
+        res.status(201).json({ message: "Internship Student Details Get Successfully", data: data });
     });
 }
 
-const getStudendDetailsbyID = (req,res) =>{
-const id = req.params.id;
+const getStudendDetailsbyID = (req, res) => {
+    const id = req.params.id;
     const query = "SELECT * FROM internship_form WHERE id = ?";
-  
+
     db.query(query, [id], (err, data) => {
-      if (err) {
-        return res.status(500).json({ message: "Database Error", error: err });
-      }
-      if (data.length === 0) {
-        return res.status(404).json({ message: "No data found for the given admission number" });
-      }
-      res.status(200).json({ message: "Student Details form fetched successfully", data: data });
+        if (err) {
+            return res.status(500).json({ message: "Database Error", error: err });
+        }
+        if (data.length === 0) {
+            return res.status(404).json({ message: "No data found for the given admission number" });
+        }
+        res.status(200).json({ message: "Student Details form fetched successfully", data: data });
     });
 }
 
+const updateStudentDetail = (req, res) => {
+    const {
+        stud_name, stud_id, department, clg_name, duration, from_date, to_date
+    } = req.body;
+
+    const id = req.params.id;
+
+    const usquery = `UPDATE internship_form SET
+                    stud_name = ?,
+                    stud_id = ?,
+                    department = ?,
+                    clg_name = ?, 
+                    duration = ?, 
+                    from_date = ?, 
+                    to_date = ?
+                    WHERE id= ?`;
+
+    const values = [
+        stud_name, stud_id, department, clg_name, duration, from_date, to_date, id
+    ];
+
+    db.query(usquery, values, (updateErr, result) => {
+        if (updateErr) {
+            return res.status(500).json({ message: "Update failed", error: updateErr });
+        }
+
+        return res.status(200).json({ message: "Intership Form updated successfully!" });
+    });
+}
 
 module.exports = {
     createSelfDeclaration,
@@ -618,5 +743,6 @@ module.exports = {
     deleteDischargeSummary,
     createInternForm,
     getStudentDetails,
-    getStudendDetailsbyID
+    getStudendDetailsbyID,
+    updateStudentDetail
 };

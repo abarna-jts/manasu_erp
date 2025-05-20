@@ -20,7 +20,8 @@ const { createSelfDeclaration,
     deleteDischargeSummary,
     createInternForm,
     getStudentDetails,
-    getStudendDetailsbyID
+    getStudendDetailsbyID,
+    updateStudentDetail
 } = require("../controllers/formality");
 const router = express.Router();
 
@@ -54,5 +55,6 @@ router.delete("/deleteDischargeSummary/:id",deleteDischargeSummary);
 router.post("/createInternForm", createInternForm);
 router.get("/getStudentDetails",getStudentDetails);
 router.get("/getStudentDet/:id",getStudendDetailsbyID);
+router.put("/updateStudentDetail/:id",updateStudentDetail);
 
 module.exports = router;

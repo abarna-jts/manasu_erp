@@ -32,7 +32,7 @@ function InternshipForm() {
 
     const navigate = useNavigate();
 
-    const handleViewAll = () =>{
+    const handleViewAll = () => {
         navigate("/allStudentDetails");
     }
 
@@ -207,7 +207,9 @@ function InternshipForm() {
                 </Form>
             </Container>
 
-            
+           
+
+
         </>
     )
 }

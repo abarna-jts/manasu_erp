@@ -1,25 +1,30 @@
 import React from 'react';
 import { Breadcrumb, Container, Row, Table, Button, InputGroup } from 'react-bootstrap';
 import { Col, Form } from 'react-bootstrap';
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
+import Modal from 'react-bootstrap/Modal';
 
 
 function AllStudentDetails() {
     const [stud_details, setStudentDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
 
     const [formData, setFormData] = useState({
-        stud_name:'',
-        stud_id:'',
-        department:'',
-        clg_name:'',
-        duration:'',
-        from_date:'',
-        to_date:''
+        id:'',
+        stud_name: '',
+        stud_id: '',
+        department: '',
+        clg_name: '',
+        duration: '',
+        from_date: '',
+        to_date: ''
     })
 
     const apiRoute = axios.create({
@@ -42,13 +47,13 @@ function AllStudentDetails() {
     const formatDateTime = (dateStr) => {
         const date = new Date(dateStr);
         if (isNaN(date)) return ""; // Invalid date fallback
-      
+
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const year = date.getFullYear();
-      
+
         return `${day}-${month}-${year}`;
-      };
+    };
 
     const filteredRescueDetails = stud_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
@@ -66,56 +71,55 @@ function AllStudentDetails() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const fetchFormData =async (id) =>{
+    const fetchFormData = async (id) => {
         try {
 
             const response = await apiRoute.get(`/formality/getStudentDet/${id}`);
-            const data = response.data;
+            const student = response.data.data[0]; // Access the first object in the 'data' array
 
             setFormData((formData) => ({
                 ...formData,
-                stud_name: data.stud_name || '',
-                stud_id: data.stud_id || '',
-                department: data.department || '',
-                clg_name: data.clg_name || '',
-                duration: data.duration || '',
-                from_date: data.from_date || '',
-                to_date: data.to_date || '',
-                
-              }));
-            
+                stud_name: student.stud_name || '',
+                stud_id: student.stud_id || '',
+                department: student.department || '',
+                clg_name: student.clg_name || '',
+                duration: student.duration || '',
+                from_date: student.from_date ? student.from_date.slice(0, 10) : '', // format date
+                to_date: student.to_date ? student.to_date.slice(0, 10) : '',
+            }));
+
             setTimeout(() => {
                 generatePDF();
-              }, 500);
+            }, 500);
 
-        }catch (error) {
+        } catch (error) {
             console.error("Error fetching form data:", error);
-          }
-      }
+        }
+    }
 
-      const formRef = useRef();
+    const formRef = useRef();
 
-      const generatePDF = async () => {
+    const generatePDF = async () => {
         const input = formRef.current;
         if (!input) {
             console.error("Form reference is not defined");
             return;
         }
-    
+
         try {
             const canvas = await html2canvas(input, { scale: 2, useCORS: true });
             const imgData = canvas.toDataURL("image/png");
-    
+
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
-    
+
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    
+
             let heightLeft = imgHeight;
             let position = 0;
-    
+
             while (heightLeft > 0) {
                 pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
                 heightLeft -= pdfHeight;
@@ -124,7 +128,7 @@ function AllStudentDetails() {
                     position = -imgHeight + heightLeft;
                 }
             }
-    
+
             const pdfBlob = pdf.output('blob');
             const pdfUrl = URL.createObjectURL(pdfBlob);
             window.open(pdfUrl, '_blank');
@@ -134,6 +138,53 @@ function AllStudentDetails() {
         }
     };
 
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/formality/getStudentDet/${id}`);
+            const student = response.data.data[0]; // Access the first object in the 'data' array
+
+            setFormData((formData) => ({
+                ...formData,
+                id: student.id || '',
+                stud_name: student.stud_name || '',
+                stud_id: student.stud_id || '',
+                department: student.department || '',
+                clg_name: student.clg_name || '',
+                duration: student.duration || '',
+                from_date: student.from_date ? student.from_date.slice(0, 10) : '', // format date
+                to_date: student.to_date ? student.to_date.slice(0, 10) : '',
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+        }
+    };
+
+    const handleUpdate = async (e) => {
+       e.preventDefault();
+        const id = formData.id; // ✅ Get it from form data
+        if (!id) {
+            alert("ID not found.");
+            return;
+        }
+        try {
+            const response = await apiRoute.put(`/formality/updateStudentDetail/${id}`, formData);
+            
+            console.log(response.data);
+            if (response.status === 200) {
+                alert('Form Updated successfully!');
+                handleClose(true);
+                window.location.reload();
+            } else {
+                alert('Error Updating form.');
+            }
+        } catch (error) {
+            console.error('There was an error Updating the form:', error);
+            alert('There was an error Updating the form.');
+        }
+    };
 
     return (
         <>
@@ -339,6 +390,127 @@ function AllStudentDetails() {
                     </Col>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Intern Information Form</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <Col md={12} className="my-2 p-3">
+                                <Row>
+
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            Student Name :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                name="stud_name"
+                                                type="text"
+                                                value={formData.stud_name}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            Student ID :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                name="stud_id"
+                                                type="number"
+                                                value={formData.stud_id}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            Department :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                name="department"
+                                                type="text"
+                                                value={formData.department}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            College Name :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                name="clg_name"
+                                                type="text"
+                                                value={formData.clg_name}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            Duration :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                name="duration"
+                                                type="text"
+                                                value={formData.duration}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+
+                                    {/* From and To Date in the same row */}
+                                    <Form.Group as={Row} className="mb-3 text-start">
+                                        <Form.Label column sm="4">
+                                            Intern Date :
+                                        </Form.Label>
+                                        <Col sm="4">
+                                            <Form.Control
+                                                name="from_date"
+                                                type="date"
+                                                value={formData.from_date}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                        <Col sm="4">
+                                            <Form.Control
+                                                name="to_date"
+                                                type="date"
+                                                value={formData.to_date}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Col md={12} className='d-flex align-items-center justify-content-between'>
+                                        <div className="mt-3 d-flex align-tems-cente justify-content-between">
+                                            <Button variant="success" className="m-1" type="button" onClick={handleUpdate}>Update</Button>
+                                            <Button variant="secondary" className="m-1" type="button" onClick={handleClose}>
+                                                Close
+                                            </Button>
+                                        </div>
+
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }
