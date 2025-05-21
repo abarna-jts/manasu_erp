@@ -300,76 +300,90 @@ const deleteEssentialRecord = (req, res) => {
 
 const createAnnualReport = (req, res) => {
     const {
+        event_type,
         event_name,
+        awareness_name,
+        outing_name,
         event_date,
         event_place,
         event_rescue_count,
+        event_report,
+        awarness_report,
+        outing_report,
         celebration_name,
         celebration_date,
         celebration_place,
         celebration_rescue_count,
+        celebration_report,
         program_name,
         program_date,
         program_place,
         program_rescue_count,
-        internship_duration,
-        internship_date,
-        internship_place,
-        internship_rescue_count,
+        program_report,
         staff_name,
         staff_date,
         staff_place,
-        staff_rescue_count
+        staff_rescue_count,
+        staff_report
 
     } = req.body;
 
 
     const q = `INSERT INTO annual_report(
+               event_type,
                event_name,
+               awareness_name,
+               outing_name,
                event_date,
                event_place,
                event_rescue_count,
+               event_report,
+               awarness_report,
+               outing_report,
                celebration_name,
                celebration_date,
                celebration_place,
                celebration_rescue_count,
+               celebration_report,
                program_name,
                program_date,
                program_place,
                program_rescue_count,
-               internship_duration,
-               internship_date,
-               internship_place,
-               internship_rescue_count,
+               program_report,
                staff_name,
                staff_date,
                staff_place,
-               staff_rescue_count
-                )VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+               staff_rescue_count,
+               staff_report
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+
 
     const values = [
+        event_type,
         event_name,
+        awareness_name,
+        outing_name,
         event_date,
         event_place,
         event_rescue_count,
+        event_report,
+        awarness_report,
+        outing_report,
         celebration_name,
         celebration_date,
         celebration_place,
         celebration_rescue_count,
+        celebration_report,
         program_name,
         program_date,
         program_place,
         program_rescue_count,
-        internship_duration,
-        internship_date,
-        internship_place,
-        internship_rescue_count,
+        program_report,
         staff_name,
         staff_date,
         staff_place,
-        staff_rescue_count
-
-
+        staff_rescue_count,
+        staff_report
     ];
 
     db.query(q, values, (dbErr, data) => {

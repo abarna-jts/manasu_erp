@@ -16,6 +16,7 @@ function View_annualReport() {
      const userType = Cookies.get('usertype'); 
 
      const [formData, setFormData] = useState({
+             event_type: '',
              event_name: '',
              event_date: '',
              event_place: '',
@@ -88,6 +89,7 @@ function View_annualReport() {
 
             setFormData((formData) => ({
                 ...formData,
+                event_type: data.event_type || '',
                 event_name: data.event_name || '',
                 event_date: data.event_date || '',
                 event_place: data.event_place || '',
@@ -229,10 +231,12 @@ function View_annualReport() {
                             <thead>
                                 <tr>
                                     <th>S.No</th>
+                                    <th>Event Type</th>
                                     <th>Event Name</th>
+                                    <th>Awarness Camp</th>
+                                    <th>Name of the Outing program</th>
                                     <th>General Celebration</th>
                                     <th>Community Programs</th>
-                                    <th>Internship Duration</th>
                                     <th>Staff Programs</th>
                                     <th>Action</th>
                                 </tr>
@@ -242,11 +246,14 @@ function View_annualReport() {
                                     filteredRescueDetails.map((item, index) => (
                                         <tr key={item.id}>
                                             <td>{index + 1}</td>
-                                            <td>{item.event_name}</td>
-                                            <td>{item.celebration_name}</td>
-                                            <td>{item.program_name}</td>
-                                            <td>{item.internship_duration}</td>
-                                            <td>{item.staff_name}</td>
+                                            <td>{item.event_type}</td>
+                                            <td>{item.event_name || "null"}</td>
+                                            <td>{item.awareness_name || "null"}</td>
+                                            <td>{item.outing_name || "null"}</td>
+                                            <td>{item.celebration_name || "null"}</td>
+                                            <td>{item.program_name || "null"}</td>
+                                            <td>{item.internship_duration || "null"}</td>
+                                            <td>{item.staff_name || "null"}</td>
                                             <td>
                                                 <button className="btn btn-success icon_details"
                                                      onClick={() => {
@@ -290,9 +297,19 @@ function View_annualReport() {
                         <Row>
                             <Col md={10}>
                                 <Form>
-                                    <Col md={6} className="text-start">
-                                        <h5 className="pdfsub_heading">Event Details</h5>
+                                    <Col md={8} className="text-start">
+                                        <h5 className="pdfsub_heading">Event / Awarness/ Outing Details</h5>
                                     </Col>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="6" className='text-start'>Event Type:</Form.Label>
+                                        <Col sm="6">
+                                             <Form.Control type="text"
+                                                name="event_type"
+                                                value={formData.event_type}
+                                                onChange={handleInputChange}
+                                                required />
+                                        </Col>
+                                    </Form.Group>
                                     <Form.Group as={Row} className="mb-3">
                                         <Form.Label column sm="6" className='text-start'>
                                             Event Name :
