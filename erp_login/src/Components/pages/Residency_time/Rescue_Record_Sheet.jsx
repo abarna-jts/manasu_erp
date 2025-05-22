@@ -13,6 +13,8 @@ function Rescue_Record_Sheet() {
     const [show, setShow] = useState(false);
     const [editshow, setEditShow] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [admission_no, setAdmissionNumber] =  useState("");
+    const [rescueName, setRescueName] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
@@ -53,24 +55,18 @@ function Rescue_Record_Sheet() {
     }, [show]);
 
     const handleSelect = (ranges) => {
-        const startDate = ranges.selection.startDate;
-        let endDate = ranges.selection.endDate;
+    const startDate = ranges.selection.startDate;
+    const endDate = ranges.selection.endDate;
 
-        const maxEndDate = new Date(startDate);
-        maxEndDate.setDate(startDate.getDate() + 14);
+    setState([ranges.selection]);
 
-        if (endDate > maxEndDate) {
-            endDate = maxEndDate;
-        }
+    setFormData((prev) => ({
+        ...prev,
+        from_date: startDate.toISOString().split('T')[0],
+        to_date: endDate.toISOString().split('T')[0]
+    }));
+};
 
-        setState([{ ...ranges.selection, endDate }]);
-
-        setFormData((prev) => ({
-            ...prev,
-            from_date: startDate.toISOString().split('T')[0],
-            to_date: endDate.toISOString().split('T')[0]
-        }));
-    };
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -89,8 +85,8 @@ function Rescue_Record_Sheet() {
         e.preventDefault();
 
         const data = new FormData();
-        data.append('admission_no', formData.admission_no);
-        data.append('resident_name', formData.resident_name);
+        data.append('admission_no', admission_no);
+        data.append('resident_name', rescueName);
         data.append('from_date', formData.from_date);
         data.append('to_date', formData.to_date);
         data.append('recovery_photo', files.recovery_photo);
@@ -228,6 +224,37 @@ function Rescue_Record_Sheet() {
         }
       };
 
+      const handleAdmissionChange = (e) => {
+        setAdmissionNumber(e.target.value);
+        };  
+
+    useEffect(() => {
+        if (admission_no.trim() !== "") {
+          fetchRescueDetails(admission_no);
+        } else {
+          setRescueName("");
+        }
+      }, [admission_no]);
+
+      const fetchRescueDetails = async (admission_no) => {
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_name) {
+                
+                setRescueName(result.rescue_name || "");
+            } else {
+        
+                setError("Image not found for this admission number");
+            }
+            } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueName("");
+            }
+        };
+
     return (
         <>
             <Container fluid>
@@ -331,8 +358,8 @@ function Rescue_Record_Sheet() {
                                     type="number"
                                     placeholder="Enter Admission Number"
                                     name="admission_no"
-                                    value={formData.admission_no}
-                                    onChange={handleInputChange}
+                                    value={admission_no}
+                                    onChange={handleAdmissionChange}
                                     required
                                 />
                             </Form.Group>
@@ -343,7 +370,7 @@ function Rescue_Record_Sheet() {
                                     type="text"
                                     name="resident_name"
                                     placeholder="Enter Resident Name"
-                                    value={formData.resident_name}
+                                    value={rescueName}
                                     onChange={handleInputChange}
                                     required
                                 />

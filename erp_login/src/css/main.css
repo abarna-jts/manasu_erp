@@ -1,63 +1,75 @@
-.accordion .accordion-item{
+.accordion .accordion-item {
     border: none !important;
     border-radius: 0px !important;
     background-color: transparent !important;
 }
-.accordion .accordion-item:hover a{
+
+.accordion .accordion-item:hover a {
     background-color: #363d5a !important;
 }
-.accordion .accordion-item a{
+
+.accordion .accordion-item a {
     color: #fff !important;
     background-color: #262b40 !important;
-    
+
 }
 
 .sidebar .nav-link .sidebar-icon {
     margin-right: 0rem !important;
     color: #ffffff;
 }
+
 .sidebar .multi-level .nav-link {
     padding-left: 15px !important;
 }
 
-body{
+body {
     background-color: #fff !important;
 }
-.navbar{
+
+.navbar {
     padding: 0px 10px;
     background-color: #f0f0f0 !important;
 }
-.breadcrumb{
+
+.breadcrumb {
     margin-bottom: 0px !important;
 }
-.section_title{
+
+.section_title {
     margin-bottom: 10px;
     font-size: 2rem;
     line-height: 1.16667em;
     font-weight: 600;
     color: #454545;
 }
-.section_title_1{
+
+.section_title_1 {
     margin-bottom: 10px;
     font-size: 1.5rem;
     line-height: 1.16667em;
     font-weight: 600;
     color: #454545;
 }
-.sub_title{
+
+.sub_title {
     margin-bottom: 10px;
     font-size: 1rem;
     line-height: 1.16667em;
     font-weight: 600;
 }
-.label_tamil{
+
+.label_tamil {
     font-size: 0.75rem;
 }
-.form_2_2 tr td{
+
+.form_2_2 tr td {
     border-right: 1px solid #8f8f8f;
 }
 
-.form_2A_table td, .form_2A_table th, .form_2A_table tr{
+.form_2A_table td,
+.form_2A_table th,
+.form_2A_table tr {
     border: 1px solid #8f8f8f;
 }
 
@@ -66,61 +78,70 @@ body{
     display: block;
     margin-bottom: 8px;
     color: #333;
-  }
-  
-  .custom-file-input {
+}
+
+.custom-file-input {
     border: 2px dashed #007bff;
     padding: 10px;
     background-color: #f9f9f9;
     cursor: pointer;
     transition: border-color 0.3s ease;
-  }
-  
-  .custom-file-input:hover {
-    border-color: #0056b3;
-  }
+}
 
-  .me-2 {
+.custom-file-input:hover {
+    border-color: #0056b3;
+}
+
+.me-2 {
     margin-right: 10px !important;
 }
-.sidebar{
+
+.sidebar {
     background-color: rgb(38 43 64) !important;
 }
-.icon_details{
+
+.icon_details {
     margin: 0px 5px;
 }
-.pdf_heading{
+
+.pdf_heading {
     font-size: 28px;
     font-weight: 600;
     font-family: 'Times New Roman', Times, serif;
 }
-.pdfsub_heading{
+
+.pdfsub_heading {
     text-align: start;
     font-size: 20px;
     font-family: 600;
     text-decoration: underline;
     font-family: 'Times New Roman', Times, serif;
 }
+
 .dropdown-menu[data-bs-popper] {
     left: -50px !important;
 }
+
 .navbar-nav .nav-link i {
     margin-right: 0.3rem;
     font-size: 1.3rem;
     color: #84c342;
 }
+
 .sidebar-inner {
     overflow: hidden !important;
 }
-.consultant_box{
+
+.consultant_box {
     border: 1px solid rgb(160 160 160);
     border-radius: 10px;
 }
-.consultant_details{
+
+.consultant_details {
     padding: 15px;
 }
 
-.modal-dialog{
+.modal-dialog {
     position: absolute !important;
     top: 0;
     right: 0;
@@ -129,49 +150,77 @@ body{
     margin-top: 0px !important;
     margin-bottom: 0px !important;
 }
+
 .modal-content {
     height: 100vh !important;
     display: flex;
     justify-content: center;
 }
+
 .modal-backdrop.show {
-    opacity: 0 !important;
+    opacity: 0.2 !important;
+}
+
+.prescription_modal .modal-dialog {
+    position: relative !important;
+    top: initial !important;
+    right: initial !important;
+    width: auto !important;
+    height: auto !important;
+    margin-top: initial !important;
+    margin-bottom: initial !important;
+}
+
+.prescription_modal .modal-content {
+    height: auto !important;
+    display: block !important;
+    justify-content: initial !important;
+}
+
+.modal-lg, .modal-xl {
+    --bs-modal-width: 1000px !important;
 }
 
 .rdrMonth {
     width: 100% !important;
 }
+
 .rdrCalendarWrapper {
     width: 100%;
 }
-.form-check{
+
+.form-check {
     display: flex !important;
     align-items: center !important;
 }
-.form-check-label{
+
+.form-check-label {
     padding-left: 10px !important;
     padding-right: 10px !important;
 }
-.annual_section_title{
-     margin-bottom: 10px;
+
+.annual_section_title {
+    margin-bottom: 10px;
     font-size: 1.6rem;
     line-height: 1.16667em;
     font-weight: 600;
     color: #454545;
 }
+
 .profile-card {
-  border-radius: 10px;
-  overflow: hidden;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .profile-img {
-  border: 3px solid #007bff;
+    border: 3px solid #007bff;
 }
+
 .list-group-item {
     border: none !important;
 }
 
-.dashboard_icon{
+.dashboard_icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -182,71 +231,90 @@ body{
     background: linear-gradient(to right, #84c342, #afe476) !important;
     margin-right: 10px;
 }
-.homeIcon{
+
+.homeIcon {
     color: #fff;
-   
+
 }
-.dashboard_icon svg{
-     margin-right: 0rem !important;
+
+.dashboard_icon svg {
+    margin-right: 0rem !important;
 }
+
 .bg-gradient-danger {
     background: linear-gradient(to right, #ffbf96, #fe7096) !important;
 }
+
 .bg-gradient-info {
     background: linear-gradient(to right, #90caf9, #047edf 99%) !important;
 }
-.bg-gradient-success{
+
+.bg-gradient-success {
     background: linear-gradient(to right, #84d9d2, #07cdae) !important;
 }
+
 .stretch-card {
     display: flex;
     align-items: stretch;
     justify-content: stretch;
 }
+
 .card.card-img-holder {
     position: relative;
 }
-.stretch-card > .card {
+
+.stretch-card>.card {
     width: 100%;
     min-width: 100%;
 }
+
 .card {
     border: 0;
     background: #fff;
 }
+
 .card .card-body {
     padding: 0rem;
     text-align: start;
 }
-.card-img-holder{
+
+.card-img-holder {
     border: none !important;
 }
+
 .card-body {
     flex: 1 1 auto;
 }
+
 .card.card-img-holder .card-img-absolute {
     position: absolute;
     top: 0;
     right: 0;
     height: 100%;
 }
+
 .font-weight-normal {
     font-family: "ubuntu-regular", sans-serif;
 }
-.card-body h4{
+
+.card-body h4 {
     font-size: 1.13rem;
 }
-.card-body h2{
+
+.card-body h2 {
     font-size: 1.88rem;
     font-family: "ubuntu-medium", sans-serif;
 }
-.card-body h6{
+
+.card-body h6 {
     font-size: 0.9375rem;
 }
+
 .grid-margin {
     margin-bottom: 2.5rem;
 }
-.recharts-legend-wrapper{
+
+.recharts-legend-wrapper {
     width: 263px !important;
 }
 
@@ -279,11 +347,13 @@ body{
 }
 
 .step.completed .step-number {
-    background: #198754; /* Bootstrap success */
+    background: #198754;
+    /* Bootstrap success */
 }
 
 .step.active .step-number {
-    background: #0d6efd; /* Bootstrap primary */
+    background: #0d6efd;
+    /* Bootstrap primary */
 }
 
 .step-label {
@@ -309,28 +379,53 @@ body{
     background: #198754;
 }
 
-@font-face {
-  font-family: "Future Bugler Upright W00 Bold";
-  src: url('/src/Components/img/font/Future Bugler Upright W00 Bold.ttf') format('truetype');
+.custom-modal-width {
+    max-width: 50% !important;
+    /* Half width */
+    margin: auto !important;
+    /* Center the modal */
+    top: 50% !important;
+    /* Center vertically */
+    transform: translateY(-50%) !important;
+    /* Adjust for the height */
+    border-radius: 10px !important;
+    /* Rounded corners */
+    background-color: #f8f9fa !important;
+    /* Light background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    /* Shadow */
+    transition: all 0.3s ease !important;
+    /* Smooth transition */
+    height: 50% !important;
 }
-.logo_text{
+
+@font-face {
+    font-family: "Future Bugler Upright W00 Bold";
+    src: url('/src/Components/img/font/Future Bugler Upright W00 Bold.ttf') format('truetype');
+}
+
+.logo_text {
     text-align: start;
     padding-left: 15px;
 }
-.logo_text h4{
+
+.logo_text h4 {
     font-size: 1.1rem;
     font-weight: 600;
     color: #55565b;
 }
-.logo_text h4 span{
+
+.logo_text h4 span {
     color: #84c342;
     font-size: 1.5rem;
     font-family: "Future Bugler Upright W00 Bold", sans-serif;
 }
-@media(max-width:1300px) and (min-width:1000px){
+
+@media(max-width:1300px) and (min-width:1000px) {
     .col-form-label {
         font-size: 15px !important;
     }
+
     .section_title {
         margin-bottom: 10px;
         font-size: 1.4rem;
@@ -338,20 +433,26 @@ body{
         font-weight: 600;
         color: #454545;
     }
-    .breadcrumb_title{
+
+    .breadcrumb_title {
         font-size: 14px !important;
     }
-    .breadcrumb-item, .breadcrumb-item a {
+
+    .breadcrumb-item,
+    .breadcrumb-item a {
         font-size: 0.7rem;
     }
+
     .form-control {
         font-size: 0.8rem;
     }
+
     .sidebar {
         width: 100%;
         max-width: 220px !important;
     }
-    .sidebar-wrapper{
+
+    .sidebar-wrapper {
         width: 220px !important;
     }
 }

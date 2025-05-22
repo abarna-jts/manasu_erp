@@ -1,6 +1,6 @@
 import React from 'react'
-import { Breadcrumb , Form, InputGroup,Container, Row, Col, Table} from '@themesberg/react-bootstrap';
-import { useState, useEffect} from "react";
+import { Breadcrumb, Form, InputGroup, Container, Row, Col, Table } from '@themesberg/react-bootstrap';
+import { useState, useEffect } from "react";
 import axios from 'axios';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -10,48 +10,48 @@ import Cookies from 'js-cookie';
 
 function View_annualReport() {
     const [report_details, setReportDetail] = useState([]);
-     const [searchQuery, setSearchQuery] = useState("");
-     const [previewRequested, setPreviewRequested] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [previewRequested, setPreviewRequested] = useState(false);
 
-     const userType = Cookies.get('usertype'); 
+    const userType = Cookies.get('usertype');
 
-     const [formData, setFormData] = useState({
-             event_type: '',
-             event_name: '',
-             event_date: '',
-             event_place: '',
-             event_rescue_count: '',
-             celebration_name: '',
-             celebration_date: '',
-             celebration_place: '',
-             celebration_rescue_count: '',
-             program_name: '',
-             program_date: '',
-             program_place: '',
-             program_rescue_count: '',
-             internship_duration: '',
-             internship_date: '',
-             internship_place: '',
-             internship_rescue_count: '',
-             staff_name: '',
-             staff_date: '',
-             staff_place: '',
-             staff_rescue_count: ''
-         })
+    const [formData, setFormData] = useState({
+        event_type: '',
+        event_name: '',
+        event_date: '',
+        event_place: '',
+        event_rescue_count: '',
+        celebration_name: '',
+        celebration_date: '',
+        celebration_place: '',
+        celebration_rescue_count: '',
+        program_name: '',
+        program_date: '',
+        program_place: '',
+        program_rescue_count: '',
+        internship_duration: '',
+        internship_date: '',
+        internship_place: '',
+        internship_rescue_count: '',
+        staff_name: '',
+        staff_date: '',
+        staff_place: '',
+        staff_rescue_count: ''
+    })
 
-     const filteredRescueDetails = report_details.filter((item) => {
+    const filteredRescueDetails = report_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-          String(item.event_name).toLowerCase().includes(searchTerm) ||
-          String(item.celebration_name).toLowerCase().includes(searchTerm)||
-          String(item.program_name).toLowerCase().includes(searchTerm) ||
-          String(item.internship_duration).toLowerCase().includes(searchTerm) ||
-          String(item.police_memo).toLowerCase().includes(searchTerm) ||
-          String(item.staff_name).toLowerCase().includes(searchTerm)
+            String(item.event_name).toLowerCase().includes(searchTerm) ||
+            String(item.celebration_name).toLowerCase().includes(searchTerm) ||
+            String(item.program_name).toLowerCase().includes(searchTerm) ||
+            String(item.internship_duration).toLowerCase().includes(searchTerm) ||
+            String(item.police_memo).toLowerCase().includes(searchTerm) ||
+            String(item.staff_name).toLowerCase().includes(searchTerm)
         );
-      });
+    });
 
-      const apiRoute = axios.create({
+    const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
@@ -59,15 +59,15 @@ function View_annualReport() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-      const getRerportDetail = async () => {
-              try {
-                  const response = await apiRoute.get('/formality/getReport');
-                  console.log("API response:", response.data); 
-                  setReportDetail(response.data.data);
-              } catch (error) {
-                  console.error('Error fetching Student:', error);
-              }
-          };
+    const getRerportDetail = async () => {
+        try {
+            const response = await apiRoute.get('/formality/getReport');
+            console.log("API response:", response.data);
+            setReportDetail(response.data.data);
+        } catch (error) {
+            console.error('Error fetching Student:', error);
+        }
+    };
     useEffect(() => {
         getRerportDetail();
     }, []);
@@ -82,7 +82,7 @@ function View_annualReport() {
     };
 
 
-     const fetchFormData = async (id) => {
+    const fetchFormData = async (id) => {
         try {
             const response = await apiRoute.get(`/formality/getAnnualReport/${id}`);
             const data = response.data;
@@ -132,49 +132,49 @@ function View_annualReport() {
     const formRef = useRef();
 
     const generatePDF = async () => {
-    const input = formRef.current;
-    if (!input) {
-        console.error("Form reference is not defined");
-        return;
-    }
+        const input = formRef.current;
+        if (!input) {
+            console.error("Form reference is not defined");
+            return;
+        }
 
-    const canvas = await html2canvas(input, { scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL("image/png");
+        const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL("image/png");
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    const imgProps = pdf.getImageProperties(imgData);
-    const imgWidth = pdfWidth;
-    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgWidth = pdfWidth;
+        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
 
-    let heightLeft = imgHeight;
-    let position = 0;
+        let heightLeft = imgHeight;
+        let position = 0;
 
-    // First page
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pdfHeight;
-
-    // Additional pages if needed
-    while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
+        // First page
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pdfHeight;
-    }
 
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, '_blank');
-};
+        // Additional pages if needed
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pdfHeight;
+        }
+
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+    };
 
     const navigate = useNavigate();
     const handleEditform = (id) => {
         navigate(`/edit_annual_report/${id}`);
-      };
+    };
 
-      const handleDelete = async (id) => {
+    const handleDelete = async (id) => {
         alert("Are you sure want to delete");
         try {
             const response = await apiRoute.delete(`/formality/deleteAnnualReport/${id}`);
@@ -203,23 +203,23 @@ function View_annualReport() {
                     </Col>
                     <Col md={2}>
                         <div className="d-flex align-items-center px-3">
-                    
+
                             <Form className="navbar-search">
-                            <Form.Group id="topbarSearch">
-                                <InputGroup className="input-group-merge search-bar">
-                                
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
-                                </InputGroup>
-                            </Form.Group>
+                                <Form.Group id="topbarSearch">
+                                    <InputGroup className="input-group-merge search-bar">
+
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Search"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
                             </Form>
                         </div>
                     </Col>
-                    
+
                 </Row>
             </Container>
 
@@ -256,9 +256,9 @@ function View_annualReport() {
                                             <td>{item.staff_name || "null"}</td>
                                             <td>
                                                 <button className="btn btn-success icon_details"
-                                                     onClick={() => {
-                                                            fetchFormData(item.id);
-                                                        }}
+                                                    onClick={() => {
+                                                        fetchFormData(item.id);
+                                                    }}
                                                 >
                                                     <i className="fas fa-eye"></i>
                                                 </button>
@@ -290,282 +290,365 @@ function View_annualReport() {
                     </Col>
                 </Row>
             </Container>
-            
+
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                    <Container>
-                        <h3 className="text-center MY-4">ANNUAL REPORT</h3>
-                        <Row>
-                            <Col md={10}>
-                                <Form>
-                                    <Col md={8} className="text-start">
-                                        <h5 className="pdfsub_heading">Event / Awarness/ Outing Details</h5>
+                <Container>
+                    <h3 className="text-center MY-4">ANNUAL REPORT</h3>
+                    <Row>
+                        <Col md={10}>
+                            <Form>
+                                <Col md={8} className="text-start">
+                                    <h5 className="pdfsub_heading">Event / Awarness/ Outing Details</h5>
+                                </Col>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>Event Type:</Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="event_type"
+                                            value={formData.event_type}
+                                            onChange={handleInputChange}
+                                            required />
                                     </Col>
+                                </Form.Group>
+                                {formData.event_type === 'event' && (
+                                    <>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Name of the Event:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="event_name"
+                                                    value={formData.event_name}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="date"
+                                                    name="event_date"
+                                                    value={formData.event_date}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="event_place"
+                                                    value={formData.event_place}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="event_rescue_count"
+                                                    value={formData.event_rescue_count}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Event Report:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    as="textarea"
+                                                    name="event_report"
+                                                    rows={3}
+                                                    value={formData.event_report}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                    </>
+
+                                )}
+                                {formData.event_type === 'awarness' && (
+                                    <>
                                     <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>Event Type:</Form.Label>
-                                        <Col sm="6">
-                                             <Form.Control type="text"
-                                                name="event_type"
-                                                value={formData.event_type}
+                                        <Form.Label column sm="4" className='text-start'>Awareness Report:</Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                as="textarea"
+                                                name="awarness_report"
+                                                rows={3}
+                                                value={formData.awarness_report}
                                                 onChange={handleInputChange}
-                                                required />
+                                                required
+                                            />
                                         </Col>
                                     </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Event Name :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="event_name"
-                                                value={formData.event_name}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Event Date :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="date"
-                                                name="event_date"
-                                                value={formatDate(formData.event_date)}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Event Place :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="event_place"
-                                                value={formData.event_place}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            How many rescue attended the events?
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="event_rescue_count"
-                                                value={formData.event_rescue_count}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                     <Col md={12} className="text-start">
-                                        <h5 className="pdfsub_heading">General Celebration Details</h5>
+                                    </>
+                                )}
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Event Name :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="event_name"
+                                            value={formData.event_name}
+                                            onChange={handleInputChange}
+                                            required />
                                     </Col>
-                                     <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Celebration Name :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="celebration_name"
-                                                value={formData.celebration_name}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Celebration Date:
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="date"
-                                                name="celebration_date"
-                                                value={formatDate(formData.celebration_date)}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Conducted Place :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="celebration_place"
-                                                value={formData.celebration_place}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            How many rescue attended the Celebration?
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="celebration_rescue_count"
-                                                value={formData.celebration_rescue_count}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Col md={12} className="text-start">
-                                        <h5 className="pdfsub_heading">Community Programs</h5>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Event Date :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="date"
+                                            name="event_date"
+                                            value={formatDate(formData.event_date)}
+                                            onChange={handleInputChange}
+                                            required />
                                     </Col>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Program Name :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="program_name"
-                                                value={formData.program_name}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Program Date:
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="date"
-                                                name="program_date"
-                                                value={formatDate(formData.program_date)}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Conducted Place :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="program_place"
-                                                value={formData.program_place}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            How many rescue attended the Programs?
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="program_rescue_count"
-                                                value={formData.program_rescue_count}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Col md={12} className="text-start">
-                                        <h5 className="pdfsub_heading">Internship Form</h5>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Event Place :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="event_place"
+                                            value={formData.event_place}
+                                            onChange={handleInputChange}
+                                            required />
                                     </Col>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Internship duration :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="internship_duration"
-                                                value={formData.internship_duration}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Internship Date:
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="date"
-                                                name="internship_date"
-                                                value={formatDate(formData.internship_date)}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Conducted Place :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="internship_place"
-                                                value={formData.internship_place}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            How many rescue attended the Internship?
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="internship_rescue_count"
-                                                value={formData.internship_rescue_count}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Col md={12} className="text-start mt-5">
-                                        <h5 className="pdfsub_heading">Staff Programs</h5>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        How many rescue attended the events?
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="event_rescue_count"
+                                            value={formData.event_rescue_count}
+                                            onChange={handleInputChange}
+                                            required />
                                     </Col>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Staff Programs Name :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="staff_name"
-                                                value={formData.staff_name}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Staff Programs Date:
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="date"
-                                                name="staff_date"
-                                                value={formatDate(formData.staff_date)}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            Conducted Place :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="staff_place"
-                                                value={formData.staff_place}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="6" className='text-start'>
-                                            How many rescue attended the Staff Programs?
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            <Form.Control type="text"
-                                                name="staff_rescue_count"
-                                                value={formData.staff_rescue_count}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                </Form>
-                            </Col>
-                        </Row>
-                    </Container>
+                                </Form.Group>
+                                <Col md={12} className="text-start">
+                                    <h5 className="pdfsub_heading">General Celebration Details</h5>
+                                </Col>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Celebration Name :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="celebration_name"
+                                            value={formData.celebration_name}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Celebration Date:
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="date"
+                                            name="celebration_date"
+                                            value={formatDate(formData.celebration_date)}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Conducted Place :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="celebration_place"
+                                            value={formData.celebration_place}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        How many rescue attended the Celebration?
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="celebration_rescue_count"
+                                            value={formData.celebration_rescue_count}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Col md={12} className="text-start">
+                                    <h5 className="pdfsub_heading">Community Programs</h5>
+                                </Col>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Program Name :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="program_name"
+                                            value={formData.program_name}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Program Date:
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="date"
+                                            name="program_date"
+                                            value={formatDate(formData.program_date)}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Conducted Place :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="program_place"
+                                            value={formData.program_place}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        How many rescue attended the Programs?
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="program_rescue_count"
+                                            value={formData.program_rescue_count}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Col md={12} className="text-start">
+                                    <h5 className="pdfsub_heading">Internship Form</h5>
+                                </Col>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Internship duration :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="internship_duration"
+                                            value={formData.internship_duration}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Internship Date:
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="date"
+                                            name="internship_date"
+                                            value={formatDate(formData.internship_date)}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Conducted Place :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="internship_place"
+                                            value={formData.internship_place}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        How many rescue attended the Internship?
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="internship_rescue_count"
+                                            value={formData.internship_rescue_count}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Col md={12} className="text-start mt-5">
+                                    <h5 className="pdfsub_heading">Staff Programs</h5>
+                                </Col>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Staff Programs Name :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="staff_name"
+                                            value={formData.staff_name}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Staff Programs Date:
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="date"
+                                            name="staff_date"
+                                            value={formatDate(formData.staff_date)}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Conducted Place :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="staff_place"
+                                            value={formData.staff_place}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        How many rescue attended the Staff Programs?
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control type="text"
+                                            name="staff_rescue_count"
+                                            value={formData.staff_rescue_count}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+                            </Form>
+                        </Col>
+                    </Row>
+                </Container>
             </div>
         </>
     )

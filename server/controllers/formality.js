@@ -298,12 +298,137 @@ const deleteEssentialRecord = (req, res) => {
     });
 }
 
+const createEventReport = (req,res) =>{
+    const{
+        event_name,
+        event_date,
+        event_place,
+        event_report,
+        event_rescue_count,
+        event_type,
+        awareness_name,
+        awarness_date,
+        awarness_place,
+        awarness_report,
+        awarness_rescue_count,
+        outing_name,
+        outing_date,
+        outing_place,
+        outing_report,
+        outing_rescue_count,
+    }= req.body;
+
+    const q = `INSERT INTO event_report(event_name, event_date, event_place, event_report, event_rescue_count, event_type, 
+                awareness_name,awarness_date, awarness_place, awarness_report, awarness_rescue_count,
+                outing_name, outing_date, outing_place, outing_report, outing_rescue_count) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    const values = [
+        event_name || 'Null',event_date || 'Null',event_place || 'Null',event_report || 'Null',event_rescue_count || 'Null',event_type,
+        awareness_name || 'Null',awarness_date || 'Null',awarness_place || 'Null',awarness_report || 'Null',awarness_rescue_count || 'Null',
+        outing_name || 'Null',outing_date || 'Null',outing_place || 'Null',outing_report || 'Null', outing_rescue_count || 'Null'
+    ]
+
+    db.query(q, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Event Report Form Created Successfully", data: data });
+        });
+    }
+
+const createCelebrationReport = (req,res) =>{
+    const{
+        celebration_name,
+        celebration_date,
+        celebration_place,
+        celebration_rescue_count,
+        celebration_report,
+    } = req.body;
+
+    const q = `INSERT INTO celebration_report(celebration_name, celebration_date, celebration_place, celebration_rescue_count, celebration_report) 
+                VALUES (?,?,?,?,?)`;
+
+    const values = [
+        celebration_name,
+        celebration_date,
+        celebration_place,
+        celebration_rescue_count,
+        celebration_report,
+    ]
+
+    db.query(q, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Celebration Report Form Created Successfully", data: data });
+        });
+}
+
+const createCommunityReport = (req,res) =>{
+    const {
+       program_name,
+        program_date,
+        program_place,
+        program_rescue_count,
+        program_report,
+    } = req.body;
+
+    const q = `INSERT INTO community_report(community_name, community_date, community_place, community_rescue_count, community_report)
+                VALUES (?,?,?,?,?)`; 
+    const values = [
+        program_name,
+        program_date,
+        program_place,
+        program_rescue_count,
+        program_report,
+    ]
+    db.query(q, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Community Report Form Created Successfully", data: data });
+        });
+}
+
+const createStaffReport = (req,res) =>{
+    const {
+        staff_name,
+        staff_date,
+        staff_place,
+        staff_rescue_count,
+        staff_report,
+    } = req.body;
+
+    const q = `INSERT INTO staff_report(staff_name, staff_date, staff_place, staff_rescue_count, staff_report)
+                VALUES (?,?,?,?,?)`;
+    const values = [
+        staff_name,
+        staff_date,
+        staff_place,
+        staff_rescue_count,
+        staff_report,
+    ]
+    db.query(q, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Staff Report Form Created Successfully", data: data });
+        });
+
+
+}
+
 const createAnnualReport = (req, res) => {
     const {
         event_type,
         event_name,
         awareness_name,
         outing_name,
+        awarness_date,
+        awarness_place,
+        awarness_rescue_count,
+        outing_date,
+        outing_place,
+        outing_rescue_count,
         event_date,
         event_place,
         event_rescue_count,
@@ -332,13 +457,19 @@ const createAnnualReport = (req, res) => {
     const q = `INSERT INTO annual_report(
                event_type,
                event_name,
-               awareness_name,
-               outing_name,
                event_date,
                event_place,
                event_rescue_count,
                event_report,
+               awareness_name,
+               awarness_date,
+               awarness_place,
+               awarness_rescue_count,
                awarness_report,
+               outing_name,
+               outing_date,
+               outing_place,
+               outing_rescue_count,
                outing_report,
                celebration_name,
                celebration_date,
@@ -355,19 +486,25 @@ const createAnnualReport = (req, res) => {
                staff_place,
                staff_rescue_count,
                staff_report
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
 
     const values = [
         event_type,
         event_name,
-        awareness_name,
-        outing_name,
         event_date,
         event_place,
         event_rescue_count,
         event_report,
+        awareness_name,
+        awarness_date,
+        awarness_place,
+        awarness_rescue_count,
         awarness_report,
+        outing_name,
+        outing_date,
+        outing_place,
+        outing_rescue_count,
         outing_report,
         celebration_name,
         celebration_date,
@@ -758,5 +895,9 @@ module.exports = {
     createInternForm,
     getStudentDetails,
     getStudendDetailsbyID,
-    updateStudentDetail
+    updateStudentDetail,
+    createEventReport,
+    createCelebrationReport,
+    createCommunityReport,
+    createStaffReport
 };

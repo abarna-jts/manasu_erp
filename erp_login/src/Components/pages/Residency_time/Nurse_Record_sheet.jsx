@@ -8,77 +8,60 @@ import axios from 'axios';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css
 // import { addDays } from 'date-fns';
+import { Alert } from "react-bootstrap";
 
 function Nurse_Record_sheet() {
     const [show, setShow] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [nurse_record, setNurseRecord] = useState([]);
     const [show1, setShow1] = useState(false);
-    
+
     const handleClose1 = () => setShow1(false);
 
-    const [startDate, setStartDate] = useState("");
-
-  // Set end date only if start date is selected
-  const endDate = startDate
-    ? new Date(new Date(startDate).setDate(new Date(startDate).getDate() + 14))
-        .toISOString()
-        .split("T")[0]
-    : "";
-
+   
     const [formData, setFormData] = useState({
         admission_no: '',
-        currentMonth: '',
+        month: '',
         temperature: '',
         bp: '',
         pulse: '',
         weight: '',
+        from_date: '',
+        to_date: ''
     });
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    useEffect(() => {
-        const monthName = new Date().toLocaleString('default', { month: 'long' });
-        setCurrentMonth(monthName);
-        setFormData((prev) => ({ ...prev, currentMonth: monthName }));
-    }, []);
-
+    
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
+
+    //alert box values
+        const [submissionMessage, setSubmissionMessage] = useState("");
+        const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
 
 
     const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Set from_date and to_date based on the selected start date
-    const from_date = startDate;
-    const to_date = endDate;
-
-    // Ensure you send the correct data
-    const newFormData = {
-        ...formData,
-        from_date,
-        to_date,
-    };
-
     try {
-        const response = await apiRoute.post("/residency/nurse_record", newFormData);
-        console.log(response);  // Log the response to check status and content
+        const response = await apiRoute.post("/residency/nurse_record", formData);
+        console.log(response);
 
-        if (response.status === 201) {
-            alert("Record submitted successfully!");
-            handleClose(); // close the modal
-            window.location.reload();
+        if (response.data.message === "Nurse Record Sheet Created Successfully") {
+            setSubmissionMessage("Form submitted successfully!");
+            setMessageType("success");
+
+            // Reset the form
             setFormData({
-                id:'',
+                id: '',
                 admission_no: '',
-                currentMonth: '',
+                month: '',
                 temperature: '',
                 bp: '',
                 pulse: '',
@@ -86,14 +69,22 @@ function Nurse_Record_sheet() {
                 from_date: '',
                 to_date: ''
             });
+
+            handleClose(); // Close modal
+
+            // Reload after 3 seconds
+            setTimeout(() => window.location.reload(), 3000);
         } else {
-            alert("Submission failed. Please try again.");
+            setSubmissionMessage("Submission failed.");
+            setMessageType("danger");
         }
     } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("An error occurred while submitting the form.");
+        console.error("Error submitting form", error);
+        setSubmissionMessage("Something went wrong.");
+        setMessageType("danger");
     }
 };
+
 
 
     useEffect(() => {
@@ -119,71 +110,79 @@ function Nurse_Record_sheet() {
         );
     });
 
-     const calculateToDate = (fromDate) => {
-        const date = new Date(fromDate);
-        date.setDate(date.getDate() + 15);
-        return date.toISOString().split("T")[0];
-    };
+    // const calculateToDate = (fromDate) => {
+    //     const date = new Date(fromDate);
+    //     date.setDate(date.getDate() + 15);
+    //     return date.toISOString().split("T")[0];
+    // };
 
-    const handleStartDateChange = (e) => {
-        const fromDate = e.target.value;
-        const toDate = calculateToDate(fromDate);
-        setFormData((prev) => ({
-        ...prev,
-        from_date: fromDate,
-        to_date: toDate,
-        }));
-    };
+    // const handleStartDateChange = (e) => {
+    //     const fromDate = e.target.value;
+    //     const toDate = calculateToDate(fromDate);
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         from_date: fromDate,
+    //         to_date: toDate,
+    //     }));
+    // };
 
     const handleEditform = async (id) => {
         try {
-        const response = await apiRoute.get(`/residency/getNurseRecordbyID/${id}`);
-        const data = response.data;
+            const response = await apiRoute.get(`/residency/getNurseRecordbyID/${id}`);
+            const data = response.data;
 
-        const [fromFormatted, toFormatted] = data.date.split(' to ');
+            const [fromFormatted, toFormatted] = data.date.split(' to ');
 
-        const parseDate = (dmy) => {
-            const [day, month, year] = dmy.split("-");
-            return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-        };
+            const parseDate = (dmy) => {
+                const [day, month, year] = dmy.split("-");
+                return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+            };
 
-        setFormData({
-            id: data.id,
-            currentMonth: data.month || '',
-            from_date: parseDate(fromFormatted),
-            to_date: parseDate(toFormatted),
-            temperature: data.temperature || '',
-            bp: data.bp || '',
-            pulse: data.pulse || '',
-            weight: data.weight || ''
-        });
-        setShow1(true);
+            setFormData({
+                id: data.id,
+                currentMonth: data.month || '',
+                from_date: parseDate(fromFormatted),
+                to_date: parseDate(toFormatted),
+                temperature: data.temperature || '',
+                bp: data.bp || '',
+                pulse: data.pulse || '',
+                weight: data.weight || ''
+            });
+            setShow1(true);
         } catch (error) {
-        console.error("Error fetching form data:", error);
-        alert("Admission Number not found");
+            console.error("Error fetching form data:", error);
+            alert("Admission Number not found");
         }
     };
 
-    
 
-    const handleUpdate = async (e, id) => {
-        e.preventDefault();
-        try {
-            const response = await apiRoute.put(`/residency/updateRecords/${id}`, formData);
-            console.log(response.data);
-            if (response.status === 200) {
-                alert('Form Updated successfully!');
-                handleClose1(true);
-                window.location.reload();
-            } else {
-                alert('Error Updating form.');
-                
-            }
-        } catch (error) {
-            console.error('There was an error Updating the form:', error);
-            alert('There was an error Updating the form.');
+
+   const handleUpdate = async (e, id) => {
+    e.preventDefault();
+
+    try {
+        const response = await apiRoute.put(`/residency/updateRecords/${id}`, formData);
+        console.log(response.data);
+
+        if (response.data.message === "Nurse Record updated successfully!") {
+            setSubmissionMessage("Form updated successfully!");
+            setMessageType("success");
+
+            handleClose1(true);
+
+            // Reload after 3 seconds
+            setTimeout(() => window.location.reload(), 3000);
+        } else {
+            setSubmissionMessage("Error updating the form.");
+            setMessageType("danger");
         }
-    };
+    } catch (error) {
+        console.error("There was an error updating the form:", error);
+        setSubmissionMessage("Something went wrong.");
+        setMessageType("danger");
+    }
+};
+
 
 
     return (
@@ -198,8 +197,8 @@ function Nurse_Record_sheet() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Record Sheet</h6>
                     </Col>
-                    <Col md={5} className="text-start">
-                        <h3 className="section_title">Nurse Record Sheet for Rescue Condition</h3>
+                    <Col md={6} className="text-start">
+                        <h3 className="section_title">Nursing Record Sheet – Resident Health & Medications</h3>
                     </Col>
                     <Col md={2}>
                         <Form className="navbar-search">
@@ -221,6 +220,15 @@ function Nurse_Record_sheet() {
                     </Col>
                 </Row>
             </Container>
+
+            <div>
+                    {/* Show success or error message box */}
+                    {submissionMessage && (
+                        <Alert variant={messageType} className="mt-3">
+                            {submissionMessage}
+                        </Alert>
+                    )}
+                </div>
 
             <Container>
                 <Row>
@@ -284,6 +292,8 @@ function Nurse_Record_sheet() {
                 </Row>
             </Container>
 
+            
+
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -308,12 +318,26 @@ function Nurse_Record_sheet() {
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAdmissionNo">
                                         <Form.Label>Month</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="currentMonth"
-                                            value={currentMonth}
-                                            readOnly
-                                        />
+                                        <Form.Select
+                                            name="month"
+                                            value={formData.month}
+                                            onChange={handleInputChange}
+                                            required
+                                        >
+                                            <option value="">-- Select --</option>
+                                            <option value="January">January</option>
+                                            <option value="February">February</option>
+                                            <option value="March">March</option>
+                                            <option value="April">April</option>
+                                            <option value="May">May</option>
+                                            <option value="June">June</option>
+                                            <option value="July">July</option>
+                                            <option value="August">August</option>
+                                            <option value="September">September</option>
+                                            <option value="October">October</option>
+                                            <option value="November">November</option>
+                                            <option value="December">December</option>
+                                        </Form.Select>
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -321,29 +345,28 @@ function Nurse_Record_sheet() {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                    <Form.Label>Start Date</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        name="start_date"
-                                        value={startDate}
-                                        min={new Date().toISOString().split("T")[0]} // No past dates
-                                        onChange={(e) => setStartDate(e.target.value)}
-                                    />
+                                        <Form.Label>From Date</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            name="from_date"
+                                            value={formData.from_date}
+                                            onChange={handleInputChange}
+                                        />
                                     </Form.Group>
                                 </Col>
 
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                    <Form.Label>End Date (15 days from Start)</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        name="end_date"
-                                        value={endDate}
-                                        readOnly
-                                    />
+                                        <Form.Label>To Date</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            name="to_date"
+                                            value={formData.to_date}
+                                            onChange={handleInputChange}
+                                        />
                                     </Form.Group>
                                 </Col>
-                                </Row>
+                            </Row>
 
                             <Row>
                                 <Col md={6}>
@@ -424,7 +447,7 @@ function Nurse_Record_sheet() {
                     <Col md={12}>
                         <Form>
                             <Row>
-                                
+
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAdmissionNo">
                                         <Form.Label>Month</Form.Label>
@@ -435,7 +458,7 @@ function Nurse_Record_sheet() {
                                                 setFormData({ ...formData, currentMonth: e.target.value })
                                             }
                                             required
-                                            >
+                                        >
                                             <option value="">-- Select Month --</option>
                                             <option value="January">January</option>
                                             <option value="February">February</option>
@@ -451,37 +474,36 @@ function Nurse_Record_sheet() {
                                             <option value="December">December</option>
                                         </Form.Select>
                                     </Form.Group>
-                                    </Col>
+                                </Col>
                             </Row>
 
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                    <Form.Label>Start Date</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        name="from_date"
-                                        value={formData.from_date}
-                                        min={new Date().toISOString().split("T")[0]}
-                                        onChange={handleStartDateChange}
-                                        required
-                                    />
+                                        <Form.Label>Start Date</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            name="from_date"
+                                            value={formData.from_date}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
                                     </Form.Group>
                                 </Col>
 
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                    <Form.Label>End Date (15 days from Start)</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        name="to_date"
-                                        value={formData.to_date}
-                                        readOnly
-                                        required
-                                    />
+                                        <Form.Label>To Date</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            name="to_date"
+                                            value={formData.to_date}
+                                            readOnly
+                                            required
+                                        />
                                     </Form.Group>
                                 </Col>
-                                </Row>
+                            </Row>
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">

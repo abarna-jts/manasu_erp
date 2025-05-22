@@ -125,7 +125,7 @@ const createRecord = (req, res) => {
 
   const {
     admission_no,
-    currentMonth,
+    month,
     from_date,
     to_date,
     temperature,
@@ -165,7 +165,7 @@ const createRecord = (req, res) => {
 
   const values = [
     admission_no,
-    currentMonth,
+    month,
     recordDate,
     temperature,
     bp,
@@ -641,6 +641,64 @@ const updateRescueCondition = (req, res) => {
   });
 }
 
+const createPrescription = (req, res) => {
+  const {
+    admission_no,
+    rescue_name,
+    age,
+    op_no,
+    hospital_name,
+    department,
+    masterHealthCheckup,
+    phone_no,
+    instruction,
+    advice,
+    follow_up,
+    medicine,
+    medicine_type,
+    duration,
+    intake,
+    med_instruction,
+    morning,
+    afternoon,
+    night
+  }= req.body;
+
+  const sql = `INSERT INTO prescription (admission_no, rescue_name, age, op_no, hospital_name, department,
+   masterHealthCheckup, phone_no, instruction, advice, follow_up, medicine, medicine_type, duration, intake,
+    med_instruction, morning, afternoon, night) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      admission_no,
+      rescue_name,
+      age,
+      op_no,
+      hospital_name,
+      department,
+      masterHealthCheckup,
+      phone_no,
+      instruction,
+      advice,
+      follow_up,
+      medicine,
+      medicine_type,
+      duration,
+      intake,
+      med_instruction,
+      morning,
+      afternoon,
+      night
+    ]; 
+  db.query(sql, values, (dbErr, data) => {
+      if (dbErr) {
+        return res.status(500).json({ message: "Database Error", error: dbErr });
+      }
+      res.status(201).json({ message: "Prescription Created Successfully", data });
+    });
+  
+
+}
+
 
 module.exports = {
   createRescueCondition,
@@ -659,5 +717,6 @@ module.exports = {
   showObservationReport,
   updateObservationReport,
   showRescueCondition,
-  updateRescueCondition
+  updateRescueCondition,
+  createPrescription
 };

@@ -53,7 +53,7 @@ export default function TopNavbar() {
   };
 
   return (
-    <Navbar variant="dark p-2 mb-1" expanded >
+    <Navbar variant="dark p-2 mb-3" expanded >
       <Container fluid className="px-0">
         <div className="d-flex justify-content-between w-100">
           <div className="d-flex align-items-center px-3">

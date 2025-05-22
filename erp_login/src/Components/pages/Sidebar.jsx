@@ -24,7 +24,8 @@ import {
   faVideo,
   faClipboardList,
   faChartLine,
-  faUserGraduate
+  faUserGraduate,
+  faNotesMedical 
 } from "@fortawesome/free-solid-svg-icons";
 
 import { Nav, Badge, Accordion} from "react-bootstrap";
@@ -120,7 +121,7 @@ const Sidebar = () => {
                   <NavItem title="Family Identification Form" to="" icon={faFileAlt} />
                   <NavItem title="Articles carried Form" to="" icon={faSuitcase} />
                   <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
-                  <NavItem title="MSE Form" to="" icon={faVideo } />
+                  <NavItem title="MSE Form" to="" icon={faNotesMedical  } />
                   <NavItem title="Activity Details" to="" icon={faCalendarAlt } />
                 </CollapsableNavItem>
 
@@ -193,8 +194,9 @@ const Sidebar = () => {
             {/* Nurse-only menus */}
             {userType === '3' && (
               <>
-                <NavItem title="Doctor Consultants Form" to="/Dr_consultant" icon={faStethoscope} />
+                {/* <NavItem title="Doctor Consultants Form" to="/Dr_consultant" icon={faStethoscope} /> */}
                 <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
+                <NavItem title="Prescription Form" to="/prescription_form" icon={faNotesMedical} />
                 <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faUserMd} />
                 
 
@@ -204,7 +206,9 @@ const Sidebar = () => {
             {userType === '4' &&(
               <>
                 <NavItem title="Observation Report" to="/observation_report" icon={faUserNurse} />
-                <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
+                <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
+                <NavItem title="MSE Form" to="" icon={faNotesMedical  } />
+                {/* <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} /> */}
               </>
             )}
 

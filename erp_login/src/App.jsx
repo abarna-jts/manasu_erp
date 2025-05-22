@@ -34,6 +34,7 @@ import Admin_RescueDetails from './Components/pages/Admin_Formality/Admin_Rescue
 import Profile from './Components/pages/Profile';
 import InternshipForm from './Components/pages/Admin_Formality/InternshipForm';
 import AllStudentDetails from './Components/pages/Admin_Formality/AllStudentDetails';
+import Prescription_form from './Components/pages/Residency_time/prescription_form';
 
 function App() {
 
@@ -157,6 +158,10 @@ function App() {
                 element={<MainLayout><Dr_consultants /></MainLayout>}
               />
               <Route
+                path='/prescription_form'
+                element={<MainLayout><Prescription_form /></MainLayout>}
+              />
+              <Route
                 path='/rescue_record_sheet'
                 element={<MainLayout><Rescue_Record_Sheet /></MainLayout>}
               />
@@ -174,6 +179,7 @@ function App() {
                 path='/rescue_details'
                 element={<MainLayout><Rescue_details /></MainLayout>}
               />
+              
               <Route
                 path='/observation_report'
                 element={<MainLayout><Observation_report /></MainLayout>}

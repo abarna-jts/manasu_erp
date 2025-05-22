@@ -219,8 +219,8 @@ function Formality_declaration() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Declaration Form</h6>
                     </Col>
-                    <Col md={7} className="text-start">
-                        <h3 className="section_title">Self Declaration Form</h3>
+                    <Col md={9} className="text-start">
+                        <h3 className="section_title">Resident's Possessions and Document Handover Form</h3>
                     </Col>
                 </Row>
             </Container>
@@ -400,7 +400,7 @@ function Formality_declaration() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                <h4 className="text-center MY-4">HandOver Form</h4>
+                <h4 className="text-center MY-4">Resident's Possessions and Document Handover Form</h4>
                 <Form className='self_declaration'>
                     <Row>
                         <Form.Group as={Row} className="mb-1">

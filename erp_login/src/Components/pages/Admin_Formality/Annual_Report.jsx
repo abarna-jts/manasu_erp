@@ -5,19 +5,26 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Alert } from "react-bootstrap";
 
 function Annual_Report() {
     const [validated, setValidated] = useState(false);
     const [step, setStep] = useState(1);
 
     const [formData, setFormData] = useState({
-        event_type: '',
+        event_type: 'event',
         event_name: '',
         awareness_name: '',
         outing_name: '',
         event_date: '',
         event_place: '',
         event_rescue_count: '',
+        awarness_date: '',
+        awarness_place: '',
+        awarness_rescue_count: '',
+        outing_date: '',
+        outing_place: '',
+        outing_rescue_count: '',
         event_report: '',
         awarness_report: '',
         outing_report: '',
@@ -30,13 +37,17 @@ function Annual_Report() {
         program_date: '',
         program_place: '',
         program_rescue_count: '',
-        program_report:'',
+        program_report: '',
         staff_name: '',
         staff_date: '',
         staff_place: '',
         staff_rescue_count: '',
         staff_report: ''
     })
+
+    //alert box values
+    const [submissionMessage, setSubmissionMessage] = useState("");
+    const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -122,11 +133,8 @@ function Annual_Report() {
     const handleBack1 = () => {
         setStep(2);
     }
-    const handleBack2 = () => {
-        setStep(3);
-    }
     const handleBack3 = () => {
-        setStep(4);
+        setStep(3);
     }
 
     const navigate = useNavigate();
@@ -134,6 +142,103 @@ function Annual_Report() {
         navigate(`/view_annualReport`);
     };
 
+    const handleEventSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await apiRoute.post("/formality/createEventReport", formData);
+            console.log(response);
+
+            if (response.data.message === "Event Report Form Created Successfully") {
+                setSubmissionMessage("Form submitted successfully!");
+                setMessageType("success");
+
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+
+            setStep(2);
+        } catch (error) {
+            console.error("Error submitting form", error.response?.data || error.message);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
+        }
+    }
+
+    const handleCelebrationSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await apiRoute.post("/formality/createCelebrationReport", formData);
+            console.log(response);
+
+            if (response.data.message === "Celebration Report Form Created Successfully") {
+                setSubmissionMessage("Form Submitted Successfully!");
+                setMessageType("success");
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error.response?.data || error.message);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
+
+        }
+
+    }
+
+    const handleCommunitySubmit =  async (e) =>{
+        e.preventDefault();
+        try{
+            const reponse = await apiRoute.post("/formality/createCommunityReport", formData);
+            console.log(reponse);
+            if (reponse.data.message === "Community Report Form Created Successfully") {
+                setSubmissionMessage("Form Submitted Successfully!");
+                setMessageType("success");
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        }catch (error) {   
+            console.error("Error submitting form", error.response?.data || error.message);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
+        }   
+    }
+
+    const handleStaffSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await apiRoute.post("/formality/createStaffReport", formData);
+            console.log(response);
+
+            if (response.data.message === "Staff Report Form Created Successfully") {
+                setSubmissionMessage("Form Submitted Successfully!");
+                setMessageType("success");
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error.response?.data || error.message);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
+        }
+    }
+
+ const totalSteps = 5;
+
+    const steps = [
+        "Event / Awareness / Outing Details",
+        "General Celebration Details",
+        "Community Programs",
+        "Staff Programs",
+    ];
 
     return (
         <>
@@ -153,185 +258,291 @@ function Annual_Report() {
                 </Row>
             </Container>
 
+             {/* Step Progress UI */}
+            <div className="step-progressbar mb-4">
+                {steps.map((label, index) => {
+                    const stepNumber = index + 1;
+                    const isActive = stepNumber === step;
+                    const isCompleted = stepNumber < step;
+
+                    return (
+                        <div
+                            key={index}
+                            className={`step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}
+                        >
+                            <div className="step-number">{stepNumber}</div>
+                            <div className="step-label">{label}</div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div>
+                {/* Show success or error message box */}
+                {submissionMessage && (
+                    <Alert variant={messageType} className="mt-3">
+                        {submissionMessage}
+                    </Alert>
+                )}
+            </div>
+
 
 
             {step === 1 && (
-    <Container>
-        <Row className='d-flex align-items-center justify-content-center'>
-            <Col md={6}>
-                <Row className='d-flex align-items-center justify-content-between'>
-                    <Col md={8} className="text-start">
-                        <h3 className="annual_section_title mt-3">Event / Awareness / Outing Details</h3>
-                    </Col>
-                    <Col md={4} className="text-start d-flex align-items-center justify-content-end">
-                        <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
-                    </Col>
-                </Row>
+                <Container>
+                    <Row className='d-flex align-items-center justify-content-center'>
+                        <Col md={6}>
+                            <Row className='d-flex align-items-center justify-content-between'>
+                                <Col md={8} className="text-start">
+                                    <h3 className="annual_section_title mt-3">Event / Awareness / Outing Details</h3>
+                                </Col>
+                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                    <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
+                                </Col>
+                            </Row>
 
-                <Form noValidate validated={validated} onSubmit={handleNext}>
-                    {/* Dropdown for selecting type */}
-                    <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="4" className='text-start'>Select Type:</Form.Label>
-                        <Col sm="8">
-                            <Form.Select
-                                name="event_type"
-                                value={formData.event_type}
-                                onChange={handleInputChange}
-                                required
-                            >
-                                <option value="">-- Select --</option>
-                                <option value="event">Event</option>
-                                <option value="awareness">Awareness</option>
-                                <option value="outing">Outing</option>
-                            </Form.Select>
+                            <Form noValidate validated={validated} onSubmit={handleEventSubmit}>
+                                {/* Dropdown for selecting type */}
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="4" className='text-start'>Select Type:</Form.Label>
+                                    <Col sm="8">
+                                        <Form.Select
+                                            name="event_type"
+                                            value={formData.event_type}
+                                            onChange={handleInputChange}
+                                            required
+                                        >
+                                            <option value="">-- Select --</option>
+                                            <option value="event">Event</option>
+                                            <option value="awareness">Awareness</option>
+                                            <option value="outing">Outing</option>
+                                        </Form.Select>
+                                    </Col>
+                                </Form.Group>
+
+                                {/* Conditionally render name fields */}
+                                {formData.event_type === 'event' && (
+                                    <>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Name of the Event:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="event_name"
+                                                    value={formData.event_name}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="date"
+                                                    name="event_date"
+                                                    value={formData.event_date}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="event_place"
+                                                    value={formData.event_place}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="event_rescue_count"
+                                                    value={formData.event_rescue_count}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Event Report:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    as="textarea"
+                                                    name="event_report"
+                                                    rows={3}
+                                                    value={formData.event_report}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                    </>
+
+                                )}
+
+                                {formData.event_type === 'awareness' && (
+                                    <>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Awareness Camp Name:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="awareness_name"
+                                                    value={formData.awareness_name}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="date"
+                                                    name="awarness_date"
+                                                    value={formData.awarness_date}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="awarness_place"
+                                                    value={formData.awarness_place}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="awarness_rescue_count"
+                                                    value={formData.awarness_rescue_count}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Awareness Report:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    as="textarea"
+                                                    name="awarness_report"
+                                                    rows={3}
+                                                    value={formData.awarness_report}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                    </>
+
+                                )}
+
+                                {formData.event_type === 'outing' && (
+                                    <>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Outing Name:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="outing_name"
+                                                    value={formData.outing_name}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="date"
+                                                    name="outing_date"
+                                                    value={formData.outing_date}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="outing_place"
+                                                    value={formData.outing_place}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="outing_rescue_count"
+                                                    value={formData.outing_rescue_count}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Outing Report:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    as="textarea"
+                                                    name="outing_report"
+                                                    rows={3}
+                                                    value={formData.outing_report}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                    </>
+
+                                )}
+
+
+
+                                <Col md={12} className='d-flex align-items-center justify-content-end'>
+                                    <Button variant='btn btn-primary' className='m-1' type="submit">Submit</Button>
+                                    <Button variant="outline-primary" className="m-1" type="button" onClick={handleNext}>
+                                        <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
+                                    </Button>
+                                </Col>
+                            </Form>
                         </Col>
-                    </Form.Group>
-
-                    {/* Conditionally render name fields */}
-                    {formData.event_type === 'event' && (
-                        <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="4" className='text-start'>Name of the Event:</Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    name="event_name"
-                                    value={formData.event_name}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Col>
-                        </Form.Group>
-                    )}
-
-                    {formData.event_type === 'awareness' && (
-                        <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="4" className='text-start'>Awareness Camp Name:</Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    name="awareness_name"
-                                    value={formData.awareness_name}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Col>
-                        </Form.Group>
-                    )}
-
-                    {formData.event_type === 'outing' && (
-                        <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="4" className='text-start'>Outing Name:</Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    name="outing_name"
-                                    value={formData.outing_name}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Col>
-                        </Form.Group>
-                    )}
-
-                    {/* Common Fields */}
-                    <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
-                        <Col sm="8">
-                            <Form.Control
-                                type="date"
-                                name="event_date"
-                                value={formData.event_date}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
-                        <Col sm="8">
-                            <Form.Control
-                                type="text"
-                                name="event_place"
-                                value={formData.event_place}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
-                        <Col sm="8">
-                            <Form.Control
-                                type="text"
-                                name="event_rescue_count"
-                                value={formData.event_rescue_count}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </Col>
-                    </Form.Group>
-
-                    {/* Report Field Based on Type */}
-                    {formData.event_type === 'event' && (
-                        <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="4" className='text-start'>Event Report:</Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    as="textarea"
-                                    name="event_report"
-                                    rows={3}
-                                    value={formData.event_report}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Col>
-                        </Form.Group>
-                    )}
-
-                    {formData.event_type === 'awareness' && (
-                        <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="4" className='text-start'>Awareness Report:</Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    as="textarea"
-                                    name="awarness_report"
-                                    rows={3}
-                                    value={formData.awarness_report}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Col>
-                        </Form.Group>
-                    )}
-
-                    {formData.event_type === 'outing' && (
-                        <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="4" className='text-start'>Outing Report:</Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    as="textarea"
-                                    name="outing_report"
-                                    rows={3}
-                                    value={formData.outing_report}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Col>
-                        </Form.Group>
-                    )}
-
-                    <Col md={12} className='d-flex align-items-center justify-content-end'>
-                        <Button variant="outline-primary" className="m-1" type="submit">
-                            <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
-                        </Button>
-                    </Col>
-                </Form>
-            </Col>
-        </Row>
-    </Container>
-)}
+                    </Row>
+                </Container>
+            )}
 
             {step === 2 && (
                 <Container>
@@ -340,7 +551,7 @@ function Annual_Report() {
                             <Col md={12} className="text-start">
                                 <h3 className="annual_section_title mt-3">General Celebration Details</h3>
                             </Col>
-                            <Form noValidate validated={validated} onSubmit={handleGeneral}>
+                            <Form noValidate validated={validated} onSubmit={handleCelebrationSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>
                                         Name of the Celebration :
@@ -412,11 +623,13 @@ function Annual_Report() {
                                         />
                                     </Col>
                                 </Form.Group>
-                                <Col md={12}>
+                                <Col md={12} className='d-flex align-items-center justify-content-between'>
                                     <Button variant="outline-primary" className="m-1" onClick={handleBack}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-primary" className="m-1" type="submit">
+                                    <Button variant="btn btn-primary" className="m-1" type='submit'>Submit
+                                    </Button>
+                                    <Button variant="outline-primary" className="m-1" type="button" onClick={handleGeneral}>
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
@@ -433,7 +646,7 @@ function Annual_Report() {
                             <Col md={12} className="text-start">
                                 <h3 className="annual_section_title mt-3">Community Programs</h3>
                             </Col>
-                            <Form noValidate validated={validated} onSubmit={handleCommunity}>
+                            <Form noValidate validated={validated} onSubmit={handleCommunitySubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>
                                         Name of the Program :
@@ -495,11 +708,12 @@ function Annual_Report() {
                                         />
                                     </Col>
                                 </Form.Group>
-                                <Col md={12}>
+                                <Col md={12} className='d-flex align-items-center justify-content-between'>
                                     <Button variant="outline-primary" className="m-1" onClick={handleBack1}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-primary" className="m-1" type="submit">
+                                    <Button variant='btn btn-primary' className='m-1' type='submit'>Submit</Button>
+                                    <Button variant="outline-primary" className="m-1" type="button" onClick={handleCommunity}>
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
@@ -516,10 +730,10 @@ function Annual_Report() {
                             <Col md={12} className="text-start">
                                 <h3 className="annual_section_title mt-3">Staff Programs</h3>
                             </Col>
-                            <Form noValidate validated={validated} onSubmit={handleSubmitAll}>
+                            <Form noValidate validated={validated} onSubmit={handleStaffSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>
-                                        Name of the Staff Programs :
+                                        Name of the Programs :
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control type="text"
@@ -578,12 +792,11 @@ function Annual_Report() {
                                         />
                                     </Col>
                                 </Form.Group>
-                                <Col md={12}>
+                                <Col md={12} className='d-flex align-items-center justify-content-between'>
                                     <Button variant="outline-primary" className="m-1" onClick={handleBack3}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-primary" className="m-1" type="submit">
-                                        <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Submit
+                                    <Button variant="btn btn-primary" className="m-1" type="submit"> Submit
                                     </Button>
                                 </Col>
                             </Form>
@@ -592,7 +805,7 @@ function Annual_Report() {
                 </Container>
             )}
 
-            
+
 
 
         </>

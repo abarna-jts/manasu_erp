@@ -15,7 +15,8 @@ const { createRescueCondition,
      updateObservationReport,
      showRescueCondition,
      updateRescueCondition,
-     getNurseRecordbyID
+     getNurseRecordbyID,
+     createPrescription
     } = require("../controllers/residency");
 const router = express.Router();
 
@@ -32,6 +33,9 @@ router.post("/nurse_record",createRecord);
 router.get("/get_nurse_record",getNurseRecord);
 router.get("/getNurseRecordbyID/:id",getNurseRecordbyID);
 router.put("/updateRecords/:id",updateNurseRecords);
+
+//prescription 
+router.post("/createPrescription",createPrescription);
 
 // Doctor Consultancy 
 router.post("/create_dr_consults",createDrConsultant);

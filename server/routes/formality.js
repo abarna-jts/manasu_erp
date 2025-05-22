@@ -21,7 +21,11 @@ const { createSelfDeclaration,
     createInternForm,
     getStudentDetails,
     getStudendDetailsbyID,
-    updateStudentDetail
+    updateStudentDetail,
+    createEventReport,
+    createCelebrationReport,
+    createCommunityReport,
+    createStaffReport
 } = require("../controllers/formality");
 const router = express.Router();
 
@@ -31,6 +35,10 @@ router.put("/updateFormalityForm/:admission_no",updateFormalityForm);
 router.delete("/deleteFormalityForm/:admission_no",deleteFormalityForm);
 
 //Essential Record
+router.post("/createEventReport",createEventReport);
+router.post("/createCelebrationReport",createCelebrationReport);
+router.post("/createCommunityReport", createCommunityReport);
+router.post("/createStaffReport", createStaffReport);
 router.post("/createRecords",createRecords);
 router.get("/getEssentialRecord/:admission_no",getEssentialRecords);
 router.put("/updateEssentialRecords/:admission_no",updateEssentialRecords);

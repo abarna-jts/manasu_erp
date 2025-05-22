@@ -7,16 +7,24 @@ import axios from 'axios';
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css
+import { Alert } from "react-bootstrap";
 
 function Observation_report() {
     const [condition_details, setConditionDetails] = useState([]);
     const [show, setShow] = useState(false);
     const [editshow, setEditShow] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [admission_no, setAdmissionNumber] = useState("");
+    const [rescueName, setRescueName] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     const handleEditClose = () => setEditShow(false);
+
+    //alert box values
+    const [submissionMessage, setSubmissionMessage] = useState("");
+    const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
+
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -54,16 +62,9 @@ function Observation_report() {
 
     const handleSelect = (ranges) => {
         const startDate = ranges.selection.startDate;
-        let endDate = ranges.selection.endDate;
+        const endDate = ranges.selection.endDate;
 
-        const maxEndDate = new Date(startDate);
-        maxEndDate.setDate(startDate.getDate() + 14);
-
-        if (endDate > maxEndDate) {
-            endDate = maxEndDate;
-        }
-
-        setState([{ ...ranges.selection, endDate }]);
+        setState([ranges.selection]);
 
         setFormData((prev) => ({
             ...prev,
@@ -71,6 +72,7 @@ function Observation_report() {
             to_date: endDate.toISOString().split('T')[0]
         }));
     };
+
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -84,8 +86,8 @@ function Observation_report() {
         e.preventDefault();
 
         const data = new FormData();
-        data.append('admission_no', formData.admission_no);
-        data.append('resident_name', formData.resident_name);
+        data.append('admission_no', admission_no);
+        data.append('resident_name', rescueName);
         data.append('from_date', formData.from_date);
         data.append('to_date', formData.to_date);
         data.append('recovery_photo', files.recovery_photo);
@@ -95,11 +97,20 @@ function Observation_report() {
             const res = await apiRoute.post('/residency/create_observation_report', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Rescue Condition submitted successfully!');
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
-            alert('Submission failed.');
+            if (response.data.message === "Rescue Condition Created Successfully") {
+                setSubmissionMessage("Form submitted successfully!");
+                setMessageType("success");
+
+                // Optionally reload after 3 seconds
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
         }
     };
 
@@ -108,11 +119,11 @@ function Observation_report() {
             const response = await apiRoute.get(`/residency/show_data/${id}`);
             const data = response.data;
 
-            
-       
-        // ✅ Use this updated logic to validate date strings
-        const startDate = data.from_date && !isNaN(new Date(data.from_date)) ? new Date(data.from_date) : new Date();
-        const endDate = data.to_date && !isNaN(new Date(data.to_date)) ? new Date(data.to_date) : new Date();
+
+
+            // ✅ Use this updated logic to validate date strings
+            const startDate = data.from_date && !isNaN(new Date(data.from_date)) ? new Date(data.from_date) : new Date();
+            const endDate = data.to_date && !isNaN(new Date(data.to_date)) ? new Date(data.to_date) : new Date();
 
             setFormData((formData) => ({
                 ...formData,
@@ -150,31 +161,39 @@ function Observation_report() {
 
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
-    
+
         const data = new FormData();
         data.append('admission_no', formData.admission_no);
         data.append('resident_name', formData.resident_name);
         data.append('from_date', formData.from_date);
         data.append('to_date', formData.to_date);
         data.append('follow_up', formData.follow_up);
-    
+
         if (files.recovery_photo instanceof File) {
             data.append('recovery_photo', files.recovery_photo);
         }
-    
+
         try {
             const res = await apiRoute.post(`/residency/updateObservationReport/${formData.admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Observation updated successfully!');
-            setEditShow(false);
-            getConditionDetails(); // Refresh table data
-        } catch (err) {
-            console.error(err);
-            alert('Update failed.');
+            if (res.data.message === "Observation updated successfully") {
+                setSubmissionMessage("Form updated successfully!");
+                setMessageType("success");
+
+                setEditShow(false);
+                getConditionDetails('');
+            } else {
+                setSubmissionMessage("updation failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
         }
     };
-    
+
 
 
     useEffect(() => {
@@ -222,11 +241,42 @@ function Observation_report() {
     //     }
     // };
 
+    const handleAdmissionChange = (e) => {
+        setAdmissionNumber(e.target.value);
+    };
+
+    useEffect(() => {
+        if (admission_no.trim() !== "") {
+            fetchRescueDetails(admission_no);
+        } else {
+            setRescueName("");
+        }
+    }, [admission_no]);
+
+    const fetchRescueDetails = async (admission_no) => {
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_name) {
+
+                setRescueName(result.rescue_name || "");
+            } else {
+
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueName("");
+        }
+    };
+
     return (
         <>
             <Container fluid>
                 <Row className='d-flex align-items-center justify-content-between'>
-                    <Col md={2} className='text-start'>
+                    <Col md={3} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
                             <Breadcrumb.Item>Home</Breadcrumb.Item>
@@ -234,8 +284,8 @@ function Observation_report() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Observation Report</h6>
                     </Col>
-                    <Col md={5} className="text-start">
-                        <h3 className="section_title">Resident Observation Report</h3>
+                    <Col md={7} className="text-start">
+                        <h3 className="section_title">Resident Observation & Progress Report – Social Worker</h3>
                     </Col>
                     <Col md={2}>
                         <Form className="navbar-search">
@@ -257,6 +307,17 @@ function Observation_report() {
                     </Col>
                 </Row>
             </Container>
+
+            <div>
+                {/* Show success or error message box */}
+                {submissionMessage && (
+                    <Alert variant={messageType} className="mt-3">
+                        {submissionMessage}
+                    </Alert>
+                )}
+            </div>
+
+
             <Container>
                 <Row>
                     <Col md={4}>
@@ -326,8 +387,8 @@ function Observation_report() {
                                     type="number"
                                     placeholder="Enter Admission Number"
                                     name="admission_no"
-                                    value={formData.admission_no}
-                                    onChange={handleInputChange}
+                                    value={admission_no}
+                                    onChange={handleAdmissionChange}
                                     required
                                 />
                             </Form.Group>
@@ -338,7 +399,7 @@ function Observation_report() {
                                     type="text"
                                     name="resident_name"
                                     placeholder="Enter Resident Name"
-                                    value={formData.resident_name}
+                                    value={rescueName}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -446,7 +507,7 @@ function Observation_report() {
                                         required={!formData.recovery_photo} // required only if there's no existing image
                                     />
                                 </div>
-                                
+
                             </Form.Group>
 
 
