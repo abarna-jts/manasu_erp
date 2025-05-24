@@ -181,8 +181,8 @@ const createRecord = (req, res) => {
   });
 };
 
-const updateNurseRecords = (req,res) =>{
-  const{
+const updateNurseRecords = (req, res) => {
+  const {
     currentMonth,
     temperature,
     bp,
@@ -190,7 +190,7 @@ const updateNurseRecords = (req,res) =>{
     weight,
     from_date,
     to_date
-  }= req.body;
+  } = req.body;
 
   const recordID = req.params.id;
 
@@ -215,7 +215,7 @@ const updateNurseRecords = (req,res) =>{
 
   const recordDate = `${fromFormatted} to ${toFormatted}`;
 
-  const recordupdate=`UPDATE nurse_record SET
+  const recordupdate = `UPDATE nurse_record SET
                        month=?,
                        date=?,
                        temperature=?,
@@ -382,20 +382,20 @@ const getNurseRecord = (req, res) => {
 
 const getNurseRecordbyID = (req, res) => {
   const id = req.params.id;
-    const query = 'SELECT * FROM nurse_record WHERE id = ?';
+  const query = 'SELECT * FROM nurse_record WHERE id = ?';
 
-    db.query(query, [id], (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Database error' });
-      }
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
 
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'Nurse Records not found' });
-      }
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Nurse Records not found' });
+    }
 
-      res.json(results[0]);
-    });
+    res.json(results[0]);
+  });
 };
 
 
@@ -646,6 +646,7 @@ const createPrescription = (req, res) => {
     admission_no,
     rescue_name,
     age,
+    current_date,
     op_no,
     hospital_name,
     department,
@@ -654,50 +655,257 @@ const createPrescription = (req, res) => {
     instruction,
     advice,
     follow_up,
-    medicine,
-    medicine_type,
-    duration,
-    intake,
-    med_instruction,
-    morning,
-    afternoon,
-    night
-  }= req.body;
+    prescription_medicines, // <-- array of medicines
+  } = req.body;
 
-  const sql = `INSERT INTO prescription (admission_no, rescue_name, age, op_no, hospital_name, department,
-   masterHealthCheckup, phone_no, instruction, advice, follow_up, medicine, medicine_type, duration, intake,
-    med_instruction, morning, afternoon, night) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+  console.log('Body received:', req.body);
+
+  if (!admission_no) {
+    return res.status(400).json({ error: 'Missing admission_no' });
+  }
+
+  const sql = `
+    INSERT INTO prescription (
+      admission_no, rescue_name, age, date, op_no, hospital_name, department,
+      masterHealthCheckup, phone_no, instruction, advice, follow_up
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  const values = [
+    admission_no,
+    rescue_name,
+    age,
+    current_date,
+    op_no,
+    hospital_name,
+    department,
+    masterHealthCheckup,
+    phone_no,
+    instruction,
+    advice,
+    follow_up,
+  ];
+
+  db.query(sql, values, (dbErr, result) => {
+    if (dbErr) {
+      return res.status(500).json({ message: "Database Error", error: dbErr });
+    }
+
+    const prescription_id = result.insertId; // Get the ID of the inserted prescription
+
+    // If no medicines, respond immediately
+    if (!Array.isArray(prescription_medicines) || prescription_medicines.length === 0) {
+      return res.status(201).json({ message: "Prescription Created Successfully", data: result });
+    }
+
+    // Prepare bulk insert query for medicines
+    const medInsertSQL = `
+      INSERT INTO prescription_medicines (
+        prescription_id, medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night
+      ) VALUES ?`;
+
+    // Convert medicine array into array of arrays
+    const medValues = prescription_medicines.map((med) => [
+      prescription_id,
+      med.medicine,
+      med.medicine_type,
+      med.duration,
+      med.intake,
+      med.med_instruction || 'Null',
+      med.morning || 'Null',
+      med.afternoon || 'Null',
+      med.night || 'Null',
+    ]);
+
+    // Bulk insert all medicine records
+    db.query(medInsertSQL, [medValues], (medErr, medResult) => {
+      if (medErr) {
+        return res.status(500).json({ message: "Error inserting medicines", error: medErr });
+      }
+
+      res.status(201).json({
+        message: "Prescription Created Successfully with Medicines",
+        prescriptionId: prescription_id,
+        medicinesInserted: medResult.affectedRows,
+      });
+    });
+  });
+};
+
+const getPrescription = (req, res) => {
+  const query = `SELECT DISTINCT prescription.*,prescription_medicines.prescription_id
+FROM prescription
+JOIN prescription_medicines ON prescription.id = prescription_medicines.prescription_id;`;
+
+  db.query(query, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res.status(201).json({ message: "Condition Details Get Successfully", data: data });
+  });
+}
+
+const getPrescriptionbyID = (req, res) => {
+  const id = req.params.id;
+  const query = `
+    SELECT p.*, pm.*
+    FROM prescription p
+    LEFT JOIN prescription_medicines pm ON p.id = pm.prescription_id
+    WHERE p.id = ?;
+  `;
+
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Prescription not found' });
+    }
+
+    const prescription = {
+      id: results[0].id,
+      admission_no: results[0].admission_no,
+      rescue_name: results[0].rescue_name,
+      age: results[0].age,
+      created_date: results[0].created_date,
+      op_no: results[0].op_no,
+      hospital_name: results[0].hospital_name,
+      department: results[0].department,
+      masterHealthCheckup: results[0].masterHealthCheckup,
+      phone_no: results[0].phone_no,
+      instruction: results[0].instruction,
+      advice: results[0].advice,
+      follow_up: results[0].follow_up,
+      // Extracting medicines
+      prescription_medicines: results.map(row => ({
+        prescription_id: row.prescription_id,
+        medicine: row.medicine,
+        medicine_type: row.medicine_type,
+        duration: row.duration,
+        intake: row.intake,
+        med_instruction: row.med_instruction,
+        morning: row.morning,
+        afternoon: row.afternoon,
+        night: row.night,
+      })),
+    };
+
+    res.json(prescription);
+  });
+};
+
+const updatePrescription = (req, res) => {
+    const id = req.params.id;
+    const {
+        admission_no,
+        rescue_name,
+        age,
+        op_no,
+        hospital_name,
+        department,
+        masterHealthCheckup,
+        phone_no,
+        instruction,
+        advice,
+        follow_up,
+        prescription_medicines,
+    } = req.body;
+
+    if (!admission_no) {
+        return res.status(400).json({ error: 'Missing admission_no' });
+    }
+
+    console.log("Updating prescription ID:", id);
+
+    const sql = `
+        UPDATE prescription SET
+          admission_no = ?, 
+          rescue_name = ?, 
+          age = ?, 
+          op_no = ?, 
+          hospital_name = ?, 
+          department = ?,
+          masterHealthCheckup = ?, 
+          phone_no = ?, 
+          instruction = ?, 
+          advice = ?, 
+          follow_up = ?
+        WHERE id = ?`;
 
     const values = [
-      admission_no,
-      rescue_name,
-      age,
-      op_no,
-      hospital_name,
-      department,
-      masterHealthCheckup,
-      phone_no,
-      instruction,
-      advice,
-      follow_up,
-      medicine,
-      medicine_type,
-      duration,
-      intake,
-      med_instruction,
-      morning,
-      afternoon,
-      night
-    ]; 
-  db.query(sql, values, (dbErr, data) => {
-      if (dbErr) {
-        return res.status(500).json({ message: "Database Error", error: dbErr });
-      }
-      res.status(201).json({ message: "Prescription Created Successfully", data });
-    });
-  
+        admission_no,
+        rescue_name,
+        age,
+        op_no,
+        hospital_name,
+        department,
+        masterHealthCheckup,
+        phone_no,
+        instruction,
+        advice,
+        follow_up,
+        id,
+    ];
 
-}
+    db.query(sql, values, (updateErr, result) => {
+        if (updateErr) {
+            return res.status(500).json({ message: 'Prescription update failed', error: updateErr });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'No prescription found with this ID' });
+        }
+
+        if (!Array.isArray(prescription_medicines) || prescription_medicines.length === 0) {
+            return res.status(200).json({ message: 'Prescription updated (no medicines provided)' });
+        }
+
+        let completed = 0;
+        let hasError = false;
+
+        prescription_medicines.forEach((med) => {
+            const updateMedSql = `
+                UPDATE prescription_medicines SET
+                  medicine = ?, 
+                  medicine_type = ?, 
+                  duration = ?, 
+                  intake = ?, 
+                  med_instruction = ?, 
+                  morning = ?, 
+                  afternoon = ?, 
+                  night = ?
+                WHERE id = ? AND prescription_id = ?
+            `;
+
+            const medValues = [
+                med.medicine || '',
+                med.medicine_type || '',
+                med.duration || '',
+                med.intake || '',
+                med.med_instruction || '',
+                med.morning ?? null,
+                med.afternoon ?? null,
+                med.night ?? null,
+                med.id,
+                id
+            ];
+
+            db.query(updateMedSql, medValues, (medErr) => {
+                completed++;
+                if (medErr && !hasError) {
+                    hasError = true;
+                    return res.status(500).json({ message: 'Error updating medicine', error: medErr });
+                }
+
+                if (completed === prescription_medicines.length && !hasError) {
+                    res.status(200).json({ message: 'Prescription and medicines updated successfully' });
+                }
+            });
+        });
+    });
+};
+
 
 
 module.exports = {
@@ -718,5 +926,8 @@ module.exports = {
   updateObservationReport,
   showRescueCondition,
   updateRescueCondition,
-  createPrescription
+  createPrescription,
+  getPrescription,
+  getPrescriptionbyID,
+  updatePrescription
 };

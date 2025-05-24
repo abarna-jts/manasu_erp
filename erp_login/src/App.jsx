@@ -35,6 +35,7 @@ import Profile from './Components/pages/Profile';
 import InternshipForm from './Components/pages/Admin_Formality/InternshipForm';
 import AllStudentDetails from './Components/pages/Admin_Formality/AllStudentDetails';
 import Prescription_form from './Components/pages/Residency_time/prescription_form';
+import MSE_form from './Components/pages/Recovery/MSE_form';
 
 function App() {
 
@@ -115,6 +116,11 @@ function App() {
                 element={<MainLayout><Essential_record /></MainLayout>}
               />
 
+              <Route
+                path='/mseform'
+                element={<MainLayout><MSE_form /></MainLayout>}
+              />
+
                <Route
                 path='/annual_report'
                 element={<MainLayout><Annual_Report /></MainLayout>}
@@ -146,6 +152,7 @@ function App() {
                 path='/imagepdf'
                 element={<MainLayout><ImagePDF /></MainLayout>}
               />
+
             </>
 
           )}

@@ -121,7 +121,7 @@ const Sidebar = () => {
                   <NavItem title="Family Identification Form" to="" icon={faFileAlt} />
                   <NavItem title="Articles carried Form" to="" icon={faSuitcase} />
                   <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
-                  <NavItem title="MSE Form" to="" icon={faNotesMedical  } />
+                  <NavItem title="MSE Form" to="/mseform" icon={faNotesMedical  } />
                   <NavItem title="Activity Details" to="" icon={faCalendarAlt } />
                 </CollapsableNavItem>
 
@@ -207,7 +207,7 @@ const Sidebar = () => {
               <>
                 <NavItem title="Observation Report" to="/observation_report" icon={faUserNurse} />
                 <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
-                <NavItem title="MSE Form" to="" icon={faNotesMedical  } />
+                <NavItem title="MSE Form" to="mse_form" icon={faNotesMedical  } />
                 {/* <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} /> */}
               </>
             )}
