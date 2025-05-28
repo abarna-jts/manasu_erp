@@ -8,6 +8,7 @@ const residencyRoutes = require('./routes/residency');
 const reunionRoutes = require('./routes/reunion');
 const formalityRoutes = require('./routes/formality');
 const dashboardRoutes = require('./routes/dashboard');
+const recoveryRoutes = require('./routes/recovery');
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ app.use('/api', authRoutes);
 app.use('/admision',admissionRoutes);
 app.use('/scrb_form',scrbFormRoutes);
 app.use('/residency',residencyRoutes);
+app.use('/recovery',recoveryRoutes);
 app.use('/reunion',reunionRoutes);
 app.use('/formality',formalityRoutes);
 app.use('/dashboard',dashboardRoutes);
