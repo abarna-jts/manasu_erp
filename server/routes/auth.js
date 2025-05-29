@@ -21,29 +21,28 @@ router.post('/register', async (req, res) => {
 
 // Login
 router.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    console.log("Login attempt:", email, password);
-  
-    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, users) => {
-      if (err) {
-        console.error("DB error:", err);
-        return res.status(500).json({ message: 'Database error' });
-      }
-      if (users.length === 0) {
-        console.log("No user found for email:", email);
-        return res.status(401).json({ message: 'Invalid email' });
-      }
-  
-      const valid = await bcrypt.compare(password, users[0].password);
-      if (!valid) {
-        console.log("Password mismatch");
-        return res.status(401).json({ message: 'Invalid password' });
-      }
-  
-      const token = jwt.sign({ id: users[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      res.json({ token });
+  const { email, password } = req.body;
+
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, users) => {
+    if (err) return res.status(500).json({ message: 'Database error' });
+    if (users.length === 0) return res.status(401).json({ message: 'Invalid email' });
+
+    const valid = await bcrypt.compare(password, users[0].password);
+    if (!valid) return res.status(401).json({ message: 'Invalid password' });
+
+    const token = jwt.sign({ id: users[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // DEBUG: check if usertype exists
+    console.log("User login successful:", users[0]);
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      usertype: users[0].user_type 
+      // username:users[0].username
     });
   });
+});
   
 
 module.exports = router;
