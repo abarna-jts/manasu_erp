@@ -296,7 +296,7 @@ function Media_consent_form() {
                 <Form className="navbar-search col-md-9 d-flex justify-content-center align-items-center mt-3">
                     <Form.Group id="topbarSearch" className="d-flex align-items-center">
                         <Col md={6}>
-                            <Form.Label>Enter Your Admission Number:</Form.Label>
+                            <Form.Label>Admission Number:</Form.Label>
                         </Col>
                         <Col md={6}>
                             <InputGroup className="input-group-merge search-bar">

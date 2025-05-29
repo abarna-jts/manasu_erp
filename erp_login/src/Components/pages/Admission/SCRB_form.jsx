@@ -368,7 +368,7 @@ function SCRB_form() {
                                                 value={admission_no}
                                                 onChange={(e) => setAdmissionNumber(e.target.value)}
                                             />
-                                            <button type="button" className="btn btn-primary" onClick={handleSearch}>
+                                            <button type="button" className="btn btn-success" onClick={handleSearch}>
                                                 Enter
                                             </button>
 
@@ -392,7 +392,7 @@ function SCRB_form() {
                             </Col>
 
                             <Col md={4} className="d-flex align-items-center justify-content-end">
-                                <Button variant="outline-primary" className="m-1" type="button" onClick={handleNextpage}>
+                                <Button variant="outline-success" className="m-1" type="button" onClick={handleNextpage}>
                                     <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                 </Button>
                             </Col>
@@ -892,7 +892,7 @@ function SCRB_form() {
 
                             <div className="mb-3">
 
-                                <button type="submit" className="btn btn-primary">
+                                <button type="submit" className="btn btn-success">
                                     Submit Form
                                 </button>
 

@@ -118,11 +118,11 @@ const Sidebar = () => {
 
                 {/* Recovery menus */}
                 <CollapsableNavItem title="Recovery" icon={faHome}>
-                  <NavItem title="Family Identification Form" to="" icon={faFileAlt} />
+                  <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
                   <NavItem title="Articles carried Form" to="" icon={faSuitcase} />
                   <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
                   <NavItem title="MSE Form" to="/mseform" icon={faNotesMedical  } />
-                  <NavItem title="Activity Details" to="" icon={faCalendarAlt } />
+                  <NavItem title="Activity Details" to="/annual_report" icon={faCalendarAlt } />
                 </CollapsableNavItem>
 
                 {/* Reunion Menus */}

@@ -127,6 +127,8 @@ const createRecords = (req, res) => {
             aadhar_card,
             udid_no,
             disability_no,
+            voter_id,
+            form_7,
             bank_name,
             account_no,
             ifsc_code,
@@ -134,6 +136,7 @@ const createRecords = (req, res) => {
             policy_no,
             validity_period,
             other_gvt_scheme,
+            any_other
         } = req.body;
 
         if (!req.file) {
@@ -145,10 +148,10 @@ const createRecords = (req, res) => {
             : null;
 
         const q = `INSERT INTO essential_records 
-        (admission_no, rescue_name, aadhar_card, udid_no, disability_no,
+        (admission_no, rescue_name, aadhar_card, udid_no, disability_no,voter_id, form_7,
          bank_name, account_no, ifsc_code, bank_passbook,
-         insurance_provider, policy_no, validity_period, other_gvt_scheme)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+         insurance_provider, policy_no, validity_period, other_gvt_scheme, any_other)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         const values = [
             admission_no,
@@ -156,6 +159,8 @@ const createRecords = (req, res) => {
             aadhar_card,
             udid_no,
             disability_no,
+            voter_id,
+            form_7,
             bank_name,
             account_no,
             ifsc_code,
@@ -164,6 +169,7 @@ const createRecords = (req, res) => {
             policy_no,
             validity_period,
             other_gvt_scheme,
+            any_other
         ];
 
         db.query(q, values, (dbErr, data) => {
@@ -795,17 +801,21 @@ const createInternForm = (req, res) => {
         stud_name,
         stud_id,
         department,
+        email,
+        phone,
+        field,
         clg_name,
         duration,
         from_date,
-        to_date
+        to_date,
+        choose_intern
     } = req.body;
 
-    const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, department, clg_name, duration,from_date, to_date)
-                        VALUES(?, ?, ?, ?, ?, ?, ?)`;
+    const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, department, email, phone, field, clg_name, duration,from_date, to_date, choose_intern)
+                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
-        stud_name, stud_id, department, clg_name, duration, from_date, to_date
+        stud_name, stud_id, department, email, phone, field, clg_name, duration, from_date, to_date, choose_intern
     ];
 
     db.query(insertQuery, values, (dbErr, data) => {
@@ -899,5 +909,6 @@ module.exports = {
     createEventReport,
     createCelebrationReport,
     createCommunityReport,
-    createStaffReport
+    createStaffReport,
+    
 };

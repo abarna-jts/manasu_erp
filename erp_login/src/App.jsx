@@ -36,6 +36,7 @@ import InternshipForm from './Components/pages/Admin_Formality/InternshipForm';
 import AllStudentDetails from './Components/pages/Admin_Formality/AllStudentDetails';
 import Prescription_form from './Components/pages/Residency_time/prescription_form';
 import MSE_form from './Components/pages/Recovery/MSE_form';
+import Sample from './Components/authentication/sample';
 
 function App() {
 
@@ -151,6 +152,11 @@ function App() {
               <Route
                 path='/imagepdf'
                 element={<MainLayout><ImagePDF /></MainLayout>}
+              />
+
+              <Route
+                path='/sample'
+                element={<MainLayout><Sample /></MainLayout>}
               />
 
             </>

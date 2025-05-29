@@ -665,7 +665,7 @@ function First_info_form() {
                             </Row>
 
                             <Col md={11}>
-                                <Button variant="outline-primary" className="m-1" type="submit">
+                                <Button variant="outline-success" className="m-1" type="submit">
                                     <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                 </Button>
                             </Col>
@@ -863,10 +863,10 @@ function First_info_form() {
                                     </Col>
                                 </Row>
                                 <Col md={11}>
-                                    <Button variant="outline-primary" className="m-1" onClick={handleBack}>
+                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-primary" className="m-1" type="submit">
+                                    <Button variant="outline-success" className="m-1" type="submit">
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
@@ -1269,10 +1269,10 @@ function First_info_form() {
                                 </Row>
 
                                 <Col md={11}>
-                                    <Button variant="outline-primary" className="m-1" onClick={handleBack3}>
+                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack3}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-primary" className="m-1" type="submit" onClick={handleSubmitFinallForm}>
+                                    <Button variant="outline-success" className="m-1" type="submit" onClick={handleSubmitFinallForm}>
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Submit
                                     </Button>
                                 </Col>

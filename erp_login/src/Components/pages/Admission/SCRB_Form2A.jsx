@@ -356,7 +356,7 @@ function SCRB_Form2A() {
                           fetchFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                      <button type="button" className="btn btn-primary mx-2" onClick={() => {
+                      <button type="button" className="btn btn-success mx-2" onClick={() => {
                         if (!admission_no.trim()) {
                           alert("Please enter your admission number.");
                         } else {
@@ -372,10 +372,10 @@ function SCRB_Form2A() {
                 </div>
               </Col>
               <Col md={4} className="d-flex align-items-center justify-content-end">
-                <Button variant="outline-primary" className="m-1" type="button" onClick={handleBackPage}>
+                <Button variant="outline-secondary" className="m-1" type="button" onClick={handleBackPage}>
                   <FontAwesomeIcon icon={faArrowLeft} className="me-2" />Back
                 </Button>
-                <Button variant="outline-primary" className="m-1" type="button" onClick={handleNextpage} >
+                <Button variant="outline-success" className="m-1" type="button" onClick={handleNextpage} >
                   <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                 </Button>
               </Col>
@@ -546,7 +546,7 @@ function SCRB_Form2A() {
               </table>
               <div className="mb-3">
 
-                <button type="submit" className="btn btn-primary mx-3">
+                <button type="submit" className="btn btn-success mx-3">
                   Submit Form
                 </button>
 

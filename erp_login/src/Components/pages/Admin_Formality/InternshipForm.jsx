@@ -11,6 +11,9 @@ function InternshipForm() {
         stud_name: '',
         stud_id: '',
         department: '',
+        email: '',
+        phone: '',
+        field: '',
         clg_name: '',
         duration: '',
         from_date: '',
@@ -144,6 +147,55 @@ function InternshipForm() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
+                                    Email ID :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="email"
+                                        type="text"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Contact Number :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="phone"
+                                        type="number"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Interested Field :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        as="select"
+                                        name="field"
+                                        value={formData.field}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="">-- Select --</option>
+                                        <option value="Social Worker">Social Worker</option>
+                                        <option value="Social Services">Social Services</option>
+                                        <option value="Psychology">Psychology</option>
+                                    </Form.Control>
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
                                     College Name :
                                 </Form.Label>
                                 <Col sm="8">
@@ -195,6 +247,21 @@ function InternshipForm() {
                                     />
                                 </Col>
                             </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Why did you choose MANASU for your internship?
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        as="textarea" rows={3}
+                                        name="choose_intern"
+                                        type="text"
+                                        value={formData.choose_intern}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
                             <Col md={12} className='d-flex align-items-center justify-content-center'>
                                 <div className="d-flex align-tems-cente justify-content-between">
                                     <Button variant="primary" className="m-1" type="submit">Submit</Button>
@@ -207,7 +274,7 @@ function InternshipForm() {
                 </Form>
             </Container>
 
-           
+
 
 
         </>

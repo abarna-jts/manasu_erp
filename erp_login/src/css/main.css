@@ -353,8 +353,24 @@ body {
 }
 
 .step.active .step-number {
-    background: #0d6efd;
+    background: #84c342;
     /* Bootstrap primary */
+}
+.btn-outline-success{
+	/* background: #83c341 !important; */
+	border: 1px solid #83c341 !important;
+	color: #83c341 !important;
+}
+.btn-outline-success:hover{
+	background: #83c341 !important;
+	color: #fff !important;
+}
+.btn-success{
+	background-color: #83c341 !important;
+	border: 1px solid #83c341 !important;
+}
+.btn-success:hover{
+	background-color: #64a027 !important;
 }
 
 .step-label {

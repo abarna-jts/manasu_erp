@@ -7,7 +7,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Modal from 'react-bootstrap/Modal';
-
+import Cookies from 'js-cookie';
 
 function AllStudentDetails() {
     const [stud_details, setStudentDetails] = useState([]);
@@ -16,15 +16,21 @@ function AllStudentDetails() {
 
     const handleClose = () => setShow(false);
 
+    const userType = Cookies.get('usertype'); 
+
     const [formData, setFormData] = useState({
-        id:'',
+        id: '',
         stud_name: '',
         stud_id: '',
         department: '',
+        email: '',
+        phone: '',
+        field: '',
         clg_name: '',
         duration: '',
         from_date: '',
-        to_date: ''
+        to_date: '',
+        choose_intern: '',
     })
 
     const apiRoute = axios.create({
@@ -82,10 +88,14 @@ function AllStudentDetails() {
                 stud_name: student.stud_name || '',
                 stud_id: student.stud_id || '',
                 department: student.department || '',
+                email: student.email || '',
+                phone: student.phone || '',
+                field: student.field || '',
                 clg_name: student.clg_name || '',
                 duration: student.duration || '',
                 from_date: student.from_date ? student.from_date.slice(0, 10) : '', // format date
                 to_date: student.to_date ? student.to_date.slice(0, 10) : '',
+                choose_intern: student.choose_intern || ''
             }));
 
             setTimeout(() => {
@@ -149,10 +159,14 @@ function AllStudentDetails() {
                 stud_name: student.stud_name || '',
                 stud_id: student.stud_id || '',
                 department: student.department || '',
+                email: student.email || '',
+                phone: student.phone || '',
+                field: student.field || '',
                 clg_name: student.clg_name || '',
                 duration: student.duration || '',
                 from_date: student.from_date ? student.from_date.slice(0, 10) : '', // format date
                 to_date: student.to_date ? student.to_date.slice(0, 10) : '',
+                choose_intern: student.choose_intern || ''
             }));
 
             setShow(true);
@@ -163,7 +177,7 @@ function AllStudentDetails() {
     };
 
     const handleUpdate = async (e) => {
-       e.preventDefault();
+        e.preventDefault();
         const id = formData.id; // ✅ Get it from form data
         if (!id) {
             alert("ID not found.");
@@ -171,7 +185,7 @@ function AllStudentDetails() {
         }
         try {
             const response = await apiRoute.put(`/formality/updateStudentDetail/${id}`, formData);
-            
+
             console.log(response.data);
             if (response.status === 200) {
                 alert('Form Updated successfully!');
@@ -264,11 +278,11 @@ function AllStudentDetails() {
                                                         handleEditform(item.id);
                                                     }}
                                                 ><i className="fas fa-edit"></i> </button>
-                                                {/* {userType === "2" && (
+                                                {userType === "2" && (
                                                     <button className="btn btn-danger icon_details"
                                                         onClick={() => handleDelete(item.id)}
                                                     ><i className="fas fa-trash"></i></button>
-                                                )} */}
+                                                )}
                                             </td>
                                         </tr>
                                     ))
@@ -334,6 +348,54 @@ function AllStudentDetails() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
+                                    Email ID :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="email"
+                                        type="text"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Contact Number :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="phone"
+                                        type="number"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Interested Field :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        as="select"
+                                        name="field"
+                                        value={formData.field}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="">-- Select --</option>
+                                        <option value="Social Worker">Social Worker</option>
+                                        <option value="Social Services">Social Services</option>
+                                        <option value="Psychology">Psychology</option>
+                                    </Form.Control>
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
                                     College Name :
                                 </Form.Label>
                                 <Col sm="8">
@@ -380,6 +442,21 @@ function AllStudentDetails() {
                                         name="to_date"
                                         type="date"
                                         value={formData.to_date}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Why did you choose MANASU for your internship?
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        as="textarea" rows={3}
+                                        name="choose_intern"
+                                        type="text"
+                                        value={formData.choose_intern}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -445,6 +522,54 @@ function AllStudentDetails() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                         <Form.Label column sm="4">
+                                            Email ID :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                name="email"
+                                                type="text"
+                                                value={formData.email}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            Contact Number :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                name="phone"
+                                                type="number"
+                                                value={formData.phone}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            Interested Field :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                as="select"
+                                                name="field"
+                                                value={formData.field}
+                                                onChange={handleInputChange}
+                                                required
+                                            >
+                                                <option value="">-- Select --</option>
+                                                <option value="Social Worker">Social Worker</option>
+                                                <option value="Social Services">Social Services</option>
+                                                <option value="Psychology">Psychology</option>
+                                            </Form.Control>
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
                                             College Name :
                                         </Form.Label>
                                         <Col sm="8">
@@ -491,6 +616,21 @@ function AllStudentDetails() {
                                                 name="to_date"
                                                 type="date"
                                                 value={formData.to_date}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="4">
+                                            Why did you choose MANASU for your internship?
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                as="textarea" rows={3}
+                                                name="choose_intern"
+                                                type="text"
+                                                value={formData.choose_intern}
                                                 onChange={handleInputChange}
                                                 required
                                             />

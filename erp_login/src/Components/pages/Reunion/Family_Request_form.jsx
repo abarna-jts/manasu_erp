@@ -417,7 +417,7 @@ function Family_Request_form() {
                 <Form className="navbar-search col-md-12 d-flex align-items-center justify-content-center">
                     <Form.Group id="topbarSearch" className="mt-3 d-flex align-items-center justify-content-center">
                         <Col md={5}>
-                            <Form.Label>Enter Your Admission Number:</Form.Label>
+                            <Form.Label>Admission Number:</Form.Label>
                         </Col>
                         <Col md={4}>
                             <InputGroup className="input-group-merge search-bar">

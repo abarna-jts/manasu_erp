@@ -315,7 +315,7 @@ function Self_Declaration_form() {
                 <Form className="navbar-search col-md-9 d-flex justify-content-center align-items-center mt-3">
                     <Form.Group id="topbarSearch" className="d-flex align-items-center">
                         <Col md={6}>
-                            <Form.Label>Enter Your Admission Number:</Form.Label>
+                            <Form.Label>Admission Number:</Form.Label>
                         </Col>
                         <Col md={6}>
                             <InputGroup className="input-group-merge search-bar">
@@ -406,7 +406,7 @@ function Self_Declaration_form() {
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Signation :
+                                            Signature :
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control

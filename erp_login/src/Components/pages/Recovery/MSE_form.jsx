@@ -819,6 +819,55 @@ function MSE_form() {
                       </li>
                     </ul>
                   </li>
+
+                  <li className="tab-content tab-content-5 typography">
+                    <h1>5. PERCEPTION</h1>
+                    <ul>
+                      <li className='icon-li'>
+                        <h4 style={{ display: "inline" }}>Stream and form of thought:</h4>
+                        <div className="d-flex flex-wrap gap-3 mt-2">
+                          <Form.Check type="checkbox" id="Spontaneity" label="Spontaneity" />
+                          <Form.Check type="checkbox" id="productivity" label="Productivity" />
+                          <Form.Check type="checkbox" id="flight of ideas" label="Flight of Ideas" />
+                          <Form.Check type="checkbox" id="poverty of content of speech" label="Poverty of content of speech" />
+                          <Form.Check type="checkbox" id="thought block" label="thought block" />
+                          <Form.Check type="checkbox" id="thought is assessed" label="Continuity of thought is assessed" />
+                          <Form.Check type="checkbox" id="questions asked" label="Whether the thought processes are relevant to the questions asked." />
+                          <Form.Check type="checkbox" id="loosening of associations" label="Loose of associations" />
+                          <Form.Check type="checkbox" id="loosening of tangentiality" label="Loose of tangentiality" />
+                          <Form.Check type="checkbox" id="loosening of circumstantiality" label="Loose of circumstantiality" />
+                          <Form.Check type="checkbox" id="Illogical thinking" label="Illogical thinking" />
+                          <Form.Check type="checkbox" id="perseveration" label="Perseveration" />
+                          <Form.Check type="checkbox" id="verbigeration is noted" label="Verbigeration is noted" />
+                        </div>
+                      </li>
+
+                      <li className='icon-li'>
+                        <h4 style={{ display: "inline" }}>Content of thought:</h4>
+                        <div className="d-flex flex-wrap gap-3 mt-2">
+                          <Form.Check type="checkbox" id="obession" label="Obsessions and contents of phobias" />
+                          <Form.Check type="checkbox" id="ideas and delusions" label="Ideas and delusions of persecution" />
+                          <Form.Check type="checkbox" id="reference" label="Reference" />
+                          <Form.Check type="checkbox" id="grandeur" label="Grandeur" />
+                          <Form.Check type="checkbox" id="love" label="Love" />
+                          <Form.Check type="checkbox" id="jealousy" label="Jealousy (infidelity)" />
+                          <Form.Check type="checkbox" id="guilt" label="Guilt" />
+                          <Form.Check type="checkbox" id="nihilism" label="Nihilism" />
+                          <Form.Check type="checkbox" id="poverty" label="Poverty" />
+                          <Form.Check type="checkbox" id="Hypochondriacal symptoms" label="Hypochondriacal symptoms" />
+                          <Form.Check type="checkbox" id="hopelessness" label="Hopelessness" />
+                          <Form.Check type="checkbox" id="helplessness" label="Helplessness" />
+                          <Form.Check type="checkbox" id="worthlessness" label="Worthlessness" />
+                          <Form.Check type="checkbox" id="suicidal ideation" label="suicide should be explored" />
+                          <Form.Check type="checkbox" id="Delusions of control" label="Delusions of control" />
+                          <Form.Check type="checkbox" id="thought insertion" label="thought insertion" />
+                          <Form.Check type="checkbox" id="thought withdrawal" label="thought withdrawal" />
+                          <Form.Check type="checkbox" id="thought broadcasting" label="thought broadcasting" />
+                          <Form.Check type="checkbox" id="Neologisms" label="Neologisms" />
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
                   {/* THOUGHT END*/}
 
                   {/* Cognition START*/}

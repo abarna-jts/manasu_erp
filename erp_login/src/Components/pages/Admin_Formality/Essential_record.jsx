@@ -33,6 +33,8 @@ function Essential_record() {
         aadhar_card: '',
         udid_no: '',
         disability_no: '',
+        voter_id: '',
+        form_7: '' ,
         bank_name: '',
         account_no: '',
         ifsc_code: '',
@@ -40,6 +42,7 @@ function Essential_record() {
         policy_no: '',
         validity_period: '',
         other_gvt_scheme: '',
+        any_other:''
     })
 
     const [files, setFiles] = useState({
@@ -55,12 +58,12 @@ function Essential_record() {
             bank_passbook: file, // Store actual File object
         }));
 
-        // Optional: if you need to preview
-        const previewUrl = URL.createObjectURL(file);
-        setPreview((prev) => ({
-            ...prev,
-            bank_passbook: previewUrl,
-        }));
+        // // Optional: if you need to preview
+        // const previewUrl = URL.createObjectURL(file);
+        // setPreview((prev) => ({
+        //     ...prev,
+        //     bank_passbook: previewUrl,
+        // }));
     }
 };
 
@@ -110,6 +113,8 @@ function Essential_record() {
         data.append('aadhar_card', formData.aadhar_card);
         data.append('udid_no', formData.udid_no);
         data.append('disability_no', formData.disability_no);
+        data.append('voter_id', formData.voter_id);
+        data.append('form_7', formData.form_7);
         data.append('bank_name', formData.bank_name);
         data.append('account_no', formData.account_no);
         data.append('ifsc_code', formData.ifsc_code);
@@ -118,6 +123,7 @@ function Essential_record() {
         data.append('policy_no', formData.policy_no);
         data.append('validity_period', formData.validity_period);
         data.append('other_gvt_scheme', formData.other_gvt_scheme);
+        data.append('any_other', formData.any_other);
 
         try {
             const res = await apiRoute.post('/formality/createRecords', data, {
@@ -153,6 +159,8 @@ function Essential_record() {
                 aadhar_card: data.aadhar_card || '',
                 udid_no: data.udid_no || '',
                 disability_no: data.disability_no || '',
+                voter_id: data.voter_id || '',
+                form_7: data.form_7 || '',
                 bank_name: data.bank_name || '',
                 account_no: data.account_no || '',
                 ifsc_code: data.ifsc_code || '',
@@ -160,6 +168,7 @@ function Essential_record() {
                 policy_no: data.policy_no || '',
                 validity_period: data.validity_period || '',
                 other_gvt_scheme: data.other_gvt_scheme || '',
+                any_other: data.any_other || '',
             }));
 
             const passbookPath = data.bank_passbook ? `http://localhost:5000/${data.bank_passbook}` : null;
@@ -224,6 +233,8 @@ function Essential_record() {
                 aadhar_card: data.aadhar_card || '',
                 udid_no: data.udid_no || '',
                 disability_no: data.disability_no || '',
+                voter_id: data.voter_id || '',
+                form_7: data.form_7 || '',
                 bank_name: data.bank_name || '',
                 account_no: data.account_no || '',
                 ifsc_code: data.ifsc_code || '',
@@ -231,6 +242,7 @@ function Essential_record() {
                 policy_no: data.policy_no || '',
                 validity_period: data.validity_period || '',
                 other_gvt_scheme: data.other_gvt_scheme || '',
+                any_other: data.any_other || '',
             }));
 
 
@@ -278,6 +290,8 @@ function Essential_record() {
         data.append('aadhar_card', formData.aadhar_card);
         data.append('udid_no', formData.udid_no);
         data.append('disability_no', formData.disability_no);
+        data.append('voter_id', formData.voter_id);
+        data.append('form_7', formData.form_7);
         data.append('bank_name', formData.bank_name);
         data.append('account_no',formData.account_no);
         data.append('ifsc_code',formData.ifsc_code);
@@ -286,6 +300,7 @@ function Essential_record() {
         data.append('policy_no',formData.policy_no);
         data.append('validity_period',formData.validity_period);
         data.append('other_gvt_scheme',formData.other_gvt_scheme);
+        data.append('any_other',formData.any_other);
 
         try {
             const res = await apiRoute.put(`/formality/updateEssentialRecords/${admission_no}`, data, {
@@ -461,7 +476,7 @@ function Essential_record() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-3 text-start">
                                         <Form.Label column sm="4">
-                                            Personal Identification :
+                                            ID Cards :
                                         </Form.Label>
                                         <Col sm="8">
                                             {/* Aadhar Card */}
@@ -491,7 +506,27 @@ function Essential_record() {
                                                 name="disability_no"
                                                 value={formData.disability_no}
                                                 onChange={handleInputChange}
-                                                accept=".pdf,.jpg,.jpeg,.png"
+                                                className="mb-2"
+                                            />
+
+                                            {/* Voter ID */}
+                                            <Form.Label className="mb-1">Voter ID</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="voter_id"
+                                                value={formData.voter_id}
+                                                onChange={handleInputChange}
+                                                className="mb-2"
+                                            />
+
+                                            {/* Form 7 */}
+                                            <Form.Label className="mb-1">Form 7</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="form_7"
+                                                value={formData.form_7}
+                                                onChange={handleInputChange}
+                                                className="mb-2"
                                             />
                                         </Col>
                                     </Form.Group>
@@ -543,7 +578,7 @@ function Essential_record() {
 
                                     <Form.Group as={Row} className="mb-3 text-start">
                                         <Form.Label column sm="4">
-                                            Health Insurance Details:
+                                            CMCHIS(Chief Minister's Comprehensive Health Insurance Scheme):
                                         </Form.Label>
                                         <Col sm="8">
                                             {/* Aadhar Card */}
@@ -584,6 +619,15 @@ function Essential_record() {
                                                 onChange={handleInputChange}
                                                 className="mb-2"
                                             />
+
+                                            <Form.Label className="mb-1">Any Other </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="any_other"
+                                                value={formData.any_other}
+                                                onChange={handleInputChange}
+                                                className="mb-2"
+                                            />
                                         </Col>
                                     </Form.Group>
 
@@ -621,7 +665,7 @@ function Essential_record() {
                         </Form.Group>
                         <Form.Group as={Row} className="mb-3 text-start">
                             <Form.Label column sm="4">
-                                Personal Identification :
+                                ID Cards :
                             </Form.Label>
                             <Col sm="8">
                                 {/* Aadhar Card */}
