@@ -13,7 +13,7 @@ function Rescue_Record_Sheet() {
     const [show, setShow] = useState(false);
     const [editshow, setEditShow] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [admission_no, setAdmissionNumber] =  useState("");
+    const [admission_no, setAdmissionNumber] = useState("");
     const [rescueName, setRescueName] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -28,45 +28,12 @@ function Rescue_Record_Sheet() {
         admission_no: '',
         resident_name: '',
         follow_up: '',
+        date: '',
     });
 
     const [files, setFiles] = useState({
         recovery_photo: null,
     });
-
-    const [state, setState] = useState([
-        {
-            startDate: new Date(),
-            endDate: new Date(),
-            key: 'selection'
-        }
-    ]);
-
-    // Ensure from_date and to_date are set when modal opens
-    useEffect(() => {
-        if (show) {
-            const today = new Date().toISOString().split('T')[0];
-            setFormData((prev) => ({
-                ...prev,
-                from_date: today,
-                to_date: today
-            }));
-        }
-    }, [show]);
-
-    const handleSelect = (ranges) => {
-    const startDate = ranges.selection.startDate;
-    const endDate = ranges.selection.endDate;
-
-    setState([ranges.selection]);
-
-    setFormData((prev) => ({
-        ...prev,
-        from_date: startDate.toISOString().split('T')[0],
-        to_date: endDate.toISOString().split('T')[0]
-    }));
-};
-
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -75,11 +42,11 @@ function Rescue_Record_Sheet() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-          setFiles({ ...files, recovery_photo: file });
+            setFiles({ ...files, recovery_photo: file });
         }
-      };
+    };
 
-      
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -87,8 +54,7 @@ function Rescue_Record_Sheet() {
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('resident_name', rescueName);
-        data.append('from_date', formData.from_date);
-        data.append('to_date', formData.to_date);
+        data.append('date', formData.date);
         data.append('recovery_photo', files.recovery_photo);
         data.append('follow_up', formData.follow_up);
 
@@ -132,7 +98,7 @@ function Rescue_Record_Sheet() {
         const d = new Date(dateObj);
         if (isNaN(d)) return '';
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      };
+    };
 
     // const handleDelete = async (id) => {
     //     alert("Are you sure want to delete");
@@ -152,19 +118,12 @@ function Rescue_Record_Sheet() {
             const response = await apiRoute.get(`/residency/rescueConditionShow/${id}`);
             const data = response.data;
 
-            
-       
-        // ✅ Use this updated logic to validate date strings
-        const startDate = data.from_date && !isNaN(new Date(data.from_date)) ? new Date(data.from_date) : new Date();
-        const endDate = data.to_date && !isNaN(new Date(data.to_date)) ? new Date(data.to_date) : new Date();
-
             setFormData((formData) => ({
                 ...formData,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
-                from_date: data.from_date || '',
-                to_date: data.to_date || '',
+                date: data.date || '',
                 recovery_photo: data.recovery_photo,
             }));
 
@@ -177,12 +136,7 @@ function Rescue_Record_Sheet() {
                 recovery_photo: recovery_photoPath,
             }));
 
-            // Set the date picker state
-            setState([{
-                startDate: startDate,
-                endDate: endDate,
-                key: 'selection'
-            }]);
+
 
             setEditShow(true);
         } catch (error) {
@@ -193,67 +147,61 @@ function Rescue_Record_Sheet() {
 
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
-      
+
         const data = new FormData();
         data.append('admission_no', formData.admission_no);
         data.append('resident_name', formData.resident_name);
-      
-        // ✅ Safely format dates
-        const fromDateStr = formatDate(state[0]?.startDate);
-        const toDateStr = formatDate(state[0]?.endDate);
-      
-        data.append('from_date', fromDateStr);
-        data.append('to_date', toDateStr);
+        data.append('date', formData.date);
         data.append('follow_up', formData.follow_up);
-      
+
         // ✅ Only append recovery photo if it's a new file
         if (files.recovery_photo instanceof File) {
-          data.append('recovery_photo', files.recovery_photo);
+            data.append('recovery_photo', files.recovery_photo);
         }
-      
-        try {
-          const res = await apiRoute.post(`/residency/updateRescueCondition/${formData.admission_no}`, data, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          });
-          alert('Observation updated successfully!');
-          setEditShow(false);
-          getConditionDetails(); // Refresh data
-        } catch (err) {
-          console.error(err);
-          alert('Update failed.');
-        }
-      };
 
-      const handleAdmissionChange = (e) => {
+        try {
+            const res = await apiRoute.post(`/residency/updateRescueCondition/${formData.admission_no}`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            alert('Observation updated successfully!');
+            setEditShow(false);
+            getConditionDetails(); // Refresh data
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
+    const handleAdmissionChange = (e) => {
         setAdmissionNumber(e.target.value);
-        };  
+    };
 
     useEffect(() => {
         if (admission_no.trim() !== "") {
-          fetchRescueDetails(admission_no);
+            fetchRescueDetails(admission_no);
         } else {
-          setRescueName("");
+            setRescueName("");
         }
-      }, [admission_no]);
+    }, [admission_no]);
 
-      const fetchRescueDetails = async (admission_no) => {
+    const fetchRescueDetails = async (admission_no) => {
         try {
             const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
             const result = response.data.data[0];
             console.log("API Result:", result);
 
             if (result && result.rescue_name) {
-                
+
                 setRescueName(result.rescue_name || "");
             } else {
-        
+
                 setError("Image not found for this admission number");
             }
-            } catch (error) {
+        } catch (error) {
             console.error("Error fetching data", error);
             setRescueName("");
-            }
-        };
+        }
+    };
 
     return (
         <>
@@ -267,8 +215,8 @@ function Rescue_Record_Sheet() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Record Sheet</h6>
                     </Col>
-                    <Col md={5} className="text-start">
-                        <h3 className="section_title">First Consultation Report by Doctor</h3>
+                    <Col md={5} className="text-center">
+                        <h3 className="section_title">Consultation Report by Doctor</h3>
                     </Col>
                     <Col md={2}>
                         <Form className="navbar-search">
@@ -317,7 +265,7 @@ function Rescue_Record_Sheet() {
                                             <td>{item.date}</td>
                                             <td>{item.admission_no}</td>
                                             <td>{item.resident_name}</td>
-                                             
+
                                             <td className='text-justify'>{item.follow_up}</td>
                                             <td>
                                                 <img
@@ -327,10 +275,10 @@ function Rescue_Record_Sheet() {
                                                 />
                                             </td>
                                             <td>
-                                                <button className="btn btn-primary icon_details" onClick={() => handleEdiShow(item.id)}>
+                                                <button className="btn btn-success icon_details" onClick={() => handleEdiShow(item.id)}>
                                                     <i className="fas fa-edit"></i>
                                                 </button>
-                                               
+
                                             </td>
                                         </tr>
                                     ))
@@ -376,12 +324,15 @@ function Rescue_Record_Sheet() {
                                 />
                             </Form.Group>
 
-                            <DateRange
-                                editableDateInputs={true}
-                                onChange={handleSelect}
-                                moveRangeOnFirstSelection={false}
-                                ranges={state}
-                            />
+                            <Form.Group className="mb-3">
+                                <Form.Label>Date</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name="date"
+                                    value={formData.date}
+                                    onChange={handleInputChange}
+                                />
+                            </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3">
                                 <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
@@ -449,12 +400,15 @@ function Rescue_Record_Sheet() {
                                 />
                             </Form.Group>
 
-                            <DateRange
-                                editableDateInputs={true}
-                                onChange={handleSelect}
-                                moveRangeOnFirstSelection={false}
-                                ranges={state}
-                            />
+                            <Form.Group className="mb-3">
+                                <Form.Label>Date</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name="date"
+                                    value={formData.date}
+                                    onChange={handleInputChange}
+                                />
+                            </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
                                 <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
@@ -478,7 +432,7 @@ function Rescue_Record_Sheet() {
                                         required={!formData.recovery_photo}
                                     />
                                 </div>
-                                
+
                             </Form.Group>
 
 
@@ -496,7 +450,7 @@ function Rescue_Record_Sheet() {
 
                             <div className="btn_footer d-flex align-items-center justify-content-end">
                                 <Button variant="success" type="submit" onClick={handleUpdateSubmit} className="m-1">
-                                    Submit
+                                    Update
                                 </Button>
                                 <Button variant="secondary" onClick={handleEditClose}>
                                     Close

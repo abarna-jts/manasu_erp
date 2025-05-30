@@ -11,6 +11,7 @@ import html2canvas from "html2canvas";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
+import manasu_logo from '../Admission/manasu_logo.png';
 
 function Family_Request_form() {
     const [show, setShow] = useState(false);
@@ -73,6 +74,9 @@ function Family_Request_form() {
         f_member_age: '',
         f_member_address: '',
         f_member_phone: '',
+        f_aadhar_card_no: '',
+        f_ration_card_no: '',
+        any_other: '',
         description: '',
     })
 
@@ -128,6 +132,9 @@ function Family_Request_form() {
         data.append('f_member_name', storeData.f_member_name);
         data.append('f_member_phone', storeData.f_member_phone);
         data.append('f_member_address', storeData.f_member_address);
+        data.append('f_aadhar_card_no', storeData.f_aadhar_card_no);
+        data.append('f_ration_card_no', storeData.f_ration_card_no);
+        data.append('any_other', storeData.any_other);
 
         try {
             const res = await apiRoute.post('/reunion/create_family_letter', data, {
@@ -283,46 +290,46 @@ function Family_Request_form() {
     }
 
     const handleUpdate = async (e, admissionNumber) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const data = new FormData();
-    data.append('rescue_name', formData.rescue_name);
-    data.append('f_member_age', formData.f_member_age);
-    data.append('description', formData.description);
-    data.append('phone_no', formData.phone_no);
-    data.append('family_relationship', formData.family_relationship);
-    data.append('f_member_name', formData.f_member_name);
-    data.append('f_member_phone', formData.f_member_phone);
-    data.append('f_member_address', formData.f_member_address);
-    data.append('f_aadhar_card', files.f_aadhar_card);
-    data.append('f_ration_card', files.f_ration_card);
-    data.append('govt_id', files.govt_id);
+        const data = new FormData();
+        data.append('rescue_name', formData.rescue_name);
+        data.append('f_member_age', formData.f_member_age);
+        data.append('description', formData.description);
+        data.append('phone_no', formData.phone_no);
+        data.append('family_relationship', formData.family_relationship);
+        data.append('f_member_name', formData.f_member_name);
+        data.append('f_member_phone', formData.f_member_phone);
+        data.append('f_member_address', formData.f_member_address);
+        data.append('f_aadhar_card', files.f_aadhar_card);
+        data.append('f_ration_card', files.f_ration_card);
+        data.append('govt_id', files.govt_id);
 
-    try {
-        const res = await apiRoute.post(`/reunion/update_family_letter/${admissionNumber}`, data, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        try {
+            const res = await apiRoute.post(`/reunion/update_family_letter/${admissionNumber}`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
 
-        console.log("Update response:", res.data);
+            console.log("Update response:", res.data);
 
-        const message = res.data.message?.toLowerCase() || "";
+            const message = res.data.message?.toLowerCase() || "";
 
-        if (message.includes("updated successfully")) {
-            setSubmissionMessage("Family Request Letter updated successfully!");
-            setMessageType("success");
+            if (message.includes("updated successfully")) {
+                setSubmissionMessage("Family Request Letter updated successfully!");
+                setMessageType("success");
 
-            // Optional: reload after 3s
-            setTimeout(() => window.location.reload(), 3000);
-        } else {
-            setSubmissionMessage(res.data.message || "Update failed.");
+                // Optional: reload after 3s
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage(res.data.message || "Update failed.");
+                setMessageType("danger");
+            }
+        } catch (err) {
+            console.error("Update error:", err);
+            setSubmissionMessage("Something went wrong while updating the form.");
             setMessageType("danger");
         }
-    } catch (err) {
-        console.error("Update error:", err);
-        setSubmissionMessage("Something went wrong while updating the form.");
-        setMessageType("danger");
-    }
-};
+    };
 
 
     const handleDelete = async (admissionNumber) => {
@@ -435,14 +442,14 @@ function Family_Request_form() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
                                 createFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
@@ -450,7 +457,7 @@ function Family_Request_form() {
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
-                            <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admissionNumber.trim()) {
                                     alert("Please enter your admission number.");
                                 } else {
@@ -567,7 +574,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Person Name :
+                                    Name :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -581,7 +588,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                                 <Form.Label column sm="4">
-                                    Person Age :
+                                    Age :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -596,7 +603,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
                                 <Form.Label column sm="4">
-                                    Person Phone No :
+                                    Phone No :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -610,7 +617,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Person Address :
+                                    Address :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -623,13 +630,37 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Aadhar Card No :
+                                    Aadhar Card Number :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="text"
+                                        name='f_aadhar_card_no'
+                                        value={storeData.f_aadhar_card_no}
+                                        onChange={handleInputChange1} />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Aadhar Card :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
                                         name='f_aadhar_card'
                                         onChange={handleFileChange} />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Ration Card Number:
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="text"
+                                        name="f_ration_card_no"
+                                        value={storeData.f_ration_card_no}
+                                        onChange={handleInputChange1} />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -645,7 +676,20 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Any other Government ID :
+                                    Any other :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="text"
+                                        name="any_other"
+                                        value={storeData.any_other}
+                                        onChange={handleInputChange1} />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Any other Document:
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -679,10 +723,18 @@ function Family_Request_form() {
                     </Form>
 
                     <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                        <h4 className="text-center">Family Request Form – Discharge of Resident</h4>
+                        <Row className="d-flex align-items-center justify-content-center mb-2">
+                            <Col md={2}>
+                                <img src={manasu_logo} className="pdf_logo" alt="" />
+                            </Col>
+                            <Col md={10}>
+                                <h4 className="text-center">Family Request Form – Discharge of Resident</h4>
+                            </Col>
+                        </Row>
+
                         <Form className='d-flex align-items-center justify-content-center flex-column'>
 
-                            <Col md={8}>
+                            <Col md={11}>
                                 <h5 className="pdfsub_heading">Rescue Details:</h5>
 
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
@@ -757,7 +809,7 @@ function Family_Request_form() {
 
                             </Col>
 
-                            <Col md={8}>
+                            <Col md={11}>
                                 <h5 className="pdfsub_heading">Family Details</h5>
 
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
@@ -902,6 +954,17 @@ function Family_Request_form() {
                                 </Form.Group>
 
                             </Col>
+                            <Col md={12}>
+                                <Row className="d-flex align-items-center justify-content-center">
+                                    <Col md={6} className="mt-3">
+                                        <h4 className="text-start">Signature</h4>
+                                    </Col>
+                                    <Col md={6} className="mt-3">
+                                        <h4 className="text-end">Seal</h4>
+                                    </Col>
+                                </Row>
+                            </Col>
+
 
                         </Form>
                     </div>

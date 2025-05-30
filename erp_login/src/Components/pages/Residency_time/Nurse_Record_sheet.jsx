@@ -28,8 +28,7 @@ function Nurse_Record_sheet() {
         bp: '',
         pulse: '',
         weight: '',
-        from_date: '',
-        to_date: ''
+        date: ''
     });
 
     const handleInputChange = (e) => {
@@ -66,8 +65,7 @@ function Nurse_Record_sheet() {
                 bp: '',
                 pulse: '',
                 weight: '',
-                from_date: '',
-                to_date: ''
+                date:''
             });
 
             handleClose(); // Close modal
@@ -141,8 +139,7 @@ function Nurse_Record_sheet() {
             setFormData({
                 id: data.id,
                 currentMonth: data.month || '',
-                from_date: parseDate(fromFormatted),
-                to_date: parseDate(toFormatted),
+                date: parseDate(fromFormatted),
                 temperature: data.temperature || '',
                 bp: data.bp || '',
                 pulse: data.pulse || '',
@@ -171,7 +168,7 @@ function Nurse_Record_sheet() {
             handleClose1(true);
 
             // Reload after 3 seconds
-            setTimeout(() => window.location.reload(), 3000);
+            setTimeout(() => window.location.reload(), 1000);
         } else {
             setSubmissionMessage("Error updating the form.");
             setMessageType("danger");
@@ -197,7 +194,7 @@ function Nurse_Record_sheet() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Record Sheet</h6>
                     </Col>
-                    <Col md={6} className="text-start">
+                    <Col md={7} className="text-center">
                         <h3 className="section_title">Nursing Record Sheet – Resident Health & Medications</h3>
                     </Col>
                     <Col md={2}>
@@ -268,7 +265,7 @@ function Nurse_Record_sheet() {
                                                 <td>{item.pulse}</td>
                                                 <td>{item.weight}</td>
                                                 <td>
-                                                    <button className="btn btn-primary icon_details" onClick={() => {
+                                                    <button className="btn btn-success icon_details" onClick={() => {
                                                         handleEditform(item.id);
                                                     }}>
                                                         <i className="fas fa-edit"></i>
@@ -343,29 +340,18 @@ function Nurse_Record_sheet() {
                             </Row>
 
                             <Row>
-                                <Col md={6}>
+                                <Col md={9}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>From Date</Form.Label>
+                                        <Form.Label>Date</Form.Label>
                                         <Form.Control
                                             type="date"
-                                            name="from_date"
-                                            value={formData.from_date}
+                                            name="date"
+                                            value={formData.date}
                                             onChange={handleInputChange}
                                         />
                                     </Form.Group>
                                 </Col>
 
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>To Date</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            name="to_date"
-                                            value={formData.to_date}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
                             </Row>
 
                             <Row>
@@ -475,30 +461,14 @@ function Nurse_Record_sheet() {
                                         </Form.Select>
                                     </Form.Group>
                                 </Col>
-                            </Row>
-
-                            <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Start Date</Form.Label>
+                                        <Form.Label>Date</Form.Label>
                                         <Form.Control
                                             type="date"
-                                            name="from_date"
-                                            value={formData.from_date}
+                                            name="date"
+                                            value={formData.date}
                                             onChange={handleInputChange}
-                                            required
-                                        />
-                                    </Form.Group>
-                                </Col>
-
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>To Date</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            name="to_date"
-                                            value={formData.to_date}
-                                            readOnly
                                             required
                                         />
                                     </Form.Group>

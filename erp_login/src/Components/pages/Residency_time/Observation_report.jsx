@@ -34,44 +34,12 @@ function Observation_report() {
         admission_no: '',
         resident_name: '',
         follow_up: '',
+        date: ''
     });
 
     const [files, setFiles] = useState({
         recovery_photo: null,
     });
-
-    const [state, setState] = useState([
-        {
-            startDate: new Date(),
-            endDate: new Date(),
-            key: 'selection'
-        }
-    ]);
-
-    // Ensure from_date and to_date are set when modal opens
-    useEffect(() => {
-        if (show && (!formData.from_date || !formData.to_date)) {
-            const today = new Date().toISOString().split('T')[0];
-            setFormData((prev) => ({
-                ...prev,
-                from_date: today,
-                to_date: today
-            }));
-        }
-    }, [show]);
-
-    const handleSelect = (ranges) => {
-        const startDate = ranges.selection.startDate;
-        const endDate = ranges.selection.endDate;
-
-        setState([ranges.selection]);
-
-        setFormData((prev) => ({
-            ...prev,
-            from_date: startDate.toISOString().split('T')[0],
-            to_date: endDate.toISOString().split('T')[0]
-        }));
-    };
 
 
     const handleInputChange = (e) => {
@@ -88,8 +56,7 @@ function Observation_report() {
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('resident_name', rescueName);
-        data.append('from_date', formData.from_date);
-        data.append('to_date', formData.to_date);
+        data.append('date', formData.date);
         data.append('recovery_photo', files.recovery_photo);
         data.append('follow_up', formData.follow_up);
 
@@ -97,7 +64,7 @@ function Observation_report() {
             const res = await apiRoute.post('/residency/create_observation_report', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            if (response.data.message === "Rescue Condition Created Successfully") {
+            if (res.data.message === "Rescue Condition Created Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
 
@@ -119,19 +86,12 @@ function Observation_report() {
             const response = await apiRoute.get(`/residency/show_data/${id}`);
             const data = response.data;
 
-
-
-            // ✅ Use this updated logic to validate date strings
-            const startDate = data.from_date && !isNaN(new Date(data.from_date)) ? new Date(data.from_date) : new Date();
-            const endDate = data.to_date && !isNaN(new Date(data.to_date)) ? new Date(data.to_date) : new Date();
-
             setFormData((formData) => ({
                 ...formData,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
-                from_date: data.from_date || '',
-                to_date: data.to_date || '',
+                date: data.date || '',
                 recovery_photo: data.recovery_photo,
             }));
 
@@ -145,12 +105,6 @@ function Observation_report() {
                 recovery_photo: recovery_photoPath,
             }));
 
-            // Set the date picker state
-            setState([{
-                startDate: startDate,
-                endDate: endDate,
-                key: 'selection'
-            }]);
 
             setEditShow(true);
         } catch (error) {
@@ -165,8 +119,7 @@ function Observation_report() {
         const data = new FormData();
         data.append('admission_no', formData.admission_no);
         data.append('resident_name', formData.resident_name);
-        data.append('from_date', formData.from_date);
-        data.append('to_date', formData.to_date);
+        data.append('date', formData.date);
         data.append('follow_up', formData.follow_up);
 
         if (files.recovery_photo instanceof File) {
@@ -354,7 +307,7 @@ function Observation_report() {
                                                 />
                                             </td>
                                             <td>
-                                                <button className="btn btn-primary icon_details" onClick={() => handleEdiShow(item.id)}>
+                                                <button className="btn btn-success icon_details" onClick={() => handleEdiShow(item.id)}>
                                                     <i className="fas fa-edit"></i>
                                                 </button>
                                                 {/* <button className="btn btn-danger icon_details" onClick={() => handleDelete(item.id)}>
@@ -405,12 +358,15 @@ function Observation_report() {
                                 />
                             </Form.Group>
 
-                            <DateRange
-                                editableDateInputs={true}
-                                onChange={handleSelect}
-                                moveRangeOnFirstSelection={false}
-                                ranges={state}
-                            />
+                            <Form.Group className="mb-3">
+                                <Form.Label>Date</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name="date"
+                                    value={formData.date}
+                                    onChange={handleInputChange}
+                                />
+                            </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3">
                                 <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
@@ -478,12 +434,15 @@ function Observation_report() {
                                 />
                             </Form.Group>
 
-                            <DateRange
-                                editableDateInputs={true}
-                                onChange={handleSelect}
-                                moveRangeOnFirstSelection={false}
-                                ranges={state}
-                            />
+                            <Form.Group className="mb-3">
+                                <Form.Label>Date</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name="date"
+                                    value={formData.date}
+                                    onChange={handleInputChange}
+                                />
+                            </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
                                 <Form.Label>Rescue Recovery Photo Attachment</Form.Label>

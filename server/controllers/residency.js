@@ -23,12 +23,9 @@ const createRescueCondition = (req, res) => {
     const {
       admission_no,
       resident_name,
-      from_date,
-      to_date,
+      date,
       follow_up
     } = req.body;
-
-    console.log('Received dates:', { from_date, to_date }); // Debug log
 
     const recovery_photo_path = req.file
       ? `uploads/Resque_Condition_Images/${req.file.filename}`
@@ -40,9 +37,7 @@ const createRescueCondition = (req, res) => {
       return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
     };
 
-    const fromFormatted = formatDate(from_date);
-    const toFormatted = formatDate(to_date);
-    const combined_date = `${fromFormatted} to ${toFormatted}`;
+    const dateFormatted = formatDate(date);
 
     const q = `
         INSERT INTO rescue_condition 
@@ -53,12 +48,11 @@ const createRescueCondition = (req, res) => {
     const values = [
       admission_no,
       resident_name,
-      combined_date,
+      dateFormatted,
       recovery_photo_path,
       follow_up
     ];
 
-    console.log(combined_date);
 
     db.query(q, values, (dbErr, data) => {
       if (dbErr) {
@@ -126,15 +120,13 @@ const createRecord = (req, res) => {
   const {
     admission_no,
     month,
-    from_date,
-    to_date,
+    date,
     temperature,
     bp,
     pulse,
     weight
   } = req.body;
 
-  console.log('Received Dates:', { from_date, to_date });
 
   const formatDate = (isoDate) => {
     const d = new Date(isoDate);
@@ -148,14 +140,11 @@ const createRecord = (req, res) => {
   };
 
 
-  const fromFormatted = formatDate(from_date);
-  const toFormatted = formatDate(to_date);
+  const dateFormatted = formatDate(date);
 
-  if (!fromFormatted || !toFormatted) {
+  if (!dateFormatted) {
     return res.status(400).json({ message: "Invalid date format" });
   }
-
-  const recordDate = `${fromFormatted} to ${toFormatted}`;
 
   const q = `
     INSERT INTO nurse_record 
@@ -166,7 +155,7 @@ const createRecord = (req, res) => {
   const values = [
     admission_no,
     month,
-    recordDate,
+    dateFormatted,
     temperature,
     bp,
     pulse,
@@ -188,8 +177,7 @@ const updateNurseRecords = (req, res) => {
     bp,
     pulse,
     weight,
-    from_date,
-    to_date
+    date
   } = req.body;
 
   const recordID = req.params.id;
@@ -206,14 +194,11 @@ const updateNurseRecords = (req, res) => {
   };
 
 
-  const fromFormatted = formatDate(from_date);
-  const toFormatted = formatDate(to_date);
+  const dateFormatted = formatDate(date);
 
-  if (!fromFormatted || !toFormatted) {
+  if (!dateFormatted) {
     return res.status(400).json({ message: "Invalid date format" });
   }
-
-  const recordDate = `${fromFormatted} to ${toFormatted}`;
 
   const recordupdate = `UPDATE nurse_record SET
                        month=?,
@@ -226,7 +211,7 @@ const updateNurseRecords = (req, res) => {
 
   const values = [
     currentMonth,
-    recordDate,
+    dateFormatted,
     temperature,
     bp,
     pulse,
@@ -406,12 +391,9 @@ const createObservationReport = (req, res) => {
     const {
       admission_no,
       resident_name,
-      from_date,
-      to_date,
+      date,
       follow_up
     } = req.body;
-
-    console.log('Received dates:', { from_date, to_date }); // Debug log
 
     const recovery_photo_path = req.file
       ? `uploads/Resque_Condition_Images/${req.file.filename}`
@@ -423,9 +405,7 @@ const createObservationReport = (req, res) => {
       return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
     };
 
-    const obfromFormatted = formatDate(from_date);
-    const obtoFormatted = formatDate(to_date);
-    const combined_date2 = `${obfromFormatted} to ${obtoFormatted}`;
+    const obdateFormatted = formatDate(date);
 
     const q = `
           INSERT INTO observation_report 
@@ -436,12 +416,10 @@ const createObservationReport = (req, res) => {
     const values = [
       admission_no,
       resident_name,
-      combined_date2,
+      obdateFormatted,
       recovery_photo_path,
       follow_up
     ];
-
-    console.log(combined_date2);
 
     db.query(q, values, (dbErr, data) => {
       if (dbErr) {
@@ -488,8 +466,7 @@ const updateObservationReport = (req, res) => {
     }
     const {
       resident_name,
-      from_date,
-      to_date,
+      date,
       follow_up,
     } = req.body;
 
@@ -520,13 +497,11 @@ const updateObservationReport = (req, res) => {
         return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
       };
 
-      const obfromFormatted = formatDate(from_date);
-      const obtoFormatted = formatDate(to_date);
-      const observationDate = `${obfromFormatted} to ${obtoFormatted}`;
+      const obdateFormatted = formatDate(date);
 
       const values = [
         resident_name,
-        observationDate,
+        obdateFormatted,
         finalRecoveryPath,
         follow_up,
         admission_no
@@ -577,8 +552,7 @@ const updateRescueCondition = (req, res) => {
     }
     const {
       resident_name,
-      from_date,
-      to_date,
+      date,
       follow_up,
     } = req.body;
 
@@ -609,13 +583,11 @@ const updateRescueCondition = (req, res) => {
         return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
       };
 
-      const rcfromFormatted = formatDate(from_date);
-      const rctoFormatted = formatDate(to_date);
-      const rescueConditionDate = `${rcfromFormatted} to ${rctoFormatted}`;
+      const dateFormatted = formatDate(date);
 
       const values = [
         resident_name,
-        rescueConditionDate,
+        dateFormatted,
         finalRecoveryPath,
         follow_up,
         admission_no
@@ -635,9 +607,7 @@ const updateRescueCondition = (req, res) => {
 
         res.status(200).json({ message: "Observation updated successfully" });
       });
-
     })
-
   });
 }
 

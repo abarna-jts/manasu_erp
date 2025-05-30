@@ -9,6 +9,7 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Cookies from 'js-cookie';
+import manasu_logo from '../Admission/manasu_logo.png';
 
 function Rescue_details(){
     const [rescue_details, setRescueDetails] = useState([]);
@@ -440,7 +441,15 @@ function Rescue_details(){
 
 
                     <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                                <h4 className="pdf_heading">FIRST INFORMATION SHEET</h4>
+                        <Row>
+                            <Col md={2}>
+                                <img src={manasu_logo} className="pdf_logo" alt="" />
+                            </Col>
+                            <Col md={10}>
+                                <h4 className="pdf_heading text-center">FIRST INFORMATION SHEET</h4>
+                            </Col>
+                        </Row>
+                                
                         <Form className="d-flex align-items-center justify-content-center text-start">
                             <Row>
                                 <Col md={8}>
@@ -978,6 +987,14 @@ function Rescue_details(){
                                         </Col>
                                     </Form.Group>
                                 </Col>
+                                <Row className="d-flex align-items-center justify-content-center">
+                                    <Col md={6} className="mt-3">
+                                        <h4 className="text-start">Signature</h4>
+                                    </Col>
+                                    <Col md={6} className="mt-3">
+                                        <h4 className="text-end">Seal</h4>
+                                    </Col>
+                                </Row>
                             </Row>
                             
                         </Form>

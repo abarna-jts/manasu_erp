@@ -18,7 +18,9 @@ function Edit_Rescue_details() {
     age: '',
     rescue_status: '',
     religion: '',
-    language: '',
+    language1: '',
+    language2: '',
+    language3: '',
     education: '',
     father: '',
     mother: '',
@@ -35,23 +37,33 @@ function Edit_Rescue_details() {
     weight: '',
     things_carried: '',
     remark: '',
-    symptoms: '',
-    rescued_by: '',
-    information: '',
-    rescue_relationship: '',
-    articles_carried: '',
-    f_member_name: '',
-    f_member_phone: '',
-    f_member_address: '',
-
+    mental_status: '',
+    behaviour: '',
+    community_ability: '',
+    self_careCapacity: '',
+    govIdType: '',
+    govIdNumber: '',
+    diagnosis: '',
+    // symptoms: '',
+    // rescued_by: '',
+    // information: '',
+    // rescue_relationship: '',
+    // articles_carried: '',
+    // f_member_name: '',
+    // f_member_phone: '',
+    // f_member_address: '',
     rescue_image: null,
     rescue_image_url: '', // for preview
-    f_aadhar_card: null,
-    f_aadhar_card_url: '',
-    f_ration_card: null,
-    f_ration_card_url: '',
-    res_aadhar_card: null,
-    res_aadhar_card_url: '',
+    attach_policeMemo: null,
+    attach_policeMemo_url: '',
+    govIdFile: null,
+    govIdFile_url: '', // for preview
+    // f_aadhar_card: null,
+    // f_aadhar_card_url: '',
+    // f_ration_card: null,
+    // f_ration_card_url: '',
+    // res_aadhar_card: null,
+    // res_aadhar_card_url: '',
   });
   const { id } = useParams();
 
@@ -78,7 +90,9 @@ function Edit_Rescue_details() {
           age: data.age || '',
           rescue_status: data.rescue_status || '',
           religion: data.religion || '',
-          language: data.language || '',
+          language1: data.language1 || '',
+          language2: data.language2 || '',
+          language3: data.language3 || '',
           education: data.education || '',
           father: data.father || '',
           mother: data.mother || '',
@@ -94,20 +108,19 @@ function Edit_Rescue_details() {
           weight: data.weight || '',
           things_carried: data.things_carried || '',
           remark: data.remark || '',
-          symptoms: data.symptoms || '',
+          mental_status: data.mental_status || '',
+          behaviour: data.behaviour || '',
+          community_ability: data.community_ability || '',
+          self_careCapacity: data.self_careCapacity || '',
+          govIdType: data.govIdType || '',
+          diagnosis: data.diagnosis || '',
+          govIdNumber: data.govIdNumber || '',
           tattoo: data.tattoo || '',
-          rescued_by: data.rescued_by || '',
-          information: data.information || '',
-          rescue_relationship: data.rescue_relationship || '',
-          articles_carried: data.articles_carried || '',
-          f_member_name: data.f_member_name || '',
-          f_member_phone: data.f_member_phone || '',
-          f_member_address: data.f_member_address || '',
+
 
           rescue_image_url: data.rescue_image,
-          f_aadhar_card_url: data.f_aadhar_card,
-          f_ration_card_url: data.f_ration_card,
-          res_aadhar_card_url: data.res_aadhar_card,
+          attach_policeMemo_url: data.attach_policeMemo,
+          govIdFile_url: data.govIdFile,
         });
       } catch (error) {
         console.error('Failed to fetch:', error);
@@ -164,38 +177,70 @@ function Edit_Rescue_details() {
     formDataToSend.append("information_public", formData.information_public);
     formDataToSend.append("admission_date", formData.admission_date);
     formDataToSend.append("admission_no", formData.admission_no);
+    formDataToSend.append("rescue_name", formData.rescue_name);
+    formDataToSend.append("age", formData.age);
+    formDataToSend.append("rescue_status", formData.rescue_status);
+    formDataToSend.append("religion", formData.religion);
+    formDataToSend.append("language1", formData.language1);
+    formDataToSend.append("language2", formData.language2);
+    formDataToSend.append("language3", formData.language3);
+    formDataToSend.append("education", formData.education);
+    formDataToSend.append("father", formData.father);
+    formDataToSend.append("mother", formData.mother);
+    formDataToSend.append("other_relation", formData.other_relation);
+    formDataToSend.append("place", formData.place);
+    formDataToSend.append("phone_no", formData.phone_no);
+    formDataToSend.append("clothing", formData.clothing);
+    formDataToSend.append("dress_code", formData.dress_code);
+    formDataToSend.append("complexion", formData.complexion);
+    formDataToSend.append("indentification_mark", formData.indentification_mark);
+    formDataToSend.append("tattoo", formData.tattoo);
+    formDataToSend.append("wound_infection", formData.wound_infection);
+    formDataToSend.append("height", formData.height);
+    formDataToSend.append("weight", formData.weight);
+    formDataToSend.append("things_carried", formData.things_carried);
+    formDataToSend.append("remark", formData.remark);
+    formDataToSend.append("mental_status", formData.mental_status);
+    formDataToSend.append("behaviour", formData.behaviour);
+    formDataToSend.append("community_ability", formData.community_ability);
+    formDataToSend.append("self_careCapacity", formData.self_careCapacity);
+    formDataToSend.append("govIdType", formData.govIdType);
+    formDataToSend.append("govIdNumber", formData.govIdNumber);
+    formDataToSend.append("diagnosis", formData.diagnosis);
+    
 
     if (formData.rescue_image) {
       formDataToSend.append("rescue_image", formData.rescue_image);
     }
-    if (formData.f_aadhar_card) {
-      formDataToSend.append("f_aadhar_card", formData.f_aadhar_card);
+    if (formData.attach_policeMemo) {
+      formDataToSend.append("attach_policeMemo", formData.attach_policeMemo);
     }
-    if (formData.f_ration_card) {
-      formDataToSend.append("f_ration_card", formData.f_ration_card);
-    }
-    if (formData.res_aadhar_card) {
-      formDataToSend.append("res_aadhar_card", formData.res_aadhar_card);
+    if (formData.govIdFile) {
+      formDataToSend.append("govIdFile", formData.govIdFile);
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/admision/update_first_form/${id}`, {
-        method: "PUT", // or "POST" based on your backend route
-        body: formDataToSend,
-      });
+      const response = await apiRoute.put(
+        `/admision/update_first_form/${id}`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response);
 
-      const result = await response.json();
-
-      if (response.ok) {
+      if (response.status === 200) {
         alert("Rescue details updated successfully.");
-        window.location.reload();
       } else {
-        console.error("Update failed:", result.message);
+        console.error("Update failed:", response.data.message);
       }
     } catch (err) {
-      console.error("Error while updating:", err);
+      console.error("Error while updating:", err.response?.data || err.message);
     }
   };
+
 
 
   return (
@@ -238,7 +283,7 @@ function Edit_Rescue_details() {
                   </Form.Group>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                     <Form.Label column sm="4">
-                      Taken From :
+                      Taken From (Rescue Place) :
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
@@ -277,6 +322,31 @@ function Edit_Rescue_details() {
                         required />
                     </Col>
                   </Form.Group>
+
+                  <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">
+                    <Form.Label column sm="5">
+                      Copy of Police Memo :
+                    </Form.Label>
+                    <Col sm="7 d-flex flex-row align-items-center">
+
+                      {formData.attach_policeMemo_url && (
+                        <img
+                          src={`http://localhost:5000/${formData.attach_policeMemo_url}`}
+                          alt="Rescue Preview"
+                          style={{ marginTop: '10px', width: '100px', maxHeight: '200px', objectFit: 'cover' }}
+                        />
+                      )}
+                      <Form.Control
+                        type="file"
+                        name="attach_policeMemo"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                    </Col>
+                  </Form.Group>
+
+
+
 
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceStation">
                     <Form.Label column sm="4">
@@ -355,12 +425,66 @@ function Edit_Rescue_details() {
                     </Col>
                   </Form.Group>
 
+                  <Form.Group className="mb-3 text-start">
+                    <Form.Label column sm={12}>Government ID Type:</Form.Label>
+                    <Col sm={12}>
+                      <Form.Select
+                        name="govIdType"
+                        value={formData.govIdType}
+                        onChange={(e) =>
+                          setFormData({ ...formData, govIdType: e.target.value })
+                        }
+                        required>
+                        <option value="">Select ID Type</option>
+                        <option value="NA">Not Available</option>
+                        <option value="Aadhar">Aadhar Card</option>
+                        <option value="PAN">PAN Card</option>
+                        <option value="Voter">Voter ID</option>
+                        <option value="Driving">Driving License</option>
+                        <option value="Passport">Passport</option>
+                      </Form.Select>
+                    </Col>
+                  </Form.Group>
+
+                  {/* Show only if govIdType is not NA or empty */}
+                  {formData.govIdType !== 'NA' && formData.govIdType !== '' && (
+                    <>
+                      <Form.Control
+                        type="text"
+                        placeholder={`Enter ${formData.govIdType} number`}
+                        value={formData.govIdNumber}
+                        onChange={(e) =>
+                          setFormData({ ...formData, govIdNumber: e.target.value })
+                        }
+                      />
+
+
+                      <Form.Group className="mb-3 text-start">
+                        <Form.Label column sm={12}>Upload {formData.govIdType} File:</Form.Label>
+                        <Col sm={12}>
+                          <Form.Control
+                            type="file"
+                            accept=".pdf,image/*"
+                            onChange={(e) =>
+                              setFormData({ ...formData, govIdFile: e.target.files[0] })
+                            }
+                          />
+                          {formData.govIdFile && (
+                            <div className="mt-1 text-success">
+                              Selected file: {formData.govIdFile.name}
+                            </div>
+                          )}
+                        </Col>
+                      </Form.Group>
+                    </>
+                  )}
+
                 </Col>
                 <Col md={8}>
-                  <h5 className="pdfsub_heading">Inmate Details:</h5>
+                  <h5 className="pdfsub_heading">Resident's Details:</h5>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formRescueName">
                     <Form.Label column sm="4">
-                      Name :
+                      Name at the time of Rescue :
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
@@ -373,7 +497,7 @@ function Edit_Rescue_details() {
                   </Form.Group>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formAge">
                     <Form.Label column sm="4">
-                      Age :
+                      Approximate age :
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
@@ -384,6 +508,71 @@ function Edit_Rescue_details() {
                         required />
                     </Col>
                   </Form.Group>
+
+                  <Row className="d-flex mb-1">
+                    <Col md={7}>
+                      <Form.Group as={Row} className="mb-1 text-start" controlId="formStatus">
+                        <Form.Label column sm="7">
+                          Status :
+                        </Form.Label>
+                        <Col sm="5">
+                          <Form.Select
+                            name="rescue_status"
+                            value={formData.rescue_status}
+                            onChange={handleInputChange}
+                            required
+                          >
+                            <option value="">-- Select --</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                          </Form.Select>
+                        </Col>
+                      </Form.Group>
+                    </Col>
+                    <Col md={5}>
+                      <Form.Group as={Row} className="mb-1 text-start" controlId="formReligion">
+                        <Form.Label column sm="6">
+                          Religion :
+                        </Form.Label>
+                        <Col sm="6">
+                          <Form.Control
+                            name="religion"
+                            type='text'
+                            value={formData.religion}
+                            onChange={handleInputChange}
+                            required />
+                        </Col>
+                      </Form.Group>
+                    </Col>
+
+
+                  </Row>
+                  <Form.Group as={Row} className="mb-2 text-start" controlId="formLanguage">
+                    <Form.Label column sm="4">Known Languages:</Form.Label>
+                    <Col sm="8" className="d-flex gap-2">
+                      <Form.Control
+                        type="text"
+                        placeholder="Language 1"
+                        value={formData.language1}
+                        onChange={(e) => setLanguage1(e.target.value)}
+                        required
+                      />
+                      <Form.Control
+                        type="text"
+                        placeholder="Language 2"
+                        value={formData.language2}
+                        onChange={(e) => setLanguage2(e.target.value)}
+                      />
+                      <Form.Control
+                        type="text"
+                        placeholder="Language 3"
+                        value={formData.language3}
+                        onChange={(e) => setLanguage3(e.target.value)}
+                      />
+                    </Col>
+                  </Form.Group>
+
+
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formEducation">
                     <Form.Label column sm="4">
                       Education :
@@ -397,53 +586,6 @@ function Edit_Rescue_details() {
                         required />
                     </Col>
                   </Form.Group>
-                  <Row className="d-flex">
-                    <Col md={4}>
-                      <Form.Group as={Row} className="mb-1 text-start" controlId="formStatus">
-                        <Form.Label column sm="5">
-                          Status :
-                        </Form.Label>
-                        <Col sm="7">
-                          <Form.Control
-                            name="rescue_status"
-                            type='text'
-                            value={formData.rescue_status}
-                            onChange={handleInputChange}
-                            required />
-                        </Col>
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group as={Row} className="mb-1 text-start" controlId="formReligion">
-                        <Form.Label column sm="5">
-                          Religion :
-                        </Form.Label>
-                        <Col sm="7">
-                          <Form.Control
-                            name="religion"
-                            type='text'
-                            value={formData.religion}
-                            onChange={handleInputChange}
-                            required />
-                        </Col>
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group as={Row} className="mb-1 text-start" controlId="formLanguage">
-                        <Form.Label column sm="6">
-                          Language :
-                        </Form.Label>
-                        <Col sm="6">
-                          <Form.Control
-                            name="language"
-                            type='text'
-                            value={formData.language}
-                            onChange={handleInputChange}
-                            required />
-                        </Col>
-                      </Form.Group>
-                    </Col>
-                  </Row>
                 </Col>
                 <Col md={8}>
                   <h5 className="pdfsub_heading">Family Details:</h5>
@@ -475,7 +617,7 @@ function Edit_Rescue_details() {
                   </Form.Group>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formanyother">
                     <Form.Label column sm="4">
-                      Any other :
+                      Any other Relationship:
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
@@ -488,7 +630,7 @@ function Edit_Rescue_details() {
                   </Form.Group>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formPlace">
                     <Form.Label column sm="4">
-                      Place :
+                      Address :
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
@@ -654,193 +796,84 @@ function Edit_Rescue_details() {
                   </Form.Group>
                 </Col>
                 <Col md={8}>
-                  <h5 className="pdfsub_heading">Mental Status:</h5>
+                  <h5 className="pdfsub_heading">Initial Psychological Assessment:</h5>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formSymptoms">
                     <Form.Label column sm="4">
-                      Symptoms :
+                      Mental status :
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
                         as="textarea"
-                        name="symptoms"
+                        name="mental_status"
                         type='text'
-                        value={formData.symptoms}
+                        value={formData.mental_status}
+                        rows={2}
                         onChange={handleInputChange}
                         required />
                     </Col>
                   </Form.Group>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formIntimated">
                     <Form.Label column sm="4">
-                      Intimated / Rescued by :
+                      Cognitive Behavior :
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
-                        name="rescued_by"
+                        as="textarea"
+                        name="behaviour"
                         type='text'
-                        value={formData.rescued_by}
+                        value={formData.behaviour}
+                        rows={2}
                         onChange={handleInputChange}
                         required />
                     </Col>
                   </Form.Group>
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
                     <Form.Label column sm="4">
-                      Information filed by :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="information"
-                        type='text'
-                        value={formData.information}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                </Col>
-                <Col md={8}>
-                  <h5 className="pdfsub_heading">Articles carried from Rescue:</h5>
-
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formRescueName">
-                    <Form.Label column sm="4">
-                      Name :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="rescue_name"
-                        value={formData.rescue_name}
-                        onChange={handleInputChange} />
-                    </Col>
-                  </Form.Group>
-
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formArticles">
-                    <Form.Label column sm="4">
-                      Items Found During Rescue :
+                      Communication Ability :
                     </Form.Label>
                     <Col sm="8">
                       <Form.Control
                         as="textarea"
-                        name="articles_carried"
+                        name="community_ability"
                         type='text'
-                        value={formData.articles_carried}
+                        value={formData.community_ability}
+                        rows={2}
+                        onChange={handleInputChange}
+                        required />
+                    </Col>
+                  </Form.Group>
+                   <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                    <Form.Label column sm="4">
+                      Self-Care Capacity :
+                    </Form.Label>
+                    <Col sm="8">
+                      <Form.Control
+                        as="textarea"
+                        name="self_careCapacity"
+                        type='text'
+                        value={formData.self_careCapacity}
+                        rows={2}
+                        onChange={handleInputChange}
+                        required />
+                    </Col>
+                  </Form.Group>
+                   <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                    <Form.Label column sm="4">
+                      Diagnosis :
+                    </Form.Label>
+                    <Col sm="8">
+                      <Form.Control
+                        as="textarea"
+                        name="diagnosis"
+                        type='text'
+                        value={formData.diagnosis}
+                        rows={2}
                         onChange={handleInputChange}
                         required />
                     </Col>
                   </Form.Group>
                 </Col>
-                <Col md={8}>
-                  <h5 className="pdfsub_heading">Family Member Identification:</h5>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formRelationship">
-                    <Form.Label column sm="4">
-                      Relationship :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="rescue_relationship"
-                        type='text'
-                        value={formData.rescue_relationship}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formMemberName">
-                    <Form.Label column sm="4">
-                      Family Member Name :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="f_member_name"
-                        type='text'
-                        value={formData.f_member_name}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formMemberPhone">
-                    <Form.Label column sm="4">
-                      Family Member Phone No. :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="f_member_phone"
-                        type='text'
-                        value={formData.f_member_phone}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formMemberAddress">
-                    <Form.Label column sm="4">
-                      Family Member Address :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="f_member_address"
-                        type='text'
-                        value={formData.f_member_address}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formAdharCard">
-                    <Form.Label column sm="4">
-                      Family Member Aadhar Card Original :
-                    </Form.Label>
-                    <Col sm="8" className='d-flex align-items-center justify-content-center'>
-                      {formData.f_aadhar_card_url && (
-                        <img
-                          src={`http://localhost:5000/${formData.f_aadhar_card_url}`}
-                          alt="Rescue Preview"
-                          style={{ marginTop: '10px', width: '100px', maxHeight: 'auto', objectFit: 'cover' }}
-                        />
-                      )}
-                      <Form.Control
-                        className='mx-3'
-                        type="file"
-                        name="f_aadhar_card"
-                        onChange={handleFileChange}
-                      />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formRationCard">
-                    <Form.Label column sm="4">
-                      Ration Card :
-                    </Form.Label>
-                    <Col sm="8" className='d-flex align-items-center justify-content-center'>
-                      {formData.f_ration_card_url && (
-                        <img
-                          src={`http://localhost:5000/${formData.f_ration_card_url}`}
-                          alt="Rescue Preview"
-                          style={{ marginTop: '10px', width: '100px', maxHeight: 'auto', objectFit: 'cover' }}
-                        />
-                      )}
-                      <Form.Control
-                        className='mx-3'
-                        type="file"
-                        name="f_ration_card"
-                        onChange={handleFileChange}
-                      />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formRescueAadhar">
-                    <Form.Label column sm="4">
-                      Rescue Aadhar Card :
-                    </Form.Label>
-                    <Col sm="8" className='d-flex align-items-center justify-content-center'>
-                      {formData.res_aadhar_card_url && (
-                        <img
-                          src={`http://localhost:5000/${formData.res_aadhar_card_url}`}
-                          alt="Rescue Preview"
-                          style={{ marginTop: '10px', width: '100px', maxHeight: 'auto', objectFit: 'cover' }}
-                        />
-                      )}
-                      <Form.Control
-                        className='mx-3'
-                        type="file"
-                        name="res_aadhar_card"
-                        onChange={handleFileChange}
-                      />
-                    </Col>
-                  </Form.Group>
-                </Col>
+                
               </Row>
               <Button type="submit">Update</Button>
             </Form>

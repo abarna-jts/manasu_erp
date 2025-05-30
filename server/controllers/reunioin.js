@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (['f_aadhar_card', 'f_ration_card', 'govt_id'].includes(file.fieldname)) {
             cb(null, path.resolve('uploads/Reunion/Family_Details/'));
-        } else if (['signature', 'photo'].includes(file.fieldname)) {
+        } else if (['signature', 'photo', 'handwritten_document'].includes(file.fieldname)) {
             cb(null, path.resolve('uploads/Self_Declaration/'));
         } else if (['scan_report']) {
             cb(null, path.resolve('uploads/MediaConsent/'));
@@ -34,6 +34,7 @@ const upload = multer({ storage: storage }).fields([
     { name: 'f_aadhar_card', maxCount: 1 },
     { name: 'f_ration_card', maxCount: 1 },
     { name: 'govt_id', maxCount: 1 },
+    { name: 'handwritten_document', maxCount: 1 },
     { name: 'signature', maxCount: 1 },
     { name: 'photo', maxCount: 1 },
     { name: 'scan_report', maxCount: 1 }, // ✅ added
@@ -55,6 +56,9 @@ const createFamilyLetter = (req, res) => {
             f_member_name,
             f_member_phone,
             f_member_address,
+            f_aadhar_card_no,
+            f_ration_card_no,
+            any_other
 
         } = req.body;
 
@@ -64,7 +68,7 @@ const createFamilyLetter = (req, res) => {
         const govt_idPath = req.files['govt_id'] ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
 
 
-        const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address,f_aadhar_card_no, f_ration_card_no, any_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         const values = [
             admissionNumber,
@@ -77,8 +81,10 @@ const createFamilyLetter = (req, res) => {
             rescue_relationship,
             f_member_name,
             f_member_phone,
-            f_member_address
-
+            f_member_address,
+            f_aadhar_card_no,
+            f_ration_card_no,
+            any_other
         ];
 
         db.query(q, values, (dbErr, data) => {
@@ -232,17 +238,19 @@ const createSelfDeclaration = (req, res) => {
         } = req.body;
 
         // File paths
+        const handWrittenPath = req.files['handwritten_document'] ? `uploads/Self_Declaration/${req.files['handwritten_document'][0].filename}` : null;
         const signaturePath = req.files['signature'] ? `uploads/Self_Declaration/${req.files['signature'][0].filename}` : null;
         const PhotoPath = req.files['photo'] ? `uploads/Self_Declaration/${req.files['photo'][0].filename}` : null;
 
-        const q = `INSERT INTO self_declaration(admission_no,rescue_name,age,description,signature,photo)
-                VALUES(?,?,?,?,?,?)`;
+        const q = `INSERT INTO self_declaration(admission_no,rescue_name,age,description,handwritten_document,signature,photo)
+                VALUES(?,?,?,?,?,?,?)`;
 
         const values = [
             admission_no,
             rescue_name,
             age,
             description,
+            handWrittenPath,
             signaturePath,
             PhotoPath
         ]

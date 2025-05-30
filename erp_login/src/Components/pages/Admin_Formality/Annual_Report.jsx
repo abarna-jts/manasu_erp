@@ -14,6 +14,7 @@ function Annual_Report() {
     const [isStep2Invalid, setIsStep2Invalid] = useState(false);
     const [isStep3Invalid, setIsStep3Invalid] = useState(false);
     const [isStep4Invalid, setIsStep4Invalid] = useState(false);
+    const [eventPhotos, setEventPhotos] = useState(null);
 
 
     const [staffData, setStaffData] = useState({
@@ -192,24 +193,80 @@ function Annual_Report() {
         navigate(`/view_annualReport`);
     };
 
+    // const handleEventSubmit = async (e) => {
+    //     e.preventDefault();
+
+    //     try {
+    //         const response = await apiRoute.post("/formality/createEventReport", eventData);
+    //         console.log(response);
+
+    //         if (response.data.message === "Event Report Form Created Successfully") {
+    //             setSubmissionMessage("Form submitted successfully!");
+    //             setMessageType("success");
+    //         } else {
+    //             setSubmissionMessage("Submission failed.");
+    //             setMessageType("danger");
+    //         }
+
+    //         setStep(2);
+    //     } catch (error) {
+    //         console.error("Error submitting form", error.response?.data || error.message);
+    //         setSubmissionMessage("Something went wrong.");
+    //         setMessageType("danger");
+    //     }
+    // }
+
+    const [files, setFiles] = useState({
+            event_photos: null,
+            awarness_photos: null,
+            outing_photos: null,
+        });
+
+    const handleFileChange = (e) => {
+        setFiles({ ...files, [e.target.name]: e.target.files[0] });
+    };
+
     const handleEventSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const response = await apiRoute.post("/formality/createEventReport", eventData);
-            console.log(response);
+        const data = new FormData();
+        data.append('event_type', eventData.event_type);
+        data.append('event_name', eventData.event_name);
+        data.append('event_date', eventData.event_date);
+        data.append('event_place', eventData.event_place);
+        data.append('event_rescue_count', eventData.event_rescue_count);
+        data.append('event_report', eventData.event_report);
+        data.append('awareness_name', eventData.awareness_name);
+        data.append('awarness_date', eventData.awarness_date);
+        data.append('awarness_place', eventData.awarness_place);
+        data.append('awarness_rescue_count', eventData.awarness_rescue_count);
+        data.append('awarness_report', eventData.awarness_report);
+        data.append('outing_name', eventData.outing_name);
+        data.append('outing_date', eventData.outing_date);
+        data.append('outing_place', eventData.outing_place);
+        data.append('outing_rescue_count', eventData.outing_rescue_count);
+        data.append('outing_report', eventData.outing_report);
+        data.append('event_photos', files.event_photos);
+        data.append('awarness_photos', files.awarness_photos);
+        data.append('outing_photos', files.outing_photos);
 
-            if (response.data.message === "Event Report Form Created Successfully") {
+        try {
+            const res = await apiRoute.post('/formality/createEventReport', data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            console.log(res);
+            if (res.data.message === "Event Report Form Created Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
+
+                // Optionally reload after 3 seconds
+                setTimeout(() => window.location.reload(), 3000);
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
             }
-
-            setStep(2);
         } catch (error) {
-            console.error("Error submitting form", error.response?.data || error.message);
+            console.error("Error submitting form", error);
             setSubmissionMessage("Something went wrong.");
             setMessageType("danger");
         }
@@ -263,7 +320,7 @@ function Annual_Report() {
         const requiredFields = [
             "staff_name",
             "staff_date",
-            "staff_place", 
+            "staff_place",
             "staff_rescue_count",
             "staff_report"
         ];
@@ -304,6 +361,8 @@ function Annual_Report() {
         "Community Programs",
         "Staff Programs",
     ];
+
+
 
     return (
         <>
@@ -456,6 +515,18 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="file"
+                                                    name="event_photos"
+                                                    onChange={handleFileChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="4" className='text-start'>Event Report:</Form.Label>
                                             <Col sm="8">
                                                 <Form.Control
@@ -526,6 +597,17 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="file"
+                                                    name="awarness_photos"
+                                                    onChange={handleFileChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="4" className='text-start'>Awareness Report:</Form.Label>
                                             <Col sm="8">
                                                 <Form.Control
@@ -590,6 +672,17 @@ function Annual_Report() {
                                                     name="outing_rescue_count"
                                                     value={eventData.outing_rescue_count}
                                                     onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    type="file"
+                                                    name="outing_photos"
+                                                    onChange={handleFileChange}
                                                     required
                                                 />
                                             </Col>

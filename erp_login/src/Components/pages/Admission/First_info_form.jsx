@@ -20,7 +20,12 @@ function First_info_form() {
     const [admission_date, setAdmissionDate] = useState('');
     const [admission_no, setAdmisisonNo] = useState('');
     const [rescue_image, setRescueImage] = useState(null);
+    const [attach_policeMemo, setAttachPoliceMemo] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [isStep1Invalid, setIsStep1Invalid] = useState(false);
+    const [isStep2Invalid, setIsStep2Invalid] = useState(false);
+    const [isStep3Invalid, setIsStep3Invalid] = useState(false);
+    const [isStep4Invalid, setIsStep4Invalid] = useState(false);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -29,6 +34,14 @@ function First_info_form() {
             setImagePreview(URL.createObjectURL(file));
         }
     };
+
+    const handleMemoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setAttachPoliceMemo(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    }
     const [rescue_name, setRescueName] = useState('');
     const [age, setAge] = useState('');
     const [rescue_status, setRescueStatus] = useState('');
@@ -43,6 +56,7 @@ function First_info_form() {
     const [other_relation, setOtherRelation] = useState('');
     const [place, setPlace] = useState('');
     const [phone_no, setPhoneNumber] = useState('');
+    const [phone_no_two, setPhoneNumberTwo] = useState('');
     const [clothing, setClothing] = useState('');
     const [clothingError, setClothingError] = useState(false);
     const [dress_code, setDressCode] = useState('');
@@ -136,38 +150,77 @@ function First_info_form() {
 
 
     const handleNext = (event) => {
-        const form = event.currentTarget;
-        event.preventDefault(); // stop default submit behavior
-        event.stopPropagation(); // stop bubbling
+        event.preventDefault();
+        event.stopPropagation(); // prevents default bubbling for better control
 
-        if (form.checkValidity()) {
-            // Proceed to next form if valid
-            console.log("Form is valid, go to next step");
-            setStep(2);
-        }
-        // else{
-        //     alert("Enter the Rescue Details Correctly");
-        // }
-
+        // Set validated true for Bootstrap's validation feedback
         setValidated(true);
+
+        // List of all required values in Step 1
+        const requiredFields = [
+            referred_by,
+            from_place,
+            date_time,
+            police_memo,
+            attach_policeMemo,
+            police_station,
+            information_public,
+            admission_no,
+            rescue_image,
+        ];
+
+        const allFilled = requiredFields.every(field => {
+            if (typeof field === "string") {
+                return field.trim() !== "";
+            }
+            return !!field;
+        });
+
+        if (!allFilled) {
+            setIsStep1Invalid(true); // mark step 1 red in progress bar
+        } else {
+            setIsStep1Invalid(false);
+        }
+
+        // Always move to next step
+        setStep(2);
     };
+
+
+
 
     const handleInmateForm = (event) => {
-        const form = event.currentTarget;
-        event.preventDefault(); // stop default submit behavior
-        event.stopPropagation(); // stop bubbling
-
-        if (form.checkValidity()) {
-            // Proceed to next form if valid
-            console.log("Form is valid, go to next step");
-            setStep(3);
-        }
-        else {
-            alert("Enter the Inmate Details Correctly");
-        }
+        event.preventDefault();
+        event.stopPropagation();
 
         setValidated(true);
+
+        // Only validate these specific required fields
+        const requiredFields = [
+            rescue_name,
+            rescue_status,
+            language1,
+            education,
+            govIdType
+        ];
+
+        const allFilled = requiredFields.every(field => {
+            if (typeof field === "string") {
+                return field.trim() !== "";
+            }
+            return !!field;
+        });
+
+        if (!allFilled) {
+            setIsStep2Invalid(true); // Show error in progress bar
+            return; // Prevent moving to next step
+        } else {
+            setIsStep2Invalid(false);
+            
+        }
+        setStep(3); // ✅ Only move forward if valid 
     };
+
 
     const handleFamilyForm = (event) => {
         const form = event.currentTarget;
@@ -379,6 +432,7 @@ function First_info_form() {
         formData.append('other_relation', other_relation);
         formData.append('place', place);
         formData.append('phone_no', phone_no);
+        formData.append('phone_no_two', phone_no_two);
         formData.append('clothing', clothing);
         formData.append('dress_code', dress_code);
         formData.append('complexion', complexion);
@@ -408,9 +462,11 @@ function First_info_form() {
 
 
         formData.append('rescue_image', rescue_image);
+        formData.append('attach_policeMemo', attach_policeMemo);
         formData.append('govIdFile', govIdFile);
 
         console.log("Rescue Image File", rescue_image);
+        console.log("Police Memo:", attach_policeMemo);
         // formData.append('f_aadhar_card', f_aadhar_card);
         // formData.append('f_ration_card', f_ration_card);
         // formData.append('res_aadhar_card', res_aadhar_card);
@@ -522,17 +578,34 @@ function First_info_form() {
                     const isActive = stepNumber === step;
                     const isCompleted = stepNumber < step;
 
+                    const isInvalid =
+                        (stepNumber === 1 && isStep1Invalid) ||
+                        (stepNumber === 2 && isStep2Invalid) ||
+                        (stepNumber === 3 && isStep3Invalid) ||
+                        (stepNumber === 4 && isStep4Invalid);
+
                     return (
                         <div
                             key={index}
                             className={`step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}
                         >
-                            <div className="step-number">{stepNumber}</div>
+                            <div
+                                className="step-number"
+                                style={{
+                                    color: isInvalid ? 'white' : 'inherit',
+                                    fontWeight: isInvalid ? 'bold' : 'normal',
+                                    background: isInvalid ? 'red' : '#84c342',
+                                }}
+                            >
+                                {stepNumber}
+                            </div>
                             <div className="step-label">{label}</div>
                         </div>
                     );
                 })}
             </div>
+
+
 
 
 
@@ -566,7 +639,7 @@ function First_info_form() {
                                         <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
                                     </Form.Group>
                                     <Form.Group className="mb-3 text-start" controlId="formtakePlace">
-                                        <Form.Label>Taken from : </Form.Label>
+                                        <Form.Label>Taken from (Rescue Place) : </Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="from_place"
@@ -583,15 +656,46 @@ function First_info_form() {
                                             onChange={(e) => setDateTime(e.target.value)}
                                             required />
                                     </Form.Group>
-                                    <Form.Group className="mb-3 text-start" controlId="formPoliceMemo">
-                                        <Form.Label>Police Memo : </Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="police_memo"
-                                            value={police_memo}
-                                            onChange={(e) => setPoliceMemo(e.target.value)}
-                                            required />
-                                    </Form.Group>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3 text-start" controlId="formPoliceMemo">
+                                                <Form.Label>Police Memo : </Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="police_memo"
+                                                    value={police_memo}
+                                                    onChange={(e) => setPoliceMemo(e.target.value)}
+                                                    required />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={6} className="text-start">
+                                            <Form.Group>
+                                                <Form.Label>Attach Police Memo : </Form.Label>
+                                                <Form.Control
+                                                    type="file"
+                                                    name="attach_policeMemo"
+                                                    accept="image/*"
+                                                    onChange={handleMemoChange}
+                                                    required={!attach_policeMemo}
+                                                />
+                                                {/* {attach_policeMemo && (
+                                                    <>
+                                                        <div className="mt-1 text-success">
+                                                            Selected file: {attach_policeMemo.name}
+                                                        </div>
+                                                        <img
+                                                            src={imagePreview}
+                                                            alt="Preview"
+                                                            className="mt-2"
+                                                            style={{ maxWidth: "200px", maxHeight: "200px", border: "1px solid #ccc" }}
+                                                        />
+                                                    </>
+                                                )} */}
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+
+
                                     <Form.Group className="mb-3 text-start" controlId="formPoliceStation">
                                         <Form.Label>Police Station : </Form.Label>
                                         <Form.Control
@@ -915,11 +1019,12 @@ function First_info_form() {
                                                 onChange={(e) => setMother(e.target.value)} />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formOther">
-                                            <Form.Label>Any Other : </Form.Label>
+                                            <Form.Label>Any Other Relationship: </Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="other_relation"
                                                 value={other_relation}
+                                                placeholder="Eg.Smith John (Brother)"
                                                 onChange={(e) => setOtherRelation(e.target.value)}
                                             />
                                         </Form.Group>
@@ -934,12 +1039,25 @@ function First_info_form() {
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formContactNo">
                                             <Form.Label>Contact Number : </Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="phone_no"
-                                                value={phone_no}
-                                                onChange={(e) => setPhoneNumber(e.target.value)}
-                                            />
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="phone_no"
+                                                        value={phone_no}
+                                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                                    />
+                                                </Col>
+                                                <Col md={6}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="phone_no_two"
+                                                        value={phone_no_two}
+                                                        onChange={(e) => setPhoneNumberTwo(e.target.value)}
+                                                    />
+                                                </Col>
+                                            </Row>
+
                                         </Form.Group>
                                     </Col>
                                     <Col md={4}>

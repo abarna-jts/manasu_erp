@@ -13,6 +13,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
+import manasu_logo from "../Admission/manasu_logo.png";
 
 function SCRB_form() {
     const [previewRequested, setPreviewRequested] = useState(false);
@@ -902,7 +903,15 @@ function SCRB_form() {
 
 
                     <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                        <h4 className="text-center">FORM 2A - PDF PREVIEW</h4>
+                        <Row className="d-flex align-items-center justify-content-center mb-2">
+                            <Col md={2}>
+                                <img src={manasu_logo} className="pdf_logo" alt="" />
+                            </Col>
+                            <Col md={10}>
+                                <h4 className="text-center">FORM 2A - PDF PREVIEW</h4>
+                            </Col>
+                        </Row>
+
                         <form>
                             <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
 
@@ -1310,14 +1319,14 @@ function SCRB_form() {
                             <table className="table">
                                 <tbody>
                                     <tr>
-                                        <td>
+                                        <td style={{marginBottom:"20px", paddingBottom:"20px"}}>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
                                                     <label>SIGNATURE / கையொப்பம் : </label>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td style={{marginBottom:"20px", paddingBottom:"70px"}}>
                                             {files.signature ? (
                                                 <>
                                                     <img
@@ -1331,7 +1340,7 @@ function SCRB_form() {
                                             )}
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr className="mt-5 pt-5">
                                         <td>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">

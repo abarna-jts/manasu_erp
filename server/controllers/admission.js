@@ -4,30 +4,31 @@ const db = require('../db');
 
 // Storage strategy based on fieldname
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        if (file.fieldname === 'rescue_image') {
-            cb(null, path.resolve('uploads/Rescue_Images/'));
-        } else {
-            cb(null, path.resolve('uploads/Rescue_Document/'));
-        }
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    },
+  destination: function (req, file, cb) {
+    if (file.fieldname === 'rescue_image') {
+      cb(null, path.resolve('uploads/Rescue_Images/'));
+    } else {
+      cb(null, path.resolve('uploads/Rescue_Document/'));
+    }
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
 });
 
 // Multer upload instance
 const upload = multer({ storage: storage }).fields([
-    { name: 'rescue_image', maxCount: 1 },
-    { name: 'govIdFile', maxCount: 1 },
-    // { name: 'f_ration_card', maxCount: 1 },
-    // { name: 'res_aadhar_card', maxCount: 1 }
+  { name: 'rescue_image', maxCount: 1 },
+  { name: 'attach_policeMemo', maxCount: 1 },
+  { name: 'govIdFile', maxCount: 1 },
+  // { name: 'f_ration_card', maxCount: 1 },
+  // { name: 'res_aadhar_card', maxCount: 1 }
 ]);
 
-const checkAdmissionNo = (req,res) =>{
+const checkAdmissionNo = (req, res) => {
   const admission_no = req.params.admission_no;
 
-   const query = 'SELECT * FROM first_information WHERE admission_no = ?';
+  const query = 'SELECT * FROM first_information WHERE admission_no = ?';
 
   db.query(query, [admission_no], (err, results) => {
     if (err) {
@@ -47,168 +48,172 @@ const checkAdmissionNo = (req,res) =>{
 
 const createFirstForm = (req, res) => {
   upload(req, res, (err) => {
-      if (err) {
-          return res.status(500).json({ message: "File upload failed", error: err });
+    if (err) {
+      return res.status(500).json({ message: "File upload failed", error: err });
+    }
+
+    const {
+      referred_by,
+      from_place,
+      date_time,
+      police_memo,
+      police_station,
+      information_public,
+      admission_date,
+      admission_no,
+      rescue_name,
+      age,
+      rescue_status,
+      religion,
+      language1,
+      language2,
+      language3,
+      education,
+      father,
+      mother,
+      other_relation,
+      place,
+      phone_no,
+      phone_no_two,
+      clothing,
+      dress_code,
+      complexion,
+      indentification_mark,
+      tattoo,
+      wound_infection,
+      height,
+      weight,
+      things_carried,
+      remark,
+      mental_status,
+      behaviour,
+      community_ability,
+      self_careCapacity,
+      diagnosis,
+      // symptoms,
+      // rescued_by,
+      // information,
+      govIdType,
+      govIdNumber
+      // articles_carried,
+      // f_member_name,
+      // f_member_phone,
+      // f_member_address
+    } = req.body;
+
+    // File paths
+    const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
+    const policeMemoPath = req.files['attach_policeMemo'] ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}` : null;
+    const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
+    // const f_ration_card_path = req.files['f_ration_card'] ? `uploads/FamilyDetails/${req.files['f_ration_card'][0].filename}` : null;
+    // const res_aadhar_card_path = req.files['res_aadhar_card'] ? `uploads/FamilyDetails/${req.files['res_aadhar_card'][0].filename}` : null;
+    console.log("rescue_image path:", rescue_image_path);
+    const q = "INSERT INTO first_information (referred_by, from_place, date_time, police_memo, attach_policeMemo, police_station, information_public, admission_date, admission_no, rescue_name, age, rescue_status, religion, language1, language2, language3, education, father, mother, other_relation, place, phone_no, phone_no_two, clothing, dress_code, complexion, indentification_mark, tattoo, wound_infection, height, weight, things_carried, remark, mental_status,behaviour, community_ability, self_careCapacity, diagnosis, govIdType, govIdNumber, govIdFile, rescue_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    const values = [
+      referred_by,
+      from_place,
+      date_time,
+      police_memo,
+      policeMemoPath,
+      police_station,
+      information_public,
+      admission_date,
+      admission_no,
+      rescue_name,
+      age || null,
+      rescue_status,
+      religion || null,
+      language1,
+      language2 || null,
+      language3 || null,
+      education,
+      father || null,
+      mother || null,
+      other_relation || null,
+      place || null,
+      phone_no || null,
+      phone_no_two || null,
+      clothing || null,
+      dress_code || null,
+      complexion || null,
+      indentification_mark || null,
+      tattoo || null,
+      wound_infection || null,
+      height,
+      weight,
+      things_carried || null,
+      remark || null,
+      mental_status,
+      behaviour,
+      community_ability,
+      self_careCapacity,
+      diagnosis,
+      govIdType,
+      govIdNumber || null,
+      govIdFile_path || null,
+      rescue_image_path,
+      // articles_carried,
+      // f_member_name,
+      // f_member_phone,
+      // f_member_address,
+      // f_aadhar_card_path,
+      // f_ration_card_path,
+      // res_aadhar_card_path
+    ];
+
+    db.query(q, values, (dbErr, data) => {
+      if (dbErr) {
+        return res.status(500).json({ message: "Database Error", error: dbErr });
       }
-
-      const {
-          referred_by,
-          from_place,
-          date_time,
-          police_memo,
-          police_station,
-          information_public,
-          admission_date,
-          admission_no,
-          rescue_name,
-          age,
-          rescue_status,
-          religion,
-          language1,
-          language2,
-          language3,
-          education,
-          father,
-          mother,
-          other_relation,
-          place,
-          phone_no,
-          clothing,
-          dress_code,
-          complexion,
-          indentification_mark,
-          tattoo,
-          wound_infection,
-          height,
-          weight,
-          things_carried,
-          remark,
-          mental_status,
-          behaviour,
-          community_ability,
-          self_careCapacity,
-          diagnosis,
-          // symptoms,
-          // rescued_by,
-          // information,
-          govIdType,
-          govIdNumber
-          // articles_carried,
-          // f_member_name,
-          // f_member_phone,
-          // f_member_address
-      } = req.body;
-
-      // File paths
-      const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
-      const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
-      // const f_ration_card_path = req.files['f_ration_card'] ? `uploads/FamilyDetails/${req.files['f_ration_card'][0].filename}` : null;
-      // const res_aadhar_card_path = req.files['res_aadhar_card'] ? `uploads/FamilyDetails/${req.files['res_aadhar_card'][0].filename}` : null;
-      console.log("rescue_image path:", rescue_image_path);
-      const q = "INSERT INTO first_information (referred_by, from_place, date_time, police_memo, police_station, information_public, admission_date, admission_no, rescue_name, age, rescue_status, religion, language1, language2, language3, education, father, mother, other_relation, place, phone_no, clothing, dress_code, complexion, indentification_mark, tattoo, wound_infection, height, weight, things_carried, remark, mental_status,behaviour, community_ability, self_careCapacity, diagnosis, govIdType, govIdNumber, govIdFile, rescue_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-      const values = [
-          referred_by,
-          from_place,
-          date_time,
-          police_memo,
-          police_station,
-          information_public,
-          admission_date,
-          admission_no,
-          rescue_name,
-          age || null,
-          rescue_status,
-          religion || null,
-          language1,
-          language2 || null,
-          language3 || null,
-          education,
-          father || null,
-          mother || null,
-          other_relation || null,
-          place || null,
-          phone_no || null,
-          clothing || null,
-          dress_code || null,
-          complexion || null,
-          indentification_mark || null,
-          tattoo || null,
-          wound_infection || null,
-          height,
-          weight,
-          things_carried || null,
-          remark || null,
-          mental_status,
-          behaviour,
-          community_ability,
-          self_careCapacity,
-          diagnosis,
-          govIdType,
-          govIdNumber || null,
-          govIdFile_path || null,
-          rescue_image_path,
-          // articles_carried,
-          // f_member_name,
-          // f_member_phone,
-          // f_member_address,
-          // f_aadhar_card_path,
-          // f_ration_card_path,
-          // res_aadhar_card_path
-      ];
-
-      db.query(q, values, (dbErr, data) => {
-          if (dbErr) {
-              return res.status(500).json({ message: "Database Error", error: dbErr });
-          }
-          res.status(201).json({ message: "First Form Created Successfully", data: data });
-      });
+      res.status(201).json({ message: "First Form Created Successfully", data: data });
+    });
   });
 };
 
 
-  const getFirstForm = (req, res) => {
-    const query="Select * from first_information";
+const getFirstForm = (req, res) => {
+  const query = "Select * from first_information";
 
-    db.query(query, (err, data) => {
-        if(err){
-            return res.status(500).json({message:"Database Error", error:err});
-        }
-        res.status(201).json({message:"First Information form Get Successfully", data:data});
-    });
-  };
+  db.query(query, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res.status(201).json({ message: "First Information form Get Successfully", data: data });
+  });
+};
 
-  const getFirst2AForm = (req, res) => {
-    const admission_no = req.params.admission_no;
-    const query = "SELECT * FROM first_information WHERE admission_no = ?";
-  
-    db.query(query, [admission_no], (err, data) => {
-      if (err) {
-        return res.status(500).json({ message: "Database Error", error: err });
-      }
-      if (data.length === 0) {
-        return res.status(404).json({ message: "No data found for the given admission number" });
-      }
-      res.status(200).json({ message: "First Information form fetched successfully", data: data });
-    });
-  };
+const getFirst2AForm = (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = "SELECT * FROM first_information WHERE admission_no = ?";
 
-  const getForm2Data = (req,res) =>{
-     const admission_no = req.params.admission_no;
-      const query = "SELECT * FROM first_information WHERE admission_no = ?";
-    
-      db.query(query, [admission_no], (err, data) => {
-        if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
-        }
-        if (data.length === 0) {
-          return res.status(404).json({ message: "No data found for the given admission number" });
-        }
-        res.status(200).json({ message: "First Information form fetched successfully", data: data });
-      });
-  }
+  db.query(query, [admission_no], (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No data found for the given admission number" });
+    }
+    res.status(200).json({ message: "First Information form fetched successfully", data: data });
+  });
+};
 
-  const getSCRBFormData = (req, res) => {
+const getForm2Data = (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = "SELECT * FROM first_information WHERE admission_no = ?";
+
+  db.query(query, [admission_no], (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No data found for the given admission number" });
+    }
+    res.status(200).json({ message: "First Information form fetched successfully", data: data });
+  });
+}
+
+const getSCRBFormData = (req, res) => {
   const admission_no = req.params.admission_no;
   const query = "SELECT * FROM form_2 WHERE admission_no = ?";
 
@@ -227,8 +232,8 @@ const createFirstForm = (req, res) => {
   });
 };
 
-const getSCRB2AFormData = (req,res) =>{
-const admission_no = req.params.admission_no;
+const getSCRB2AFormData = (req, res) => {
+  const admission_no = req.params.admission_no;
   const query = "SELECT * FROM form_2a WHERE admission_no = ?";
 
   db.query(query, [admission_no], (err, data) => {
@@ -246,7 +251,7 @@ const admission_no = req.params.admission_no;
   });
 };
 
-const getSCRB2BFormData = (req,res) =>{
+const getSCRB2BFormData = (req, res) => {
   const admission_no = req.params.admission_no;
   const query = "SELECT * FROM form_2b WHERE admission_no = ?";
 
@@ -265,8 +270,8 @@ const getSCRB2BFormData = (req,res) =>{
   });
 }
 
-const getSCRB2CFormData = (req,res) =>{
- const admission_no = req.params.admission_no;
+const getSCRB2CFormData = (req, res) => {
+  const admission_no = req.params.admission_no;
   const query = "SELECT * FROM form_2c WHERE admission_no = ?";
 
   db.query(query, [admission_no], (err, data) => {
@@ -318,119 +323,241 @@ const getAllSCRBFormData = (req, res) => {
 
 
 
-  const DeleteFirstForm = (req, res) =>{
+const DeleteFirstForm = (req, res) => {
+  const rescueId = req.params.id;
+
+  const deletequery = "DELETE FROM first_information WHERE id = ?";
+  const values = [
+    rescueId
+  ];
+
+  db.query(deletequery, values, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res
+      .status(201)
+      .json({ message: "First Form Deleted Successfully", data: data });
+  });
+}
+
+const UpdateFirstForm = (req, res) => {
+  upload(req, res, (err) => {
+    if (err) {
+      return res.status(500).json({ message: "File upload failed", error: err });
+    }
+
+    const {
+      referred_by,
+      from_place,
+      date_time,
+      police_memo,
+      police_station,
+      information_public,
+      admission_date,
+      admission_no,
+      rescue_name,
+      age,
+      rescue_status,
+      religion,
+      language1,
+      language2,
+      language3,
+      education,
+      father,
+      mother,
+      other_relation,
+      place,
+      dress_code,
+      complexion,
+      indentification_mark,
+      wound_infection,
+      height,
+      weight,
+      phone_no,
+      phone_no_two,
+      clothing,
+      things_carried,
+      remark,
+      mental_status,
+      behaviour,
+      community_ability,
+      self_careCapacity,
+      govIdType,
+      govIdNumber,
+      diagnosis,
+      tattoo
+    } = req.body;
+
     const rescueId = req.params.id;
 
-    const deletequery = "DELETE FROM first_information WHERE id = ?";
-    const values = [
-      rescueId
-    ];
+    const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
+    const newAttachPoliceMemo = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
+    const newgovIdFile = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
 
-    db.query(deletequery, values, (err, data) => {
-        if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
-        }
-        res
-          .status(201)
-          .json({ message: "First Form Deleted Successfully", data: data });
-      });
-  }
-
-  const UpdateFirstForm = (req,res) =>{
-    upload(req, res, (err) => {
-      if (err) {
-        return res.status(500).json({ message: "File upload failed", error: err });
+    // Fetch the existing logo path
+    const selectQuery = "SELECT rescue_image, attach_policeMemo, govIdFile FROM first_information WHERE id = ?";
+    db.query(selectQuery, [rescueId], (selectErr, selectData) => {
+      if (selectErr) {
+        return res.status(500).json({ message: "Failed to retrieve Rescue Image", error: selectErr });
       }
-  
-      const {
+
+      const existingRescuePath = selectData[0]?.rescue_image;
+      const finalRescuePath = newRescueImage || existingRescuePath;
+
+      const existingPoliceMemo = selectData[0]?.attach_policeMemo;
+      const finalPoliceMemo = newAttachPoliceMemo || existingPoliceMemo;
+
+      const existingGovtID = selectData[0]?.govIdFile;
+      const finalGovtID = newgovIdFile || existingGovtID;
+
+      // Update the catalogue
+      const updateQuery = `
+        UPDATE first_information SET 
+          referred_by = ?, 
+          from_place = ?, 
+          date_time = ?, 
+          police_memo = ?, 
+          attach_policeMemo = ?,
+          police_station = ?,
+          information_public = ?, 
+          admission_date = ?, 
+          admission_no = ?,
+          rescue_name = ?,
+          age = ?,
+          rescue_status = ?,
+          religion = ?,
+          language1 = ?,
+          language2 = ?,
+          language3 = ?,
+          education = ?,
+          father = ?,
+          mother = ?,
+          other_relation = ?,
+          place = ?,
+          phone_no = ?,
+          phone_no_two = ?,
+          clothing = ?,
+          dress_code = ?,
+          complexion = ?,
+          indentification_mark = ?,
+          tattoo = ?,
+          wound_infection = ?,
+          height = ?,
+          weight = ?,
+          things_carried = ?,
+          remark = ?,
+          mental_status = ?,
+          behaviour = ?,
+          community_ability = ?,
+          self_careCapacity = ?,
+          diagnosis = ?,
+          govIdType = ?,
+          govIdNumber = ?,
+          govIdFile = ?,
+          rescue_image = ?
+        WHERE id = ?`;
+
+
+      const values = [
         referred_by,
         from_place,
         date_time,
         police_memo,
+        finalPoliceMemo,
+        police_station,
         information_public,
         admission_date,
-        admission_no
-      } = req.body;
-  
-      const rescueId = req.params.id;
-      const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
-  
-      // Fetch the existing logo path
-      const selectQuery = "SELECT rescue_image FROM first_information WHERE id = ?";
-      db.query(selectQuery, [rescueId], (selectErr, selectData) => {
-        if (selectErr) {
-          return res.status(500).json({ message: "Failed to retrieve Rescue Image", error: selectErr });
+        admission_no,
+        rescue_name,
+        age,
+        rescue_status,
+        religion,
+        language1,
+        language2,
+        language3,
+        education,
+        father,
+        mother,
+        other_relation,
+        place,
+        phone_no,
+        phone_no_two,
+        clothing,
+        dress_code,
+        complexion,
+        indentification_mark,
+        tattoo,
+        wound_infection,
+        height,
+        weight,
+        things_carried,
+        remark,
+        mental_status,
+        behaviour,
+        community_ability,
+        self_careCapacity,
+        diagnosis,
+        govIdType,
+        govIdNumber,
+        finalGovtID,
+        finalRescuePath,
+        rescueId
+      ];
+
+
+      db.query(updateQuery, values, (updateErr, data) => {
+        if (updateErr) {
+          return res.status(500).json({ message: "Update failed", error: updateErr });
         }
-  
-        const existingRescuePath = selectData[0]?.rescue_image;
-        const finalRescuePath = newRescueImage || existingRescuePath;
-  
-        // Update the catalogue
-        const updateQuery = `
-          UPDATE first_information SET 
-            referred_by = ?, 
-            from_place = ?, 
-            date_time = ?, 
-            police_memo = ?, 
-            information_public = ?, 
-            admission_date = ?, 
-            admission_no = ?,
-            rescue_image = ?
-          WHERE id = ?`;
-  
-          const values = [
-            referred_by,
-            from_place,
-            date_time,
-            police_memo,
-            information_public,
-            admission_date,
-            admission_no,
-            finalRescuePath,
-            rescueId             
-          ];
-          
-  
-        db.query(updateQuery, values, (updateErr, data) => {
-          if (updateErr) {
-            return res.status(500).json({ message: "Update failed", error: updateErr });
-          }
-        
-          if (newRescueImage && existingRescuePath) {
-            fs.unlink(existingRescuePath, (fsErr) => {
-              if (fsErr) console.warn("Failed to delete old logo:", fsErr);
-            });
-          }
-        
-          res.status(200).json({ message: "Rescue updated successfully" });
-        });
-        
+
+        if (newRescueImage && existingRescuePath) {
+          fs.unlink(existingRescuePath, (fsErr) => {
+            if (fsErr) console.warn("Failed to delete old logo:", fsErr);
+          });
+        }
+
+        if (newAttachPoliceMemo && existingPoliceMemo) {
+          fs.unlink(existingPoliceMemo, (fsErr) => {
+            if (fsErr) console.warn("Failed to delete Police Memo:", fsErr);
+          });
+        }
+
+        if (newgovIdFile && existingGovtID) {
+          fs.unlink(existingGovtID, (fsErr) => {
+            if (fsErr) console.warn("Failed to delete Government ID type:", fsErr);
+          });
+        }
+
+        res.status(200).json({ message: "Rescue updated successfully" });
       });
+
     });
-  }
+  });
+}
 
 
-  // getting scrb form data
-  const getSCRBFormDatta = (req,res) =>{
-    const { admissionNumber } = req.params;
+// getting scrb form data
+const getSCRBFormDatta = (req, res) => {
+  const { admissionNumber } = req.params;
 
-    const query = 'SELECT * FROM first_information WHERE admission_no = ?';
-    db.query(query, [admissionNumber], (err, result) => {
-      if (err) {
-        console.error('DB error:', err);
-        return res.status(500).send('Server error');
-      }
+  const query = 'SELECT * FROM first_information WHERE admission_no = ?';
+  db.query(query, [admissionNumber], (err, result) => {
+    if (err) {
+      console.error('DB error:', err);
+      return res.status(500).send('Server error');
+    }
 
-      if (result.length === 0) {
-        return res.status(404).send('Admission number not found');
-      }
+    if (result.length === 0) {
+      return res.status(404).send('Admission number not found');
+    }
 
-      res.json(result[0]); // send back the found record
-    });
-    
-  }
-  
-const getRescueDetailsPDF =(req,res) =>{
+    res.json(result[0]); // send back the found record
+  });
+
+}
+
+const getRescueDetailsPDF = (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM first_information WHERE id = ?';
 
@@ -448,20 +575,19 @@ const getRescueDetailsPDF =(req,res) =>{
   });
 }
 
-  module.exports = {
-    checkAdmissionNo,
-    createFirstForm,
-    getFirstForm,
-    DeleteFirstForm,
-    UpdateFirstForm,
-    getSCRBFormDatta,
-    getFirst2AForm,
-    getRescueDetailsPDF,
-    getSCRBFormData,
-    getSCRB2AFormData,
-    getSCRB2BFormData,
-    getSCRB2CFormData,
-    getAllSCRBFormData,
-    getForm2Data
-  };
-  
+module.exports = {
+  checkAdmissionNo,
+  createFirstForm,
+  getFirstForm,
+  DeleteFirstForm,
+  UpdateFirstForm,
+  getSCRBFormDatta,
+  getFirst2AForm,
+  getRescueDetailsPDF,
+  getSCRBFormData,
+  getSCRB2AFormData,
+  getSCRB2BFormData,
+  getSCRB2CFormData,
+  getAllSCRBFormData,
+  getForm2Data
+};

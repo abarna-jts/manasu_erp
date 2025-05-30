@@ -8,6 +8,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import manasu_logo from "../Admission/manasu_logo.png";
 
 function Self_Declaration_form() {
     const [show, setShow] = useState(false);
@@ -15,8 +16,8 @@ function Self_Declaration_form() {
     const [files, setFiles] = useState('');
     const [previewRequested, setPreviewRequested] = useState(false);
     const [rescueImage, setRescueImage] = useState(null);
-        const [rescueName, setRescueName] = useState("");
-        const [error, setError] = useState("");
+    const [rescueName, setRescueName] = useState("");
+    const [error, setError] = useState("");
 
     const handleClose = () => setShow(false);
 
@@ -122,15 +123,18 @@ function Self_Declaration_form() {
                 description: data.description || '',
             }));
 
+
             // Handle old and new photo paths correctly
             const signaturePath = data.signature ? `http://localhost:5000/${data.signature}` : null;
             const photoPath = data.photo ? `http://localhost:5000/${data.photo}` : null;
-
+            const handwritten_documentPath = data.handwritten_document ? `http://localhost:5000/${data.handwritten_document}` : null;
+            console.log(handwritten_documentPath);
             // Set files state
             setFiles((files) => ({
                 ...files,
                 signature: signaturePath,
                 photo: photoPath,
+                handwritten_document: handwritten_documentPath,
             }));
 
             setPreviewRequested(true);
@@ -158,6 +162,7 @@ function Self_Declaration_form() {
         data.append('rescue_name', formData.rescue_name);
         data.append('age', formData.age);
         data.append('description', formData.description);
+        data.append('handwritten_document', files.handwritten_document);
         data.append('signature', files.signature);
         data.append('photo', files.photo);
 
@@ -188,11 +193,13 @@ function Self_Declaration_form() {
             // Handle old and new photo paths correctly
             const signaturePath = data.signature ? `http://localhost:5000/${data.signature}` : null;
             const photoPath = data.photo ? `http://localhost:5000/${data.photo}` : null;
+            const handwritten_documentPath = data.handwritten_document ? `http://localhost:5000/${data.handwritten_document}` : null;
 
 
             // Set files state
             setFiles((files) => ({
                 ...files,
+                handwritten_document: handwritten_documentPath,
                 signature: signaturePath,
                 photo: photoPath,
             }));
@@ -212,6 +219,7 @@ function Self_Declaration_form() {
         data.append('age', formData.age);
         data.append('description', formData.description);
         data.append('signature', files.signature);
+        data.append('handwritten_document', files.handwritten_document);
         data.append('photo', files.photo);
 
         try {
@@ -239,42 +247,42 @@ function Self_Declaration_form() {
     };
 
     const fetchRescueDetails = async (admission_no) => {
-            try {
-                const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-                const result = response.data.data[0];
-                console.log("API Result:", result);
-    
-                if (result && result.rescue_image) {
-                    const imagePath = result.rescue_image.startsWith("http")
-                        ? result.rescue_image
-                        : `http://localhost:5000/${result.rescue_image}`;
-    
-                    setRescueImage(imagePath);
-                    setRescueName(result.rescue_name || "");
-                    setError(""); // clear any previous error
-                } else {
-                    setRescueImage(null);
-                    setRescueName("");
-                    setError("Image not found for this admission number");
-                }
-            } catch (error) {
-                console.error("Error fetching data", error);
-                setRescueImage(null);
-                setRescueName("");
-                setError("Admission Number Not found");
-            }
-        };
-    
-        // Trigger when admission number changes
-        useEffect(() => {
-            if (admission_no.trim() !== "") {
-                fetchRescueDetails(admission_no);
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_image) {
+                const imagePath = result.rescue_image.startsWith("http")
+                    ? result.rescue_image
+                    : `http://localhost:5000/${result.rescue_image}`;
+
+                setRescueImage(imagePath);
+                setRescueName(result.rescue_name || "");
+                setError(""); // clear any previous error
             } else {
                 setRescueImage(null);
                 setRescueName("");
-                setError("");
+                setError("Image not found for this admission number");
             }
-        }, [admission_no]);
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueImage(null);
+            setRescueName("");
+            setError("Admission Number Not found");
+        }
+    };
+
+    // Trigger when admission number changes
+    useEffect(() => {
+        if (admission_no.trim() !== "") {
+            fetchRescueDetails(admission_no);
+        } else {
+            setRescueImage(null);
+            setRescueName("");
+            setError("");
+        }
+    }, [admission_no]);
 
     return (
         <>
@@ -333,14 +341,14 @@ function Self_Declaration_form() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
                                 createFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
@@ -348,7 +356,7 @@ function Self_Declaration_form() {
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
-                            <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter your admission number.");
                                 } else {
@@ -403,6 +411,19 @@ function Self_Declaration_form() {
                                         </Col>
                                     </Form.Group>
 
+                                    <Form.Group as={Row} className="mb-3 mt-3">
+                                        <Form.Label column sm="4" className='text-start'>
+                                            Handwritten Document :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                type="file"
+                                                name='handwritten_document'
+                                                onChange={handleFileChange}
+                                                required />
+                                        </Col>
+                                    </Form.Group>
+
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
@@ -444,7 +465,14 @@ function Self_Declaration_form() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                <h3 className='section_title'>Self-Declaration Form for Discharge by Resident</h3>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={2}>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                    </Col>
+                    <Col md={10}>
+                        <h4 className="text-center">Self-Declaration Form for Discharge by Resident</h4>
+                    </Col>
+                </Row>
                 <Form className='self_declaration'>
                     <Row>
                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
@@ -487,6 +515,24 @@ function Self_Declaration_form() {
                             </Col>
                         </Form.Group>
 
+                        <Form.Group as={Row} className="mb-3 mt-3">
+                            <Form.Label column sm="4" className='text-start'>
+                                HandWritten Document :
+                            </Form.Label>
+                            <Col sm="8">
+                                {files.handwritten_document ? (
+                                    <>
+                                        <img
+                                            src={files.handwritten_document}
+                                            alt="New"
+                                            style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                        />
+                                    </>
+                                ) : (
+                                    <p>No handwritten_document photo available</p> // Display if no photo
+                                )}
+                            </Col>
+                        </Form.Group>
 
                         <Form.Group as={Row} className="mb-3 mt-3">
                             <Form.Label column sm="4" className='text-start'>
@@ -526,6 +572,14 @@ function Self_Declaration_form() {
                             </Col>
                         </Form.Group>
 
+                    </Row>
+                    <Row className="d-flex align-items-center justify-content-center">
+                        <Col md={6} className="mt-3">
+                            <h5 className="text-start">Signature</h5>
+                        </Col>
+                        <Col md={6} className="mt-3">
+                            <h5 className="text-end">Seal</h5>
+                        </Col>
                     </Row>
                 </Form>
             </div>
@@ -575,6 +629,31 @@ function Self_Declaration_form() {
                                             value={formData.description}
                                             onChange={handleInputChange}
                                             required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-3 mt-3">
+                                    <Form.Label column sm="4" className='text-start'>
+                                        HandWritten Document :
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        {files.handwritten_document ? (
+                                            <>
+                                                <img
+                                                    src={files.handwritten_document}
+                                                    alt="Old"
+                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                />
+                                            </>
+                                        ) : (
+                                            <p>No handwritten_document photo available</p> // Display if no photo
+                                        )}
+
+                                        <Form.Control
+                                            type="file"
+                                            onChange={handleFileChange}
+                                            name="handwritten_document"
+                                        />
                                     </Col>
                                 </Form.Group>
 
