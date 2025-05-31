@@ -586,7 +586,7 @@ function Self_Declaration_form() {
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Family Request Letter</Modal.Title>
+                    <Modal.Title>Edit Self Decaration Form</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>

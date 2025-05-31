@@ -12,6 +12,7 @@ import {
   faCalendarAlt,
   faMapPin,
   faClipboard,
+  faClipboardCheck,
   faInbox,
   faRocket,
   faBrain,
@@ -119,7 +120,7 @@ const Sidebar = () => {
                 {/* Recovery menus */}
                 <CollapsableNavItem title="Recovery" icon={faHome}>
                   <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="Articles carried Form" to="" icon={faSuitcase} />
+                  <NavItem title="Articles carried Form" to="/articles_form" icon={faSuitcase} />
                   <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
                   <NavItem title="MSE Form" to="/mseform" icon={faNotesMedical  } />
                   <NavItem title="Activity Details" to="/annual_report" icon={faCalendarAlt } />
@@ -134,7 +135,7 @@ const Sidebar = () => {
 
                 {/* Fomality Menus */}
                 <CollapsableNavItem title="Admin Formality" icon={faMapPin}>
-                  <NavItem title="Formality Self Declaration" to="/formality_declaration" icon={faPenSquare} />
+                  <NavItem title="Handover Form" to="/formality_declaration" icon={faPenSquare} />
                   <NavItem title="Essential Records" to="/essential_record" icon={faClipboardList} />
                   <NavItem title="Annual Report" to="/annual_report" icon={faChartLine } />
                   <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate } />
@@ -143,6 +144,9 @@ const Sidebar = () => {
 
                 {/* Residency Details */}
                 <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
+
+                 {/* Discharge Details */}
+                <NavItem title="Reunion Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
               </>
             )}
 

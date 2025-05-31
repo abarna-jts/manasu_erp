@@ -73,6 +73,8 @@ function First_info_form() {
     const [weight, setWeight] = useState('');
     const [things_carried, setThingsCarried] = useState('');
     const [thingsCarrierError, setThingsCarriedError] = useState(false);
+    const [heightError, setHeightError] = useState(false);
+    const [weightError, setWeightError] = useState(false);
     const [remark, setRemark] = useState('');
     const [mental_status, setMentalStatus] = useState('');
     const [behaviour, setBehaviour] = useState('');
@@ -187,176 +189,107 @@ function First_info_form() {
     };
 
 
+  const handleInmateForm = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
 
+    setValidated(true);
 
-    const handleInmateForm = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+    const requiredFields = [
+        rescue_name,
+        rescue_status,
+        language1,
+        education,
+        govIdType
+    ];
 
-        setValidated(true);
-
-        // Only validate these specific required fields
-        const requiredFields = [
-            rescue_name,
-            rescue_status,
-            language1,
-            education,
-            govIdType
-        ];
-
-        const allFilled = requiredFields.every(field => {
-            if (typeof field === "string") {
-                return field.trim() !== "";
-            }
-            return !!field;
-        });
-
-        if (!allFilled) {
-            setIsStep2Invalid(true); // Show error in progress bar
-            return; // Prevent moving to next step
-        } else {
-            setIsStep2Invalid(false);
-            
+    const allRequiredFilled = requiredFields.every(field => {
+        if (typeof field === "string") {
+            return field.trim() !== "";
         }
-        setStep(3); // ✅ Only move forward if valid 
-    };
+        return !!field;
+    });
+
+    console.log("All fields filled?", allRequiredFilled);
+
+    setIsStep2Invalid(!allRequiredFilled); // this controls the red color
+    setStep(3); // always go to step 3
+};
+
+
 
 
     const handleFamilyForm = (event) => {
-        const form = event.currentTarget;
-        event.preventDefault(); // stop default submit behavior
-        event.stopPropagation(); // stop bubbling
+    const form = event.currentTarget;
+    event.preventDefault(); // stop default submit behavior
+    event.stopPropagation(); // stop bubbling
 
-        // Custom validation for father field
-        if (father.trim() === '') {
-            setFatherError(true);
-            return;
-        } else {
-            setFatherError(false);
-        }
+    setValidated(true); // for Bootstrap feedback
 
-        if (!['unknown', 'na'].includes(father.trim().toLowerCase()) && father.trim() === '') {
-            setFatherError(true);
-            return;
-        }
+    let isValid = true;
 
-        if (form.checkValidity()) {
-            // Proceed to next form if valid
-            console.log("Form is valid, go to next step");
-            setStep(4);
-        }
-        else {
-            alert("Enter the Family Details Correctly");
-        }
-        setValidated(true);
-    };
+    // Custom validation for 'father'
+    if (
+        father.trim() === '' ||
+        (!['unknown', 'na'].includes(father.trim().toLowerCase()) && father.trim() === '')
+    ) {
+        setFatherError(true);
+        isValid = false;
+    } else {
+        setFatherError(false);
+    }
 
-    const handlePhysicalForm = (event) => {
-        const form = event.currentTarget;
-        event.preventDefault(); // stop default submit behavior
-        event.stopPropagation(); // stop bubbling
+    // ✅ Always go to next step, but mark invalid if needed
+    if (form.checkValidity() && isValid) {
+        setIsStep3Invalid(false); // valid: no red mark
+    } else {
+        setIsStep3Invalid(true); // invalid: show red mark
+    }
 
-        //clothing field Error
-        if (clothing.trim() === '') {
-            setClothingError(true);
-            return;
-        } else {
-            setClothingError(false);
-        }
+    // ✅ Always move to next step
+    setStep(4);
+};
 
-        if (!['unknown', 'na'].includes(clothing.trim().toLowerCase()) && clothing.trim() === '') {
-            setClothingError(true);
-            return;
-        }
 
-        // Dress code field Error
-        if (dress_code.trim() === '') {
-            setDressCodeError(true);
-            return;
-        } else {
-            setDressCodeError(false);
-        }
+const handlePhysicalForm = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
 
-        if (!['unknown', 'na'].includes(dress_code.trim().toLowerCase()) && dress_code.trim() === '') {
-            setDressCodeError(true);
-            return;
-        }
+  setValidated(true);
 
-        //complexion error field
-        if (complexion.trim() === '') {
-            setComplexionError(true);
-            return;
-        } else {
-            setComplexionError(false);
-        }
+  let isValid = true;
 
-        if (!['unknown', 'na'].includes(complexion.trim().toLowerCase()) && complexion.trim() === '') {
-            setComplexionError(true);
-            return;
-        }
-        //identification mark error field
-        if (indentification_mark.trim() === '') {
-            setIdentificationError(true);
-            return;
-        } else {
-            setIdentificationError(false);
-        }
+  // Helper function to check if a field is empty (required)
+  const checkField = (value, setError) => {
+    if (value.trim() === '') {
+      setError(true);
+      return false;
+    }
+    setError(false);
+    return true;
+  };
 
-        if (!['unknown', 'na'].includes(indentification_mark.trim().toLowerCase()) && indentification_mark.trim() === '') {
-            setIdentificationError(true);
-            return;
-        }
+  // Validate all fields
+  if (!checkField(clothing, setClothingError)) isValid = false;
+  if (!checkField(dress_code, setDressCodeError)) isValid = false;
+  if (!checkField(complexion, setComplexionError)) isValid = false;
+  if (!checkField(indentification_mark, setIdentificationError)) isValid = false;
+  if (!checkField(tattoo, setTattooError)) isValid = false;
+  if (!checkField(wound_infection, setWoundInfectionError)) isValid = false;
+  if (!checkField(things_carried, setThingsCarriedError)) isValid = false;
+  if (!checkField(height, setHeightError)) isValid = false;
+  if (!checkField(weight, setWeightError)) isValid = false;
 
-        //tattoo error field
-        if (tattoo.trim() === '') {
-            setTattooError(true);
-            return;
-        } else {
-            setTattooError(false);
-        }
+  // Set the step 4 invalid flag based on validation results
+  setIsStep4Invalid(!isValid);
 
-        if (!['unknown', 'na'].includes(tattoo.trim().toLowerCase()) && tattoo.trim() === '') {
-            setTattooError(true);
-            return;
-        }
+  // Always move to next step (step 5)
+  setStep(5);
+};
 
-        //wound infection error field
-        if (wound_infection.trim() === '') {
-            setWoundInfectionError(true);
-            return;
-        } else {
-            setWoundInfectionError(false);
-        }
 
-        if (!['unknown', 'na'].includes(wound_infection.trim().toLowerCase()) && wound_infection.trim() === '') {
-            setWoundInfectionError(true);
-            return;
-        }
 
-        //things carried error field
-        if (things_carried.trim() === '') {
-            setThingsCarriedError(true);
-            return;
-        } else {
-            setThingsCarriedError(false);
-        }
 
-        if (!['unknown', 'na'].includes(things_carried.trim().toLowerCase()) && things_carried.trim() === '') {
-            setThingsCarriedError(true);
-            return;
-        }
-
-        if (form.checkValidity()) {
-            // Proceed to next form if valid
-            console.log("Form is valid, go to next step");
-            setStep(5);
-        }
-        else {
-            alert("Enter the Physical Apperance Correctly");
-        }
-
-        setValidated(true);
-    };
 
     // const handleMentalStatus = (event) => {
     //     const form = event.currentTarget;
@@ -392,8 +325,68 @@ function First_info_form() {
     //     setValidated(true);
     // }
 
+     // Validate Step 1 (Example)
+  const validateStep1 = () => {
+    let valid = true;
+    if (!admission_no || admission_no.trim() === "") valid = false;
+    if (!admission_date || admission_date.trim() === "") valid = false;
+    // Add other required Step 1 fields here...
+    setIsStep1Invalid(!valid);
+    return valid;
+  };
+
+  // Validate Step 2 (Example)
+  const validateStep2 = () => {
+    let valid = true;
+    if (!referred_by || referred_by.trim() === "") valid = false;
+    if (!from_place || from_place.trim() === "") valid = false;
+    // Add other required Step 2 fields here...
+    setIsStep2Invalid(!valid);
+    return valid;
+  };
+
+  // Validate Step 3 (Example)
+  const validateStep3 = () => {
+    let valid = true;
+    if (!date_time || date_time.trim() === "") valid = false;
+    // Add other required Step 3 fields here...
+    setIsStep3Invalid(!valid);
+    return valid;
+  };
+
+  // Validate Step 4 (physical form)
+  const validateStep4 = () => {
+    let valid = true;
+
+    // Here assuming these fields are required, but if not, you can tweak conditions
+    if (clothing.trim() === "") valid = false;
+    if (dress_code.trim() === "") valid = false;
+    if (complexion.trim() === "") valid = false;
+    if (indentification_mark.trim() === "") valid = false;
+    if (tattoo.trim() === "") valid = false;
+    if (wound_infection.trim() === "") valid = false;
+    if (things_carried.trim() === "") valid = false;
+    if (height.trim() === "") valid = false;
+    if (weight.trim() === "") valid = false;
+
+    setIsStep4Invalid(!valid);
+    return valid;
+  };
+
     const handleSubmitFinallForm = async (e) => {
         e.preventDefault();
+
+         // Validate all steps before submitting
+    const step1Valid = validateStep1();
+    const step2Valid = validateStep2();
+    const step3Valid = validateStep3();
+    const step4Valid = validateStep4();
+
+    if (!step1Valid || !step2Valid || !step3Valid || !step4Valid) {
+      alert("Please fill all required fields in the previous steps.");
+      return; // Prevent submission if any step invalid
+    }
+
 
         try {
             // Step 1: Check if admission_no already exists
@@ -470,11 +463,11 @@ function First_info_form() {
         // formData.append('f_aadhar_card', f_aadhar_card);
         // formData.append('f_ration_card', f_ration_card);
         // formData.append('res_aadhar_card', res_aadhar_card);
-        console.log("mentalstatus", mental_status);
-        console.log("behaviour", behaviour);
-        console.log("community_ability", community_ability);
-        console.log("self_careCapacity", self_careCapacity);
-        console.log("diagnosis", diagnosis);
+        // console.log("mentalstatus", mental_status);
+        // console.log("behaviour", behaviour);
+        // console.log("community_ability", community_ability);
+        // console.log("self_careCapacity", self_careCapacity);
+        // console.log("diagnosis", diagnosis);
 
         console.log("Submitting values:", admission_no, admission_date);
         try {
@@ -1212,6 +1205,7 @@ function First_info_form() {
                                                         name="height"
                                                         value={height}
                                                         onChange={(e) => setHeight(e.target.value)}
+                                                        isInvalid={heightError}
                                                         required />
                                                 </Form.Group>
                                             </Col>
@@ -1223,6 +1217,7 @@ function First_info_form() {
                                                         name="weight"
                                                         value={weight}
                                                         onChange={(e) => setWeight(e.target.value)}
+                                                        isInvalid={weightError}
                                                         required />
                                                 </Form.Group>
                                             </Col>

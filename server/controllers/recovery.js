@@ -1,5 +1,19 @@
 const db = require('../db');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.resolve("uploads/Articles_carried/"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+
+const upload = multer({ storage: storage }).single("attach_items");
 
 const createMSEForm = (req, res) => {
    const {
@@ -129,8 +143,113 @@ const createMood = (req, res) => {
   });
 }
 
+const createArticles = (req, res) =>{
+  upload(req, res, (err) => {
+  const{
+    admission_no,
+    rescue_name, date_time, collected_items
+  }=req.body;
+
+   const attachItemsPath = req.file
+      ? `uploads/Articles_carried/${req.file.filename}`
+      : null;
+
+
+  const createquery= `INSERT INTO articles_items(admission_no, rescue_name, date_time, collected_items, attach_items) 
+                      VALUES(?,?,?,?,?)`;
+
+  const values = [
+    admission_no,
+    rescue_name,date_time,collected_items,attachItemsPath
+  ]
+   db.query(createquery, values, (dbErr, data) => {
+      if (dbErr) {
+        return res.status(500).json({ message: "Database Error", error: dbErr });
+      }
+      res.status(201).json({ message: "Rescue Condition Created Successfully", data });
+    });
+  });
+};
+
+const getArticles = (req, res) =>{
+  const admission_no = req.params.admission_no;
+    const query = 'SELECT * FROM articles_items WHERE admission_no = ?';
+
+    db.query(query, [admission_no], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Articles carried Form not found' });
+        }
+
+        res.json(results[0]);
+    });
+}
+
+const updateArticles = (req, res) =>{
+  upload(req, res, (err) => {
+    if (err) {
+            return res.status(500).json({ message: "File upload failed", error: err });
+        }
+
+    const{
+      rescue_name,date_time,collected_items
+    }=req.body;
+
+    const admission_no = req.params.admission_no;
+
+   const attachItemsPath = req.file
+  ? `uploads/Articles_carried/${req.file.filename}`
+  : null;
+
+
+     const selectQuery = "SELECT attach_items FROM articles_items WHERE admission_no = ?";
+        db.query(selectQuery, [admission_no], (selectErr, selectData) => {
+            if (selectErr) {
+                return res.status(500).json({ message: "Failed to retrieve existing files", error: selectErr });
+            }
+
+            const exsitingattachItems = selectData[0]?.attach_items;
+
+            const finalattachItems = attachItemsPath || exsitingattachItems;
+
+            const updateQuery = `
+                UPDATE articles_items SET 
+                    rescue_name = ?, 
+                    date_time = ?, 
+                    collected_items = ?, 
+                    attach_items = ?
+                WHERE admission_no = ?
+            `;
+
+            const values = [
+                rescue_name,
+                date_time,
+                collected_items,
+                finalattachItems,
+                admission_no
+            ];
+
+            db.query(updateQuery, values, (updateErr, result) => {
+                if (updateErr) {
+                    return res.status(500).json({ message: "Update failed", error: updateErr });
+                }
+
+                return res.status(200).json({ message: "Self Declaration updated successfully!" });
+            });
+        });
+  });
+}
+
+
 module.exports = {
   createMSEForm,
   createSpeech,
-  createMood
+  createMood,
+  createArticles,
+  getArticles,
+  updateArticles
 };

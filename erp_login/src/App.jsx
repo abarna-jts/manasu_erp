@@ -37,6 +37,8 @@ import AllStudentDetails from './Components/pages/Admin_Formality/AllStudentDeta
 import Prescription_form from './Components/pages/Residency_time/prescription_form';
 import MSE_form from './Components/pages/Recovery/MSE_form';
 import Sample from './Components/authentication/sample';
+import Rescue_articles_form from './Components/pages/Recovery/Rescue_articles_form';
+import Reunion_Checklist from './Components/pages/Reunion/Reunion_Checklist';
 
 function App() {
 
@@ -150,6 +152,16 @@ function App() {
               />
 
               <Route
+                path='/articles_form'
+                element={<MainLayout><Rescue_articles_form /></MainLayout>}
+              />
+
+              <Route
+                path='/reunion_checklist'
+                element={<MainLayout><Reunion_Checklist /></MainLayout>}
+              />
+
+              <Route
                 path='/imagepdf'
                 element={<MainLayout><ImagePDF /></MainLayout>}
               />
@@ -158,6 +170,7 @@ function App() {
                 path='/sample'
                 element={<MainLayout><Sample /></MainLayout>}
               />
+              
 
             </>
 

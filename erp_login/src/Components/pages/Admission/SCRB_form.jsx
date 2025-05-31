@@ -304,11 +304,9 @@ function SCRB_form() {
     const navigate = useNavigate();
 
     const handleNextpage = () => {
-        if (!admission_no.trim()) {
-            alert("Please enter admission number.");
-        } else {
+        
             navigate("/scrb_form2A");
-        }
+        
 
     }
 

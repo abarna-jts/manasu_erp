@@ -26,7 +26,6 @@ function Prescription_form() {
         hospital_name: '',
         department: '',
         masterHealthCheckup: '',
-        phone_no: '',
         instruction: '',
         advice: '',
         follow_up: '',
@@ -55,7 +54,6 @@ function Prescription_form() {
         hospital_name: '',
         department: '',
         masterHealthCheckup: '',
-        phone_no: '',
         instruction: '',
         advice: '',
         follow_up: '',
@@ -601,7 +599,7 @@ function Prescription_form() {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        <Row className='d-flex align-items-center justify-content-center'>
+                        <Row className='d-flex align-items-center justify-content-start'>
                             <Col md={5}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
@@ -628,7 +626,7 @@ function Prescription_form() {
                                 </Form.Group>
 
                             </Col>
-                            <Col md={4}>
+                            {/* <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
                                         Phone Number:
@@ -645,7 +643,7 @@ function Prescription_form() {
 
                                     </Col>
                                 </Form.Group>
-                            </Col>
+                            </Col> */}
                             <Col md={3}>
 
                             </Col>
@@ -1102,7 +1100,7 @@ function Prescription_form() {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        <Row className='d-flex align-items-center justify-content-center'>
+                        <Row className='d-flex align-items-center justify-content-start'>
                             <Col md={5}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
@@ -1129,7 +1127,7 @@ function Prescription_form() {
                                 </Form.Group>
 
                             </Col>
-                            <Col md={4}>
+                            {/* <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
                                         Phone Number:
@@ -1146,7 +1144,7 @@ function Prescription_form() {
 
                                     </Col>
                                 </Form.Group>
-                            </Col>
+                            </Col> */}
                             <Col md={3}>
 
                             </Col>
