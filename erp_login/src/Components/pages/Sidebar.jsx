@@ -119,34 +119,37 @@ const Sidebar = () => {
 
                 {/* Recovery menus */}
                 <CollapsableNavItem title="Recovery" icon={faHome}>
-                  <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="Articles carried Form" to="/articles_form" icon={faSuitcase} />
+                  {/* <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="Articles carried Form" to="/articles_form" icon={faSuitcase} /> */}
+                  <NavItem title="Reunion Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
                   <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
                   <NavItem title="MSE Form" to="/mseform" icon={faNotesMedical  } />
                   <NavItem title="Activity Details" to="/annual_report" icon={faCalendarAlt } />
                 </CollapsableNavItem>
 
                 {/* Reunion Menus */}
-                <CollapsableNavItem title="Reunion" icon={faMapPin}>
-                  <NavItem title="Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
-                  <NavItem title="Media Consent" to="/media_consent" icon={faVideo } />
+                <CollapsableNavItem title="Reunion/Discharge" icon={faMapPin}>
+                  <NavItem title="1.Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="2.Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
+                  <NavItem title="3.Media Consent" to="/media_consent" icon={faVideo } />
+                  <NavItem title="4.Essential Records" to="/essential_record" icon={faClipboardList} />
+                  <NavItem title="5.Handover Form" to="/formality_declaration" icon={faPenSquare} />
                 </CollapsableNavItem>
 
                 {/* Fomality Menus */}
                 <CollapsableNavItem title="Admin Formality" icon={faMapPin}>
-                  <NavItem title="Handover Form" to="/formality_declaration" icon={faPenSquare} />
-                  <NavItem title="Essential Records" to="/essential_record" icon={faClipboardList} />
                   <NavItem title="Annual Report" to="/annual_report" icon={faChartLine } />
-                  <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate } />
                   <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers } />
                 </CollapsableNavItem>
 
                 {/* Residency Details */}
                 <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
 
-                 {/* Discharge Details */}
-                <NavItem title="Reunion Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
+                {/* Internship Form */}
+                <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate } />
+
+                 
+                
               </>
             )}
 
@@ -199,11 +202,10 @@ const Sidebar = () => {
             {userType === '3' && (
               <>
                 {/* <NavItem title="Doctor Consultants Form" to="/Dr_consultant" icon={faStethoscope} /> */}
+                <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faUserMd} />
                 <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
                 <NavItem title="Prescription Form" to="/prescription_form" icon={faNotesMedical} />
-                <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faUserMd} />
                 
-
               </>
             )}
 

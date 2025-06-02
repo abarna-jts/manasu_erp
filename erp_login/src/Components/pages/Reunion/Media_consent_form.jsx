@@ -270,7 +270,7 @@ function Media_consent_form() {
                         <h6 className="breadcrumb_title">Media Consent</h6>
                     </Col>
                     <Col md={7} className="text-center">
-                        <h3 className="section_title">Resident Consent Form for Social Media Use</h3>
+                        <h3 className="section_title">3. Resident Consent Form for Social Media Use</h3>
                     </Col>
                     <Col md={2} className='text-center'>
                         {error && <div className="text-danger mt-2">{error}</div>}
@@ -453,7 +453,7 @@ function Media_consent_form() {
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
 
-                <h4 className="text-center MY-4">Resident Consent Form for Social Media Use</h4>
+                <h4 className="text-center MY-4">3. Resident Consent Form for Social Media Use</h4>
 
                 <Form className='media_consent'>
                     <Row>

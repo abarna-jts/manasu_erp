@@ -5,16 +5,243 @@ import { faEye, faPlus, faEdit, faTrash } from "@fortawesome/free-solid-svg-icon
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-
+import { useRef } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import manasu_logo from '../Admission/manasu_logo.png';
 
 function Reunion_Checklist() {
-    const [admission_no, setAdmissionNumber] = useState();
+    // const [admission_no, setAdmissionNumber] = useState();
+    const [previewRequested, setPreviewRequested] = useState(false);
+    const [files, setFiles] = useState({});
+    const [formData, setFormData] = useState({
+        admission_no: '',
+        familyRequestLetter: '',
+        selfDeclarationLetter: '',
+        mediaConsentLetter: '',
+        familyRequestLetterFile: null,
+        selfDeclarationFile: null,
+        mediaConsentFile: null,
+        residentIDproof: '',
+        residentIDproofFile: null,
+        familyIDproof: '',
+        familyIDproofFile: null,
+        aadharCard: '',
+        aadharCardFile: null,
+        udidCard: '',
+        udidCardFile: null,
+        disabilityCertificate: '',
+        disabilityCertificateFile: null,
+        bankPassbook: '',
+        bankPassbookFile: null,
+        healthInsurance: '',
+        healthInsuranceFile: null,
+        medicalReport: '',
+        medicalReportFile: null,
+        dischargeSummary: '',
+        dischargeSummaryFile: null,
+        medications: '',
+        medicationsFile: null,
+        Clothes: '',
+        ClothesFile: null,
+        possessionsRecovered: '',
+        possessionsRecoveredFile: null,
+        travelExpenses: '',
+        travelExpensesFile: null,
+        copyOfdischargeSummary: '',
+        copyOfdischargeSummaryFile: null,
+        travelSafetyLetter: '',
+        travelSafetyLetterFile: null,
+        reunionPhoto: '',
+        reunionPhotoFile: null,
+        witnessSignature: '',
+        witnessSignatureFile: null,
+        any_other: '',
+
+    });
+
+    const handleChange = (e) => {
+        const { name, value, files } = e.target;
+
+        if (files && files.length > 0) {
+            setFormData((prevState) => ({
+                ...prevState,
+                [name]: files[0], // store the file object
+            }));
+        } else {
+            setFormData((prevState) => ({
+                ...prevState,
+                [name]: value,
+            }));
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Check if admission_no is empty
+        if (!formData.admission_no || formData.admission_no.trim() === '') {
+            alert("Please enter admission number before submitting the form.");
+            return; // Stop submission
+        }
+
+        const data = new FormData();
+
+        for (const key in formData) {
+            if (formData[key] instanceof File) {
+                data.append(key, formData[key]); // file
+            } else {
+                data.append(key, formData[key]); // string/text
+            }
+        }
+
+
+        try {
+            await apiRoute.post("/reunion/createDischarge_checklist", data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            alert('Form submitted successfully!');
+        } catch (err) {
+            console.error(err);
+            alert('Error submitting form.');
+        }
+    };
+
 
     const userType = Cookies.get('usertype');
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
+
+    const createFormData = () => {
+        const targetElement = document.querySelector('.checklist_form');
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    const ViewFormData = async () => {
+        try {
+            const response = await apiRoute.get(`/reunion/get_checklist/${formData.admission_no}`);
+            const data = response.data;
+
+            // Prefix file fields with server path
+            const getFilePath = (file) => file ? `http://localhost:5000/${file}` : null;
+
+            // Update normal form fields
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                admission_no: data.admission_no || '',
+                familyRequestLetter: data.familyRequestLetter || '',
+                selfDeclarationLetter: data.selfDeclarationLetter || '',
+                mediaConsentLetter: data.mediaConsentLetter || '',
+                residentIDproof: data.residentIDproof || '',
+                familyIDproof: data.familyIDproof || '',
+                aadharCard: data.aadharCard || '',
+                udidCard: data.udidCard || '',
+                disabilityCertificate: data.disabilityCertificate || '',
+                bankPassbook: data.bankPassbook || '',
+                healthInsurance: data.healthInsurance || '',
+                medicalReport: data.medicalReport || '',
+                dischargeSummary: data.dischargeSummary || '',
+                medications: data.medications || '',
+                Clothes: data.Clothes || '',
+                possessionsRecovered: data.possessionsRecovered || '',
+                travelExpenses: data.travelExpenses || '',
+                copyOfdischargeSummary: data.copyOfdischargeSummary || '',
+                travelSafetyLetter: data.travelSafetyLetter || '',
+                reunionPhoto: data.reunionPhoto || '',
+                witnessSignature: data.witnessSignature || '',
+                any_other: data.any_other || ''
+            }));
+
+            // Update file-related fields separately
+            setFiles({
+                familyRequestLetterFile: getFilePath(data.familyRequestLetterFile),
+                selfDeclarationFile: getFilePath(data.selfDeclarationFile),
+                mediaConsentFile: getFilePath(data.mediaConsentFile),
+                residentIDproofFile: getFilePath(data.residentIDproofFile),
+                familyIDproofFile: getFilePath(data.familyIDproofFile),
+                aadharCardFile: getFilePath(data.aadharCardFile),
+                udidCardFile: getFilePath(data.udidCardFile),
+                disabilityCertificateFile: getFilePath(data.disabilityCertificateFile),
+                bankPassbookFile: getFilePath(data.bankPassbookFile),
+                healthInsuranceFile: getFilePath(data.healthInsuranceFile),
+                medicalReportFile: getFilePath(data.medicalReportFile),
+                dischargeSummaryFile: getFilePath(data.dischargeSummaryFile),
+                medicationsFile: getFilePath(data.medicationsFile),
+                ClothesFile: getFilePath(data.ClothesFile),
+                possessionsRecoveredFile: getFilePath(data.possessionsRecoveredFile),
+                travelExpensesFile: getFilePath(data.travelExpensesFile),
+                copyOfdischargeSummaryFile: getFilePath(data.copyOfdischargeSummaryFile),
+                travelSafetyLetterFile: getFilePath(data.travelSafetyLetterFile),
+                reunionPhotoFile: getFilePath(data.reunionPhotoFile),
+                witnessSignatureFile: getFilePath(data.witnessSignatureFile)
+            });
+
+            console.log("Fetched Form Data:", data);
+            setPreviewRequested(true);
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Admission Number not found");
+        }
+    };
+
+
+    useEffect(() => {
+        if (previewRequested) {
+            // Delay slightly to allow DOM updates
+            setTimeout(() => {
+                generatePDF();
+                setPreviewRequested(false);
+            }, 100); // 100ms delay is often enough
+        }
+    }, [previewRequested]);
+
+    const formRef = useRef();
+
+    const generatePDF = async () => {
+        const input = formRef.current;
+        if (!input) {
+            console.error("Form reference is not defined");
+            return;
+        }
+
+        try {
+            const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/png");
+
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            while (heightLeft > 0) {
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    position = -imgHeight + heightLeft;
+                }
+            }
+
+            const pdfBlob = pdf.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, '_blank');
+        } catch (err) {
+            console.error("Error generating PDF:", err);
+            alert("Failed to generate PDF.");
+        }
+    };
+
 
     return (
         <>
@@ -56,38 +283,40 @@ function Reunion_Checklist() {
                             <InputGroup className="input-group-merge search-bar">
                                 <Form.Control
                                     type="text"
-                                    value={admission_no}
-                                    onChange={(e) => setAdmissionNumber(e.target.value)}
+                                    value={formData.admission_no}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, admission_no: e.target.value })
+                                    }
                                 />
                             </InputGroup>
                         </Col>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                            if (!formData.admission_no.trim()) {
+                                alert("Please enter admission number.");
                             } else {
-                                ViewFormData(); // Fetch & populate data before generating PDF
+                                ViewFormData();
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                            if (!formData.admission_no.trim()) {
+                                alert("Please enter admission number.");
                             } else {
-                                createFormData(); // Fetch & populate data before generating PDF
+                                createFormData();
                             }
                         }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                            if (!formData.admission_no.trim()) {
+                                alert("Please enter admission number.");
                             } else {
-                                handleShow(admission_no); // Fetch & populate data before generating PDF
+                                handleShow(admission_no);
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
-                                if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
+                                if (!formData.admission_no.trim()) {
+                                    alert("Please enter admission number.");
                                 } else {
-                                    handleDelete(admission_no); // Fetch & populate data before generating PDF
+                                    // handleDelete(admission_no); 
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
                         )}
@@ -98,7 +327,7 @@ function Reunion_Checklist() {
             <Container>
                 <Row className='d-flex align-items-center justify-content-center'>
                     <Col md={10}>
-                        <Form>
+                        <Form onSubmit={handleSubmit} className="checklist_form">
                             <ol className="ps-3 text-start my-3">
                                 <li className='checklist_ul'>
                                     <h4>Request and Consent Documentation</h4>
@@ -115,6 +344,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="familyRequestLetter"
                                                 id="familyRequestLetterYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -122,12 +353,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="familyRequestLetter"
                                                 id="familyRequestLetterNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='familyRequestLetterFile' />
+                                                        name='familyRequestLetterFile'
+                                                        onChange={handleChange}
+                                                        required={formData.familyRequestLetter === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -146,6 +381,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="selfDeclarationLetter"
                                                 id="selfDeclarationYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -153,12 +390,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="selfDeclarationLetter"
                                                 id="selfDeclarationNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='selfDeclarationFile' />
+                                                        name='selfDeclarationFile'
+                                                        onChange={handleChange}
+                                                        required={formData.selfDeclarationLetter === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -177,6 +418,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="mediaConsentLetter"
                                                 id="mediaConsentYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -184,12 +427,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="mediaConsentLetter"
                                                 id="mediaConsentNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='mediaConsentFile' />
+                                                        name='mediaConsentFile'
+                                                        onChange={handleChange}
+                                                        required={formData.mediaConsentLetter === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -213,6 +460,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="familyIDproof"
                                                 id="familyIDproofYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -220,12 +469,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="familyIDproof"
                                                 id="familyIDproofNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='familyIDproofFile' />
+                                                        name='familyIDproofFile'
+                                                        onChange={handleChange}
+                                                        required={formData.familyIDproof === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -244,6 +497,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="residentIDproof"
                                                 id="residentIDproofYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -251,12 +506,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="residentIDproof"
                                                 id="residentIDproofNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='residentIDproofFile' />
+                                                        name='residentIDproofFile'
+                                                        onChange={handleChange}
+                                                        required={formData.residentIDproof === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -275,6 +534,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="aadharCard"
                                                 id="aadharCardYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -282,12 +543,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="aadharCard"
                                                 id="aadharCardNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='aadharCardFile' />
+                                                        name='aadharCardFile'
+                                                        onChange={handleChange}
+                                                        required={formData.aadharCard === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -306,6 +571,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="udidCard"
                                                 id="udidCardYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -313,12 +580,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="udidCard"
                                                 id="udidCardNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='udidCardFile' />
+                                                        name='udidCardFile'
+                                                        onChange={handleChange}
+                                                        required={formData.udidCard === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -337,6 +608,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="disabilityCertificate"
                                                 id="disabilityCertificateYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -344,12 +617,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="disabilityCertificate"
                                                 id="disabilityCertificateNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='disabilityCertificateFile' />
+                                                        name='disabilityCertificateFile'
+                                                        onChange={handleChange}
+                                                        required={formData.disabilityCertificate === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -368,6 +645,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="bankPassbook"
                                                 id="bankPassbookYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -375,12 +654,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="bankPassbook"
                                                 id="bankPassbookNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='bankPassbookFile' />
+                                                        name='bankPassbookFile'
+                                                        onChange={handleChange}
+                                                        required={formData.bankPassbook === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -399,6 +682,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="healthInsurance"
                                                 id="healthInsuranceYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -406,12 +691,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="healthInsurance"
                                                 id="healthInsuranceNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='healthInsuranceFile' />
+                                                        name='healthInsuranceFile'
+                                                        onChange={handleChange}
+                                                        required={formData.healthInsurance === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -435,6 +724,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="medicalReport"
                                                 id="medicalReportYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -442,12 +733,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="medicalReport"
                                                 id="medicalReportNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='medicalReportFile' />
+                                                        name='medicalReportFile'
+                                                        onChange={handleChange}
+                                                        required={formData.medicalReport === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -466,6 +761,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="dischargeSummary"
                                                 id="dischargeSummaryYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -473,12 +770,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="dischargeSummary"
                                                 id="dischargeSummaryNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='dischargeSummaryFile' />
+                                                        name='dischargeSummaryFile'
+                                                        onChange={handleChange}
+                                                        required={formData.dischargeSummary === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -497,6 +798,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="medications"
                                                 id="medicationsYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -504,12 +807,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="medications"
                                                 id="medicationsNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='medicationsFile' />
+                                                        name='medicationsFile'
+                                                        onChange={handleChange}
+                                                        required={formData.medications === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -532,6 +839,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="Clothes"
                                                 id="ClothesYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -539,12 +848,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="Clothes"
                                                 id="ClothesNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='ClothesFile' />
+                                                        name='ClothesFile'
+                                                        onChange={handleChange}
+                                                        required={formData.Clothes === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -554,7 +867,7 @@ function Reunion_Checklist() {
                                     {/* Possessions Recovered */}
                                     <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
                                         <Form.Label column sm="3">
-                                             Possessions Recovered at Time of Rescue :
+                                            Possessions Recovered at Time of Rescue :
                                         </Form.Label>
                                         <Col sm="9" className='d-flex align-items-center justify-content-start'>
                                             <Form.Check
@@ -563,6 +876,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="possessionsRecovered"
                                                 id="possessionsRecoveredYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -570,12 +885,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="possessionsRecovered"
                                                 id="possessionsRecoveredNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='possessionsRecoveredFile' />
+                                                        name='possessionsRecoveredFile'
+                                                        onChange={handleChange}
+                                                        required={formData.possessionsRecovered === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -585,7 +904,7 @@ function Reunion_Checklist() {
                                     {/* Discharge Allowance / Travel Expenses Provided */}
                                     <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
                                         <Form.Label column sm="3">
-                                             Discharge Allowance / Travel Expenses Provided :
+                                            Discharge Allowance / Travel Expenses Provided :
                                         </Form.Label>
                                         <Col sm="9" className='d-flex align-items-center justify-content-start'>
                                             <Form.Check
@@ -594,6 +913,8 @@ function Reunion_Checklist() {
                                                 label="Yes"
                                                 name="travelExpenses"
                                                 id="travelExpensesYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
@@ -601,12 +922,16 @@ function Reunion_Checklist() {
                                                 label="No"
                                                 name="travelExpenses"
                                                 id="travelExpensesNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='travelExpensesFile' />
+                                                        name='travelExpensesFile'
+                                                        onChange={handleChange}
+                                                        required={formData.travelExpenses === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -616,28 +941,34 @@ function Reunion_Checklist() {
                                     {/* Copy of Discharge Summary */}
                                     <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
                                         <Form.Label column sm="3">
-                                             Copy of Discharge Summary :
+                                            Copy of Discharge Summary :
                                         </Form.Label>
                                         <Col sm="9" className='d-flex align-items-center justify-content-start'>
                                             <Form.Check
                                                 inline
                                                 type="radio"
                                                 label="Yes"
-                                                name="dischargeSummary"
-                                                id="dischargeSummaryYes"
+                                                name="copyOfdischargeSummary"
+                                                id="copyOfdischargeSummaryYes"
+                                                value="Yes"
+                                                onChange={handleChange}
                                             />
                                             <Form.Check
                                                 inline
                                                 type="radio"
                                                 label="No"
-                                                name="dischargeSummary"
-                                                id="dischargeSummaryNo"
+                                                name="copyOfdischargeSummary"
+                                                id="copyOfdischargeSummaryNo"
+                                                value="No"
+                                                onChange={handleChange}
                                             />
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
-                                                        name='dischargeSummaryFile' />
+                                                        name='copyOfdischargeSummaryFile'
+                                                        onChange={handleChange}
+                                                        required={formData.copyOfdischargeSummary === "Yes"} />
                                                 </Col>
                                             </Form.Group>
 
@@ -649,28 +980,408 @@ function Reunion_Checklist() {
                                 <li className='checklist_ul'>
                                     <h4>Safety and Travel Arrangements</h4>
 
-                                    <Form.Check type="checkbox" className="checkbox_class" label="Travel Safety Letter" />
-                                    <Form.Check type="checkbox" className="checkbox_class" label="Reunion Photo" />
+                                    {/* Travel Safety Letter */}
+                                    <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
+                                        <Form.Label column sm="3">
+                                            Travel Safety Letter :
+                                        </Form.Label>
+                                        <Col sm="9" className='d-flex align-items-center justify-content-start'>
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="Yes"
+                                                name="travelSafetyLetter"
+                                                id="travelSafetyLetterYes"
+                                                value="Yes"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="No"
+                                                name="travelSafetyLetter"
+                                                id="travelSafetyLetterNo"
+                                                value="No"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm="2">Attach:</Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="file"
+                                                        name='travelSafetyLetterFile'
+                                                        onChange={handleChange}
+                                                        required={formData.travelSafetyLetter === "Yes"} />
+                                                </Col>
+                                            </Form.Group>
+
+                                        </Col>
+                                    </Form.Group>
+
+                                    {/* Reunion Photo */}
+                                    <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
+                                        <Form.Label column sm="3">
+                                            Reunion Photo :
+                                        </Form.Label>
+                                        <Col sm="9" className='d-flex align-items-center justify-content-start'>
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="Yes"
+                                                name="reunionPhoto"
+                                                id="reunionPhotoYes"
+                                                value="Yes"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="No"
+                                                name="reunionPhoto"
+                                                id="reunionPhotoNo"
+                                                value="No"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm="2">Attach:</Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="file"
+                                                        name='reunionPhotoFile'
+                                                        onChange={handleChange}
+                                                        required={formData.reunionPhoto === "Yes"} />
+                                                </Col>
+                                            </Form.Group>
+
+                                        </Col>
+                                    </Form.Group>
 
                                 </li>
 
                                 <li className='checklist_ul'>
                                     <h4>Signatures and Final Verifications</h4>
 
-                                    <Form.Check type="checkbox" className="checkbox_class" label="Witness Signature" />
-                                    <Form.Group controlId="otherSignature">
-                                        <Form.Check type="checkbox" className="checkbox_class" label="Other:" />
-                                        <Form.Control type="text" placeholder="__________________________" className="mt-1" />
+                                    {/*  Witness Signature */}
+                                    <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
+                                        <Form.Label column sm="3">
+                                            Witness Signature :
+                                        </Form.Label>
+                                        <Col sm="9" className='d-flex align-items-center justify-content-start'>
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="Yes"
+                                                name="witnessSignature"
+                                                id="witnessSignatureYes"
+                                                value="Yes"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="No"
+                                                name="witnessSignature"
+                                                id="witnessSignatureNo"
+                                                value="No"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm="2">Attach:</Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="file"
+                                                        name='witnessSignatureFile'
+                                                        onChange={handleChange}
+                                                        required={formData.witnessSignature === "Yes"} />
+                                                </Col>
+                                            </Form.Group>
+
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className='icon_checkList'>
+                                        <Form.Label column sm="3">Any Other:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control type="text"
+                                                name='any_other'
+                                                onChange={handleChange} />
+                                        </Col>
                                     </Form.Group>
 
                                 </li>
                             </ol>
+                            <Button type='submit' className='btn btn-success'>Submit</Button>
                         </Form>
 
                     </Col>
 
                 </Row>
             </Container>
+
+            <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={2}>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                    </Col>
+                    <Col md={10}>
+                        <h4 className="text-center">Resident Discharge Summary and Checklist</h4>
+                    </Col>
+                </Row>
+                <Form>
+                    <ol className="ps-3 text-start my-4">
+                        <li className="checklist_ul">
+                            <h4>Request and Consent Documentation</h4>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Family Request Letter:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="familyRequestLetter"
+                                        value={formData.familyRequestLetter}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Self-Declaration Letter:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="selfDeclarationLetter"
+                                        value={formData.selfDeclarationLetter}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Media Consent Letter:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="mediaConsentLetter"
+                                        value={formData.mediaConsentLetter}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                        </li>
+
+                        <li className="checklist_ul">
+                            <h4>Identification and Proof Documents</h4>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Family ID Proof:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="familyIDproof"
+                                        value={formData.familyIDproof}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Resident’s ID Proof:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="residentIDproof"
+                                        value={formData.residentIDproof}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Aadhaar Card :</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="aadharCard"
+                                        value={formData.aadharCard}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">UDID Card :</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="udidCard"
+                                        value={formData.udidCard}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                             <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Disability Certificate :</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="disabilityCertificate"
+                                        value={formData.disabilityCertificate}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Bank Passbook / ATM Card :</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="bankPassbook"
+                                        value={formData.bankPassbook}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Health Insurance Document :</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="healthInsurance"
+                                        value={formData.healthInsurance}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                        </li>
+
+                        <li className="checklist_ul">
+                            <h4>Medical and Social Work Documentation</h4>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Medical Report (Prepared by Nurse):</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="medicalReport"
+                                        value={formData.medicalReport}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Discharge Summary Report (Prepared by Social Worker):</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="dischargeSummary"
+                                        value={formData.dischargeSummary}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">One-Month Supply of Prescribed Medications:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="medications"
+                                        value={formData.medications}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                        </li>
+
+                        <li className="checklist_ul">
+                            <h4>Handover of Belongings and Support</h4>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Clothes:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="Clothes"
+                                        value={formData.Clothes}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Possessions Recovered at Time of Rescue:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="possessionsRecovered"
+                                        value={formData.possessionsRecovered}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Discharge Allowance / Travel Expenses Provided:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="travelExpenses"
+                                        value={formData.travelExpenses}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Copy of Discharge Summary:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="copyOfdischargeSummary"
+                                        value={formData.copyOfdischargeSummary}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            
+                        </li>
+
+                        <li className="checklist_ul">
+                            <h4>Safety and Travel Arrangements</h4>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Travel Safety Letter:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="travelSafetyLetter"
+                                        value={formData.travelSafetyLetter}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Reunion Photo :</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="reunionPhoto"
+                                        value={formData.reunionPhoto}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            
+                        </li>
+
+                        <li className="checklist_ul">
+                            <h4>Signatures and Final Verifications</h4>
+                            <Form.Group as={Row} className="mb-2 align-items-center">
+                                <Form.Label column sm="4">Witness Signature:</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="witnessSignature"
+                                        value={formData.witnessSignature}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className='icon_checkList'>
+                                        <Form.Label column sm="3">Any Other:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control type="text"
+                                                name='any_other'
+                                                value={formData.any_other || "Null"} />
+                                        </Col>
+                                    </Form.Group>
+                            
+                        </li>
+                    </ol>
+                </Form>
+            </div>
         </>
     )
 }

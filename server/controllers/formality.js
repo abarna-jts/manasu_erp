@@ -43,10 +43,11 @@ const createSelfDeclaration = (req, res) => {
         medicine_provided,
         toiletries_provided,
         dress_provided,
+        travel_expenses
     } = req.body;
 
 
-    const q = "INSERT INTO formality_declaration (admission_no,rescue_name,age,medicine_provided,toiletries_provided,dress_provided) VALUES (?, ?, ?, ?, ?, ?)";
+    const q = "INSERT INTO formality_declaration (admission_no,rescue_name,age,medicine_provided,toiletries_provided,dress_provided,travel_expenses) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     const values = [
         admission_no,
@@ -54,7 +55,8 @@ const createSelfDeclaration = (req, res) => {
         age,
         medicine_provided,
         toiletries_provided,
-        dress_provided
+        dress_provided,
+        travel_expenses
     ];
 
     db.query(q, values, (dbErr, data) => {
@@ -89,7 +91,8 @@ const updateFormalityForm = (req, res) => {
         age,
         medicine_provided,
         toiletries_provided,
-        dress_provided
+        dress_provided,
+        travel_expenses
     } = req.body;
 
     const admission_no = req.params.admission_no;
@@ -99,7 +102,8 @@ const updateFormalityForm = (req, res) => {
                             age = ?,
                             medicine_provided = ?,
                             toiletries_provided = ?,
-                            dress_provided = ?
+                            dress_provided = ?,
+                            travel_expenses = ?
                         WHERE admission_no = ?`;
 
     const values = [
@@ -108,6 +112,7 @@ const updateFormalityForm = (req, res) => {
         medicine_provided,
         toiletries_provided,
         dress_provided,
+        travel_expenses,
         admission_no
     ];
 
@@ -736,17 +741,18 @@ const createRescueDischargeInfo = (req, res) => {
         referred_by,
         escape,
         death,
-        discharge
+        discharge,
+        reunited
     } = req.body;
 
     const cquery = `INSERT INTO discharge_summary
                     (admission_no,
                     rescue_name,
                     referred_by,
-                    escape,death,discharge)VALUES(?,?,?,?,?,?)`;
+                    escape,death,discharge,reunited)VALUES(?,?,?,?,?,?,?)`;
 
     const values = [
-        admission_no, rescue_name, referred_by, escape, death, discharge
+        admission_no, rescue_name, referred_by, escape, death, discharge,reunited
     ];
 
     db.query(cquery, values, (dbErr, data) => {
@@ -788,7 +794,7 @@ const getDischargeSummaryID = (req, res) => {
 
 const updateDischargeSummary = (req, res) => {
     const {
-        rescue_name, referred_by, escape, death, discharge
+        rescue_name, referred_by, escape, death, discharge,reunited
     } = req.body;
 
     const rescueID = req.params.id;
@@ -798,11 +804,12 @@ const updateDischargeSummary = (req, res) => {
                     referred_by = ?, 
                     escape = ?, 
                     death = ?, 
-                    discharge = ?
+                    discharge = ?,
+                    reunited = ?
                     WHERE id = ?`;
 
     const values = [
-        rescue_name, referred_by, escape, death, discharge, rescueID
+        rescue_name, referred_by, escape, death, discharge, reunited, rescueID,
     ];
 
     db.query(uquery, values, (updateErr, result) => {

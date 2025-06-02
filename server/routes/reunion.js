@@ -11,7 +11,9 @@ const { createFamilyLetter,
     createMediaConsent,
     getMediaConsent,
     UpdateMediaConsent,
-    deleteMediaConsent
+    deleteMediaConsent,
+    createDischargeList,
+    getReunionChecklist
 } = require("../controllers/reunioin");
 const router = express.Router();
 
@@ -32,6 +34,10 @@ router.post("/createMediaConsent",createMediaConsent);
 router.get("/getMediaConsent/:admission_no",getMediaConsent);
 router.put("/updateMediaConsent/:admission_no",UpdateMediaConsent);
 router.delete("/deleteMediaConsent/:admission_no",deleteMediaConsent);
+
+//discharge checklist 
+router.post("/createDischarge_checklist",createDischargeList);
+router.get("/get_checklist/:admission_no", getReunionChecklist);
 
 
 module.exports = router;

@@ -297,7 +297,7 @@ function Self_Declaration_form() {
                         <h6 className="breadcrumb_title">Self Declaration</h6>
                     </Col>
                     <Col md={8} className="text-center">
-                        <h3 className="section_title">Self-Declaration Form for Discharge by Resident</h3>
+                        <h3 className="section_title">2. Self-Declaration Form for Discharge by Resident</h3>
                     </Col>
                     <Col md={2} className='text-center'>
                         {error && <div className="text-danger mt-2">{error}</div>}
@@ -470,7 +470,7 @@ function Self_Declaration_form() {
                         <img src={manasu_logo} className="pdf_logo" alt="" />
                     </Col>
                     <Col md={10}>
-                        <h4 className="text-center">Self-Declaration Form for Discharge by Resident</h4>
+                        <h4 className="text-center">2. Self-Declaration Form for Discharge by Resident</h4>
                     </Col>
                 </Row>
                 <Form className='self_declaration'>

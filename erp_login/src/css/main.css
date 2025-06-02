@@ -458,13 +458,20 @@ body {
 	background-color: #f2f2f2;
 }
 
+
 .checklist_ul {
 	margin: 15px 0px;
 }
 
+.checklist_ul::marker{
+	font-weight: 700;
+	font-size: 19px;
+}
+
 .checklist_ul h4 {
 	font-size: 19px;
-	font-weight: 600;
+	font-weight: 800;
+	text-transform: uppercase;
 }
 .checklist_ul .checkbox_class{
 	font-size: 17px;
@@ -1321,5 +1328,5 @@ body {
 /**/
 .pcss3t>ul,
 .pcss3t>ul>li {
-	height: 267em;
+	height: 270em;
 }

@@ -378,7 +378,7 @@ function Essential_record() {
                         <h6 className="breadcrumb_title">Records</h6>
                     </Col>
                     <Col md={7} className="text-center">
-                        <h3 className="section_title">Resident Document Information Form</h3>
+                        <h3 className="section_title">4. Resident Document Information Form</h3>
                     </Col>
                     <Col md={2} className='text-center'>
                         {error && <div className="text-danger mt-2">{error}</div>}
@@ -401,7 +401,7 @@ function Essential_record() {
                 <Form className="navbar-search col-md-9 d-flex justify-content-center align-items-center mt-3">
                     <Form.Group id="topbarSearch" className="d-flex align-items-center">
                         <Col md={6}>
-                            <Form.Label>Enter Your Admission Number:</Form.Label>
+                            <Form.Label>Admission Number:</Form.Label>
                         </Col>
                         <Col md={6}>
                             <InputGroup className="input-group-merge search-bar">
@@ -645,7 +645,7 @@ function Essential_record() {
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
 
-                <h4 className="text-center MY-4">Resident Document Information Form</h4>
+                <h4 className="text-center MY-4">4. Resident Document Information Form</h4>
 
                 <Form className='media_consent'>
                     <Row>
