@@ -31,7 +31,7 @@ function Register (){
           });
           console.log(response);
           alert('Registered successfully');
-          
+          navigate('/');
         } catch (err) {
           console.error(err);
           alert('Registration error');

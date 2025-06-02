@@ -1,162 +1,355 @@
-import React, { useRef } from "react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import React from 'react';
+import { Breadcrumb, Container, Row, Table, Button } from 'react-bootstrap';
+import { Col, Form, InputGroup } from 'react-bootstrap';
+import Modal from 'react-bootstrap/Modal';
+import { useState, useEffect } from 'react';
+import { DateRange } from 'react-date-range';
+import axios from 'axios';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css
 
-const PDF_preview= () => {
-  const tableRef = useRef(null);
+function Nurse_Record_sheet() {
+    const [show, setShow] = useState(false);
+    const [currentMonth, setCurrentMonth] = useState("");
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
-  const handlePreview = async () => {
-    const input = tableRef.current;
+    const [formData, setFormData] = useState({
+        admission_no: '',
+        currentMonth:'',
+        temperature: '',
+        bp: '',
+        pulse: '',
+        weight: '',
+        from_date: '',
+        to_date: '',
+        from_date2: '',
+        to_date2: '',
+      });
+      
+    const handleInputChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-    // Make sure element is visible for html2canvas
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
+    useEffect(() => {
+        const monthName = new Date().toLocaleString('default', { month: 'long' });
+        setCurrentMonth(monthName);
+        setFormData((prev) => ({ ...prev, currentMonth: monthName }));
+      }, []);
 
-    const pdf = new jsPDF('p', 'mm', 'a4'); // portrait, millimeters, A4
+    const apiRoute = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+    });
 
-    // Calculate width/height to fit A4 page
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    const [state, setState] = useState([
+        {
+          startDate: new Date(),
+          endDate: new Date(),
+          key: 'selection1'
+        },
+        {
+          startDate: new Date(),
+          endDate: new Date(),
+          key: 'selection2'
+        }
+      ]);
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    // Ensure from_date and to_date are set when modal opens
+    useEffect(() => {
+        if (show) {
+          const today = new Date().toISOString().split('T')[0];
+          setFormData((prev) => ({
+            ...prev,
+            from_date: today,
+            to_date: today,
+            from_date2: today,
+            to_date2: today,
+          }));
+        }
+      }, [show]);
 
-    // Open PDF in new tab
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const handleSelect = (ranges) => {
+        const selection = ranges.selection1;
+        const startDate = selection.startDate;
+        let endDate = selection.endDate;
+      
+        const maxEndDate = new Date(startDate);
+        maxEndDate.setDate(startDate.getDate() + 14);
+      
+        if (endDate > maxEndDate) {
+          endDate = maxEndDate;
+        }
+      
+        setState((prevState) =>
+          prevState.map((range) =>
+            range.key === 'selection1' ? { ...range, endDate } : range
+          )
+        );
+      
+        setFormData((prev) => ({
+          ...prev,
+          from_date: startDate.toISOString().split('T')[0],
+          to_date: endDate.toISOString().split('T')[0]
+        }));
+      };
+      
+      const handleSelect2 = (ranges) => {
+        const selection = ranges.selection2;
+        const startDate = selection.startDate;
+        let endDate = selection.endDate;
+      
+        const maxEndDate = new Date(startDate);
+        maxEndDate.setDate(startDate.getDate() + 14);
+      
+        if (endDate > maxEndDate) {
+          endDate = maxEndDate;
+        }
+      
+        setState((prevState) =>
+          prevState.map((range) =>
+            range.key === 'selection2' ? { ...range, endDate } : range
+          )
+        );
+      
+        setFormData((prev) => ({
+          ...prev,
+          from_date2: startDate.toISOString().split('T')[0],
+          to_date2: endDate.toISOString().split('T')[0]
+        }));
+      };
 
-    window.open(pdfUrl, '_blank'); // Full screen preview
-  };
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+      
+        try {
+          const response = await apiRoute.post("/residency/nurse_record", formData);
+          console.log(response);  // Log the response to check status and content
+      
+          if (response.status === 201) {
+            alert("Record submitted successfully!");
+            handleClose(); // close the modal
+            // Optionally reset form
+            setFormData({
+                admission_no: '',
+                currentMonth: '',
+                temperature: '',
+                bp: '',
+                pulse: '',
+                weight: '',
+                from_date: '',
+                to_date: '',
+                from_date2: '',
+                to_date2: '',
+            });
+          } else {
+            alert("Submission failed. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error submitting form:", error);
+          alert("An error occurred while submitting the form.");
+        }
+      };
+      
+      
 
-  const handleDownload = async () => {
-    const input = tableRef.current;
+    return (
+        <>
+            <Container fluid>
+                <Row className='d-flex align-items-center justify-content-between'>
+                    <Col md={2} className='text-start'>
+                        <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
+                            <Breadcrumb.Item></Breadcrumb.Item>
+                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item active>Residency Time</Breadcrumb.Item>
+                        </Breadcrumb>
+                        <h6 className="breadcrumb_title">Record Sheet</h6>
+                    </Col>
+                    <Col md={5} className="text-start">
+                        <h3 className="section_title">Nurse Record Sheet for Rescue Condition</h3>
+                    </Col>
+                    <Col md={2}>
+                        <Form className="navbar-search">
+                            <Form.Group id="topbarSearch">
+                                <InputGroup className="input-group-merge search-bar">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Search"
+                                    />
+                                    <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
+                                        <i className="fas fa-plus"></i>
+                                    </InputGroup.Text>
 
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
+                                </InputGroup>
+                            </Form.Group>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
+            <Container>
+                <Row>
+                    <Col md={4}>
+                        <Button variant="success"
+                            className="m-1 d-flex justify-content-start align-items-center"
+                            type="submit"
+                            onClick={handleShow}>Enter Condition</Button>
+                    </Col>
+                    <Col md={12} className="mt-3 my-3">
 
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                        <Table responsive className="table-centered table-nowrap rounded mb-0">
+                            <thead className="thead-light">
+                                <tr>
+                                    <th scope="col">S.No.</th>
+                                    <th scope="col">Month</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Temperature</th>
+                                    <th scope="col">BP </th>
+                                    <th scope="col">Pulse</th>
+                                    <th scope="col">WT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-    pdf.save('form_preview.pdf'); // Direct download
-  };
-
-  return (
-    <div>
-      <h1>Form Example</h1>
-      <form>
-        {/* Your form inputs here */}
-        <input type="text" placeholder="Name" />
-        <input type="text" placeholder="Email" />
-      </form>
-
-      <button onClick={handlePreview}>Preview PDF</button>
-      <button onClick={handleDownload}>Download PDF</button>
-
-      {/* Hidden form view for PDF */}
-      <div
-        ref={tableRef}
-        style={{
-          background: "#fff",
-          padding: "20px",
-          position: "absolute",
-          top: "-9999px",
-          left: "-9999px",
-        }}
-      >
-        <table border="1" cellPadding="10" width="100%">
-          <thead>
-            <tr>
-              <th>Field</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Name</td>
-              <td>John Doe</td>
-            </tr>
-            <tr>
-              <td>Email</td>
-              <td>john@example.com</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
-export default PDF_preview;
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
+            </Container>
 
 
-//exact screen pdf 
-// import React, { useRef } from "react";
-// import jsPDF from "jspdf";
-// import html2canvas from "html2canvas";
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Enter your Record for this month</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form onSubmit={handleSubmit}>
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="formAdmissionNo">
+                                        <Form.Label>Admission Number</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="admission_no"
+                                            value={formData.admission_no}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="formAdmissionNo">
+                                        <Form.Label>Month</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="currentMonth"
+                                            value={currentMonth}
+                                            readOnly
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-// const PreviewPDF = () => {
-//   const contentRef = useRef(null);
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                    <Form.Label>First Record</Form.Label>
+                                    <div className="custom-calendar">
+                                        <DateRange
+                                            editableDateInputs={true}
+                                            onChange={handleSelect}
+                                            ranges={[state.find((r) => r.key === 'selection1')]}
+                                            />
+                                    </div>
+                                    </Form.Group>
+                                </Col>
 
-//   const handlePreview = async () => {
-//     const input = contentRef.current;
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                    <Form.Label>Second Record</Form.Label>
+                                    <div className="custom-calendar">
+                                    <DateRange
+                                            editableDateInputs={true}
+                                            onChange={handleSelect2}
+                                            ranges={[state.find((r) => r.key === 'selection2')]}
+                                            />
+                                    </div>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-//     const canvas = await html2canvas(input, {
-//       scale: 2,
-//       useCORS: true,
-//     });
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="formResidentName">
+                                        <Form.Label>Temperature</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="temperature"
+                                            value={formData.temperature}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="formResidentName">
+                                        <Form.Label>BP</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="bp"
+                                            value={formData.bp}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-//     const imgData = canvas.toDataURL("image/png");
 
-//     const pdf = new jsPDF("p", "mm", "a4");
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="formResidentName">
+                                        <Form.Label>Pulse</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="pulse"
+                                            value={formData.pulse}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="formResidentName">
+                                        <Form.Label>Weight</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="weight"
+                                            value={formData.weight}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-//     const imgProps = pdf.getImageProperties(imgData);
-//     const pdfWidth = pdf.internal.pageSize.getWidth();
-//     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-//     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-//     const blob = pdf.output("blob");
 
-//     const blobURL = URL.createObjectURL(blob);
+                            <div className="btn_footer d-flex align-items-center justify-content-end">
+                                <Button variant="success" type="submit" className="m-1">
+                                    Submit
+                                </Button>
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Close
+                                </Button>
+                            </div>
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
+        </>
+    )
+}
 
-//     // Open in new full screen tab
-//     const newWindow = window.open(blobURL, "_blank");
-//     if (newWindow) newWindow.document.title = "Preview PDF";
-//   };
-
-//   return (
-//     <div>
-//       <div ref={contentRef} style={{ padding: "20px", background: "#fff" }}>
-//         <h1>Form Preview</h1>
-//         <table border="1" cellPadding="10" cellSpacing="0" style={{ width: "100%" }}>
-//           <thead>
-//             <tr>
-//               <th>Name</th>
-//               <th>Email</th>
-//               <th>Phone</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             <tr>
-//               <td>John Doe</td>
-//               <td>john@example.com</td>
-//               <td>1234567890</td>
-//             </tr>
-//           </tbody>
-//         </table>
-//       </div>
-
-//       <button onClick={handlePreview} style={{ marginTop: "20px" }}>
-//         Preview PDF
-//       </button>
-//     </div>
-//   );
-// };
-
-// export default PreviewPDF;
-
+export default Nurse_Record_sheet

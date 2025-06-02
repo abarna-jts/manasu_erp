@@ -74,9 +74,9 @@ const createForm2 = (req, res) => {
         old_photo, 
         new_photo, 
         name_rescue,
-         phone_no, 
-         signature_path, 
-         seal_path];
+        phone_no, 
+        signature_path, 
+        seal_path];
 
     db.query(q, values, (dbErr, data) => {
       if (dbErr) {

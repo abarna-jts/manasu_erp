@@ -1,5 +1,19 @@
 const db = require('../db');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.resolve("uploads/Articles_carried/"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+
+const upload = multer({ storage: storage }).single("attach_items");
 
 const createMSEForm = (req, res) => {
    const {
@@ -129,102 +143,104 @@ const createMood = (req, res) => {
   });
 }
 
-const createThough = (req, res) =>{
+const createArticles = (req, res) =>{
+  upload(req, res, (err) => {
   const{
-    stream_form_though,
-    content_though,
-    admission_no
-  }=req.body;
-
-  const query = `INSERT INTO though_form(admission_no, stream_form_though, content_though) VALUES(?,?,?)`;
-
-  const values = [
-    admission_no,stream_form_though.join(", "), content_though.join(", ")
-  ]
-
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
-    }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
-}
-
-const crateJudgement =(req, res) => {
-  const {
-    admission_no,personal_judgement,social_judgement,test_judgement, judgement
-  }=req.body;
-
-  const query=`INSERT INTO judgement(admission_no, personal_judgement, social_judgement, test_judgement, judgement)
-                VALUES(?,?,?,?,?)`;
-   const values = [
-    admission_no,personal_judgement, social_judgement, test_judgement, judgement
-  ]
-
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
-    }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
-
-}
-
-const createInsight = (req, res) =>{
-  const{
-    denail_illness,
-    slight_awareness,
-    awarness_sick,
-    awarness_illness,
-    intellectual_insight,
-    true_emotion,
     admission_no,
-
+    rescue_name, date_time, collected_items
   }=req.body;
 
-  const query = `INSERT INTO insight(admission_no, denail_illness, slight_awareness, awarness_sick, awarness_illness, intellectual_insight, true_emotion)
-               VALUES(?,?,?,?,?,?,?)`;
-  
+   const attachItemsPath = req.file
+      ? `uploads/Articles_carried/${req.file.filename}`
+      : null;
+
+
+  const createquery= `INSERT INTO articles_items(admission_no, rescue_name, date_time, collected_items, attach_items) 
+                      VALUES(?,?,?,?,?)`;
+
   const values = [
-  admission_no, denail_illness, slight_awareness, awarness_sick, awarness_illness, intellectual_insight, true_emotion
-];
-
-
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
-    }
-    res.status(200).json({ message: "Data inserted successfully" });
+    admission_no,
+    rescue_name,date_time,collected_items,attachItemsPath
+  ]
+   db.query(createquery, values, (dbErr, data) => {
+      if (dbErr) {
+        return res.status(500).json({ message: "Database Error", error: dbErr });
+      }
+      res.status(201).json({ message: "Rescue Condition Created Successfully", data });
+    });
   });
+};
 
+const getArticles = (req, res) =>{
+  const admission_no = req.params.admission_no;
+    const query = 'SELECT * FROM articles_items WHERE admission_no = ?';
+
+    db.query(query, [admission_no], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Articles carried Form not found' });
+        }
+
+        res.json(results[0]);
+    });
 }
 
-const createPerception = (req, res) =>{
-  const{
-    hallucination_type,
-    heard,
-    voices_heard,
-    part_of_day,
-    female_male_voices,
-    interpreted_person,
-    admission_no
-  }=req.body;
-
-  const query = `INSERT INTO Perception(admission_no, hallucination_type, heard, voices_heard, part_of_day, female_male_voices, interpreted_person)
-                  VALUES(?,?,?,?,?,?,?)`;
-  const values = [
-    admission_no, hallucination_type,heard, voices_heard, part_of_day, female_male_voices, interpreted_person
-  ];
-
-  db.query(query, values, (err, results) => {
+const updateArticles = (req, res) =>{
+  upload(req, res, (err) => {
     if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
-    }
-    res.status(200).json({ message: "Data inserted successfully" });
+            return res.status(500).json({ message: "File upload failed", error: err });
+        }
+
+    const{
+      rescue_name,date_time,collected_items
+    }=req.body;
+
+    const admission_no = req.params.admission_no;
+
+   const attachItemsPath = req.file
+  ? `uploads/Articles_carried/${req.file.filename}`
+  : null;
+
+
+     const selectQuery = "SELECT attach_items FROM articles_items WHERE admission_no = ?";
+        db.query(selectQuery, [admission_no], (selectErr, selectData) => {
+            if (selectErr) {
+                return res.status(500).json({ message: "Failed to retrieve existing files", error: selectErr });
+            }
+
+            const exsitingattachItems = selectData[0]?.attach_items;
+
+            const finalattachItems = attachItemsPath || exsitingattachItems;
+
+            const updateQuery = `
+                UPDATE articles_items SET 
+                    rescue_name = ?, 
+                    date_time = ?, 
+                    collected_items = ?, 
+                    attach_items = ?
+                WHERE admission_no = ?
+            `;
+
+            const values = [
+                rescue_name,
+                date_time,
+                collected_items,
+                finalattachItems,
+                admission_no
+            ];
+
+            db.query(updateQuery, values, (updateErr, result) => {
+                if (updateErr) {
+                    return res.status(500).json({ message: "Update failed", error: updateErr });
+                }
+
+                return res.status(200).json({ message: "Self Declaration updated successfully!" });
+            });
+        });
   });
 }
 
@@ -233,8 +249,7 @@ module.exports = {
   createMSEForm,
   createSpeech,
   createMood,
-  createThough,
-  crateJudgement,
-  createInsight,
-  createPerception
+  createArticles,
+  getArticles,
+  updateArticles
 };

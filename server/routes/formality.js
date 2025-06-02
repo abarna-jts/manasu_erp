@@ -65,4 +65,5 @@ router.get("/getStudentDetails",getStudentDetails);
 router.get("/getStudentDet/:id",getStudendDetailsbyID);
 router.put("/updateStudentDetail/:id",updateStudentDetail);
 
+
 module.exports = router;

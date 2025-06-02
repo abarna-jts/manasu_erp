@@ -1,98 +1,44 @@
-
-
-
-
-
-
 import React, { useState } from 'react';
 
+function Sample() {
+  const [step, setStep] = useState(1);
 
-const Login = () => {
-  const [isLoginActive, setIsLoginActive] = useState(true);
+  const nextStep = () => {
+    if (step < 2) setStep(step + 1);
+  };
 
-//   const handleToggle = () => {
-//     setIsLoginActive(!isLoginActive);
-//   };
+  const prevStep = () => {
+    if (step > 1) setStep(step - 1);
+  };
 
   return (
-    <div className="hero">
-      <div className="form-box">
-        <div className="button-box">
-          <div
-            id="btn"
-            style={{ left: isLoginActive ? '0px' : '130px' }}
-          ></div>
-          <button
-            type="button"
-            className="toggle-btn"
-            onClick={() => setIsLoginActive(true)}
-          >
-            Log in
-          </button>
-          <button
-            type="button"
-            className="toggle-btn"
-            onClick={() => setIsLoginActive(false)}
-          >
-            Register
-          </button>
-        </div>
-        
-
-        {isLoginActive ? (
-          <form className="input-group">
-            <input
-              type="text"
-              className="input-field"
-              placeholder="User Name"
-              required
-            />
-            <input
-              type="password"
-              className="input-field"
-              placeholder="Enter Password"
-              required
-            />
-            <div>
-              <input type="checkbox" className="check-box" />
-              <span>Remember Password</span>
-            </div>
-            <button type="submit" className="submit-btn">
-              Log in
-            </button>
-          </form>
-        ) : (
-          <form className="input-group">
-            <input
-              type="text"
-              className="input-field"
-              placeholder="User Name"
-              required
-            />
-            <input
-              type="email"
-              className="input-field"
-              placeholder="Email Id"
-              required
-            />
-            <input
-              type="password"
-              className="input-field"
-              placeholder="Enter Password"
-              required
-            />
-            <div>
-              <input type="checkbox" className="check-box" />
-              <span>Send me updates</span>
-            </div>
-            <button type="submit" className="submit-btn">
-              Register
-            </button>
-          </form>
-        )}
+    <div className="container">
+      {/* Step Indicator */}
+      <div className="step-indicator">
+        <div className={`step ${step === 1 ? 'active' : ''}`}>1</div>
+        <div className={`step ${step === 2 ? 'active' : ''}`}>2</div>
       </div>
+
+      {/* Step 1 */}
+      {step === 1 && (
+        <div className="form-step">
+          <h3>Step 1</h3>
+          <input type="text" placeholder="Enter First Name" />
+          <button className="btn" onClick={nextStep}>Next</button>
+        </div>
+      )}
+
+      {/* Step 2 */}
+      {step === 2 && (
+        <div className="form-step">
+          <h3>Step 2</h3>
+          <input type="email" placeholder="Enter Email" />
+          <button className="btn" onClick={prevStep}>Back</button>
+          <button className="btn" style={{ marginLeft: '10px' }}>Submit</button>
+        </div>
+      )}
     </div>
   );
-};
+}
 
-export default Login;
+export default Sample;

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup } from '@themesberg/react-bootstrap';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 function Login(){
     const [form, setForm] = useState({ email: '', password: '' });
@@ -11,6 +12,9 @@ function Login(){
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    const apiRoute = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+      });
 
     const navigate = useNavigate();
 
@@ -19,11 +23,19 @@ function Login(){
         console.log("Button functionality working");
       
         try {
-          const res = await axios.post('http://localhost:5000/api/login', form);
+          const res = await apiRoute.post('/api/login', form);
           
-          setToken(res.data.token);
-          localStorage.setItem('jwt', res.data.token);
-      
+            // Save JWT token
+            setToken(res.data.token);
+            localStorage.setItem('jwt', res.data.token);
+
+            const userType = res.data.usertype;
+            console.log("UserType:", userType);
+            Cookies.set('usertype', userType);
+            // console.log("Name:",username);
+            
+        console.log(res.data);
+
           console.log("Login successful:", res.data);
           alert('Login successful');
           navigate('/dashboard');
@@ -69,7 +81,7 @@ function Login(){
                                     <FormCheck.Input id="defaultCheck5" className="me-2" />
                                     <FormCheck.Label htmlFor="defaultCheck5" className="mb-0">Remember me</FormCheck.Label>
                                 </Form.Check>
-                                <Card.Link className="small text-end">Lost password?</Card.Link>
+                                <Card.Link className="small text-end" onClick={() => navigate('/forgot_password')}>Lost password?</Card.Link>
                                 </div>
                             </Form.Group>
                             <Button variant="primary" type="submit" className="w-100" onClick={handleLogin}>

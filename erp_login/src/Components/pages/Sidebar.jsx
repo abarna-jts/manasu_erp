@@ -3,6 +3,7 @@ import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import Cookies from 'js-cookie';
 import {
   faBook,
   faUsers,
@@ -10,11 +11,25 @@ import {
   faFileAlt,
   faCalendarAlt,
   faMapPin,
+  faClipboard,
+  faClipboardCheck,
   faInbox,
-  faRocket
+  faRocket,
+  faBrain,
+  faHome,
+  faSuitcase,
+  faStethoscope,
+  faUserMd ,
+  faUserNurse ,
+  faPenSquare,
+  faVideo,
+  faClipboardList,
+  faChartLine,
+  faUserGraduate,
+  faNotesMedical 
 } from "@fortawesome/free-solid-svg-icons";
 
-import { Nav, Badge, Image, Button, Accordion, Navbar} from "react-bootstrap";
+import { Nav, Badge, Accordion} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 
@@ -23,6 +38,8 @@ const Sidebar = () => {
   const onCollapse = () => setShow(!show);
 
   const navigate = useNavigate();
+
+  const userType = Cookies.get('usertype'); 
 
   const CollapsableNavItem = ({ title, icon, children }) => (
     <Accordion as={Nav.Item}>
@@ -69,48 +86,141 @@ const Sidebar = () => {
     <>
       
 
-      <SimpleBar className={`sidebar d-md-block bg-primary text-white ${show ? "show" : ""}`}>
+      <SimpleBar className={`sidebar d-md-block text-white ${show ? "show" : ""}`}>
         <div className="sidebar-inner px-4 pt-3">
-          <div className="user-card d-flex d-md-none align-items-center justify-content-between pb-4">
-            <div className="d-flex align-items-center">
-              <div className="user-avatar lg-avatar me-4">
-                {/* <Image src={ProfilePicture} className="rounded-circle border-white" /> */}
-              </div>
-              <div>
-                <h6>Hi, User</h6>
-                
-              </div>
-            </div>
-            <Nav.Link className="collapse-close d-md-none" onClick={onCollapse}>
-              
-            </Nav.Link>
-          </div>
-
           <Nav className="flex-column pt-3">
+            {/* Common menu for all users */}
             <NavItem title="Dashboard" to="/dashboard" icon={faChartPie} />
 
-            <CollapsableNavItem title="Admission" icon={faBook}>
-              <NavItem title="First Information Form" to="/first_info_form" icon={faFileAlt} />
-              <CollapsableNavItem title="SCRB Form" icon={faBook}>
-              <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
-              <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
-              <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
-              <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
-            </CollapsableNavItem>
-            </CollapsableNavItem>
+            {/* Admin-only menus */}
+            {userType === '1' && (
+              <>
 
-            <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
-              <NavItem title="Track Time" icon={faRocket} />
-              <NavItem title="View History" icon={faInbox} />
-            </CollapsableNavItem>
+                {/* Admission Form Menu */}
+                <CollapsableNavItem title="Admission" icon={faBook}>
+                  <NavItem title="First Information Form" to="/first_info_form" icon={faFileAlt} />
+                </CollapsableNavItem>
 
-            <CollapsableNavItem title="Reunion" icon={faMapPin}>
-              <NavItem title="Upcoming Events" icon={faCalendarAlt} />
-              <NavItem title="Past Events" icon={faCalendarAlt} />
-            </CollapsableNavItem>
+                {/* SCRB Form Menu */}
+                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} />
+                {/* <CollapsableNavItem title="SCRB Form" icon={faBook}>
+                  <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
+                    <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
+                    <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
+                    <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
+                </CollapsableNavItem> */}
 
-            <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
-            </Nav>
+                 {/* Residency Time menu */}
+                {/* <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
+                  <NavItem title="Doctor Consultant Form" to="/Dr_consultant" icon={faUserMd} />
+                  <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
+                  <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faStethoscope} />
+                </CollapsableNavItem> */}
+
+                {/* Recovery menus */}
+                <CollapsableNavItem title="Recovery" icon={faHome}>
+                  <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="Articles carried Form" to="/articles_form" icon={faSuitcase} />
+                  <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
+                  <NavItem title="MSE Form" to="/mseform" icon={faNotesMedical  } />
+                  <NavItem title="Activity Details" to="/annual_report" icon={faCalendarAlt } />
+                </CollapsableNavItem>
+
+                {/* Reunion Menus */}
+                <CollapsableNavItem title="Reunion" icon={faMapPin}>
+                  <NavItem title="Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
+                  <NavItem title="Media Consent" to="/media_consent" icon={faVideo } />
+                </CollapsableNavItem>
+
+                {/* Fomality Menus */}
+                <CollapsableNavItem title="Admin Formality" icon={faMapPin}>
+                  <NavItem title="Handover Form" to="/formality_declaration" icon={faPenSquare} />
+                  <NavItem title="Essential Records" to="/essential_record" icon={faClipboardList} />
+                  <NavItem title="Annual Report" to="/annual_report" icon={faChartLine } />
+                  <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate } />
+                  <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers } />
+                </CollapsableNavItem>
+
+                {/* Residency Details */}
+                <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
+
+                 {/* Discharge Details */}
+                <NavItem title="Reunion Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
+              </>
+            )}
+
+            {/* Directors menus */}
+            {userType === '2' && (
+              <>
+
+                {/* Admission Form Menu */}
+                <CollapsableNavItem title="Admission" icon={faBook}>
+                  <NavItem title="First Information Form" to="/first_info_form" icon={faFileAlt} />
+                </CollapsableNavItem>
+
+                {/* SCRB Form Menu */}
+                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} />
+                {/* <CollapsableNavItem title="SCRB Form" icon={faBook}>
+                  <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
+                    <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
+                    <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
+                    <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
+                </CollapsableNavItem> */}
+
+                 {/* Residency Time menu */}
+                {/* <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
+                  <NavItem title="Doctor Consultant Form" to="/Dr_consultant" icon={faUserMd} />
+                  <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
+                  <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faStethoscope} />
+                </CollapsableNavItem> */}
+
+                {/* Reunion Menus */}
+                <CollapsableNavItem title="Reunion" icon={faMapPin}>
+                  <NavItem title="Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
+                  <NavItem title="Media Consent" to="/media_consent" icon={faVideo } />
+                </CollapsableNavItem>
+
+                {/* Fomality Menus */}
+                <CollapsableNavItem title="Admin Formality" icon={faMapPin}>
+                  <NavItem title="Formality Self Declaration" to="/formality_declaration" icon={faPenSquare} />
+                  <NavItem title="Essential Records" to="/essential_record" icon={faClipboardList} />
+                  <NavItem title="Annual Report" to="/annual_report" icon={faChartLine } />
+                  <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers } />
+                </CollapsableNavItem>
+
+                {/* Residency Details */}
+                <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
+              </>
+            )}
+
+            {/* Nurse-only menus */}
+            {userType === '3' && (
+              <>
+                {/* <NavItem title="Doctor Consultants Form" to="/Dr_consultant" icon={faStethoscope} /> */}
+                <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
+                <NavItem title="Prescription Form" to="/prescription_form" icon={faNotesMedical} />
+                <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faUserMd} />
+                
+
+              </>
+            )}
+
+            {userType === '4' &&(
+              <>
+                <NavItem title="Observation Report" to="/observation_report" icon={faUserNurse} />
+                <NavItem title="Psychatrics Care History" to="" icon={faBrain } />
+                <NavItem title="MSE Form" to="mse_form" icon={faNotesMedical  } />
+                {/* <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} /> */}
+              </>
+            )}
+
+            {/* Menus common to admin and nurse */}
+            {/* {(userType === '6' || userType === '3') && (
+              <NavItem title="Rescue Details" to="/rescue_details" icon={faUsers} />
+            )} */}
+          </Nav>
         </div>
       </SimpleBar>
     </>
