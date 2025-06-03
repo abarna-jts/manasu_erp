@@ -39,6 +39,7 @@ import MSE_form from './Components/pages/Recovery/MSE_form';
 import Sample from './Components/authentication/sample';
 import Rescue_articles_form from './Components/pages/Recovery/Rescue_articles_form';
 import Reunion_Checklist from './Components/pages/Reunion/Reunion_Checklist';
+import Edit_ReunionChecklist from './Components/pages/Reunion/Edit_ReunionChecklist';
 
 function App() {
 
@@ -160,6 +161,12 @@ function App() {
                 path='/reunion_checklist'
                 element={<MainLayout><Reunion_Checklist /></MainLayout>}
               />
+
+              <Route
+                path='/edit_reunion_checklist/:admission_no'
+                element={<MainLayout><Edit_ReunionChecklist /></MainLayout>}
+              />
+              
 
               <Route
                 path='/imagepdf'

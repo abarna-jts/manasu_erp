@@ -15,7 +15,7 @@ function Formality_declaration() {
     const [admission_no, setAdmissionNumber] = useState('');
     const [previewRequested, setPreviewRequested] = useState(false);
 
-     const userType = Cookies.get('usertype'); 
+    const userType = Cookies.get('usertype');
 
     const handleClose = () => setShow(false);
 
@@ -25,7 +25,8 @@ function Formality_declaration() {
         age: '',
         medicine_provided: '',
         toiletries_provided: '',
-        dress_provided: ''
+        dress_provided: '',
+        travel_expenses: ''
     })
 
     const apiRoute = axios.create({
@@ -135,6 +136,7 @@ function Formality_declaration() {
                 medicine_provided: data.medicine_provided || '',
                 toiletries_provided: data.toiletries_provided || '',
                 dress_provided: data.dress_provided || '',
+                travel_expenses: data.travel_expenses || '',
             }));
 
             setPreviewRequested(true);
@@ -168,6 +170,7 @@ function Formality_declaration() {
                 medicine_provided: data.medicine_provided || '',
                 toiletries_provided: data.toiletries_provided || '',
                 dress_provided: data.dress_provided || '',
+                travel_expenses: data.travel_expenses || '',
             }));
 
             setShow(true);
@@ -220,7 +223,7 @@ function Formality_declaration() {
                         <h6 className="breadcrumb_title">Declaration Form</h6>
                     </Col>
                     <Col md={9} className="text-start">
-                        <h3 className="section_title">Resident's Possessions and Document Handover Form</h3>
+                        <h3 className="section_title">5. Resident's Possessions and Document Handover Form</h3>
                     </Col>
                 </Row>
             </Container>
@@ -263,12 +266,12 @@ function Formality_declaration() {
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
                             <button type="button" className="btn btn-primary mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
-                            } else {
-                                handleDelete(admission_no); // Fetch & populate data before generating PDF
-                            }
-                        }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
+                                if (!admission_no.trim()) {
+                                    alert("Please enter your admission number.");
+                                } else {
+                                    handleDelete(admission_no); // Fetch & populate data before generating PDF
+                                }
+                            }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
                         )}
                     </Form.Group>
                 </Form>
@@ -385,6 +388,29 @@ function Formality_declaration() {
                                             />
                                         </Col>
                                     </Form.Group>
+                                    <Form.Group as={Row} className="mb-1">
+                                        <Form.Label column sm="4" className="text-start">
+                                            Discharge Allowance / Travel Expenses Provided:
+                                        </Form.Label>
+                                        <Col sm="8" className='d-flex align-items-center'>
+                                            <Form.Check
+                                                type="radio"
+                                                label="Yes"
+                                                name="travel_expenses"
+                                                value="Yes"
+                                                checked={formData.travel_expenses === 'Yes'}
+                                                onChange={handleCheckChange}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="No"
+                                                name="travel_expenses"
+                                                value="No"
+                                                checked={formData.travel_expenses === 'No'}
+                                                onChange={handleCheckChange}
+                                            />
+                                        </Col>
+                                    </Form.Group>
 
 
                                     <div className="mt-3">
@@ -400,7 +426,7 @@ function Formality_declaration() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                <h4 className="text-center MY-4">Resident's Possessions and Document Handover Form</h4>
+                <h4 className="text-center MY-4">5. Resident's Possessions and Document Handover Form</h4>
                 <Form className='self_declaration'>
                     <Row>
                         <Form.Group as={Row} className="mb-1">
@@ -512,6 +538,30 @@ function Formality_declaration() {
                             </Col>
                         </Form.Group>
 
+                        <Form.Group as={Row} className="mb-1">
+                            <Form.Label column sm="4" className="text-start">
+                                Discharge Allowance / Travel Expenses Provided:
+                            </Form.Label>
+                            <Col sm="8" className='d-flex align-items-center'>
+                                <Form.Check
+                                    type="radio"
+                                    label="Yes"
+                                    name="travel_expenses"
+                                    value="Yes"
+                                    checked={formData.travel_expenses === 'Yes'}
+                                    onChange={handleCheckChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="No"
+                                    name="travel_expenses"
+                                    value="No"
+                                    checked={formData.travel_expenses === 'No'}
+                                    onChange={handleCheckChange}
+                                />
+                            </Col>
+                        </Form.Group>
+
                     </Row>
                 </Form>
             </div>
@@ -615,6 +665,30 @@ function Formality_declaration() {
                                             name="dress_provided"
                                             value="No"
                                             checked={formData.dress_provided === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1">
+                                    <Form.Label column sm="4" className="text-start">
+                                        Discharge Allowance / Travel Expenses Provided :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="t"
+                                            value="travel_expenses"
+                                            checked={formData.travel_expenses === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="travel_expenses"
+                                            value="No"
+                                            checked={formData.travel_expenses === 'No'}
                                             onChange={handleCheckChange}
                                         />
                                     </Col>

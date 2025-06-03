@@ -198,7 +198,8 @@ function Family_Request_form() {
         }
     };
 
-    const ViewFormData = async () => {
+    const ViewFormData = async (e) => {
+        e.preventDefault();
         try {
             const response = await apiRoute.get(`/reunion/get_family_letter/${admissionNumber}`);
             const data = response.data;
@@ -398,7 +399,7 @@ function Family_Request_form() {
                         <h6 className="breadcrumb_title">Rescue Reunion</h6>
                     </Col>
                     <Col md={8} className="text-center">
-                        <h3 className="section_title">Family Request Form – Discharge of Resident</h3>
+                        <h3 className="section_title">1. Family Request Form – Discharge of Resident</h3>
                     </Col>
                     <Col md={2} className='text-center'>
                         {error && <div className="text-danger mt-2">{error}</div>}
@@ -728,7 +729,7 @@ function Family_Request_form() {
                                 <img src={manasu_logo} className="pdf_logo" alt="" />
                             </Col>
                             <Col md={10}>
-                                <h4 className="text-center">Family Request Form – Discharge of Resident</h4>
+                                <h4 className="text-center">1. Family Request Form – Discharge of Resident</h4>
                             </Col>
                         </Row>
 

@@ -264,7 +264,7 @@ function InternshipForm() {
                             </Form.Group>
                             <Col md={12} className='d-flex align-items-center justify-content-center'>
                                 <div className="d-flex align-tems-cente justify-content-between">
-                                    <Button variant="primary" className="m-1" type="submit">Submit</Button>
+                                    <Button variant="success" className="m-1" type="submit">Submit</Button>
                                 </div>
 
                             </Col>

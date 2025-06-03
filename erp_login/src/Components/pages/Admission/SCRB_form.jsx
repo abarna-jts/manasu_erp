@@ -716,7 +716,7 @@ function SCRB_form() {
                                                     <div className="col-md-12">
                                                         <input
                                                             type="text"
-                                                            name="language"
+                                                            name="language1"
                                                             className="form-control text-center"
                                                             value={formData.language1 || ''}
                                                             onChange={handleInputChange}

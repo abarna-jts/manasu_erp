@@ -143,6 +143,147 @@ const createMood = (req, res) => {
   });
 }
 
+const createPerception = (req,res) =>{
+ const { 
+    hallucination_type,
+    heard,
+    voices_heard,
+    part_of_day,
+    female_male_voices,
+    interpreted_person,
+    admission_no,
+   } = req.body;
+
+  const query = `
+    INSERT INTO perception (
+      admission_no,
+      hallucination_type,
+      heard,
+        voices_heard,
+        part_of_day,
+        female_male_voices,
+        interpreted_person
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const values = [
+    admission_no,
+    hallucination_type.join(", "),
+    heard,
+    voices_heard,
+    part_of_day,
+    female_male_voices,
+    interpreted_person,
+  ];
+
+  db.query(query, values, (err, results) => {
+    if (err) {
+      console.error("Insert error:", err);
+      return res.status(500).json({ error: "Database insert error" });
+    }
+    res.status(200).json({ message: "Data inserted successfully" });
+  });
+}
+
+const createCognition = (req,res) =>{
+  const { 
+    consciousness,
+    orientation_time,
+    orientation_place,
+    orientation_person,
+    distractibility,
+    asking_test,
+    names_months,
+    test_performance,
+    immediate_retention,
+    recall,
+    patient_place,
+    dinner_ate,
+    date_ofMrg,
+    birthdays_children,
+    person_past,
+    amnesia,
+    live_growing,
+    person_school,
+    breakfast_ques,
+    do_yesterday,
+    general_info,
+    test_red_wri,
+    calculation_test,
+    proverb_testing,
+    familiar_object,
+    admission_no
+   } = req.body;
+
+  const query = `
+    INSERT INTO conginition (
+        admission_no,
+        consciousness,
+        orientation_time,
+        orientation_place,
+        orientation_person,
+        distractibility,
+        asking_test,
+        names_months,
+        test_performance,
+        immediate_retention,
+        recall,
+        patient_place,
+        dinner_ate,
+        date_ofMrg,
+        birthdays_children,
+        person_past,
+        amnesia,
+        live_growing,
+        person_school,
+        breakfast_ques,
+        do_yesterday,
+        general_info,
+        test_red_wri,
+        calculation_test,
+        proverb_testing,
+        familiar_object
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const values = [
+    admission_no,
+    consciousness.join(", "),
+    orientation_time,
+    orientation_place,
+    orientation_person,
+    distractibility,
+    asking_test,
+    names_months,
+    test_performance,
+    immediate_retention,
+    recall,
+    patient_place,
+    dinner_ate,
+    date_ofMrg,
+    birthdays_children,
+    person_past,
+    amnesia,
+    live_growing,
+    person_school,
+    breakfast_ques,
+    do_yesterday,
+    general_info,
+    test_red_wri,
+    calculation_test,
+    proverb_testing,
+    familiar_object
+  ];
+
+  db.query(query, values, (err, results) => {
+    if (err) {
+      console.error("Insert error:", err);
+      return res.status(500).json({ error: "Database insert error" });
+    }
+    res.status(200).json({ message: "Data inserted successfully" });
+  });
+}
+
 const createArticles = (req, res) =>{
   upload(req, res, (err) => {
   const{
@@ -251,5 +392,7 @@ module.exports = {
   createMood,
   createArticles,
   getArticles,
-  updateArticles
+  updateArticles,
+  createPerception,
+  createCognition
 };

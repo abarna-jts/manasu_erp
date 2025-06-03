@@ -12,32 +12,43 @@ const multer = require('multer');
 //   },
 // });
 
+// Define multer storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
+        let uploadPath;
+
+        // Map field names to folders
         if (['f_aadhar_card', 'f_ration_card', 'govt_id'].includes(file.fieldname)) {
-            cb(null, path.resolve('uploads/Reunion/Family_Details/'));
+            uploadPath = path.resolve('uploads/Reunion/Family_Details/');
         } else if (['signature', 'photo', 'handwritten_document'].includes(file.fieldname)) {
-            cb(null, path.resolve('uploads/Self_Declaration/'));
-        } else if (['scan_report']) {
-            cb(null, path.resolve('uploads/MediaConsent/'));
+            uploadPath = path.resolve('uploads/Self_Declaration/');
+        } else if (['scan_report'].includes(file.fieldname)) {
+            uploadPath = path.resolve('uploads/MediaConsent/');
         } else {
-            cb(null, path.resolve('uploads/Discharge_Checklist/')); // fallback (optional)
+            // Default fallback for Discharge_Checklist and others
+            uploadPath = path.resolve('uploads/Reunion/Discharge_Checklist/');
         }
+
+        // Create the folder if it doesn't exist
+        fs.mkdirSync(uploadPath, { recursive: true });
+
+        // Pass the folder to multer
+        cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
-    },
+    }
 });
 
-// Multer upload instance
+// Define upload fields
 const upload = multer({ storage: storage }).fields([
     { name: 'f_aadhar_card', maxCount: 1 },
     { name: 'f_ration_card', maxCount: 1 },
     { name: 'govt_id', maxCount: 1 },
-    { name: 'handwritten_document', maxCount: 1 },
     { name: 'signature', maxCount: 1 },
     { name: 'photo', maxCount: 1 },
-    { name: 'scan_report', maxCount: 1 }, // ✅ added
+    { name: 'handwritten_document', maxCount: 1 },
+    { name: 'scan_report', maxCount: 1 },
     { name: 'familyRequestLetterFile', maxCount: 1 },
     { name: 'selfDeclarationFile', maxCount: 1 },
     { name: 'mediaConsentFile', maxCount: 1 },
@@ -56,7 +67,8 @@ const upload = multer({ storage: storage }).fields([
     { name: 'copyOfdischargeSummaryFile', maxCount: 1 },
     { name: 'travelSafetyLetterFile', maxCount: 1 },
     { name: 'reunionPhotoFile', maxCount: 1 },
-    { name: 'witnessSignatureFile', maxCount: 1 }
+    { name: 'witnessSignatureFile', maxCount: 1 },
+    { name: 'residentIDproofFile', maxCount: 1},
 ]);
 
 
@@ -496,6 +508,7 @@ const createDischargeList = (req, res) => {
             selfDeclarationLetter,
             mediaConsentLetter,
             familyIDproof,
+            residentIDproof,
             aadharCard,
             udidCard,
             disabilityCertificate,
@@ -510,11 +523,58 @@ const createDischargeList = (req, res) => {
             copyOfdischargeSummary,
             travelSafetyLetter,
             reunionPhoto,
-            witnessSignature
+            witnessSignature,
+            any_other
         } = req.body;
 
         const getFilePath = (fieldName) =>
             req.files[fieldName] ? `uploads/Reunion/Discharge_Checklist/${req.files[fieldName][0].filename}` : null;
+
+        
+
+        const query = `
+            INSERT INTO discharge_checklist (
+                admission_no, familyRequestLetter, selfDeclarationLetter, mediaConsentLetter,
+                familyRequestLetterFile, selfDeclarationFile, mediaConsentLetterFile,
+                familyIDproof, familyIDproofFile,
+                residentIDproof, residentIDproofFile,
+                aadharCard, aadharCardFile,
+                udidCard, udidCardFile,
+                disabilityCertificate, disabilityCertificateFile,
+                bankPassbook, bankPassbookFile,
+                healthInsurance, healthInsuranceFile,
+                medicalReport, medicalReportFile,
+                dischargeSummary, dischargeSummaryFile,
+                medications, medicationsFile,
+                Clothes, ClothesFile,
+                possessionsRecovered, possessionsRecoveredFile,
+                travelExpenses, travelExpensesFile,
+                copyOfdischargeSummary, copyOfdischargeSummaryFile,
+                travelSafetyLetter, travelSafetyLetterFile,
+                reunionPhoto, reunionPhotoFile,
+                witnessSignature, witnessSignatureFile,any_other
+            ) VALUES (
+                ?, ?, ?, ?,
+                ?, ?, ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?
+            )
+        `;
 
         const values = [
             admission_no,
@@ -526,6 +586,8 @@ const createDischargeList = (req, res) => {
             getFilePath('mediaConsentFile'),
             familyIDproof,
             getFilePath('familyIDproofFile'),
+            residentIDproof,
+            getFilePath('residentIDproofFile'),
             aadharCard,
             getFilePath('aadharCardFile'),
             udidCard,
@@ -555,49 +617,12 @@ const createDischargeList = (req, res) => {
             reunionPhoto,
             getFilePath('reunionPhotoFile'),
             witnessSignature,
-            getFilePath('witnessSignatureFile')
+            getFilePath('witnessSignatureFile'),
+            any_other
         ];
 
-        const query = `
-            INSERT INTO discharge_checklist (
-                admission_no, familyRequestLetter, selfDeclarationLetter, mediaConsentLetter,
-                familyRequestLetterFile, selfDeclarationFile, mediaConsentLetterFile,
-                familyIDproof, familyIDproofFile,
-                aadharCard, aadharCardFile,
-                udidCard, udidCardFile,
-                disabilityCertificate, disabilityCertificateFile,
-                bankPassbook, bankPassbookFile,
-                healthInsurance, healthInsuranceFile,
-                medicalReport, medicalReportFile,
-                dischargeSummary, dischargeSummaryFile,
-                medications, medicationsFile,
-                Clothes, ClothesFile,
-                possessionsRecovered, possessionsRecoveredFile,
-                travelExpenses, travelExpensesFile,
-                copyOfdischargeSummary, copyOfdischargeSummaryFile,
-                travelSafetyLetter, travelSafetyLetterFile,
-                reunionPhoto, reunionPhotoFile,
-                witnessSignature, witnessSignatureFile
-            ) VALUES (
-                ?, ?, ?, ?,
-                ?, ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?
-            )
-        `;
+        
+
 
         db.query(query, values, (dbErr, data) => {
             if (dbErr) {
@@ -608,6 +633,41 @@ const createDischargeList = (req, res) => {
     });
 };
 
+const getReunionChecklist = (req,res) =>{
+    const admission_no = req.params.admission_no;
+    const query = 'SELECT * FROM discharge_checklist WHERE admission_no = ?';
+
+    db.query(query, [admission_no], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Family Request Letter Form not found' });
+        }
+
+        res.json(results[0]);
+    });
+}
+
+const getReunionChecklistAll = (req,res)=>{
+    const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM discharge_checklist WHERE admission_no = ?';
+
+  db.query(query, [admission_no], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Discharge Reunion not found' });
+    }
+
+    res.json(results[0]);
+  });
+}
 
 module.exports = {
     createFamilyLetter,
@@ -623,5 +683,7 @@ module.exports = {
     getMediaConsent,
     UpdateMediaConsent,
     deleteMediaConsent,
-    createDischargeList
+    createDischargeList,
+    getReunionChecklist,
+    getReunionChecklistAll
 };

@@ -12,7 +12,9 @@ const { createFamilyLetter,
     getMediaConsent,
     UpdateMediaConsent,
     deleteMediaConsent,
-    createDischargeList
+    createDischargeList,
+    getReunionChecklist,
+    getReunionChecklistAll
 } = require("../controllers/reunioin");
 const router = express.Router();
 
@@ -36,6 +38,8 @@ router.delete("/deleteMediaConsent/:admission_no",deleteMediaConsent);
 
 //discharge checklist 
 router.post("/createDischarge_checklist",createDischargeList);
+router.get("/get_checklist/:admission_no", getReunionChecklist);
+router.get("/get_allCheckList/:admission_no", getReunionChecklistAll);
 
 
 module.exports = router;

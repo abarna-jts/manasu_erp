@@ -16,7 +16,7 @@ function Admin_RescueDetails() {
     const [previewRequested, setPreviewRequested] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
 
-    const userType = Cookies.get('usertype'); 
+    const userType = Cookies.get('usertype');
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -28,7 +28,8 @@ function Admin_RescueDetails() {
         referred_by: '',
         escape: '',
         death: '',
-        discharge: ''
+        discharge: '',
+        reunited: '',
     });
 
     const apiRoute = axios.create({
@@ -120,6 +121,7 @@ function Admin_RescueDetails() {
                 escape: data.escape || '',
                 death: data.death || '',
                 discharge: data.discharge || '',
+                reunited: data.reunited || ''
 
             }));
 
@@ -181,26 +183,27 @@ function Admin_RescueDetails() {
     };
 
     const handleEditform = async (id) => {
-    try {
-        const response = await apiRoute.get(`/formality/getDischargeSummaryID/${id}`);
-        const data = response.data;
+        try {
+            const response = await apiRoute.get(`/formality/getDischargeSummaryID/${id}`);
+            const data = response.data;
 
-        setFormData({
-            admission_no: data.admission_no || '',
-            rescue_name: data.rescue_name || '',
-            referred_by: data.referred_by || '',
-            escape: data.escape || '',
-            death: data.death || '',
-            discharge: data.discharge || ''
-        });
+            setFormData({
+                admission_no: data.admission_no || '',
+                rescue_name: data.rescue_name || '',
+                referred_by: data.referred_by || '',
+                escape: data.escape || '',
+                death: data.death || '',
+                discharge: data.discharge || '',
+                reunited: data.reunited || ''
+            });
 
-        setSelectedId(id); // ✅ Store the ID
-        setShow1(true);
-    } catch (error) {
-        console.error("Error fetching form data:", error);
-        alert("Rescue not found");
-    }
-};
+            setSelectedId(id); // ✅ Store the ID
+            setShow1(true);
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Rescue not found");
+        }
+    };
 
 
     const handleUpdate = async (e, id) => {
@@ -221,7 +224,7 @@ function Admin_RescueDetails() {
         }
     };
 
-     const handleDelete = async (id) => {
+    const handleDelete = async (id) => {
         alert("Are you sure want to delete");
         try {
             const response = await apiRoute.delete(`/formality/deleteDischargeSummary/${id}`);
@@ -246,7 +249,7 @@ function Admin_RescueDetails() {
                         <h6 className="breadcrumb_title">Discharge Details</h6>
                     </Col>
                     <Col md={8} className="text-start mb-4">
-                        <h3 className="section_title">Rescue Discharge Information</h3>
+                        <h3 className="section_title">Resident's Discharge Information</h3>
                     </Col>
                 </Row>
             </Container>
@@ -281,12 +284,13 @@ function Admin_RescueDetails() {
                             <thead>
                                 <tr>
                                     <th>S.No</th>
-                                    <th>Rescue Id</th>
-                                    <th>Rescue Name</th>
+                                    <th>Resident's Id</th>
+                                    <th>Resident's Name</th>
                                     <th>Admitting Authority for Rescue</th>
+                                    <th>Self Discharge</th>
                                     <th>Escape</th>
                                     <th>Death</th>
-                                    <th>Discharge by</th>
+                                    <th>Reunited</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -298,9 +302,10 @@ function Admin_RescueDetails() {
                                             <td>{item.admission_no}</td>
                                             <td>{item.rescue_name}</td>
                                             <td>{item.referred_by}</td>
+                                            <td>{item.discharge}</td>
                                             <td>{item.escape}</td>
                                             <td>{item.death}</td>
-                                            <td>{item.discharge}</td>
+                                            <td>{item.reunited}</td>
                                             <td>
                                                 <button className="btn btn-success icon_details"
                                                     onClick={() => {
@@ -438,7 +443,7 @@ function Admin_RescueDetails() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
                                     <Form.Label column sm="4" className="text-start">
-                                        Discharge by :
+                                        Self Discharge :
                                     </Form.Label>
                                     <Col sm="8" className='d-flex align-items-center'>
                                         <Form.Check
@@ -455,6 +460,30 @@ function Admin_RescueDetails() {
                                             name="discharge"
                                             value="No"
                                             checked={formData.discharge === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
+                                    <Form.Label column sm="4" className="text-start">
+                                        Reunited :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="reunited"
+                                            value="Yes"
+                                            checked={formData.reunited === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="reunited"
+                                            value="No"
+                                            checked={formData.reunited === 'No'}
                                             onChange={handleCheckChange}
                                         />
                                     </Col>
@@ -569,7 +598,7 @@ function Admin_RescueDetails() {
 
                         <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
                             <Form.Label column sm="4" className="text-start">
-                                Discharge by :
+                                Self Discharge :
                             </Form.Label>
                             <Col sm="8" className='d-flex align-items-center'>
                                 <Form.Check
@@ -586,6 +615,30 @@ function Admin_RescueDetails() {
                                     name="discharge"
                                     value="No"
                                     checked={formData.discharge === 'No'}
+                                    onChange={handleCheckChange}
+                                />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
+                            <Form.Label column sm="4" className="text-start">
+                                Reunited :
+                            </Form.Label>
+                            <Col sm="8" className='d-flex align-items-center'>
+                                <Form.Check
+                                    type="radio"
+                                    label="Yes"
+                                    name="reunited"
+                                    value="Yes"
+                                    checked={formData.reunited === 'Yes'}
+                                    onChange={handleCheckChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="No"
+                                    name="reunited"
+                                    value="No"
+                                    checked={formData.reunited === 'No'}
                                     onChange={handleCheckChange}
                                 />
                             </Col>
@@ -680,7 +733,7 @@ function Admin_RescueDetails() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
                                     <Form.Label column sm="4" className="text-start">
-                                        Discharge by :
+                                        Self Discharge :
                                     </Form.Label>
                                     <Col sm="8" className='d-flex align-items-center'>
                                         <Form.Check
@@ -702,8 +755,32 @@ function Admin_RescueDetails() {
                                     </Col>
                                 </Form.Group>
 
+                                <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
+                                    <Form.Label column sm="4" className="text-start">
+                                        Reunited :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="reunited"
+                                            value="Yes"
+                                            checked={formData.reunited === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="reunited"
+                                            value="No"
+                                            checked={formData.reunited === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+
                                 <div className="mt-3 d-flex align-tems-cente justify-content-between">
-                                    <Button variant="success" className="m-1" type="submit"  onClick={(e) => handleUpdate(e, selectedId)}>Update</Button>
+                                    <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, selectedId)}>Update</Button>
                                     <Button variant="secondary" onClick={handleEditClose}>
                                         Close
                                     </Button>

@@ -387,7 +387,7 @@ function Prescription_form() {
                         <h6 className="breadcrumb_title">Record Sheet</h6>
                     </Col>
                     <Col md={5} className="text-center">
-                        <h3 className="section_title">Nursing Prescription</h3>
+                        <h3 className="section_title">Nurse Prescription Form</h3>
                     </Col>
                     <Col md={2}>
                         <Form className="navbar-search">

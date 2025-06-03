@@ -1083,10 +1083,10 @@ const handlePhysicalForm = (event) => {
                                 </Row>
 
                                 <Col md={11}>
-                                    <Button variant="outline-primary" className="m-1" onClick={handleBack1}>
+                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack1}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-primary" className="m-1" type="submit">
+                                    <Button variant="outline-success" className="m-1" type="submit">
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
@@ -1223,7 +1223,7 @@ const handlePhysicalForm = (event) => {
                                             </Col>
                                         </Row>
                                         <Form.Group className="mb-3 text-start" controlId="formThingsCarried">
-                                            <Form.Label>Things carried : </Form.Label>
+                                            <Form.Label>Possessions & Items Carried at the Time of Rescue  : </Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="things_carried"
@@ -1273,10 +1273,10 @@ const handlePhysicalForm = (event) => {
                                     </Col>
                                 </Row>
                                 <Col md={11}>
-                                    <Button variant="outline-primary" className="m-1" onClick={handleBack2}>
+                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack2}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-primary" className="m-1" type="submit">
+                                    <Button variant="outline-success" className="m-1" type="submit">
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>

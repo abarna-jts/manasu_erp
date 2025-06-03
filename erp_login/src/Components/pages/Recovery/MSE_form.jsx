@@ -10,6 +10,8 @@ function MSE_form() {
   const [error, setError] = useState("");
   const [admission_no, setAdmissionNumber] = useState('');
   const [rescue_name, setRescueName] = useState("");
+  const [canConcentrate, setCanConcentrate] = useState('');
+  const [selectedStates, setSelectedStates] = useState([]);
   const [formData, setFormData] = useState({
     admission_no: '',
     general_appearance: [],
@@ -76,12 +78,63 @@ function MSE_form() {
     admission_no: '',
   })
 
+  const [cognitionData, setCognitionData] = useState({
+    consciousness: [],
+    orientation_time: '',
+    orientation_place: '',
+    orientation_person: '',
+    distractibility: '',
+    asking_test: '',
+    names_months: '',
+    test_performance: '',
+    immediate_retention: '',
+    recall: '',
+    patient_place: '',
+    dinner_ate: '',
+    date_ofMrg: '',
+    birthdays_children: '',
+    person_past: '',
+    amnesia: '',
+    live_growing: '',
+    person_school: '',
+    breakfast_ques: '',
+    do_yesterday: '',
+    general_info: '',
+    test_red_wri: '',
+    calculation_test: '',
+    proverb_testing: '',
+    familiar_object: ''
+
+  })
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setJudgementFormData((prev) => ({
       ...prev,
       [name]: value, // dynamically set field, like formData.judgment
     }));
+  };
+
+  const handleChange1 = (e) => {
+    const { name, value } = e.target;
+
+    setCognitionData((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+  const handleCheckboxChange1 = (e) => {
+    const { id, checked } = e.target;
+
+    if (checked) {
+      setSelectedStates((prev) => [...prev, id]);
+    } else {
+      setSelectedStates((prev) => prev.filter((item) => item !== id));
+    }
+  };
+
+  const handleRadioChange = (e) => {
+    setCanConcentrate(e.target.value);
   };
 
   // const handleAdmissionChange = (e) => {
@@ -156,6 +209,10 @@ function MSE_form() {
 
   const handleInputChange3 = (e) => {
     setPerceptionData({ ...perceptionData, [e.target.name]: e.target.value });
+  }
+
+  const handleInputChange4 = (e) => {
+    setCognitionData({ ...cognitionData, [e.target.name]: e.target.value });
   }
 
 
@@ -448,7 +505,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
-    if (!perceptionData.hallucination_type || insightData.hallucination_type.length === 0) {
+    if (!perceptionData.hallucination_type || perceptionData.hallucination_type.length === 0) {
       alert("Hallucination is required.");
       return;
     }
@@ -488,6 +545,84 @@ function MSE_form() {
     } catch (error) {
       console.error("Error submitting Perception form:", error);
       alert("Error submitting Perception form.");
+    }
+  }
+
+  const handleCognitionSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.admission_no || formData.admission_no.trim() === '') {
+      alert("Admission Number is required.");
+      return;
+    }
+    if (!cognitionData.consciousness || cognitionData.consciousness.length === 0) {
+      alert("Consciousness is required.");
+      return;
+    }
+    if (!cognitionData.orientation_time || cognitionData.orientation_time.length === 0) {
+      alert("Orientation Time is required.");
+      return;
+    }
+    if (!cognitionData.orientation_place || cognitionData.orientation_place.length === 0) {
+      alert("Orientation Place is required.");
+      return;
+    }
+    if (!cognitionData.orientation_person || cognitionData.orientation_person.length === 0) {
+      alert("Orientation Person is required.");
+      return;
+    }
+    if (!cognitionData.distractibility || cognitionData.distractibility.length === 0) {
+      alert("Distractibility Time is required.");
+      return;
+    }
+    if (!cognitionData.asking_test || cognitionData.asking_test.length === 0) {
+      alert("Asking test is required.");
+      return;
+    }
+    if (!cognitionData.names_months || cognitionData.names_months.length === 0) {
+      alert("Names of the Months is required.");
+      return;
+    }
+    if (!cognitionData.test_performance || cognitionData.test_performance.length === 0) {
+      alert("Test Perfomance is required.");
+      return;
+    }
+    if (!cognitionData.immediate_retention || cognitionData.immediate_retention.length === 0) {
+      alert("Immediate Retention is required.");
+      return;
+    }
+    if (!cognitionData.recall || cognitionData.recall.length === 0) {
+      alert("Recall (R) after a delay is required.");
+      return;
+    }
+    if (!cognitionData.patient_place || cognitionData.patient_place.length === 0) {
+      alert("Patient Coming place is required.");
+      return;
+    }
+    if (selectedStates.length === 0) {
+      alert("Please select at least one attention state.");
+      return;
+    }
+    if(setCanConcentrate.length === 0){
+      alert("Please select at least one Patient Concentrate.");
+      return;
+    }
+
+    const payload = {
+      ...cognitionData,
+      admission_no: formData.admission_no,
+      consciousness: selectedStates,  // Include array of checked states
+      canConcentrate: canConcentrate, // Include selected radio value
+    };
+
+    try {
+      const response = await apiRoute.post('/recovery/create_cognition', payload);
+      console.log("Cognition Data submitted:", response.data);
+      alert("Cognition form submitted successfully!");
+      window.location.reload(); // Reload the page to reflect changes
+
+    } catch (error) {
+      console.error("Error submitting Cognition form:", error);
+      alert("Error submitting Cognition form.");
     }
   }
 
@@ -572,6 +707,27 @@ function MSE_form() {
           : perceptionData[field].filter(item => item !== label);
 
         setPerceptionData(prev => ({
+          ...prev,
+          [field]: updated
+        }));
+      }}
+    />
+
+
+  );
+
+  const renderConginationCheck = (field, id, label) => (
+    <Form.Check
+      type="checkbox"
+      id={id}
+      label={label}
+      checked={cognitionData[field]?.includes(label)}
+      onChange={(e) => {
+        const updated = e.target.checked
+          ? [...cognitionData[field], label]
+          : cognitionData[field].filter(item => item !== label);
+
+        setCognitionData(prev => ({
           ...prev,
           [field]: updated
         }));
@@ -1141,9 +1297,6 @@ function MSE_form() {
                                   value={perceptionData.part_of_day}
                                   onChange={handleInputChange3} />
                               </Form.Group>
-                            </Col>
-
-                            <Col md={4}>
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                                 <Form.Label>Male or Female voices?</Form.Label>
                                 <Form.Control as="textarea" rows={2}
@@ -1151,6 +1304,10 @@ function MSE_form() {
                                   value={perceptionData.female_male_voices}
                                   onChange={handleInputChange3} />
                               </Form.Group>
+                            </Col>
+
+                            <Col md={4}>
+
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                                 <Form.Label>How interpreted and whether second person or third person hallucinations? (i.e., whether the voices are addressing the patient or are discussing him in third person)</Form.Label>
                                 <Form.Control as="textarea" rows={2}
@@ -1167,8 +1324,8 @@ function MSE_form() {
                         <li className='icon-li'>
                           <h4 style={{ display: "inline" }}>Illusions and misinterpretations:</h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
-                            <Form.Check type="checkbox" id="visual" label="Visual" />
-                            <Form.Check type="checkbox" id="auditory" label="Auditory" />
+                            <Form.Check type="checkbox" id="Illusions_visual" label="Visual" />
+                            <Form.Check type="checkbox" id="Illusions_auditory" label="Auditory" />
                             <Form.Check type="checkbox" id="other sensory fields" label="Other Sensory Fields" />
                             <Form.Check type="checkbox" id="clearConsciousness" label="Occur in clear consciousness" />
                             <Form.Check type="checkbox" id="unclearConsciousness" label="Occur in unclear consciousness" />
@@ -1221,263 +1378,349 @@ function MSE_form() {
                   {/* Cognition START*/}
                   <li className="tab-content tab-content-6 typography">
                     <h1>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</h1>
-                    <ul>
-                      <li className='icon-li'>
-                        <h4 style={{ display: "inline" }}>Consciousness:</h4>
-                        <div className="d-flex flex-wrap gap-3 mt-2">
-                          <Form.Check type="checkbox" id="Conscious" label="Conscious" />
-                          <Form.Check type="checkbox" id="Confusion" label="Confusion" />
-                          <Form.Check type="checkbox" id="Clouding" label="Clouding" />
-                          <Form.Check type="checkbox" id="Delirium" label="Delirium" />
-                          <Form.Check type="checkbox" id="stupor" label="Stupor" />
-                          <Form.Check type="checkbox" id="coma" label="Coma" />
-                          <p>Any disturbance of consciousness should be rated on Glasgow Coma Scale.</p>
-                        </div>
-                      </li>
+                    <Form onSubmit={handleCognitionSubmit}>
+                      <ul>
+                        <li className='icon-li'>
+                          <h4 style={{ display: "inline" }}>Consciousness:</h4>
+                          <div className="d-flex flex-wrap gap-3 mt-2">
+                            {[
+                              ["Conscious", "Conscious"],
+                              ["Confusion", "Confusion"],
+                              ["Clouding", "Clouding"],
+                              ["Delirium", "Delirium"],
+                              ["stupor", "Stupor"],
+                              ["coma", "Coma"],
+                            ].map(([id, label]) => renderConginationCheck("consciousness", id, label))}
+                            <p className="w-100 mt-2">Any disturbance of consciousness should be rated on Glasgow Coma Scale.</p>
+                          </div>
+                        </li>
 
-                      <li className='icon-li'>
-                        <h4 style={{ display: "inline" }}>Orientation:</h4>
-                        <div className="d-flex flex-wrap gap-3 mt-2">
-                          <label>Oriented to Time:</label>
-                          <select id="orientation_time" name="orientation_time" className="form-control" required>
-                            <option value="">-- Select --</option>
-                            <option value="yes">Yes (knows time, date, season, etc.)</option>
-                            <option value="no">No</option>
-                          </select>
+                        <li className='icon-li'>
+                          <h4 style={{ display: "inline" }}>Orientation:</h4>
+                          <div className="d-flex flex-wrap gap-3 mt-2">
+                            <label>Oriented to Time:</label>
+                            <select id="orientation_time" name="orientation_time" className="form-control" required
+                              value={cognitionData.orientation_time}
+                              onChange={handleChange1}>
+                              <option value="">-- Select --</option>
+                              <option value="yes">Yes (knows time, date, season, etc.)</option>
+                              <option value="no">No</option>
+                            </select>
 
-                          <label>Oriented to Place:</label>
-                          <select id="orientation_place" name="orientation_place" className="form-control" required>
-                            <option value="">-- Select --</option>
-                            <option value="yes">Yes (knows location, residence)</option>
-                            <option value="no">No</option>
-                          </select>
+                            <label>Oriented to Place:</label>
+                            <select id="orientation_place" name="orientation_place" className="form-control" required
+                              value={cognitionData.orientation_place}
+                              onChange={handleChange1}>
+                              <option value="">-- Select --</option>
+                              <option value="yes">Yes (knows location, residence)</option>
+                              <option value="no">No</option>
+                            </select>
 
-                          <label>Oriented to Person:</label>
-                          <select id="orientation_person" name="orientation_person" className="form-control" required>
-                            <option value="">-- Select --</option>
-                            <option value="yes">Yes (knows name, identifies others)</option>
-                            <option value="no">No</option>
-                          </select>
+                            <label>Oriented to Person:</label>
+                            <select id="orientation_person" name="orientation_person" className="form-control" required
+                              value={cognitionData.orientation_person}
+                              onChange={handleChange1}>
+                              <option value="">-- Select --</option>
+                              <option value="yes">Yes (knows name, identifies others)</option>
+                              <option value="no">No</option>
+                            </select>
 
-                        </div>
-                      </li>
+                          </div>
+                        </li>
 
-                      <li className='icon-li'>
-                        <h4 style={{ display: "inline" }}>Attention:</h4>
-                        <p>Is the attention easily aroused and sustained. Ask the patient to repeat digits forwards backwards.</p>
-                        <div className="d-flex flex-wrap gap-3 mt-2">
-                          {consciousnessStates.map((state) => (
-                            <div key={state.id} style={{ width: "30%", minWidth: "200px" }}>
-                              <Form.Check
-                                type="checkbox"
-                                id={state.id}
-                                label={
-                                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                    <img
-                                      src={state.img}
-                                      alt={state.label}
-                                      style={{ width: "100%", height: "auto", objectFit: "contain" }}
-                                    />
-                                    <span>{state.label}</span>
-                                  </div>
-                                }
-                              />
-                            </div>
-                          ))}
-                        </div>
+                        <li className='icon-li'>
+                          <h4 style={{ display: "inline" }}>Attention:</h4>
+                          <p>Is the attention easily aroused and sustained. Ask the patient to repeat digits forwards backwards.</p>
+                          <div className="d-flex flex-wrap gap-3 mt-2">
+                            {consciousnessStates.map((state) => (
+                              <div key={state.id} style={{ width: "30%", minWidth: "200px" }}>
+                                <Form.Check
+                                  type="checkbox"
+                                  id={state.id}
+                                  checked={selectedStates.includes(state.id)}
+                                  onChange={handleCheckboxChange1}
+                                  label={
+                                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                      <img
+                                        src={state.img}
+                                        alt={state.label}
+                                        style={{ width: "100%", height: "auto", objectFit: "contain" }}
+                                      />
+                                      <span>{state.label}</span>
+                                    </div>
+                                  }
+                                />
+                              </div>
+                            ))}
+                          </div>
 
-                      </li>
+                        </li>
 
-                      <li className='icon-li'>
-                        <h4 style={{ display: "inline" }}>Concentration</h4>
-                        <Form.Group className="mb-3">
-                          <Form.Label>1. Can the patient concentrate?</Form.Label>
-                          <Form.Check type="radio" label="Yes" name="canConcentrate" value="yes" />
-                          <Form.Check type="radio" label="No" name="canConcentrate" value="no" />
-                        </Form.Group>
+                        <li className='icon-li'>
+                          <h4 style={{ display: "inline" }}>Concentration</h4>
+                          <Form.Group className="mb-3">
+                            <Form.Label>1. Can the patient concentrate?</Form.Label>
+                            <Form.Check type="radio" label="Yes" name="canConcentrate" value="yes" checked={canConcentrate === 'Yes'}
+                              onChange={handleRadioChange} />
+                            <Form.Check type="radio" label="No" name="canConcentrate" value="no"
+                              checked={canConcentrate === 'No'}
+                              onChange={handleRadioChange} />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>2. Ease of distractibility</Form.Label>
-                          <Form.Control as="textarea" rows={2} placeholder="Describe how easily the Resident's is distracted" />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>2. Ease of distractibility</Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                              placeholder="Describe how easily the Resident's is distracted"
+                              name='distractibility'
+                              value={cognitionData.distractibility}
+                              onChange={handleInputChange4} />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>3. Ask to subtract serial sevens from hundred (100-7 test), or serial threes from forty (40-3 test), or to count backwards from 20</Form.Label>
-                          <Form.Control as="textarea" rows={2} placeholder="Describe the resident's response." />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>3. Ask to subtract serial sevens from hundred (100-7 test), or serial threes from forty (40-3 test), or to count backwards from 20</Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                              placeholder="Describe the resident's response."
+                              name='asking_test'
+                              value={cognitionData.asking_test}
+                              onChange={handleInputChange4} />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>4. Enumerate the names of the months (or days of the week) in the reverse order.</Form.Label>
-                          <Form.Control as="textarea" rows={2} placeholder="Describe or write the resident's response here" />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>4. Enumerate the names of the months (or days of the week) in the reverse order.</Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                              placeholder="Describe or write the resident's response here"
+                              name="names_months"
+                              value={cognitionData.names_months}
+                              onChange={handleInputChange4} />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>5. Note down the answers and the time take perform the tests.</Form.Label>
-                          <Form.Control as="textarea" rows={2} placeholder="Describe here..." />
-                        </Form.Group>
-                      </li>
+                          <Form.Group className="mb-3">
+                            <Form.Label>5. Note down the answers and the time take perform the tests.</Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                              placeholder="Describe here..."
+                              value={cognitionData.test_performance}
+                              name="test_performance"
+                              onChange={handleInputChange4} />
+                          </Form.Group>
+                        </li>
 
-                      <li className='icon-li'>
-                        <h4 style={{ display: "inline" }}>Memory:</h4>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Immediate Retention (IR)</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                        <li className='icon-li'>
+                          <h4 style={{ display: "inline" }}>Memory:</h4>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Immediate Retention (IR)</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="immediate_retention"
+                              value={cognitionData.immediate_retention}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Recall (R) after a delay</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Recall (R) after a delay</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="recall"
+                              value={cognitionData.recall}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>How did the patient come to the room/hospital ?</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>How did the patient come to the room/hospital ?</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="patient_place"
+                              value={cognitionData.patient_place}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>What he ate for dinner the day before or for breakfast the same morning ?</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>What he ate for dinner the day before or for breakfast the same morning ?</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="dinner_ate"
+                              value={cognitionData.dinner_ate}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Ask for the date of marriage</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Ask for the date of marriage</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="date_ofMrg"
+                              value={cognitionData.date_ofMrg}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Name and birthdays of children</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Name and birthdays of children</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              name="birthdays_children"
+                              value={cognitionData.birthdays_children}
+                              onChange={handleInputChange4}
+                              rows={2}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Any other relevant questions from the person's past</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Any other relevant questions from the person's past</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              value={cognitionData.person_past}
+                              name='person_past'
+                              onChange={handleInputChange4}
+                              rows={2}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Note any amnesia (anterograde/retrograde)</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
-                      </li>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Note any amnesia (anterograde/retrograde)</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="amnesia"
+                              value={cognitionData.amnesia}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
+                        </li>
 
-                      <li className='icon-li'>
-                        <h4 style={{ display: "inline" }}>Question to ask for the Memory</h4>
-                        <h5>Long-term Memory</h5>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Where did you live when you were growing up?</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                        <li className='icon-li'>
+                          <h4 style={{ display: "inline" }}>Question to ask for the Memory</h4>
+                          <h5>Long-term Memory</h5>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Where did you live when you were growing up?</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              name="live_growing"
+                              value={cognitionData.live_growing}
+                              onChange={handleInputChange4}
+                              rows={2}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>What was the name of the school you went to?</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>What was the name of the school you went to?</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="person_school"
+                              value={cognitionData.person_school}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
-                        <h5>Short-term Memory</h5>
+                          <h5>Short-term Memory</h5>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>What did you have for breakfast?</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>What did you have for breakfast?</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="breakfast_ques"
+                              value={cognitionData.breakfast_ques}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>What did you do Yesterday?</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>What did you do Yesterday?</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="do_yesterday"
+                              value={cognitionData.do_yesterday}
+                              onChange={handleInputChange4}
+                            />
+                          </Form.Group>
 
 
-                      </li>
+                        </li>
 
-                      <li className='icon-li'>
-                        <h4 style={{ display: "inline" }}>Intelligence:</h4>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Ask questions about general information, keeping in mind the patient's educational and social background, his experiences and interests</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                            placeholder="Describe what you asked and how the resident responded."
-                          />
-                        </Form.Group>
+                        <li className='icon-li'>
+                          <h4 style={{ display: "inline" }}>Intelligence:</h4>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Ask questions about general information, keeping in mind the patient's educational and social background, his experiences and interests</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="general_info"
+                              value={cognitionData.general_info}
+                              onChange={handleInputChange4}
+                              placeholder="Describe what you asked and how the resident responded."
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Test for reading and writing</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                            placeholder="Describe what you asked and how the resident responded."
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Test for reading and writing</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name='test_red_wri'
+                              value={cognitionData.test_red_wri}
+                              onChange={handleInputChange4}
+                              placeholder="Describe what you asked and how the resident responded."
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Give simple tests of calculation</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                            placeholder="Describe what you asked and how the resident responded."
-                          />
-                        </Form.Group>
-                      </li>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Give simple tests of calculation</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name='calculation_test'
+                              value={cognitionData.calculation_test}
+                              onChange={handleInputChange4}
+                              placeholder="Describe what you asked and how the resident responded."
+                            />
+                          </Form.Group>
+                        </li>
 
-                      <li>
-                        <h4 style={{ display: "inline" }}>Abstract thinking:</h4>
-                        <p>Abstract thinking testing assesses patient's concept formation. The methods used are:</p>
+                        <li>
+                          <h4 style={{ display: "inline" }}>Abstract thinking:</h4>
+                          <p>Abstract thinking testing assesses patient's concept formation. The methods used are:</p>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Proverb testing: Asking the meaning of simple proverbs.</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                            placeholder="Describe what you asked and how the resident responded."
-                          />
-                        </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Proverb testing: Asking the meaning of simple proverbs.</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="proverb_testing"
+                              value={cognitionData.proverb_testing}
+                              onChange={handleInputChange4}
+                              placeholder="Describe what you asked and how the resident responded."
+                            />
+                          </Form.Group>
 
-                        <Form.Group className="mb-3">
-                          <Form.Label>Ask the resident to identify the similarities and differences between familiar objects such as a table and a chair, a banana and an orange, a dog and a lion, and an eye and an ear.</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                            placeholder="Describe what you asked and how the resident responded."
-                          />
-                        </Form.Group>
-                      </li>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Ask the resident to identify the similarities and differences between familiar objects such as a table and a chair, a banana and an orange, a dog and a lion, and an eye and an ear.</Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              name="familiar_object"
+                              value={cognitionData.familiar_object}
+                              onChange={handleInputChange4}
+                              placeholder="Describe what you asked and how the resident responded."
+                            />
+                          </Form.Group>
+                        </li>
+                        <Col md={12} className="text-center mt-3">
+                          <Button type='submit' className='btn btn-success'>Save</Button>
+                        </Col>
 
-                    </ul>
+                      </ul>
+                    </Form>
+
                   </li>
                   {/* Cognition END*/}
 
