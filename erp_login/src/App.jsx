@@ -39,6 +39,7 @@ import MSE_form from './Components/pages/Recovery/MSE_form';
 import Sample from './Components/authentication/sample';
 import Rescue_articles_form from './Components/pages/Recovery/Rescue_articles_form';
 import Reunion_Checklist from './Components/pages/Reunion/Reunion_Checklist';
+import Edit_ReunionChecklist from './Components/pages/Reunion/Edit_ReunionChecklist';
 
 function App() {
 
@@ -162,6 +163,12 @@ function App() {
               />
 
               <Route
+                path='/edit_reunion_checklist/:admission_no'
+                element={<MainLayout><Edit_ReunionChecklist /></MainLayout>}
+              />
+              
+
+              <Route
                 path='/imagepdf'
                 element={<MainLayout><ImagePDF /></MainLayout>}
               />
@@ -174,6 +181,36 @@ function App() {
 
             </>
 
+          )}
+
+          {userType === '2' && (
+            <>
+            <Route
+                path='/Dr_consultant'
+                element={<MainLayout><Dr_consultants /></MainLayout>}
+              />
+              <Route
+                path='/prescription_form'
+                element={<MainLayout><Prescription_form /></MainLayout>}
+              />
+              <Route
+                path='/rescue_record_sheet'
+                element={<MainLayout><Rescue_Record_Sheet /></MainLayout>}
+              />
+              <Route
+                path='/nurse_sheet'
+                element={<MainLayout><Nurse_Record_sheet /></MainLayout>}
+              />
+              <Route
+                path='/rescue_details'
+                element={<MainLayout><Rescue_details /></MainLayout>}
+              />
+              
+              <Route
+                path='/observation_report'
+                element={<MainLayout><Observation_report /></MainLayout>}
+              />
+            </>
           )}
 
 
@@ -209,6 +246,11 @@ function App() {
               <Route
                 path='/observation_report'
                 element={<MainLayout><Observation_report /></MainLayout>}
+              />
+
+              <Route
+                path='/mseform'
+                element={<MainLayout><MSE_form /></MainLayout>}
               />
             </>
           )}

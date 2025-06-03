@@ -9,6 +9,7 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from '../Admission/manasu_logo.png';
+import { useNavigate } from 'react-router-dom';
 
 function Reunion_Checklist() {
     // const [admission_no, setAdmissionNumber] = useState();
@@ -242,6 +243,11 @@ function Reunion_Checklist() {
         }
     };
 
+   const navigate = useNavigate();
+    const handleShow = (admission_no) => {
+        navigate(`/edit_reunion_checklist/${admission_no}`);
+      };
+
 
     return (
         <>
@@ -308,7 +314,7 @@ function Reunion_Checklist() {
                             if (!formData.admission_no.trim()) {
                                 alert("Please enter admission number.");
                             } else {
-                                handleShow(admission_no);
+                                handleShow(formData.admission_no);
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (

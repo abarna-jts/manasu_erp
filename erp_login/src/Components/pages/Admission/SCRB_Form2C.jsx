@@ -389,9 +389,9 @@ function SCRB_Form2C() {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                      {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
+                      <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
                         Import Excel Sheet
-                      </button> */}
+                      </button>
                     </Form.Group>
                   </Form>
 

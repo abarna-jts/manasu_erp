@@ -458,7 +458,16 @@ body {
 	background-color: #f2f2f2;
 }
 
+.pdf_logo .logo_text span{
+	font-size: 15px;
+}
 
+.pdf_logo .logo_text h4{
+	font-size: 11px;
+}
+.down_title h5{
+	font-weight: 600;
+}
 .checklist_ul {
 	margin: 15px 0px;
 }

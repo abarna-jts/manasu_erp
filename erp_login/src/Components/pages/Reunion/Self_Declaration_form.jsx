@@ -170,7 +170,7 @@ function Self_Declaration_form() {
             const res = await apiRoute.post('/reunion/create_selfDeclaration', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Family Request Letter submitted successfully!');
+            alert('Self Declaration Form submitted successfully!');
             window.location.reload();
         } catch (err) {
             console.error(err);
@@ -226,7 +226,6 @@ function Self_Declaration_form() {
             const res = await apiRoute.post(`/reunion/updateSelfDecl/${admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Family Resquest Letter updated successfully!');
             window.location.reload();
         } catch (err) {
             console.error(err);
@@ -466,10 +465,13 @@ function Self_Declaration_form() {
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
                 <Row className="d-flex align-items-center justify-content-center mb-2">
-                    <Col md={2}>
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
                         <img src={manasu_logo} className="pdf_logo" alt="" />
+                        <div className="logo_text">
+                            <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                        </div>
                     </Col>
-                    <Col md={10}>
+                    <Col md={9}>
                         <h4 className="text-center">2. Self-Declaration Form for Discharge by Resident</h4>
                     </Col>
                 </Row>
@@ -573,14 +575,16 @@ function Self_Declaration_form() {
                         </Form.Group>
 
                     </Row>
-                    <Row className="d-flex align-items-center justify-content-center">
-                        <Col md={6} className="mt-3">
-                            <h5 className="text-start">Signature</h5>
-                        </Col>
-                        <Col md={6} className="mt-3">
-                            <h5 className="text-end">Seal</h5>
-                        </Col>
-                    </Row>
+                    <Col md={12}>
+                        <Row className="d-flex align-items-center justify-content-center mt-3">
+                            <Col md={6} className="mt-3 down_title">
+                                <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                            </Col>
+                            <Col md={6} className="mt-3 down_title">
+                                <h5 className="text-end">Manasu Seal</h5>
+                            </Col>
+                        </Row>
+                    </Col>
                 </Form>
             </div>
 

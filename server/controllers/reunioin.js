@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
         let uploadPath;
 
         // Map field names to folders
-        if (['f_aadhar_card', 'f_ration_card', 'govt_id'].includes(file.fieldname)) {
+        if (['f_aadhar_card', 'f_ration_card', 'govt_id', 'r_aadhar_card', 'r_ration_card'].includes(file.fieldname)) {
             uploadPath = path.resolve('uploads/Reunion/Family_Details/');
         } else if (['signature', 'photo', 'handwritten_document'].includes(file.fieldname)) {
             uploadPath = path.resolve('uploads/Self_Declaration/');
@@ -44,6 +44,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }).fields([
     { name: 'f_aadhar_card', maxCount: 1 },
     { name: 'f_ration_card', maxCount: 1 },
+    { name: 'r_aadhar_card', maxCount: 1 },
+    { name: 'r_ration_card', maxCount: 1 },
     { name: 'govt_id', maxCount: 1 },
     { name: 'signature', maxCount: 1 },
     { name: 'photo', maxCount: 1 },
@@ -68,7 +70,7 @@ const upload = multer({ storage: storage }).fields([
     { name: 'travelSafetyLetterFile', maxCount: 1 },
     { name: 'reunionPhotoFile', maxCount: 1 },
     { name: 'witnessSignatureFile', maxCount: 1 },
-    { name: 'residentIDproofFile', maxCount: 1},
+    { name: 'residentIDproofFile', maxCount: 1 },
 ]);
 
 
@@ -89,6 +91,8 @@ const createFamilyLetter = (req, res) => {
             f_member_address,
             f_aadhar_card_no,
             f_ration_card_no,
+            r_aadhar_card_no,
+            r_ration_card_no,
             any_other
 
         } = req.body;
@@ -96,16 +100,20 @@ const createFamilyLetter = (req, res) => {
         // File paths
         const aadharCardPath = req.files['f_aadhar_card'] ? `uploads/Reunion/Family_Details/${req.files['f_aadhar_card'][0].filename}` : null;
         const rationCardPath = req.files['f_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['f_ration_card'][0].filename}` : null;
+        const resaadharCardPath = req.files['r_aadhar_card'] ? `uploads/Reunion/Family_Details/${req.files['r_aadhar_card'][0].filename}` : null;
+        const resrationCardPath = req.files['r_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['r_ration_card'][0].filename}` : null;
         const govt_idPath = req.files['govt_id'] ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
 
 
-        const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address,f_aadhar_card_no, f_ration_card_no, any_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,r_aadhar_card,r_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address,f_aadhar_card_no, f_ration_card_no,r_aadhar_card_no, r_ration_card_no, any_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         const values = [
             admissionNumber,
             f_member_age,
             aadharCardPath,
             rationCardPath,
+            resaadharCardPath || null,
+            resrationCardPath || null,
             govt_idPath || null,
             description,
             rescue_name,
@@ -115,7 +123,9 @@ const createFamilyLetter = (req, res) => {
             f_member_address,
             f_aadhar_card_no,
             f_ration_card_no,
-            any_other
+            r_aadhar_card_no,
+            r_ration_card_no,
+            any_other,
         ];
 
         db.query(q, values, (dbErr, data) => {
@@ -150,6 +160,11 @@ const UpdateFamilyRequestForm = (req, res) => {
         if (err) {
             return res.status(500).json({ message: "File upload failed", error: err });
         }
+        const admission_no = req.params.admission_no;
+
+        if (!admission_no) {
+            return res.status(400).json({ message: "Admission number is required" });
+        }
 
         const {
             rescue_name,
@@ -158,44 +173,67 @@ const UpdateFamilyRequestForm = (req, res) => {
             family_relationship,
             f_member_name,
             f_member_phone,
-            f_member_address
+            f_member_address,
+            f_aadhar_card_no,
+            f_ration_card_no,
+            r_aadhar_card_no,
+            r_ration_card_no,
+            any_other
         } = req.body;
 
-        const admission_no = req.params.admission_no;
 
         // Safely get file paths
-        const aadharCardPath = req.files['f_aadhar_card']
-            ? `uploads/Reunion/Family_Details/${req.files['f_aadhar_card'][0].filename}`
-            : null;
+          const aadharCardPath = req.files['f_aadhar_card']
+            ? `uploads/Reunion/Family_Details/${req.files['f_aadhar_card'][0].filename}` : null;
 
         const rationCardPath = req.files['f_ration_card']
-            ? `uploads/Reunion/Family_Details/${req.files['f_ration_card'][0].filename}`
-            : null;
+            ? `uploads/Reunion/Family_Details/${req.files['f_ration_card'][0].filename}` : null;
 
-        // Fetch existing image paths from DB
-        const selectQuery = "SELECT f_aadhar_card, f_ration_card FROM family_request_form WHERE admission_no = ?";
+        const resaadharCardPath = req.files['r_aadhar_card']
+            ? `uploads/Reunion/Family_Details/${req.files['r_aadhar_card'][0].filename}` : null;
+
+        const resrationCardPath = req.files['r_ration_card']
+            ? `uploads/Reunion/Family_Details/${req.files['r_ration_card'][0].filename}` : null;
+
+        const govtIDCardPath = req.files['govt_id']
+            ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
+
+        const selectQuery = `
+            SELECT f_aadhar_card, f_ration_card, r_aadhar_card, r_ration_card, govt_id 
+            FROM family_request_form 
+            WHERE admission_no = ?
+        `;
         db.query(selectQuery, [admission_no], (selectErr, selectData) => {
             if (selectErr) {
                 return res.status(500).json({ message: "Failed to retrieve existing files", error: selectErr });
             }
 
-            const existingAadharCard = selectData[0]?.f_aadhar_card;
-            const existingRationCard = selectData[0]?.f_ration_card;
-
-            const finalAadharCard = aadharCardPath || existingAadharCard;
-            const finalRationCard = rationCardPath || existingRationCard;
+            const existing = selectData[0] || {};
+            const finalAadharCard = aadharCardPath || existing.f_aadhar_card;
+            const finalRationCard = rationCardPath || existing.f_ration_card;
+            const finalResAadharCard = resaadharCardPath || existing.r_aadhar_card;
+            const finalResRationCard = resrationCardPath || existing.r_ration_card;
+            const finalGovtID = govtIDCardPath || existing.govt_id;
 
             const updateQuery = `
                 UPDATE family_request_form SET 
                     rescue_name = ?, 
                     age = ?, 
                     f_aadhar_card = ?, 
-                    f_ration_card = ?, 
+                    f_ration_card = ?,
+                    r_aadhar_card = ?,
+                    r_ration_card = ?,
+                    govt_id = ?,
                     description = ?, 
                     family_relationship = ?, 
                     f_member_name = ?,
                     f_member_phone = ?,
-                    f_member_address = ?
+                    f_member_address = ?,
+                    f_aadhar_card_no = ?,
+                    f_ration_card_no = ?,
+                    r_aadhar_card_no = ?,
+                    r_ration_card_no = ?,
+                    any_other = ?
                 WHERE admission_no = ?
             `;
 
@@ -204,11 +242,19 @@ const UpdateFamilyRequestForm = (req, res) => {
                 f_member_age,
                 finalAadharCard,
                 finalRationCard,
+                finalResAadharCard,
+                finalResRationCard,
+                finalGovtID,
                 description,
                 family_relationship,
                 f_member_name,
                 f_member_phone,
                 f_member_address,
+                f_aadhar_card_no || null,
+                f_ration_card_no || null,
+                r_aadhar_card_no || null,
+                r_ration_card_no || null,
+                any_other || null,
                 admission_no
             ];
 
@@ -223,22 +269,22 @@ const UpdateFamilyRequestForm = (req, res) => {
     });
 };
 
-const deleteFamilyRequest = (req,res) =>{
+const deleteFamilyRequest = (req, res) => {
     const admissionNumber = req.params.admissionNumber;
 
     const deletequery = "DELETE FROM family_request_form WHERE admission_no = ?";
     const values = [
-      admissionNumber
+        admissionNumber
     ];
 
     db.query(deletequery, values, (err, data) => {
         if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Database Error", error: err });
         }
         res
-          .status(201)
-          .json({ message: "Family Request Letter Deleted Successfully", data: data });
-      });
+            .status(201)
+            .json({ message: "Family Request Letter Deleted Successfully", data: data });
+    });
 }
 
 const getInformation = (req, res) => {
@@ -380,25 +426,29 @@ const UpdateSelfDeclaration = (req, res) => {
     });
 }
 
-const deleteSelfDeclaration = (req,res) =>{
-const admission_no = req.params.admission_no;
+const deleteSelfDeclaration = (req, res) => {
+    const admission_no = req.params.admission_no;
 
     const deletequery = "DELETE FROM self_declaration WHERE admission_no = ?";
     const values = [
-      admission_no
+        admission_no
     ];
 
     db.query(deletequery, values, (err, data) => {
         if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Database Error", error: err });
         }
         res
-          .status(201)
-          .json({ message: "Self Declaration Deleted Successfully", data: data });
-      });
+            .status(201)
+            .json({ message: "Self Declaration Deleted Successfully", data: data });
+    });
 }
 
 const createMediaConsent = (req, res) => {
+     upload(req, res, (err) => {
+        if (err) {
+            return res.status(500).json({ message: "File upload failed", error: err });
+        }
     const {
         admission_no,
         rescue_name,
@@ -406,7 +456,7 @@ const createMediaConsent = (req, res) => {
         description
     } = req.body;
 
-    const scan_report = req.files && req.files.scan_report ? req.files.scan_report[0].path : null;
+    const scanReportPath = req.files['scan_report'] ? `uploads/MediaConsent/${req.files['scan_report'][0].filename}` : null;
 
     const q = "INSERT INTO media_consent (admission_no, rescue_name, social_media_consent, scan_report, description) VALUES (?, ?, ?, ?, ?)";
 
@@ -414,7 +464,7 @@ const createMediaConsent = (req, res) => {
         admission_no,
         rescue_name,
         social_media_consent,
-        scan_report,
+        scanReportPath,
         description
     ];
 
@@ -424,37 +474,42 @@ const createMediaConsent = (req, res) => {
         }
         res.status(201).json({ message: "Media Consent Form Created Successfully", data: data });
     });
+});
 };
 
 
-const getMediaConsent = (req,res) =>{
-const admission_no = req.params.admission_no;
+const getMediaConsent = (req, res) => {
+    const admission_no = req.params.admission_no;
     const query = 'SELECT * FROM media_consent WHERE admission_no = ?';
-  
+
     db.query(query, [admission_no], (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Database error' });
-      }
-  
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'Media Consent not found' });
-      }
-  
-      res.json(results[0]);
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Media Consent not found' });
+        }
+
+        res.json(results[0]);
     });
 }
 
-const UpdateMediaConsent = (req,res) =>{
-const {
-    rescue_name,
-    social_media_consent,
-    description,
-  } = req.body;
+const UpdateMediaConsent = (req, res) => {
+    upload(req, res, (err) => {
+        if (err) {
+            return res.status(500).json({ message: "File upload failed", error: err });
+        }
+    const {
+        rescue_name,
+        social_media_consent,
+        description,
+    } = req.body;
 
-  const admission_no = req.params.admission_no;
+    const admission_no = req.params.admission_no;
 
-  const updateQuery = `
+    const updateQuery = `
     UPDATE media_consent SET 
     rescue_name = ?, 
     social_media_consent = ?, 
@@ -462,38 +517,39 @@ const {
     WHERE admission_no = ?
   `;
 
-  const values = [
-    rescue_name,
-    social_media_consent,
-    description,
-    admission_no
-  ];
+    const values = [
+        rescue_name,
+        social_media_consent,
+        description,
+        admission_no
+    ];
 
-  db.query(updateQuery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
+    db.query(updateQuery, values, (updateErr, result) => {
+        if (updateErr) {
+            return res.status(500).json({ message: "Update failed", error: updateErr });
+        }
 
-    return res.status(200).json({ message: "Media Consent updated successfully!" });
-  });
+        return res.status(200).json({ message: "Media Consent updated successfully!" });
+    });
+});
 }
 
-const deleteMediaConsent = (req,res) =>{
+const deleteMediaConsent = (req, res) => {
     const admission_no = req.params.admission_no;
 
     const deletequery = "DELETE FROM media_consent WHERE admission_no = ?";
     const values = [
-      admission_no
+        admission_no
     ];
 
     db.query(deletequery, values, (err, data) => {
         if (err) {
-          return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Database Error", error: err });
         }
         res
-          .status(201)
-          .json({ message: "First Form Deleted Successfully", data: data });
-      });
+            .status(201)
+            .json({ message: "First Form Deleted Successfully", data: data });
+    });
 }
 
 const createDischargeList = (req, res) => {
@@ -530,12 +586,12 @@ const createDischargeList = (req, res) => {
         const getFilePath = (fieldName) =>
             req.files[fieldName] ? `uploads/Reunion/Discharge_Checklist/${req.files[fieldName][0].filename}` : null;
 
-        
+
 
         const query = `
             INSERT INTO discharge_checklist (
                 admission_no, familyRequestLetter, selfDeclarationLetter, mediaConsentLetter,
-                familyRequestLetterFile, selfDeclarationFile, mediaConsentLetterFile,
+                familyRequestLetterFile, selfDeclarationFile, mediaConsentFile,
                 familyIDproof, familyIDproofFile,
                 residentIDproof, residentIDproofFile,
                 aadharCard, aadharCardFile,
@@ -621,7 +677,7 @@ const createDischargeList = (req, res) => {
             any_other
         ];
 
-        
+
 
 
         db.query(query, values, (dbErr, data) => {
@@ -633,7 +689,7 @@ const createDischargeList = (req, res) => {
     });
 };
 
-const getReunionChecklist = (req,res) =>{
+const getReunionChecklist = (req, res) => {
     const admission_no = req.params.admission_no;
     const query = 'SELECT * FROM discharge_checklist WHERE admission_no = ?';
 
@@ -651,6 +707,136 @@ const getReunionChecklist = (req,res) =>{
     });
 }
 
+const getReunionChecklistAll = (req, res) => {
+    const admission_no = req.params.admission_no;
+    const query = 'SELECT * FROM discharge_checklist WHERE admission_no = ?';
+
+    db.query(query, [admission_no], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Discharge Reunion not found' });
+        }
+
+        res.json(results[0]);
+    });
+}
+
+const updateChecklist = (req, res) => {
+    upload(req, res, (err) => {
+        if (err) {
+            return res.status(500).json({ message: "File upload failed", error: err });
+        }
+
+        const {
+            admission_no,
+            familyRequestLetter,
+            selfDeclarationLetter,
+            mediaConsentLetter,
+            familyIDproof,
+            residentIDproof,
+            aadharCard,
+            udidCard,
+            disabilityCertificate,
+            bankPassbook,
+            healthInsurance,
+            medicalReport,
+            dischargeSummary,
+            medications,
+            Clothes,
+            possessionsRecovered,
+            travelExpenses,
+            copyOfdischargeSummary,
+            travelSafetyLetter,
+            reunionPhoto,
+            witnessSignature,
+            any_other
+        } = req.body;
+
+        const getFilePath = (fieldName) =>
+            req.files[fieldName] ? `uploads/Reunion/Discharge_Checklist/${req.files[fieldName][0].filename}` : null;
+
+        const query = `
+            UPDATE discharge_checklist SET
+                familyRequestLetter = ?, selfDeclarationLetter = ?, mediaConsentLetter = ?,
+                familyRequestLetterFile = ?, selfDeclarationFile = ?, mediaConsentFile = ?,
+                familyIDproof = ?, familyIDproofFile = ?,
+                residentIDproof = ?, residentIDproofFile = ?,
+                aadharCard = ?, aadharCardFile = ?,
+                udidCard = ?, udidCardFile = ?,
+                disabilityCertificate = ?, disabilityCertificateFile = ?,
+                bankPassbook = ?, bankPassbookFile = ?,
+                healthInsurance = ?, healthInsuranceFile = ?,
+                medicalReport = ?, medicalReportFile = ?,
+                dischargeSummary = ?, dischargeSummaryFile = ?,
+                medications = ?, medicationsFile = ?,
+                Clothes = ?, ClothesFile = ?,
+                possessionsRecovered = ?, possessionsRecoveredFile = ?,
+                travelExpenses = ?, travelExpensesFile = ?,
+                copyOfdischargeSummary = ?, copyOfdischargeSummaryFile = ?,
+                travelSafetyLetter = ?, travelSafetyLetterFile = ?,
+                reunionPhoto = ?, reunionPhotoFile = ?,
+                witnessSignature = ?, witnessSignatureFile = ?,
+                any_other = ?
+            WHERE admission_no = ?
+        `;
+
+        const values = [
+            familyRequestLetter,
+            selfDeclarationLetter,
+            mediaConsentLetter,
+            getFilePath('familyRequestLetterFile'),
+            getFilePath('selfDeclarationFile'),
+            getFilePath('mediaConsentFile'),
+            familyIDproof,
+            getFilePath('familyIDproofFile'),
+            residentIDproof,
+            getFilePath('residentIDproofFile'),
+            aadharCard,
+            getFilePath('aadharCardFile'),
+            udidCard,
+            getFilePath('udidCardFile'),
+            disabilityCertificate,
+            getFilePath('disabilityCertificateFile'),
+            bankPassbook,
+            getFilePath('bankPassbookFile'),
+            healthInsurance,
+            getFilePath('healthInsuranceFile'),
+            medicalReport,
+            getFilePath('medicalReportFile'),
+            dischargeSummary,
+            getFilePath('dischargeSummaryFile'),
+            medications,
+            getFilePath('medicationsFile'),
+            Clothes,
+            getFilePath('ClothesFile'),
+            possessionsRecovered,
+            getFilePath('possessionsRecoveredFile'),
+            travelExpenses,
+            getFilePath('travelExpensesFile'),
+            copyOfdischargeSummary,
+            getFilePath('copyOfdischargeSummaryFile'),
+            travelSafetyLetter,
+            getFilePath('travelSafetyLetterFile'),
+            reunionPhoto,
+            getFilePath('reunionPhotoFile'),
+            witnessSignature,
+            getFilePath('witnessSignatureFile'),
+            any_other,
+            admission_no // important: last in values
+        ];
+
+        db.query(query, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(200).json({ message: "Discharge checklist updated successfully", data });
+        });
+    });
+}
 
 module.exports = {
     createFamilyLetter,
@@ -667,5 +853,7 @@ module.exports = {
     UpdateMediaConsent,
     deleteMediaConsent,
     createDischargeList,
-    getReunionChecklist
+    getReunionChecklist,
+    getReunionChecklistAll,
+    updateChecklist
 };

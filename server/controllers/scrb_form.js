@@ -82,7 +82,7 @@ const createForm2 = (req, res) => {
       if (dbErr) {
         return res.status(500).json({ message: 'Database Error', error: dbErr });
       }
-      res.status(201).json({ message: 'First Form Created Successfully', data: data });
+      res.status(201).json({ message: 'SCRRB Form2 Created Successfully', data: data });
     });
   });
 };
@@ -99,7 +99,7 @@ const createForm2A = (req,res) =>{
         console.error('Error inserting data:', err);
         return res.status(500).send('Database error');
       }
-      res.send('Form 2A saved successfully');
+      res.json({ message: "SCRB form2A Created Successfully" });
     }
   );
 };
@@ -108,7 +108,7 @@ const createForm2B = (req, res) => {
   const {
     name_ngo,
     file_no,
-    admissionNumber,
+    admission_no,
     tattoo,
     addition_tatoo,
     scar,
@@ -116,7 +116,7 @@ const createForm2B = (req, res) => {
     height
   } = req.body;
 
-  if (!name_ngo || !file_no || !admissionNumber || !tattoo || !addition_tatoo || !scar || !mole || !height) {
+  if (!name_ngo || !file_no || !admission_no || !tattoo || !addition_tatoo || !scar || !mole || !height) {
     return res.status(400).send('All fields are required');
   }
 
@@ -127,13 +127,13 @@ const createForm2B = (req, res) => {
 
   db.query(
     create_sql,
-    [name_ngo, admissionNumber, file_no, tattoo, addition_tatoo, scar, mole, height],
+    [name_ngo, admission_no, file_no, tattoo, addition_tatoo, scar, mole, height],
     (err, result) => {
       if (err) {
         console.error('Error inserting data:', err);
         return res.status(500).send('Database error');
       }
-      res.status(201).send('Form 2B saved successfully');
+      res.status(201).send('SCRB form2A Created Successfully');
     }
   );
 };

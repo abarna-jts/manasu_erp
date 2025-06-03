@@ -26,6 +26,7 @@ function First_info_form() {
     const [isStep2Invalid, setIsStep2Invalid] = useState(false);
     const [isStep3Invalid, setIsStep3Invalid] = useState(false);
     const [isStep4Invalid, setIsStep4Invalid] = useState(false);
+    const [isStep5Invalid, setIsStep5Invalid] = useState(false);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -53,9 +54,13 @@ function First_info_form() {
     const [father, setFather] = useState('');
     const [fatherError, setFatherError] = useState(false);
     const [mother, setMother] = useState('');
+    const [motherError, setMotherError] = useState(false);
     const [other_relation, setOtherRelation] = useState('');
+    const [other_relationError, setOtherRelationError] = useState(false);
     const [place, setPlace] = useState('');
+    const [placeError, setPlaceError] = useState(false);
     const [phone_no, setPhoneNumber] = useState('');
+    const [phone_noError, setPhoneNoError] = useState(false);
     const [phone_no_two, setPhoneNumberTwo] = useState('');
     const [clothing, setClothing] = useState('');
     const [clothingError, setClothingError] = useState(false);
@@ -189,103 +194,151 @@ function First_info_form() {
     };
 
 
-  const handleInmateForm = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+    const handleInmateForm = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
 
-    setValidated(true);
+        setValidated(true);
 
-    const requiredFields = [
-        rescue_name,
-        rescue_status,
-        language1,
-        education,
-        govIdType
-    ];
+        const requiredFields = [
+            rescue_name,
+            rescue_status,
+            language1,
+            education,
+            govIdType
+        ];
 
-    const allRequiredFilled = requiredFields.every(field => {
-        if (typeof field === "string") {
-            return field.trim() !== "";
-        }
-        return !!field;
-    });
+        const allRequiredFilled = requiredFields.every(field => {
+            if (typeof field === "string") {
+                return field.trim() !== "";
+            }
+            return !!field;
+        });
 
-    console.log("All fields filled?", allRequiredFilled);
+        console.log("All fields filled?", allRequiredFilled);
 
-    setIsStep2Invalid(!allRequiredFilled); // this controls the red color
-    setStep(3); // always go to step 3
-};
+        setIsStep2Invalid(!allRequiredFilled); // this controls the red color
+        setStep(3); // always go to step 3
+    };
 
 
 
 
     const handleFamilyForm = (event) => {
-    const form = event.currentTarget;
-    event.preventDefault(); // stop default submit behavior
-    event.stopPropagation(); // stop bubbling
+        const form = event.currentTarget;
+        event.preventDefault(); // stop default submit behavior
+        event.stopPropagation(); // stop bubbling
 
-    setValidated(true); // for Bootstrap feedback
+        setValidated(true); // for Bootstrap feedback
 
-    let isValid = true;
+        let isValid = true;
 
-    // Custom validation for 'father'
-    if (
-        father.trim() === '' ||
-        (!['unknown', 'na'].includes(father.trim().toLowerCase()) && father.trim() === '')
-    ) {
-        setFatherError(true);
-        isValid = false;
-    } else {
-        setFatherError(false);
-    }
+        // Custom validation for 'father'
+        if (
+            father.trim() === '' ||
+            (!['unknown', 'na'].includes(father.trim().toLowerCase()) && father.trim() === '')
+        ) {
+            setFatherError(true);
+            isValid = false;
+        } else {
+            setFatherError(false);
+        }
 
-    // ✅ Always go to next step, but mark invalid if needed
-    if (form.checkValidity() && isValid) {
-        setIsStep3Invalid(false); // valid: no red mark
-    } else {
-        setIsStep3Invalid(true); // invalid: show red mark
-    }
+        // Custom validation for 'mother'
+        if (
+            mother.trim() === '' ||
+            (!['unknown', 'na'].includes(mother.trim().toLowerCase()) && mother.trim() === '')
+        ) {
+            setMotherError(true);
+            isValid = false;
+        } else {
+            setMotherError(false);
+        }
 
-    // ✅ Always move to next step
-    setStep(4);
-};
+        // Custom validation for 'other_relation'
+        const nameWithRelationRegex = /^[a-zA-Z]+(?:\s[a-zA-Z]+)*\s\([a-zA-Z]+\)$/;
+
+        if (
+            other_relation.trim() === '' ||
+            (!nameWithRelationRegex.test(other_relation.trim()) &&
+                !['unknown', 'na'].includes(other_relation.trim().toLowerCase()))
+        ) {
+            setOtherRelationError(true);
+            isValid = false;
+        } else {
+            setOtherRelationError(false);
+        }
 
 
-const handlePhysicalForm = (event) => {
-  event.preventDefault();
-  event.stopPropagation();
+        // Custom validation for 'place'
+        if (
+            place.trim() === '' ||
+            (!['unknown', 'na'].includes(place.trim().toLowerCase()) && place.trim() === '')
+        ) {
+            setPlaceError(true);
+            isValid = false;
+        } else {
+            setPlaceError(false);
+        }
 
-  setValidated(true);
+        // Custom validation for 'phone_no'
+        if (
+            phone_no.trim() === '' ||
+            (!['unknown', 'na'].includes(phone_no.trim().toLowerCase()) && phone_no.trim() === '')
+        ) {
+            setPhoneNoError(true);
+            isValid = false;
+        } else {
+            setPhoneNoError(false);
+        }
 
-  let isValid = true;
+        // ✅ Always go to next step, but mark invalid if needed
+        if (form.checkValidity() && isValid) {
+            setIsStep3Invalid(false); // valid: no red mark
+        } else {
+            setIsStep3Invalid(true); // invalid: show red mark
+        }
 
-  // Helper function to check if a field is empty (required)
-  const checkField = (value, setError) => {
-    if (value.trim() === '') {
-      setError(true);
-      return false;
-    }
-    setError(false);
-    return true;
-  };
+        // ✅ Always move to next step
+        setStep(4);
+    };
 
-  // Validate all fields
-  if (!checkField(clothing, setClothingError)) isValid = false;
-  if (!checkField(dress_code, setDressCodeError)) isValid = false;
-  if (!checkField(complexion, setComplexionError)) isValid = false;
-  if (!checkField(indentification_mark, setIdentificationError)) isValid = false;
-  if (!checkField(tattoo, setTattooError)) isValid = false;
-  if (!checkField(wound_infection, setWoundInfectionError)) isValid = false;
-  if (!checkField(things_carried, setThingsCarriedError)) isValid = false;
-  if (!checkField(height, setHeightError)) isValid = false;
-  if (!checkField(weight, setWeightError)) isValid = false;
 
-  // Set the step 4 invalid flag based on validation results
-  setIsStep4Invalid(!isValid);
+    const handlePhysicalForm = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
 
-  // Always move to next step (step 5)
-  setStep(5);
-};
+        setValidated(true);
+
+        let isValid = true;
+
+        // Helper function to check if a field is empty (required)
+        const checkField = (value, setError) => {
+            if (value.trim() === '') {
+                setError(true);
+                return false;
+            }
+            setError(false);
+            return true;
+        };
+
+        // Validate all fields
+        if (!checkField(clothing, setClothingError)) isValid = false;
+        if (!checkField(dress_code, setDressCodeError)) isValid = false;
+        if (!checkField(complexion, setComplexionError)) isValid = false;
+        if (!checkField(indentification_mark, setIdentificationError)) isValid = false;
+        if (!checkField(tattoo, setTattooError)) isValid = false;
+        if (!checkField(wound_infection, setWoundInfectionError)) isValid = false;
+        if (!checkField(things_carried, setThingsCarriedError)) isValid = false;
+        if (!checkField(height, setHeightError)) isValid = false;
+        if (!checkField(weight, setWeightError)) isValid = false;
+
+        // Set the step 4 invalid flag based on validation results
+        setIsStep4Invalid(!isValid);
+
+        // Always move to next step (step 5)
+        setStep(5);
+    };
 
 
 
@@ -325,67 +378,84 @@ const handlePhysicalForm = (event) => {
     //     setValidated(true);
     // }
 
-     // Validate Step 1 (Example)
-  const validateStep1 = () => {
-    let valid = true;
-    if (!admission_no || admission_no.trim() === "") valid = false;
-    if (!admission_date || admission_date.trim() === "") valid = false;
-    // Add other required Step 1 fields here...
-    setIsStep1Invalid(!valid);
-    return valid;
-  };
+    // Validate Step 1 (Example)
+    const validateStep1 = () => {
+        let valid = true;
+        if (!admission_no || admission_no.trim() === "") valid = false;
+        if (!admission_date || admission_date.trim() === "") valid = false;
+        // Add other required Step 1 fields here...
+        setIsStep1Invalid(!valid);
+        return valid;
+    };
 
-  // Validate Step 2 (Example)
-  const validateStep2 = () => {
-    let valid = true;
-    if (!referred_by || referred_by.trim() === "") valid = false;
-    if (!from_place || from_place.trim() === "") valid = false;
-    // Add other required Step 2 fields here...
-    setIsStep2Invalid(!valid);
-    return valid;
-  };
+    // Validate Step 2 (Example)
+    const validateStep2 = () => {
+        let valid = true;
+        if (!referred_by || referred_by.trim() === "") valid = false;
+        if (!from_place || from_place.trim() === "") valid = false;
+        // Add other required Step 2 fields here...
+        setIsStep2Invalid(!valid);
+        return valid;
+    };
 
-  // Validate Step 3 (Example)
-  const validateStep3 = () => {
-    let valid = true;
-    if (!date_time || date_time.trim() === "") valid = false;
-    // Add other required Step 3 fields here...
-    setIsStep3Invalid(!valid);
-    return valid;
-  };
+    // Validate Step 3 (Example)
+    const validateStep3 = () => {
+        let valid = true;
+        if (!date_time || date_time.trim() === "") valid = false;
+        // Add other required Step 3 fields here...
+        setIsStep3Invalid(!valid);
+        return valid;
+    };
 
-  // Validate Step 4 (physical form)
-  const validateStep4 = () => {
-    let valid = true;
+    // Validate Step 4 (physical form)
+    const validateStep4 = () => {
+        let valid = true;
 
-    // Here assuming these fields are required, but if not, you can tweak conditions
-    if (clothing.trim() === "") valid = false;
-    if (dress_code.trim() === "") valid = false;
-    if (complexion.trim() === "") valid = false;
-    if (indentification_mark.trim() === "") valid = false;
-    if (tattoo.trim() === "") valid = false;
-    if (wound_infection.trim() === "") valid = false;
-    if (things_carried.trim() === "") valid = false;
-    if (height.trim() === "") valid = false;
-    if (weight.trim() === "") valid = false;
+        // Here assuming these fields are required, but if not, you can tweak conditions
+        if (clothing.trim() === "") valid = false;
+        if (dress_code.trim() === "") valid = false;
+        if (complexion.trim() === "") valid = false;
+        if (indentification_mark.trim() === "") valid = false;
+        if (tattoo.trim() === "") valid = false;
+        if (wound_infection.trim() === "") valid = false;
+        if (things_carried.trim() === "") valid = false;
+        if (height.trim() === "") valid = false;
+        if (weight.trim() === "") valid = false;
 
-    setIsStep4Invalid(!valid);
-    return valid;
-  };
+        setIsStep4Invalid(!valid);
+        return valid;
+    };
+
+    // Validate Step 5 (physical form)
+    const validateStep5 = () => {
+        let valid = true;
+
+        // Here assuming these fields are required, but if not, you can tweak conditions
+        if (mental_status.trim() === "") valid = false;
+        if (behaviour.trim() === "") valid = false;
+        if (community_ability.trim() === "") valid = false;
+        if (self_careCapacity.trim() === "") valid = false;
+        if (diagnosis.trim() === "") valid = false;
+
+        setIsStep5Invalid(!valid);
+        return valid;
+    };
+
 
     const handleSubmitFinallForm = async (e) => {
         e.preventDefault();
 
-         // Validate all steps before submitting
-    const step1Valid = validateStep1();
-    const step2Valid = validateStep2();
-    const step3Valid = validateStep3();
-    const step4Valid = validateStep4();
+        // Validate all steps before submitting
+        const step1Valid = validateStep1();
+        const step2Valid = validateStep2();
+        const step3Valid = validateStep3();
+        const step4Valid = validateStep4();
+        const step5Valid = validateStep5();
 
-    if (!step1Valid || !step2Valid || !step3Valid || !step4Valid) {
-      alert("Please fill all required fields in the previous steps.");
-      return; // Prevent submission if any step invalid
-    }
+        if (!step1Valid || !step2Valid || !step3Valid || !step4Valid || !step5Valid) {
+            alert("Please fill all required fields in the previous steps.");
+            return; // Prevent submission if any step invalid
+        }
 
 
         try {
@@ -1009,7 +1079,11 @@ const handlePhysicalForm = (event) => {
                                                 type="text"
                                                 name="mother"
                                                 value={mother}
-                                                onChange={(e) => setMother(e.target.value)} />
+                                                onChange={(e) => setMother(e.target.value)}
+                                                isInvalid={motherError} />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formOther">
                                             <Form.Label>Any Other Relationship: </Form.Label>
@@ -1019,7 +1093,12 @@ const handlePhysicalForm = (event) => {
                                                 value={other_relation}
                                                 placeholder="Eg.Smith John (Brother)"
                                                 onChange={(e) => setOtherRelation(e.target.value)}
+                                                isInvalid={other_relationError}
                                             />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter in the format: "Name (Relation)", or enter "Unknown" or "NA" if not applicable.
+                                            </Form.Control.Feedback>
+
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formPlace">
                                             <Form.Label>Address : </Form.Label>
@@ -1028,7 +1107,11 @@ const handlePhysicalForm = (event) => {
                                                 name="place"
                                                 value={place}
                                                 onChange={(e) => setPlace(e.target.value)}
+                                                isInvalid={placeError}
                                             />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formContactNo">
                                             <Form.Label>Contact Number : </Form.Label>
@@ -1039,8 +1122,12 @@ const handlePhysicalForm = (event) => {
                                                         name="phone_no"
                                                         value={phone_no}
                                                         onChange={(e) => setPhoneNumber(e.target.value)}
+                                                        isInvalid={phone_noError}
                                                     />
                                                 </Col>
+                                                <Form.Control.Feedback type="invalid">
+                                                    Please enter "Unknown" or "NA" if not available.
+                                                </Form.Control.Feedback>
                                                 <Col md={6}>
                                                     <Form.Control
                                                         type="text"

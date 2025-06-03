@@ -385,6 +385,25 @@ const updateArticles = (req, res) =>{
   });
 }
 
+const getallMSE = (req, res) =>{
+
+}
+
+const getallmood = (req, res) =>{
+
+}
+
+const getallspeech = (req, res) =>{
+
+}
+
+const getallperception = (req, res) =>{
+
+}
+
+const getallcognition = (req, res) =>{
+
+}
 
 module.exports = {
   createMSEForm,
@@ -394,5 +413,7 @@ module.exports = {
   getArticles,
   updateArticles,
   createPerception,
-  createCognition
+  createCognition,
+  getallMSE,
+  getallmood,getallspeech,getallcognition,getallperception
 };

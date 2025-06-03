@@ -76,6 +76,8 @@ function Family_Request_form() {
         f_member_phone: '',
         f_aadhar_card_no: '',
         f_ration_card_no: '',
+        r_aadhar_card_no: '',
+        r_ration_card_no: '',
         any_other: '',
         description: '',
     })
@@ -127,6 +129,8 @@ function Family_Request_form() {
         data.append('description', storeData.description);
         data.append('f_aadhar_card', files.f_aadhar_card);
         data.append('f_ration_card', files.f_ration_card);
+        data.append('r_aadhar_card', files.r_aadhar_card);
+        data.append('r_ration_card', files.r_ration_card);
         data.append('govt_id', storeData.govt_id);
         data.append('rescue_relationship', storeData.rescue_relationship);
         data.append('f_member_name', storeData.f_member_name);
@@ -134,7 +138,10 @@ function Family_Request_form() {
         data.append('f_member_address', storeData.f_member_address);
         data.append('f_aadhar_card_no', storeData.f_aadhar_card_no);
         data.append('f_ration_card_no', storeData.f_ration_card_no);
+        data.append('r_aadhar_card_no', storeData.r_aadhar_card_no);
+        data.append('r_ration_card_no', storeData.r_ration_card_no);
         data.append('any_other', storeData.any_other);
+
 
         try {
             const res = await apiRoute.post('/reunion/create_family_letter', data, {
@@ -198,8 +205,7 @@ function Family_Request_form() {
         }
     };
 
-    const ViewFormData = async (e) => {
-        e.preventDefault();
+    const ViewFormData = async () => {
         try {
             const response = await apiRoute.get(`/reunion/get_family_letter/${admissionNumber}`);
             const data = response.data;
@@ -212,7 +218,7 @@ function Family_Request_form() {
                 description: data.description || '',
                 family_relationship: data.family_relationship || '',
                 f_member_name: data.f_member_name || '',
-                f_member_phone: data.f_member_phone || '',
+                f_member_phone: data.f_member_phone || 'NULL',
                 f_member_address: data.f_member_address || '',
             }));
             console.log("Fetched Data:", data);
@@ -220,12 +226,16 @@ function Family_Request_form() {
             // Handle old and new photo paths correctly
             const aadharCardPath = data.f_aadhar_card ? `http://localhost:5000/${data.f_aadhar_card}` : null;
             const rationCardPath = data.f_ration_card ? `http://localhost:5000/${data.f_ration_card}` : null;
+            const residentaadharCardPath = data.r_aadhar_card ? `http://localhost:5000/${data.r_aadhar_card}` : null;
+            const residentrationCardPath = data.r_ration_card ? `http://localhost:5000/${data.r_ration_card}` : null;
             const govt_idPath = data.govt_id ? `http://localhost:5000/${data.govt_id}` : null;
             // Set files state
             setFiles((files) => ({
                 ...files,
                 f_aadhar_card: aadharCardPath,
                 f_ration_card: rationCardPath,
+                r_aadhar_card: residentaadharCardPath,
+                r_ration_card: residentrationCardPath,
                 govt_id: govt_idPath,
             }));
 
@@ -265,6 +275,8 @@ function Family_Request_form() {
             // Handle old and new photo paths correctly
             const aadharCardPath = data.f_aadhar_card ? `http://localhost:5000/${data.f_aadhar_card}` : null;
             const rationCardPath = data.f_ration_card ? `http://localhost:5000/${data.f_ration_card}` : null;
+            const residentaadharCardPath = data.r_aadhar_card ? `http://localhost:5000/${data.r_aadhar_card}` : null;
+            const residentrationCardPath = data.r_ration_card ? `http://localhost:5000/${data.r_ration_card}` : null;
             const govt_idPath = data.govt_id ? `http://localhost:5000/${data.govt_id}` : null;
 
 
@@ -273,6 +285,8 @@ function Family_Request_form() {
                 ...files,
                 f_aadhar_card: aadharCardPath,
                 f_ration_card: rationCardPath,
+                r_aadhar_card: residentaadharCardPath,
+                r_ration_card: residentrationCardPath,
                 govt_id: govt_idPath,
             }));
 
@@ -304,6 +318,8 @@ function Family_Request_form() {
         data.append('f_member_address', formData.f_member_address);
         data.append('f_aadhar_card', files.f_aadhar_card);
         data.append('f_ration_card', files.f_ration_card);
+        data.append('r_aadhar_card', files.r_aadhar_card);
+        data.append('r_ration_card', files.r_ration_card);
         data.append('govt_id', files.govt_id);
 
         try {
@@ -383,7 +399,6 @@ function Family_Request_form() {
             setError("");
         }
     }, [admissionNumber]);
-
 
 
     return (
@@ -631,7 +646,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Aadhar Card Number :
+                                    Aadhar Card Number (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -643,7 +658,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Aadhar Card :
+                                    Aadhar Card  (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -654,7 +669,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Ration Card Number:
+                                    Ration Card Number (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -666,12 +681,59 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Ration Card :
+                                    Ration Card  (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
                                         name="f_ration_card"
+                                        onChange={handleFileChange} />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Aadhar Card Number (Resident):
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="text"
+                                        name='r_aadhar_card_no'
+                                        value={storeData.r_aadhar_card_no}
+                                        onChange={handleInputChange1} />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Aadhar Card  (Resident):
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="file"
+                                        name='r_aadhar_card'
+                                        onChange={handleFileChange} />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Ration Card Number (Resident):
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="text"
+                                        name="r_ration_card_no"
+                                        value={storeData.r_ration_card_no}
+                                        onChange={handleInputChange1} />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Label column sm="4">
+                                    Ration Card  (Resident):
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="file"
+                                        name="r_ration_card"
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
@@ -725,10 +787,13 @@ function Family_Request_form() {
 
                     <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
                         <Row className="d-flex align-items-center justify-content-center mb-2">
-                            <Col md={2}>
+                            <Col md={3} className='d-flex align-items-center pdf_logo'>
                                 <img src={manasu_logo} className="pdf_logo" alt="" />
+                                <div className="logo_text">
+                                    <h4><span>MANASU</span> <br />Mental Health Charity Home <br/>Chennai,</h4>
+                                </div>
                             </Col>
-                            <Col md={10}>
+                            <Col md={9}>
                                 <h4 className="text-center">1. Family Request Form – Discharge of Resident</h4>
                             </Col>
                         </Row>
@@ -774,7 +839,7 @@ function Family_Request_form() {
                                         <Form.Control
                                             name="age"
                                             type='text'
-                                            value={storeData.age}
+                                            value={storeData.age || "NULL"}
                                             onChange={handleInputChange2}
                                             required />
                                     </Col>
@@ -802,7 +867,7 @@ function Family_Request_form() {
                                         <Form.Control
                                             name="phone_no"
                                             type='number'
-                                            value={storeData.phone_no}
+                                            value={storeData.phone_no || "NULL"}
                                             onChange={handleInputChange2}
                                             required />
                                     </Col>
@@ -885,7 +950,7 @@ function Family_Request_form() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
-                                        Aadhar Card No :
+                                        Aadhar Card No(Relation) :
                                     </Form.Label>
                                     <Col sm="8">
                                         {files.f_aadhar_card ? (
@@ -903,7 +968,7 @@ function Family_Request_form() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
-                                        Ration Card :
+                                        Ration Card (Relation):
                                     </Form.Label>
                                     <Col sm="8">
                                         {files.f_ration_card ? (
@@ -919,7 +984,44 @@ function Family_Request_form() {
                                         )}
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-5 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Aadhar Card No (Resident):
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        {files.r_aadhar_card ? (
+                                            <>
+                                                <img
+                                                    src={files.r_aadhar_card}
+                                                    alt="New"
+                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                />
+                                            </>
+                                        ) : (
+                                            <p>Unknown</p> // Display if no photo
+                                        )}
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-5 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Ration Card (Resident):
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        {files.r_ration_card ? (
+                                            <>
+                                                <img
+                                                    src={files.r_ration_card}
+                                                    alt="New"
+                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                />
+                                            </>
+                                        ) : (
+                                            <p>Unknown</p> // Display if no photo
+                                        )}
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-4 mt-5 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Any other Government ID :
                                     </Form.Label>
@@ -956,12 +1058,12 @@ function Family_Request_form() {
 
                             </Col>
                             <Col md={12}>
-                                <Row className="d-flex align-items-center justify-content-center">
-                                    <Col md={6} className="mt-3">
-                                        <h4 className="text-start">Signature</h4>
+                                <Row className="d-flex align-items-center justify-content-center mt-3">
+                                    <Col md={6} className="mt-3 down_title">
+                                        <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
                                     </Col>
-                                    <Col md={6} className="mt-3">
-                                        <h4 className="text-end">Seal</h4>
+                                    <Col md={6} className="mt-3 down_title">
+                                        <h5 className="text-end">Manasu Seal</h5>
                                     </Col>
                                 </Row>
                             </Col>
@@ -1129,7 +1231,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Aadhar Card No :
+                                                Aadhar Card No (Relation):
                                             </Form.Label>
                                             <Col sm="6" className='d-flex align-items-center justify-content-center'>
                                                 {files.f_aadhar_card ? (
@@ -1153,7 +1255,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Ration Card :
+                                                Ration Card (Relation):
                                             </Form.Label>
                                             <Col sm="6" className='d-flex align-items-center justify-content-center'>
                                                 {files.f_ration_card ? (
@@ -1172,6 +1274,55 @@ function Family_Request_form() {
                                                     type="file"
                                                     onChange={handleFileChange}
                                                     name="f_ration_card"
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
+                                                Aadhar Card No (Resident):
+                                            </Form.Label>
+                                            <Col sm="6" className='d-flex align-items-center justify-content-center'>
+                                                {files.r_aadhar_card ? (
+                                                    <>
+                                                        <img
+                                                            src={files.r_aadhar_card}
+                                                            alt="Old"
+                                                            style={{ width: "100px", height: "80px", marginTop: "10px" }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <p>No old photo available</p> // Display if no photo
+                                                )}
+
+                                                <Form.Control
+                                                    type="file"
+                                                    onChange={handleFileChange}
+                                                    name="r_aadhar_card"
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
+                                                Ration Card (Resident):
+                                            </Form.Label>
+                                            <Col sm="6" className='d-flex align-items-center justify-content-center'>
+                                                {files.r_ration_card ? (
+                                                    <>
+                                                        <img
+                                                            src={files.r_ration_card}
+                                                            alt="Old"
+                                                            style={{ width: "100px", height: "80px", marginTop: "10px" }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <p>No old photo available</p> // Display if no photo
+                                                )}
+
+                                                <Form.Control
+                                                    type="file"
+                                                    onChange={handleFileChange}
+                                                    name="r_ration_card"
                                                 />
                                             </Col>
                                         </Form.Group>

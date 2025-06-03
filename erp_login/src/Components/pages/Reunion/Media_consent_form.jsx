@@ -32,7 +32,6 @@ function Media_consent_form() {
     });
 
     const [formData, setFormData] = useState({
-        admission_no: '',
         rescue_name: '',
         social_media_consent: '',
         description: '',
@@ -51,7 +50,7 @@ function Media_consent_form() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >= 8) { // Adjust minimum length as needed
+        if (admission_no.trim().length >= 10) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
@@ -72,19 +71,48 @@ function Media_consent_form() {
     };
 
     const ViewFormData = async () => {
+        // try {
+        //     const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
+        //     const data = response.data;
+
+        //     setFormData((formData) => ({
+        //         ...formData,
+        //         admission_no: data.admission_no || '',
+        //         rescue_name: data.rescue_name || '',
+        //         social_media_consent: data.social_media_consent || '',
+        //         description: data.description || ''
+        //     }));
+
+        //     setPreviewRequested(true); // trigger the effect after state updates
+        // } catch (error) {
+        //     console.error("Error fetching form data:", error);
+        //     alert("Admission Number not found");
+        // }
         try {
             const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
             const data = response.data;
 
+            // Update form fields
             setFormData((formData) => ({
                 ...formData,
                 admission_no: data.admission_no || '',
                 rescue_name: data.rescue_name || '',
                 social_media_consent: data.social_media_consent || '',
-                description: data.description || ''
+                description: data.description || '',
             }));
 
-            setPreviewRequested(true); // trigger the effect after state updates
+
+            // Handle old and new photo paths correctly
+            const scanReportPath = data.scan_report ? `http://localhost:5000/${data.scan_report}` : null;
+
+            console.log(scanReportPath);
+            // Set files state
+            setFiles((files) => ({
+                ...files,
+                scan_report: scanReportPath,
+            }));
+
+            setPreviewRequested(true);
         } catch (error) {
             console.error("Error fetching form data:", error);
             alert("Admission Number not found");
@@ -128,8 +156,7 @@ function Media_consent_form() {
         e.preventDefault();
 
         const data = new FormData();
-
-        data.append('admission_no', formData.admission_no);
+        data.append('admission_no', admission_no);
         data.append('rescue_name', formData.rescue_name);
         data.append('social_media_consent', formData.social_media_consent);
         data.append('description', formData.description);
@@ -141,9 +168,10 @@ function Media_consent_form() {
         try {
             const res = await apiRoute.post('/reunion/createMediaConsent', data, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+                    'Content-Type': 'multipart/form-data'
+                }
             });
+
             if (res.data.message === "Media Consent Form Created Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
@@ -159,6 +187,7 @@ function Media_consent_form() {
         }
     };
 
+
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -169,6 +198,26 @@ function Media_consent_form() {
         }
     };
 
+    // const handleShow = async (admission_no) => {
+    //     try {
+    //         const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
+    //         const data = response.data;
+
+    //         setFormData((formData) => ({
+    //             ...formData,
+    //             admission_no: data.admission_no || '',
+    //             rescue_name: data.rescue_name || '',
+    //             social_media_consent: data.social_media_consent || '',
+    //             description: data.description || '',
+    //         }));
+
+    //         setShow(true);
+    //     } catch (error) {
+    //         console.error("Error fetching form data:", error);
+    //         alert("Admission Number not found");
+    //     }
+    // };
+
     const handleShow = async (admission_no) => {
         try {
             const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
@@ -176,10 +225,19 @@ function Media_consent_form() {
 
             setFormData((formData) => ({
                 ...formData,
-                admission_no: data.admission_no || '',
                 rescue_name: data.rescue_name || '',
                 social_media_consent: data.social_media_consent || '',
                 description: data.description || '',
+            }));
+
+            // Handle old and new photo paths correctly
+            const scanReportPath = data.scan_report ? `http://localhost:5000/${data.scan_report}` : null;
+
+
+            // Set files state
+            setFiles((files) => ({
+                ...files,
+                scan_report: scanReportPath,
             }));
 
             setShow(true);
@@ -187,25 +245,43 @@ function Media_consent_form() {
             console.error("Error fetching form data:", error);
             alert("Admission Number not found");
         }
-    };
+    }
 
+    // const handleUpdate = async (e, admission_no) => {
+    //     e.preventDefault();
+    //     try {
+    //         const response = await apiRoute.put(`/reunion/updateMediaConsent/${admission_no}`, formData);
+    //         console.log(response.data);
+    //         if (response.status === 200) {
+    //             alert('Form Updated successfully!');
+    //             handleClose(true);
+    //             window.location.reload();
+    //         } else {
+    //             alert('Error Updating form.');
+    //         }
+    //     } catch (error) {
+    //         console.error('There was an error Updating the form:', error);
+    //         alert('There was an error Updating the form.');
+    //     }
+    // };
     const handleUpdate = async (e, admission_no) => {
         e.preventDefault();
+
+        const data = new FormData();
+        data.append('rescue_name', formData.rescue_name);
+        data.append('social_media_consent', formData.social_media_consent);
+        data.append('description', formData.description);
+        data.append('scan_report', files.scan_report);
+
         try {
-            const response = await apiRoute.put(`/reunion/updateMediaConsent/${admission_no}`, formData);
-            console.log(response.data);
-            if (response.status === 200) {
-                alert('Form Updated successfully!');
-                handleClose(true);
-                window.location.reload();
-            } else {
-                alert('Error Updating form.');
-            }
-        } catch (error) {
-            console.error('There was an error Updating the form:', error);
-            alert('There was an error Updating the form.');
+            const res = await apiRoute.post(`/reunion/updateMediaConsent/${admission_no}`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
         }
-    };
+    }
 
     const handleDelete = async (admission_no) => {
         alert("Are you sure want to delete");
@@ -356,7 +432,7 @@ function Media_consent_form() {
                         <div className="consultant_details">
                             <Form className='media_consent' onSubmit={handleSubmit}>
                                 <Row>
-                                    <Form.Group as={Row} className="mb-1" controlId="formAdmissionNo">
+                                    {/* <Form.Group as={Row} className="mb-1" controlId="formAdmissionNo">
                                         <Form.Label column sm="4" className='text-start'>
                                             Admission Number :
                                         </Form.Label>
@@ -369,7 +445,7 @@ function Media_consent_form() {
                                                 required
                                             />
                                         </Col>
-                                    </Form.Group>
+                                    </Form.Group> */}
 
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
@@ -494,6 +570,22 @@ function Media_consent_form() {
                                 />
                             </Col>
                         </Form.Group>
+                        <Form.Group as={Row} className="mb-3 mt-3">
+                            <Form.Label column sm="4" className='text-start'>
+                                Scan The Report :
+                            </Form.Label>
+                            <Col sm="8">
+                                {files.scan_report ? (
+                                    <img
+                                        src={files.scan_report}
+                                        alt="Report"
+                                        style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                    />
+                                ) : (
+                                    <p>No scan_report photo available</p>
+                                )}
+                            </Col>
+                        </Form.Group>
 
                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                             <Form.Label column sm="4" className='text-start'>
@@ -554,6 +646,33 @@ function Media_consent_form() {
                                             value="No"
                                             checked={formData.social_media_consent === 'No'}
                                             onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-3 mt-3">
+                                    <Form.Label column sm="4" className='text-start'>
+                                        Scan The Report :
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        {files.scan_report ? (
+                                            <>
+                                                <img
+                                                    src={files.scan_report}
+                                                    alt="Old"
+                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                />
+                                            </>
+                                        ) : (
+                                            <p>No handwritten_document photo available</p> // Display if no photo
+                                        )}
+
+                                        <Form.Control
+                                            type="file"
+                                            accept="image/*"
+                                            name="scan_report"
+                                            onChange={handleImageUpload}
+                                            required
                                         />
                                     </Col>
                                 </Form.Group>
