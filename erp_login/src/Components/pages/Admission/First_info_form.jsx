@@ -614,11 +614,11 @@ function First_info_form() {
                         <Breadcrumb.Item>Home</Breadcrumb.Item>
                         <Breadcrumb.Item active>Admission</Breadcrumb.Item>
                     </Breadcrumb>
-                    <h6 className="breadcrumb_title">Resident Intake Report</h6>
+                    <h6 className="breadcrumb_title">Resident Intake Form</h6>
 
                 </div>
                 <Col md={7} className="text-center mb-4">
-                    <h3 className="section_title">Resident Intake Report</h3>
+                    <h3 className="section_title">Resident Intake Form</h3>
                 </Col>
 
                 <div className="d-flex align-items-center px-3">

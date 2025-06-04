@@ -9,7 +9,7 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Cookies from 'js-cookie';
-import manasu_logo from '../Admission/manasu_logo.png';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Rescue_details(){
     const [rescue_details, setRescueDetails] = useState([]);
@@ -374,7 +374,7 @@ function Rescue_details(){
 
             <div className="first_table mt-2 mb-4">
                     <Col md={12} className="text-start">
-                            <h3 className="section_title px-4">Rescue Details</h3>
+                            <h3 className="section_title px-4">Resident Rescue Details</h3>
                     </Col>
                     <Table responsive="sm">
 
@@ -446,7 +446,7 @@ function Rescue_details(){
                                 <img src={manasu_logo} className="pdf_logo" alt="" />
                             </Col>
                             <Col md={10}>
-                                <h4 className="pdf_heading text-center">FIRST INFORMATION SHEET</h4>
+                                <h4 className="pdf_heading text-center">RESIDENT INTAKE REPORT</h4>
                             </Col>
                         </Row>
                                 

@@ -50,10 +50,14 @@ function Annual_Report() {
         celebration_place: '',
         celebration_rescue_count: '',
         celebration_report: '',
+        other_celebration: ''
     })
 
     const [programData, setProgramData] = useState({
         program_name: '',
+        clg_name: '',
+        clg_dept: '',
+        resource_person: '',
         program_date: '',
         program_place: '',
         program_rescue_count: '',
@@ -138,6 +142,9 @@ function Annual_Report() {
 
         const requiredFields = [
             "program_name",
+            "clg_name",
+            "clg_dept",
+            "resource_person",
             "program_date",
             "program_place",
             "program_rescue_count",
@@ -217,10 +224,10 @@ function Annual_Report() {
     // }
 
     const [files, setFiles] = useState({
-            event_photos: null,
-            awarness_photos: null,
-            outing_photos: null,
-        });
+        event_photos: null,
+        awarness_photos: null,
+        outing_photos: null,
+    });
 
     const handleFileChange = (e) => {
         setFiles({ ...files, [e.target.name]: e.target.files[0] });
@@ -377,7 +384,7 @@ function Annual_Report() {
                         <h6 className="breadcrumb_title">Report</h6>
                     </Col>
                     <Col md={8} className="text-start mb-4">
-                        <h3 className="section_title">Resident Activities and Events Report Form</h3>
+                        <h3 className="section_title">Resident Activities and Events Report Form (Annual)</h3>
                     </Col>
                 </Row>
             </Container>
@@ -722,9 +729,15 @@ function Annual_Report() {
                 <Container>
                     <Row className='d-flex align-items-center justify-content-center'>
                         <Col md={6}>
-                            <Col md={12} className="text-start">
-                                <h3 className="annual_section_title mt-3">General Celebration Details</h3>
-                            </Col>
+                            <Row className='d-flex align-items-center justify-content-between'>
+                                <Col md={8} className="text-start">
+                                    <h3 className="annual_section_title mt-3">General Celebration Details</h3>
+                                </Col>
+                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                    <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
+                                </Col>
+                            </Row>
+
                             <Form noValidate validated={validated} onSubmit={handleCelebrationSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>
@@ -748,6 +761,23 @@ function Annual_Report() {
                                         </Form.Select>
                                     </Col>
                                 </Form.Group>
+                                {celebrationData.celebration_name === "Any other" && (
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="4" className="text-start">
+                                            Specify Other Celebration:
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                type="text"
+                                                name="other_celebration"
+                                                value={celebrationData.other_celebration || ""}
+                                                onChange={handleInputChange1}
+                                                placeholder="Enter celebration name"
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                )}
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>
                                         Date:
@@ -817,9 +847,15 @@ function Annual_Report() {
                 <Container>
                     <Row className='d-flex align-items-center justify-content-center'>
                         <Col md={6}>
-                            <Col md={12} className="text-start">
-                                <h3 className="annual_section_title mt-3">Community Programs</h3>
-                            </Col>
+                            <Row className='d-flex align-items-center justify-content-center'>
+                                <Col md={8} className="text-start">
+                                    <h3 className="annual_section_title mt-3">Community Programs</h3>
+                                </Col>
+                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                    <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
+                                </Col>
+                            </Row>
+
                             <Form noValidate validated={validated} onSubmit={handleCommunitySubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>
@@ -833,6 +869,46 @@ function Annual_Report() {
                                             required />
                                     </Col>
                                 </Form.Group>
+
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="4" className='text-start'>
+                                        College Name :
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control type="text"
+                                            name="clg_name"
+                                            value={programData.clg_name}
+                                            onChange={handleInputChange2}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="4" className='text-start'>
+                                        College Department :
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control type="text"
+                                            name="clg_dept"
+                                            value={programData.clg_dept}
+                                            onChange={handleInputChange2}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="4" className='text-start'>
+                                        Resource Person :
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control type="text"
+                                            name="resource_person"
+                                            value={programData.resource_person}
+                                            onChange={handleInputChange2}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>
                                         Date:
@@ -901,9 +977,15 @@ function Annual_Report() {
                 <Container>
                     <Row className='d-flex align-items-center justify-content-center'>
                         <Col md={6}>
-                            <Col md={12} className="text-start">
-                                <h3 className="annual_section_title mt-3">Staff Programs</h3>
-                            </Col>
+                            <Row className='d-flex align-items-center justify-content-center'>
+                                <Col md={8} className="text-start">
+                                    <h3 className="annual_section_title mt-3">Staff Programs</h3>
+                                </Col>
+                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                    <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
+                                </Col>
+                            </Row>
+
                             <Form noValidate validated={validated} onSubmit={handleStaffSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="4" className='text-start'>

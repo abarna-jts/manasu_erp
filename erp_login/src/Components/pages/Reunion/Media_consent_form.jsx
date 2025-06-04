@@ -9,6 +9,7 @@ import { useRef } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Media_consent_form() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -138,19 +139,37 @@ function Media_consent_form() {
             return;
         }
 
-        const canvas = await html2canvas(input, { scale: 2 });
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        try {
+            const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/png");
 
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            while (heightLeft > 0) {
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    position = -imgHeight + heightLeft;
+                }
+            }
+
+            const pdfBlob = pdf.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, '_blank');
+        } catch (err) {
+            console.error("Error generating PDF:", err);
+            alert("Failed to generate PDF.");
+        }
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -390,14 +409,14 @@ function Media_consent_form() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
                                 createFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
@@ -405,7 +424,7 @@ function Media_consent_form() {
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
-                            <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter your admission number.");
                                 } else {
@@ -528,8 +547,17 @@ function Media_consent_form() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-
-                <h4 className="text-center MY-4">3. Resident Consent Form for Social Media Use</h4>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                        {/* <div className="logo_text">
+                            <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                        </div> */}
+                    </Col>
+                    <Col md={9}>
+                        <h4 className="text-center">3. Resident Consent Form for Social Media Use</h4>
+                    </Col>
+                </Row>
 
                 <Form className='media_consent'>
                     <Row>
@@ -601,6 +629,16 @@ function Media_consent_form() {
                                     required />
                             </Col>
                         </Form.Group>
+                        <Col md={12}>
+                            <Row className="d-flex align-items-center justify-content-center mt-3">
+                                <Col md={6} className="mt-3 down_title">
+                                    <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                                </Col>
+                                <Col md={6} className="mt-3 down_title">
+                                    <h5 className="text-end">Manasu Seal</h5>
+                                </Col>
+                            </Row>
+                        </Col>
                     </Row>
                 </Form>
             </div>

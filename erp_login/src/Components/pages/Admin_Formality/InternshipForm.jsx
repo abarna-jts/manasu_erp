@@ -13,11 +13,20 @@ function InternshipForm() {
         department: '',
         email: '',
         phone: '',
+        secondary_phone: '',
         field: '',
         clg_name: '',
         duration: '',
         from_date: '',
         to_date: '',
+        supervisor_name: '',
+        supervisor_email: '',
+        supervisor_phone: '',
+        choose_intern: '',
+    });
+
+    const [files, setFiles] = useState({
+        stud_photo: null
     });
 
     //alert box values
@@ -33,19 +42,49 @@ function InternshipForm() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleFileChange = (e) => {
+        setFiles({ ...files, stud_photo: e.target.files[0] });
+    };
+
     const navigate = useNavigate();
 
     const handleViewAll = () => {
         navigate("/allStudentDetails");
     }
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const response = await apiRoute.post("/formality/createInternForm", formData);
-            console.log(response);
+            const data = new FormData();
+
+            // Append file from files state
+            data.append("stud_photo", files.stud_photo);
+
+            // Append any other form fields
+            data.append("stud_name", formData.stud_name);
+            data.append("stud_id", formData.stud_id);
+            data.append("department", formData.department);
+            data.append("email", formData.email);
+            data.append("phone", formData.phone);
+            data.append("secondary_phone", formData.secondary_phone);
+            data.append("field", formData.field);
+            data.append("clg_name", formData.clg_name);
+            data.append("duration", formData.duration);
+            data.append("from_date", formData.from_date);
+            data.append("to_date", formData.to_date);
+            data.append("supervisor_name", formData.supervisor_name);
+            data.append("supervisor_email", formData.supervisor_email);
+            data.append("supervisor_phone", formData.supervisor_phone);
+            data.append("choose_intern", formData.choose_intern);
+            // Add other fields as needed
+
+            const response = await apiRoute.post("/formality/createInternForm", data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
             if (response.data.message === "Internship Form Created successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
@@ -60,6 +99,7 @@ function InternshipForm() {
             setMessageType("danger");
         }
     };
+
     return (
         <>
             <Container fluid>
@@ -131,9 +171,39 @@ function InternshipForm() {
                                     />
                                 </Col>
                             </Form.Group>
+
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Department :
+                                    Attach Student Photo :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="stud_photo"
+                                        type="file"
+                                        value={formData.stud_photo}
+                                        onChange={handleFileChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Name of the College :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="clg_name"
+                                        type="text"
+                                        value={formData.clg_name}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Name of the Department :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -159,7 +229,7 @@ function InternshipForm() {
                                     />
                                 </Col>
                             </Form.Group>
-                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                            {/* <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
                                     Contact Number :
                                 </Form.Label>
@@ -172,12 +242,79 @@ function InternshipForm() {
                                         required
                                     />
                                 </Col>
+                            </Form.Group> */}
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
+                                <Form.Label column sm="4">
+                                    Contact Numbers:
+                                </Form.Label>
+                                <Col sm="4">
+                                    <Form.Control
+                                        name="phone"
+                                        type="number"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                                <Col sm="4">
+                                    <Form.Control
+                                        name="secondary_phone"
+                                        type="number"
+                                        value={formData.secondary_phone}
+                                        onChange={handleInputChange}
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start d-flex align-items-center" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Supervisor's Name from College/Institution :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="supervisor_name"
+                                        type="text"
+                                        value={formData.supervisor_name}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Interested Field :
+                                    Supervisor's Email :
                                 </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="supervisor_email"
+                                        type="text"
+                                        value={formData.supervisor_email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Supervisor's Contact Number :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="supervisor_phone"
+                                        type="text"
+                                        value={formData.supervisor_phone}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formField">
+                                <Form.Label column sm="4">Interested Field :</Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         as="select"
@@ -187,27 +324,22 @@ function InternshipForm() {
                                         required
                                     >
                                         <option value="">-- Select --</option>
-                                        <option value="Social Worker">Social Worker</option>
+
+                                        <optgroup label="Social Worker">
+                                            <option value="Community Development">Community Development</option>
+                                            <option value="Child Welfare">Child Welfare</option>
+                                            <option value="Mental Health">Mental Health</option>
+                                        </optgroup>
+                                        
                                         <option value="Social Services">Social Services</option>
                                         <option value="Psychology">Psychology</option>
+
                                     </Form.Control>
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
-                                    College Name :
-                                </Form.Label>
-                                <Col sm="8">
-                                    <Form.Control
-                                        name="clg_name"
-                                        type="text"
-                                        value={formData.clg_name}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
+
+
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
                                     Duration :

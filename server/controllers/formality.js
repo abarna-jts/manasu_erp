@@ -14,9 +14,13 @@ const fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        if (file.fieldname === 'bank_passbook') {
+        if (file.fieldname === 'bank_passbook' || file.fieldname === 'form7_attach') {
             cb(null, path.resolve('uploads/Rescue_Images/'));
-        } else {
+        }
+        else if(file.fieldname === 'stud_photo'){
+            cb(null, path.resolve('uploads/Internship_photos/'));
+        } 
+        else {
             cb(null, path.resolve('uploads/Event_Photos/'));
         }
     },
@@ -29,9 +33,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage }).fields([
     { name: 'bank_passbook', maxCount: 1 },
+    { name: 'form7_attach', maxCount: 1 },
     { name: 'event_photos', maxCount: 1 },
     { name: 'awarness_photos', maxCount: 1 },
-    { name: 'outing_photos', maxCount: 1 }
+    { name: 'outing_photos', maxCount: 1 },
+    { name: 'stud_photo', maxCount: 1 }
 ]);
 
 
@@ -145,6 +151,9 @@ const deleteFormalityForm = (req, res) => {
 
 const createRecords = (req, res) => {
     upload(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({ message: "File upload error", error: err });
+        }
         const {
             admission_no,
             rescue_name,
@@ -163,19 +172,24 @@ const createRecords = (req, res) => {
             any_other
         } = req.body;
 
-        if (!req.file) {
-            return res.status(400).json({ message: "Bank passbook upload required" });
-        }
+        // if (!req.file) {
+        //     return res.status(400).json({ message: "Bank passbook upload required" });
+        // }
 
-        const bank_passbookPath = req.file
-            ? `uploads/Resident_DocumentFile/${req.file.filename}`
+        const bank_passbookPath = req.files['bank_passbook']
+            ? `uploads/Rescue_Images/${req.files['bank_passbook'][0].filename}`
             : null;
 
+        const Form7Path = req.files['form7_attach']
+            ? `uploads/Rescue_Images/${req.files['form7_attach'][0].filename}`
+            : null;
+
+
         const q = `INSERT INTO essential_records 
-        (admission_no, rescue_name, aadhar_card, udid_no, disability_no,voter_id, form_7,
+        (admission_no, rescue_name, aadhar_card, udid_no, disability_no,voter_id, form_7,form7_attach,
          bank_name, account_no, ifsc_code, bank_passbook,
          insurance_provider, policy_no, validity_period, other_gvt_scheme, any_other)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         const values = [
             admission_no,
@@ -185,6 +199,7 @@ const createRecords = (req, res) => {
             disability_no,
             voter_id,
             form_7,
+            Form7Path,
             bank_name,
             account_no,
             ifsc_code,
@@ -235,6 +250,8 @@ const updateEssentialRecords = (req, res) => {
             aadhar_card,
             udid_no,
             disability_no,
+            voter_id,
+            form_7,
             bank_name,
             account_no,
             ifsc_code,
@@ -246,9 +263,10 @@ const updateEssentialRecords = (req, res) => {
 
         const admission_no = req.params.admission_no;
         const newBankPassbook = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
+        const newForm7Attach = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
 
         // Fetch the existing logo path
-        const selectQuery = "SELECT bank_passbook FROM essential_records WHERE admission_no = ?";
+        const selectQuery = "SELECT bank_passbook, form7_attach FROM essential_records WHERE admission_no = ?";
         db.query(selectQuery, [admission_no], (selectErr, selectData) => {
             if (selectErr) {
                 return res.status(500).json({ message: "Failed to retrieve Bank passbook", error: selectErr });
@@ -257,13 +275,19 @@ const updateEssentialRecords = (req, res) => {
             const existingBankPassbook = selectData[0]?.bank_passbook;
             const finalBankPassbook = newBankPassbook || existingBankPassbook;
 
+            const existingForm7Attach = selectData[0]?.form7_attach;
+            const finalForm7Attach = newForm7Attach || existingForm7Attach;
+
             // Update the catalogue
             const updateQuery = `
           UPDATE essential_records SET 
             rescue_name = ?, 
             aadhar_card = ?, 
             udid_no = ?, 
-            disability_no = ?, 
+            disability_no = ?,
+            voter_id = ?,
+            form_7 = ?,
+            form7_attach = ?,
             bank_name = ?, 
             account_no = ?, 
             ifsc_code = ?,
@@ -279,6 +303,9 @@ const updateEssentialRecords = (req, res) => {
                 aadhar_card,
                 udid_no,
                 disability_no,
+                voter_id,
+                form_7,
+                finalForm7Attach,
                 bank_name,
                 account_no,
                 ifsc_code,
@@ -299,6 +326,12 @@ const updateEssentialRecords = (req, res) => {
                 if (newBankPassbook && existingBankPassbook) {
                     fs.unlink(existingBankPassbook, (fsErr) => {
                         if (fsErr) console.warn("Failed to delete Bank Passbook:", fsErr);
+                    });
+                }
+
+                if (newForm7Attach && existingForm7Attach) {
+                    fs.unlink(existingForm7Attach, (fsErr) => {
+                        if (fsErr) console.warn("Failed to delete Form 7 attachment:", fsErr);
                     });
                 }
 
@@ -333,24 +366,24 @@ const createEventReport = (req, res) => {
         if (err) {
             return res.status(500).json({ message: 'File upload failed', error: err });
         }
-    const {
-        event_name,
-        event_date,
-        event_place,
-        event_report,
-        event_rescue_count,
-        event_type,
-        awareness_name,
-        awarness_date,
-        awarness_place,
-        awarness_report,
-        awarness_rescue_count,
-        outing_name,
-        outing_date,
-        outing_place,
-        outing_report,
-        outing_rescue_count,
-    } = req.body;
+        const {
+            event_name,
+            event_date,
+            event_place,
+            event_report,
+            event_rescue_count,
+            event_type,
+            awareness_name,
+            awarness_date,
+            awarness_place,
+            awarness_report,
+            awarness_rescue_count,
+            outing_name,
+            outing_date,
+            outing_place,
+            outing_report,
+            outing_rescue_count,
+        } = req.body;
 
         const event_photosPath = req.files['event_photos']
             ? `/uploads/Event_Photos/${req.files['event_photos'][0].filename}`
@@ -363,23 +396,23 @@ const createEventReport = (req, res) => {
             ? `/uploads/Event_Photos/${req.files['outing_photos'][0].filename}`
             : null;
 
-    const q = `INSERT INTO event_report(event_name, event_date, event_place, event_report, event_rescue_count, event_type, event_photos,
+        const q = `INSERT INTO event_report(event_name, event_date, event_place, event_report, event_rescue_count, event_type, event_photos,
                 awareness_name,awarness_date, awarness_place, awarness_report, awarness_rescue_count,awarness_photos,
                 outing_name, outing_date, outing_place, outing_report, outing_rescue_count, outing_photos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
-                
-    const values = [
-        event_name || 'Null', event_date || 'Null', event_place || 'Null', event_report || 'Null', event_rescue_count || 'Null', event_type, event_photosPath || 'Null',
-        awareness_name || 'Null', awarness_date || 'Null', awarness_place || 'Null', awarness_report || 'Null', awarness_rescue_count || 'Null',awarness_photosPath || 'Null',
-        outing_name || 'Null', outing_date || 'Null', outing_place || 'Null', outing_report || 'Null', outing_rescue_count || 'Null', outing_photosPath || 'Null'
-    ]
 
-    db.query(q, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
-        }
-        res.status(201).json({ message: "Event Report Form Created Successfully", data: data });
+        const values = [
+            event_name || 'Null', event_date || 'Null', event_place || 'Null', event_report || 'Null', event_rescue_count || 'Null', event_type, event_photosPath || 'Null',
+            awareness_name || 'Null', awarness_date || 'Null', awarness_place || 'Null', awarness_report || 'Null', awarness_rescue_count || 'Null', awarness_photosPath || 'Null',
+            outing_name || 'Null', outing_date || 'Null', outing_place || 'Null', outing_report || 'Null', outing_rescue_count || 'Null', outing_photosPath || 'Null'
+        ]
+
+        db.query(q, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Event Report Form Created Successfully", data: data });
+        });
     });
-});
 }
 
 const createCelebrationReport = (req, res) => {
@@ -389,13 +422,15 @@ const createCelebrationReport = (req, res) => {
         celebration_place,
         celebration_rescue_count,
         celebration_report,
+        other_celebration
     } = req.body;
 
-    const q = `INSERT INTO celebration_report(celebration_name, celebration_date, celebration_place, celebration_rescue_count, celebration_report) 
-                VALUES (?,?,?,?,?)`;
+    const q = `INSERT INTO celebration_report(celebration_name, other_celebration, celebration_date, celebration_place, celebration_rescue_count, celebration_report) 
+                VALUES (?,?,?,?,?,?)`;
 
     const values = [
         celebration_name,
+        other_celebration,
         celebration_date,
         celebration_place,
         celebration_rescue_count,
@@ -413,16 +448,22 @@ const createCelebrationReport = (req, res) => {
 const createCommunityReport = (req, res) => {
     const {
         program_name,
+        clg_name,
+        clg_dept,
+        resource_person,
         program_date,
         program_place,
         program_rescue_count,
         program_report,
     } = req.body;
 
-    const q = `INSERT INTO community_report(community_name, community_date, community_place, community_rescue_count, community_report)
-                VALUES (?,?,?,?,?)`;
+    const q = `INSERT INTO community_report(community_name, clg_name, clg_dept, resource_person, community_date, community_place, community_rescue_count, community_report)
+                VALUES (?,?,?,?,?,?,?,?)`;
     const values = [
         program_name,
+        clg_name,
+        clg_dept,
+        resource_person,
         program_date,
         program_place,
         program_rescue_count,
@@ -464,48 +505,48 @@ const createStaffReport = (req, res) => {
 }
 
 const createAnnualReport = (req, res) => {
-    
 
-        const {
-            event_type,
-            event_name,
-            awareness_name,
-            outing_name,
-            awarness_date,
-            awarness_place,
-            awarness_rescue_count,
-            outing_date,
-            outing_place,
-            outing_rescue_count,
-            event_date,
-            event_place,
-            event_rescue_count,
-            event_report,
-            awarness_report,
-            outing_report,
-            celebration_name,
-            celebration_date,
-            celebration_place,
-            celebration_rescue_count,
-            celebration_report,
-            program_name,
-            program_date,
-            program_place,
-            program_rescue_count,
-            program_report,
-            staff_name,
-            staff_date,
-            staff_place,
-            staff_rescue_count,
-            staff_report
 
-        } = req.body;
+    const {
+        event_type,
+        event_name,
+        awareness_name,
+        outing_name,
+        awarness_date,
+        awarness_place,
+        awarness_rescue_count,
+        outing_date,
+        outing_place,
+        outing_rescue_count,
+        event_date,
+        event_place,
+        event_rescue_count,
+        event_report,
+        awarness_report,
+        outing_report,
+        celebration_name,
+        celebration_date,
+        celebration_place,
+        celebration_rescue_count,
+        celebration_report,
+        program_name,
+        program_date,
+        program_place,
+        program_rescue_count,
+        program_report,
+        staff_name,
+        staff_date,
+        staff_place,
+        staff_rescue_count,
+        staff_report
 
-        
+    } = req.body;
 
 
 
-        const q = `INSERT INTO annual_report(
+
+
+    const q = `INSERT INTO annual_report(
                event_type,
                event_name,
                event_date,
@@ -540,58 +581,74 @@ const createAnnualReport = (req, res) => {
             ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
 
-        const values = [
-            event_type,
-            event_name,
-            event_date,
-            event_place,
-            event_rescue_count,
-            event_report,
-            awareness_name,
-            awarness_date,
-            awarness_place,
-            awarness_rescue_count,
-            awarness_report,
-            outing_name,
-            outing_date,
-            outing_place,
-            outing_rescue_count,
-            outing_report,
-            celebration_name,
-            celebration_date,
-            celebration_place,
-            celebration_rescue_count,
-            celebration_report,
-            program_name,
-            program_date,
-            program_place,
-            program_rescue_count,
-            program_report,
-            staff_name,
-            staff_date,
-            staff_place,
-            staff_rescue_count,
-            staff_report
-        ];
+    const values = [
+        event_type,
+        event_name,
+        event_date,
+        event_place,
+        event_rescue_count,
+        event_report,
+        awareness_name,
+        awarness_date,
+        awarness_place,
+        awarness_rescue_count,
+        awarness_report,
+        outing_name,
+        outing_date,
+        outing_place,
+        outing_rescue_count,
+        outing_report,
+        celebration_name,
+        celebration_date,
+        celebration_place,
+        celebration_rescue_count,
+        celebration_report,
+        program_name,
+        program_date,
+        program_place,
+        program_rescue_count,
+        program_report,
+        staff_name,
+        staff_date,
+        staff_place,
+        staff_rescue_count,
+        staff_report
+    ];
 
-        db.query(q, values, (dbErr, data) => {
-            if (dbErr) {
-                return res.status(500).json({ message: "Database Error", error: dbErr });
-            }
-            res.status(201).json({ message: "Annual Report Form Created Successfully", data: data });
-        });
+    db.query(q, values, (dbErr, data) => {
+        if (dbErr) {
+            return res.status(500).json({ message: "Database Error", error: dbErr });
+        }
+        res.status(201).json({ message: "Annual Report Form Created Successfully", data: data });
+    });
 }
 
 const getAnnualReport = (req, res) => {
-    const query = "Select * from annual_report";
+    const query = `
+        SELECT 
+    e.*, 
+    c.*, 
+    cm.*, 
+    s.* 
+FROM 
+    event_report e
+INNER JOIN 
+    celebration_report c ON e.id = c.id
+INNER JOIN 
+    community_report cm ON e.id = cm.id
+INNER JOIN 
+    staff_report s ON e.id = s.id;
 
-    db.query(query, (err, data) => {
+    `;
+
+    db.query(query, (err, results) => {
         if (err) {
-            return res.status(500).json({ message: "Database Error", error: err });
+            return res.status(500).json({ message: "Joined Report Error", error: err });
         }
-        res.status(201).json({ message: "Annual Report Get Successfully", data: data });
+
+        return res.status(200).json({ data: results });
     });
-}
+};
 
 const getAnnualReportbyID = (req, res) => {
     const id = req.params.id;
@@ -742,17 +799,20 @@ const createRescueDischargeInfo = (req, res) => {
         escape,
         death,
         discharge,
-        reunited
+        reunited,
+        transfer,
+        state_venue,
+        state
     } = req.body;
 
     const cquery = `INSERT INTO discharge_summary
                     (admission_no,
                     rescue_name,
                     referred_by,
-                    escape,death,discharge,reunited)VALUES(?,?,?,?,?,?,?)`;
+                    escape,death,discharge,reunited, transfer, state_venue, state)VALUES(?,?,?,?,?,?,?,?,?,?)`;
 
     const values = [
-        admission_no, rescue_name, referred_by, escape, death, discharge,reunited
+        admission_no, rescue_name, referred_by, escape, death, discharge, reunited, transfer, state_venue, state
     ];
 
     db.query(cquery, values, (dbErr, data) => {
@@ -794,7 +854,7 @@ const getDischargeSummaryID = (req, res) => {
 
 const updateDischargeSummary = (req, res) => {
     const {
-        rescue_name, referred_by, escape, death, discharge,reunited
+        rescue_name, referred_by, escape, death, discharge, reunited,transfer, state_venue,state
     } = req.body;
 
     const rescueID = req.params.id;
@@ -805,11 +865,14 @@ const updateDischargeSummary = (req, res) => {
                     escape = ?, 
                     death = ?, 
                     discharge = ?,
-                    reunited = ?
+                    reunited = ?,
+                    transfer = ?,
+                    state_venue = ?,
+                    state = ?
                     WHERE id = ?`;
 
     const values = [
-        rescue_name, referred_by, escape, death, discharge, reunited, rescueID,
+        rescue_name, referred_by, escape, death, discharge, reunited, transfer, state_venue, state, rescueID,
     ];
 
     db.query(uquery, values, (updateErr, result) => {
@@ -844,25 +907,38 @@ const deleteDischargeSummary = (req, res) => {
 }
 
 const createInternForm = (req, res) => {
+    upload(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({ message: "File upload error", error: err });
+        }
     const {
         stud_name,
         stud_id,
         department,
         email,
         phone,
+        secondary_phone,
         field,
         clg_name,
         duration,
         from_date,
         to_date,
+        supervisor_name,
+        supervisor_email,
+        supervisor_phone,
         choose_intern
     } = req.body;
 
-    const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, department, email, phone, field, clg_name, duration,from_date, to_date, choose_intern)
-                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const studentPhotoPath = req.files['stud_photo']
+            ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
+            : null;
+
+    const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, stud_photo, department, email, phone, secondary_phone, field, clg_name, duration,from_date, 
+                        to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern)
+                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
-        stud_name, stud_id, department, email, phone, field, clg_name, duration, from_date, to_date, choose_intern
+        stud_name, stud_id, studentPhotoPath, department, email, phone, secondary_phone, field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
     ];
 
     db.query(insertQuery, values, (dbErr, data) => {
@@ -871,6 +947,7 @@ const createInternForm = (req, res) => {
         }
         res.status(201).json({ message: "Internship Form Created successfully", data: data });
     });
+});
 }
 
 const getStudentDetails = (req, res) => {

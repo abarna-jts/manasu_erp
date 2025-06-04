@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function SCRB_Form2A() {
   const [admission_no, setAdmissionNumber] = useState('');
@@ -19,7 +20,7 @@ function SCRB_Form2A() {
   const [complexion, setComplexion] = useState([]);
   const [face, setFace] = useState([]);
   const [previewRequested, setPreviewRequested] = useState(false);
-   const [rescueImage, setRescueImage] = useState(null);
+  const [rescueImage, setRescueImage] = useState(null);
   const [rescueName, setRescueName] = useState("");
   const [error, setError] = useState("");
 
@@ -234,17 +235,17 @@ function SCRB_Form2A() {
   const navigate = useNavigate();
 
   const handleNextpage = () => {
-      navigate("/scrb_form2B");
-    
+    navigate("/scrb_form2B");
+
   }
 
   const handleBackPage = () => {
     navigate("/scrb_form");
   }
 
-   // Mock API call or fetch
+  // Mock API call or fetch
   const fetchRescueDetails = async (admission_no) => {
-  try {
+    try {
       const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
       const result = response.data.data[0];
       console.log("API Result:", result);
@@ -259,7 +260,7 @@ function SCRB_Form2A() {
         setError(""); // clear any previous error
       } else {
         setRescueImage(null);
- 
+
         setError("Image not found for this admission number");
       }
     } catch (error) {
@@ -268,7 +269,7 @@ function SCRB_Form2A() {
       setRescueName("");
       setError("Admission Number Not found");
     }
-};
+  };
 
   // Trigger when admission number changes
   useEffect(() => {
@@ -308,9 +309,9 @@ function SCRB_Form2A() {
             {/* Rescue Name and Image */}
             {rescueImage && (
               <div>
-                
+
                 <img
-                  
+
                   alt={rescueName || "Rescue Image"}
                   style={{ width: "100px", height: "100px" }}
                   src={rescueImage}
@@ -553,7 +554,14 @@ function SCRB_Form2A() {
 
             {/* pdf formate view  */}
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-              <h4 className="text-center">FORM 2A - PDF PREVIEW</h4>
+              <Row className="d-flex align-items-center justify-content-center mb-2">
+                <Col md={2}>
+                  <img src={manasu_logo} className="pdf_logo" alt="" />
+                </Col>
+                <Col md={10}>
+                  <h4 className="text-center">FORM 2A - PDF PREVIEW</h4>
+                </Col>
+              </Row>
               <form>
                 <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
                   <tbody>

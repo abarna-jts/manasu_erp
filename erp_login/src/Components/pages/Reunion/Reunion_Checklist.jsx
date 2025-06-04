@@ -8,7 +8,7 @@ import axios from 'axios';
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import manasu_logo from '../Admission/manasu_logo.png';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useNavigate } from 'react-router-dom';
 
 function Reunion_Checklist() {
@@ -243,10 +243,10 @@ function Reunion_Checklist() {
         }
     };
 
-   const navigate = useNavigate();
+    const navigate = useNavigate();
     const handleShow = (admission_no) => {
         navigate(`/edit_reunion_checklist/${admission_no}`);
-      };
+    };
 
 
     return (
@@ -1122,13 +1122,17 @@ function Reunion_Checklist() {
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
                 <Row className="d-flex align-items-center justify-content-center mb-2">
-                    <Col md={2}>
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
                         <img src={manasu_logo} className="pdf_logo" alt="" />
+                        {/* <div className="logo_text">
+                            <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                        </div> */}
                     </Col>
-                    <Col md={10}>
+                    <Col md={9}>
                         <h4 className="text-center">Resident Discharge Summary and Checklist</h4>
                     </Col>
                 </Row>
+                
                 <Form>
                     <ol className="ps-3 text-start my-4">
                         <li className="checklist_ul">
@@ -1214,7 +1218,7 @@ function Reunion_Checklist() {
                                     />
                                 </Col>
                             </Form.Group>
-                             <Form.Group as={Row} className="mb-2 align-items-center">
+                            <Form.Group as={Row} className="mb-2 align-items-center">
                                 <Form.Label column sm="4">Disability Certificate :</Form.Label>
                                 <Col sm="3">
                                     <Form.Control
@@ -1332,7 +1336,7 @@ function Reunion_Checklist() {
                                     />
                                 </Col>
                             </Form.Group>
-                            
+
                         </li>
 
                         <li className="checklist_ul">
@@ -1359,7 +1363,7 @@ function Reunion_Checklist() {
                                     />
                                 </Col>
                             </Form.Group>
-                            
+
                         </li>
 
                         <li className="checklist_ul">
@@ -1376,16 +1380,26 @@ function Reunion_Checklist() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className='icon_checkList'>
-                                        <Form.Label column sm="3">Any Other:</Form.Label>
-                                        <Col sm="7">
-                                            <Form.Control type="text"
-                                                name='any_other'
-                                                value={formData.any_other || "Null"} />
-                                        </Col>
-                                    </Form.Group>
-                            
+                                <Form.Label column sm="3">Any Other:</Form.Label>
+                                <Col sm="7">
+                                    <Form.Control type="text"
+                                        name='any_other'
+                                        value={formData.any_other || "Null"} />
+                                </Col>
+                            </Form.Group>
+
                         </li>
                     </ol>
+                    <Col md={12}>
+                        <Row className="d-flex align-items-center justify-content-center mt-3">
+                            <Col md={6} className="mt-3 down_title">
+                                <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                            </Col>
+                            <Col md={6} className="mt-3 down_title">
+                                <h5 className="text-end">Manasu Seal</h5>
+                            </Col>
+                        </Row>
+                    </Col>
                 </Form>
             </div>
         </>

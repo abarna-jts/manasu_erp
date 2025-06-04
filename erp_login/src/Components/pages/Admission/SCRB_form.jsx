@@ -13,7 +13,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
-import manasu_logo from "../Admission/manasu_logo.png";
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function SCRB_form() {
     const [previewRequested, setPreviewRequested] = useState(false);
@@ -906,7 +906,7 @@ function SCRB_form() {
                                 <img src={manasu_logo} className="pdf_logo" alt="" />
                             </Col>
                             <Col md={10}>
-                                <h4 className="text-center">FORM 2A - PDF PREVIEW</h4>
+                                <h4 className="text-center">FORM 2 - PDF PREVIEW</h4>
                             </Col>
                         </Row>
 

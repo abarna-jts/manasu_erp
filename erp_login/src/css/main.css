@@ -459,7 +459,11 @@ body {
 }
 
 .pdf_logo .logo_text span{
-	font-size: 15px;
+	font-size: 18px;
+}
+.pdf_logo{
+	width: 90px;
+	height: auto;
 }
 
 .pdf_logo .logo_text h4{

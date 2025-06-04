@@ -9,6 +9,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Formality_declaration() {
     const [show, setShow] = useState(false);
@@ -250,14 +251,14 @@ function Formality_declaration() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
                                 createFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
@@ -265,7 +266,7 @@ function Formality_declaration() {
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
-                            <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter your admission number.");
                                 } else {
@@ -426,14 +427,24 @@ function Formality_declaration() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                <h4 className="text-center MY-4">5. Resident's Possessions and Document Handover Form</h4>
-                <Form className='self_declaration'>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                        {/* <div className="logo_text">
+                            <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                        </div> */}
+                    </Col>
+                    <Col md={9}>
+                        <h4 className="text-center">5. Resident's Possessions and Document Handover Form</h4>
+                    </Col>
+                </Row>
+                <Form className='self_declaration d-flex align-items-center justify-content-center'>
                     <Row>
                         <Form.Group as={Row} className="mb-1">
                             <Form.Label column sm="4" className='text-start'>
                                 Name :
                             </Form.Label>
-                            <Col sm="8">
+                            <Col sm="6">
                                 <Form.Control
                                     type="text"
                                     name="rescue_name"
@@ -446,7 +457,7 @@ function Formality_declaration() {
                             <Form.Label column sm="4" className='text-start'>
                                 Age :
                             </Form.Label>
-                            <Col sm="8">
+                            <Col sm="6">
                                 <Form.Control
                                     type="text"
                                     name="age"
@@ -459,7 +470,7 @@ function Formality_declaration() {
                             <Form.Label column sm="4" className='text-start'>
                                 Admission No. :
                             </Form.Label>
-                            <Col sm="8">
+                            <Col sm="6">
                                 <Form.Control
                                     type="number"
                                     name="admission_no"
@@ -472,7 +483,7 @@ function Formality_declaration() {
                             <Form.Label column sm="4" className="text-start">
                                 30 days Medicine Provided :
                             </Form.Label>
-                            <Col sm="8" className='d-flex align-items-center'>
+                            <Col sm="6" className='d-flex align-items-center'>
                                 <Form.Check
                                     type="radio"
                                     label="Yes"
@@ -495,7 +506,7 @@ function Formality_declaration() {
                             <Form.Label column sm="4" className="text-start">
                                 Toiletries provided :
                             </Form.Label>
-                            <Col sm="8" className='d-flex align-items-center'>
+                            <Col sm="6" className='d-flex align-items-center'>
                                 <Form.Check
                                     type="radio"
                                     label="Yes"
@@ -518,7 +529,7 @@ function Formality_declaration() {
                             <Form.Label column sm="4" className="text-start">
                                 1 month dress provided :
                             </Form.Label>
-                            <Col sm="8" className='d-flex align-items-center'>
+                            <Col sm="6" className='d-flex align-items-center'>
                                 <Form.Check
                                     type="radio"
                                     label="Yes"
@@ -542,7 +553,7 @@ function Formality_declaration() {
                             <Form.Label column sm="4" className="text-start">
                                 Discharge Allowance / Travel Expenses Provided:
                             </Form.Label>
-                            <Col sm="8" className='d-flex align-items-center'>
+                            <Col sm="6" className='d-flex align-items-center'>
                                 <Form.Check
                                     type="radio"
                                     label="Yes"
@@ -561,7 +572,16 @@ function Formality_declaration() {
                                 />
                             </Col>
                         </Form.Group>
-
+                        <Col md={12}>
+                            <Row className="d-flex align-items-center justify-content-center mt-3">
+                                <Col md={6} className="mt-3 down_title">
+                                    <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                                </Col>
+                                <Col md={6} className="mt-3 down_title">
+                                    <h5 className="text-end">Manasu Seal</h5>
+                                </Col>
+                            </Row>
+                        </Col>
                     </Row>
                 </Form>
             </div>

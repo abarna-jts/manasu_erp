@@ -10,6 +10,7 @@ import { useRef } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Essential_record() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -34,7 +35,7 @@ function Essential_record() {
         udid_no: '',
         disability_no: '',
         voter_id: '',
-        form_7: '' ,
+        form_7: '',
         bank_name: '',
         account_no: '',
         ifsc_code: '',
@@ -42,37 +43,32 @@ function Essential_record() {
         policy_no: '',
         validity_period: '',
         other_gvt_scheme: '',
-        any_other:''
+        any_other: ''
     })
 
     const [files, setFiles] = useState({
         bank_passbook: null,
+        form7_attach: null,
     });
 
     const handleFileChange = (e) => {
-    const file = e.target.files[0];
-
-    if (file) {
-        setFiles((prev) => ({
+        const { name, files } = e.target;
+        setFiles(prev => ({
             ...prev,
-            bank_passbook: file, // Store actual File object
+            [name]: files[0]
         }));
-
-        // // Optional: if you need to preview
-        // const previewUrl = URL.createObjectURL(file);
-        // setPreview((prev) => ({
-        //     ...prev,
-        //     bank_passbook: previewUrl,
-        // }));
-    }
-};
+    };
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: value
+        }));
     };
 
     const handleCheckChange = (e) => {
@@ -98,7 +94,7 @@ function Essential_record() {
     };
 
     const createFormData = () => {
-        const targetElement = document.querySelector('.media_consent');
+        const targetElement = document.querySelector('.essential_records');
         if (targetElement) {
             targetElement.scrollIntoView({ behavior: 'smooth' });
         }
@@ -107,6 +103,11 @@ function Essential_record() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return; // Stop form submission
+        }
+
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('rescue_name', formData.rescue_name);
@@ -114,6 +115,7 @@ function Essential_record() {
         data.append('udid_no', formData.udid_no);
         data.append('disability_no', formData.disability_no);
         data.append('voter_id', formData.voter_id);
+        data.append('form7_attach', files.form7_attach);
         data.append('form_7', formData.form_7);
         data.append('bank_name', formData.bank_name);
         data.append('account_no', formData.account_no);
@@ -172,14 +174,19 @@ function Essential_record() {
             }));
 
             const passbookPath = data.bank_passbook ? `http://localhost:5000/${data.bank_passbook}` : null;
+            const Form7Path = data.form7_attach ? `http://localhost:5000/${data.form7_attach}` : null;
 
             console.log("bank_passbook path:", data.bank_passbook);
             console.log("Full URL:", passbookPath);
+
+            console.log("Form 7 path:", data.form7_attach);
+            console.log("Full URL:", Form7Path);
 
             // Set files state
             setFiles((files) => ({
                 ...files,
                 bank_passbook: passbookPath,
+                form7_attach: Form7Path
             }));
 
             setPreviewRequested(true); // trigger the effect after state updates
@@ -208,17 +215,36 @@ function Essential_record() {
             return;
         }
 
-        const canvas = await html2canvas(input, { scale: 2 });
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        try {
+            const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/png");
 
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            while (heightLeft > 0) {
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    position = -imgHeight + heightLeft;
+                }
+            }
+
+            const pdfBlob = pdf.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, '_blank');
+        } catch (err) {
+            console.error("Error generating PDF:", err);
+            alert("Failed to generate PDF.");
+        }
     };
 
     const handleShow = async (admission_no) => {
@@ -248,12 +274,14 @@ function Essential_record() {
 
             // Handle old and new photo paths correctly
             const bankPassbookPath = data.bank_passbook ? `http://localhost:5000/${data.bank_passbook}` : null;
+            const Form7Path = data.form7_attach ? `http://localhost:5000/${data.form7_attach}` : null;
 
 
             // Set files state
             setFiles((files) => ({
                 ...files,
                 bank_passbook: bankPassbookPath,
+                form7_attach: Form7Path,
             }));
 
 
@@ -292,15 +320,16 @@ function Essential_record() {
         data.append('disability_no', formData.disability_no);
         data.append('voter_id', formData.voter_id);
         data.append('form_7', formData.form_7);
+        data.append('form7_attach', files.form7_attach);
         data.append('bank_name', formData.bank_name);
-        data.append('account_no',formData.account_no);
-        data.append('ifsc_code',formData.ifsc_code);
+        data.append('account_no', formData.account_no);
+        data.append('ifsc_code', formData.ifsc_code);
         data.append('bank_passbook', files.bank_passbook);
-        data.append('insurance_provider',formData.insurance_provider);
-        data.append('policy_no',formData.policy_no);
-        data.append('validity_period',formData.validity_period);
-        data.append('other_gvt_scheme',formData.other_gvt_scheme);
-        data.append('any_other',formData.any_other);
+        data.append('insurance_provider', formData.insurance_provider);
+        data.append('policy_no', formData.policy_no);
+        data.append('validity_period', formData.validity_period);
+        data.append('other_gvt_scheme', formData.other_gvt_scheme);
+        data.append('any_other', formData.any_other);
 
         try {
             const res = await apiRoute.put(`/formality/updateEssentialRecords/${admission_no}`, data, {
@@ -419,14 +448,14 @@ function Essential_record() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
                                 createFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
                             } else {
@@ -434,7 +463,7 @@ function Essential_record() {
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
-                            <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                            <button type="button" className="btn btn-danger mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter your admission number.");
                                 } else {
@@ -460,7 +489,6 @@ function Essential_record() {
                         <div className="consultant_details">
                             <Form className='media_consent' onSubmit={handleSubmit}>
                                 <Row>
-
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
                                             Name :
@@ -528,6 +556,14 @@ function Essential_record() {
                                                 onChange={handleInputChange}
                                                 className="mb-2"
                                             />
+
+                                            {/* Form 7  attachment*/}
+                                            <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="form7_attach"
+                                                onChange={handleFileChange}
+                                            />
                                         </Col>
                                     </Form.Group>
 
@@ -571,7 +607,6 @@ function Essential_record() {
                                                 type="file"
                                                 name="bank_passbook"
                                                 onChange={handleFileChange}
-                                                accept=".pdf,.jpg,.jpeg,.png"
                                             />
                                         </Col>
                                     </Form.Group>
@@ -644,8 +679,17 @@ function Essential_record() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-
-                <h4 className="text-center MY-4">4. Resident Document Information Form</h4>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                        {/* <div className="logo_text">
+                            <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                        </div> */}
+                    </Col>
+                    <Col md={9}>
+                        <h4 className="text-center">4. Resident Document Information Form</h4>
+                    </Col>
+                </Row>
 
                 <Form className='media_consent'>
                     <Row>
@@ -696,6 +740,33 @@ function Essential_record() {
                                     value={formData.disability_no}
                                     onChange={handleInputChange}
                                     accept=".pdf,.jpg,.jpeg,.png"
+                                />
+
+                                {/* Voter ID */}
+                                <Form.Label className="mb-1">Voter ID</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="voter_id"
+                                    value={formData.voter_id}
+                                    onChange={handleInputChange}
+                                    className="mb-2"
+                                />
+
+                                {/* Form 7 */}
+                                <Form.Label className="mb-1">Form 7</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="form_7"
+                                    value={formData.form_7}
+                                    onChange={handleInputChange}
+                                    className="mb-2"
+                                />
+
+                                <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
+                                <img
+                                    src={files.form7_attach}
+                                    alt="Form 7"
+                                    style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
                                 />
                             </Col>
                         </Form.Group>
@@ -793,7 +864,16 @@ function Essential_record() {
                                 />
                             </Col>
                         </Form.Group>
-
+                        <Col md={12}>
+                            <Row className="d-flex align-items-center justify-content-center mt-3">
+                                <Col md={6} className="mt-3 down_title">
+                                    <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                                </Col>
+                                <Col md={6} className="mt-3 down_title">
+                                    <h5 className="text-end">Manasu Seal</h5>
+                                </Col>
+                            </Row>
+                        </Col>
                     </Row>
                 </Form>
 
@@ -861,6 +941,73 @@ function Essential_record() {
                                             value={formData.disability_no}
                                             onChange={handleInputChange}
                                             required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Disability Certificate No. & Issuing Authority :
+                                    </Form.Label>
+                                    <Col sm="6" className='d-flex align-items-center'>
+                                        <Form.Control
+                                            type="text"
+                                            name="disability_no"
+                                            value={formData.disability_no}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Voter ID :
+                                    </Form.Label>
+                                    <Col sm="6" className='d-flex align-items-center'>
+                                        <Form.Control
+                                            type="text"
+                                            name="voter_id"
+                                            value={formData.voter_id}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Form 7 :
+                                    </Form.Label>
+                                    <Col sm="6" className='d-flex align-items-center'>
+                                        <Form.Control
+                                            type="text"
+                                            name="form_7"
+                                            value={formData.form_7}
+                                            onChange={handleInputChange}
+                                            required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Form 7 Attachment:
+                                    </Form.Label>
+                                    <Col sm="6" className='d-flex flex-column align-items-start'>
+                                        <Form.Control
+                                            type="file"
+                                            name="form7_attach"
+                                            onChange={handleFileChange}
+                                            required
+                                        />
+
+                                        {/* Preview Image Below File Input */}
+                                        {files?.form7_attach ? (
+                                            <img
+                                                src={files.form7_attach}
+                                                alt="form7_attach"
+                                                style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
+                                            />
+                                        ) : (
+                                            <p style={{ marginTop: "10px" }}>No new photo available</p>
+                                        )}
                                     </Col>
                                 </Form.Group>
 

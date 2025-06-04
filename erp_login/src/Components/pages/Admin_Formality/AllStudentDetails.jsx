@@ -8,6 +8,7 @@ import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function AllStudentDetails() {
     const [stud_details, setStudentDetails] = useState([]);
@@ -16,7 +17,7 @@ function AllStudentDetails() {
 
     const handleClose = () => setShow(false);
 
-    const userType = Cookies.get('usertype'); 
+    const userType = Cookies.get('usertype');
 
     const [formData, setFormData] = useState({
         id: '',
@@ -25,11 +26,15 @@ function AllStudentDetails() {
         department: '',
         email: '',
         phone: '',
+        secondary_phone: '',
         field: '',
         clg_name: '',
         duration: '',
         from_date: '',
         to_date: '',
+        supervisor_name: '',
+        supervisor_email: '',
+        supervisor_phone: '',
         choose_intern: '',
     })
 
@@ -64,11 +69,10 @@ function AllStudentDetails() {
     const filteredRescueDetails = stud_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.admission_no).toLowerCase().includes(searchTerm) ||
-            String(item.rescue_name).toLowerCase().includes(searchTerm) ||
-            String(item.referred_by).toLowerCase().includes(searchTerm) ||
-            String(item.from_place).toLowerCase().includes(searchTerm) ||
-            String(item.police_memo).toLowerCase().includes(searchTerm) ||
+            String(item.stud_name).toLowerCase().includes(searchTerm) ||
+            String(item.stud_id).toLowerCase().includes(searchTerm) ||
+            String(item.clg_name).toLowerCase().includes(searchTerm) ||
+            String(item.department).toLowerCase().includes(searchTerm) ||
             String(item.information_public).toLowerCase().includes(searchTerm)
         );
     });
@@ -83,6 +87,12 @@ function AllStudentDetails() {
             const response = await apiRoute.get(`/formality/getStudentDet/${id}`);
             const student = response.data.data[0]; // Access the first object in the 'data' array
 
+            const photoUrl = student.stud_photo
+                ? `http://localhost:5000/${student.stud_photo}`
+                : ''; // fallback if photo not available
+
+            console.log(photoUrl);
+
             setFormData((formData) => ({
                 ...formData,
                 stud_name: student.stud_name || '',
@@ -90,12 +100,17 @@ function AllStudentDetails() {
                 department: student.department || '',
                 email: student.email || '',
                 phone: student.phone || '',
+                secondary_phone: student.secondary_phone || '',
                 field: student.field || '',
                 clg_name: student.clg_name || '',
                 duration: student.duration || '',
                 from_date: student.from_date ? student.from_date.slice(0, 10) : '', // format date
                 to_date: student.to_date ? student.to_date.slice(0, 10) : '',
-                choose_intern: student.choose_intern || ''
+                supervisor_name: student.supervisor_name || '',
+                supervisor_email: student.supervisor_email || '',
+                supervisor_phone: student.supervisor_phone || '',
+                choose_intern: student.choose_intern || '',
+                stud_photo: photoUrl
             }));
 
             setTimeout(() => {
@@ -155,17 +170,20 @@ function AllStudentDetails() {
 
             setFormData((formData) => ({
                 ...formData,
-                id: student.id || '',
                 stud_name: student.stud_name || '',
                 stud_id: student.stud_id || '',
                 department: student.department || '',
                 email: student.email || '',
                 phone: student.phone || '',
+                secondary_phone: student.secondary_phone || '',
                 field: student.field || '',
                 clg_name: student.clg_name || '',
                 duration: student.duration || '',
                 from_date: student.from_date ? student.from_date.slice(0, 10) : '', // format date
                 to_date: student.to_date ? student.to_date.slice(0, 10) : '',
+                supervisor_name: student.supervisor_name || '',
+                supervisor_email: student.supervisor_email || '',
+                supervisor_phone: student.supervisor_phone || '',
                 choose_intern: student.choose_intern || ''
             }));
 
@@ -300,8 +318,23 @@ function AllStudentDetails() {
             </Container>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={2}>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                    </Col>
+                    <Col md={8}>
+                        <h4 className="text-center">Internship Student Details</h4>
+                    </Col>
+                    <Col md={2}>
+                        {formData.stud_photo ? (
+                            <img src={formData.stud_photo} className="pdf_logo" alt="Student" />
+                        ) : (
+                            <p>No photo available</p>
+                        )}
+                    </Col>
+                </Row>
                 <Form>
-                    <Col md={8} className="consultant_box my-2 p-3">
+                    <Col md={12} className="consultant_box my-2 p-3">
                         <Row>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
@@ -334,7 +367,21 @@ function AllStudentDetails() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Department :
+                                    Name of the College :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="clg_name"
+                                        type="text"
+                                        value={formData.clg_name}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Name of the Department :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -360,15 +407,68 @@ function AllStudentDetails() {
                                     />
                                 </Col>
                             </Form.Group>
-                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
                                 <Form.Label column sm="4">
-                                    Contact Number :
+                                    Contact Numbers:
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="4">
                                     <Form.Control
                                         name="phone"
                                         type="number"
                                         value={formData.phone}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                                <Col sm="4">
+                                    <Form.Control
+                                        name="secondary_phone"
+                                        type="number"
+                                        value={formData.secondary_phone}
+                                        onChange={handleInputChange}
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start d-flex align-items-center" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Supervisor's Name from College/Institution :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="supervisor_name"
+                                        type="text"
+                                        value={formData.supervisor_name}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Supervisor's Email :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="supervisor_email"
+                                        type="text"
+                                        value={formData.supervisor_email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
+                                    Supervisor's Contact Number :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="supervisor_phone"
+                                        type="text"
+                                        value={formData.supervisor_phone}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -394,20 +494,7 @@ function AllStudentDetails() {
                                     </Form.Control>
                                 </Col>
                             </Form.Group>
-                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
-                                    College Name :
-                                </Form.Label>
-                                <Col sm="8">
-                                    <Form.Control
-                                        name="clg_name"
-                                        type="text"
-                                        value={formData.clg_name}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
+
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
                                     Duration :

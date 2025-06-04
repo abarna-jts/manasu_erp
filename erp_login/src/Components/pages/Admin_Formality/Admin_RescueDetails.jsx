@@ -7,6 +7,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Cookies from 'js-cookie';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Admin_RescueDetails() {
     const [show, setShow] = useState(false);
@@ -29,7 +30,10 @@ function Admin_RescueDetails() {
         escape: '',
         death: '',
         discharge: '',
+        transfer: '',
         reunited: '',
+        state_venue: '',
+        state: ''
     });
 
     const apiRoute = axios.create({
@@ -47,7 +51,13 @@ function Admin_RescueDetails() {
 
     const handleCheckChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+            ...(name === 'transfer' && value === 'No' && { state_venue: '' }), // Clear state_venue if Transfer = No
+            ...(name === 'reunited' && value === 'No' && { state: '' }) // Clear state if Reunited = No
+        }));
     };
 
 
@@ -86,12 +96,11 @@ function Admin_RescueDetails() {
     const filteredRescueDetails = report_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.event_name).toLowerCase().includes(searchTerm) ||
-            String(item.celebration_name).toLowerCase().includes(searchTerm) ||
-            String(item.program_name).toLowerCase().includes(searchTerm) ||
-            String(item.internship_duration).toLowerCase().includes(searchTerm) ||
-            String(item.police_memo).toLowerCase().includes(searchTerm) ||
-            String(item.staff_name).toLowerCase().includes(searchTerm)
+            String(item.rescue_name).toLowerCase().includes(searchTerm) ||
+            String(item.state).toLowerCase().includes(searchTerm) ||
+            String(item.state_venue).toLowerCase().includes(searchTerm) ||
+            String(item.referred_by).toLowerCase().includes(searchTerm) ||
+            String(item.admission_no).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -121,7 +130,10 @@ function Admin_RescueDetails() {
                 escape: data.escape || '',
                 death: data.death || '',
                 discharge: data.discharge || '',
-                reunited: data.reunited || ''
+                reunited: data.reunited || '',
+                transfer: data.transfer || '',
+                state_venue: data.state_venue || '',
+                state: data.state || '',
 
             }));
 
@@ -194,7 +206,10 @@ function Admin_RescueDetails() {
                 escape: data.escape || '',
                 death: data.death || '',
                 discharge: data.discharge || '',
-                reunited: data.reunited || ''
+                reunited: data.reunited || '',
+                transfer: data.transfer || '',
+                state_venue: data.state_venue || '',
+                state: data.state || '',
             });
 
             setSelectedId(id); // ✅ Store the ID
@@ -288,9 +303,12 @@ function Admin_RescueDetails() {
                                     <th>Resident's Name</th>
                                     <th>Admitting Authority for Rescue</th>
                                     <th>Self Discharge</th>
+                                    <th>Transfer</th>
+                                    <th>Transfered State</th>
                                     <th>Escape</th>
                                     <th>Death</th>
                                     <th>Reunited</th>
+                                    <th>Reunited State</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -299,13 +317,16 @@ function Admin_RescueDetails() {
                                     filteredRescueDetails.map((item, index) => (
                                         <tr key={item.id}>
                                             <td>{index + 1}</td>
-                                            <td>{item.admission_no}</td>
-                                            <td>{item.rescue_name}</td>
-                                            <td>{item.referred_by}</td>
-                                            <td>{item.discharge}</td>
-                                            <td>{item.escape}</td>
-                                            <td>{item.death}</td>
-                                            <td>{item.reunited}</td>
+                                            <td>{item.admission_no || "Null"}</td>
+                                            <td>{item.rescue_name || "Null"}</td>
+                                            <td>{item.referred_by || "Null"}</td>
+                                            <td>{item.discharge || "Null"}</td>
+                                            <td>{item.transfer || "Null"}</td>
+                                            <td>{item.state_venue || "Null"}</td>
+                                            <td>{item.escape || "Null"}</td>
+                                            <td>{item.death || "Null"}</td>
+                                            <td>{item.reunited || "Null"}</td>
+                                            <td>{item.state || "Null"}</td>
                                             <td>
                                                 <button className="btn btn-success icon_details"
                                                     onClick={() => {
@@ -467,6 +488,48 @@ function Admin_RescueDetails() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
                                     <Form.Label column sm="4" className="text-start">
+                                        Transfer :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="transfer"
+                                            value="Yes"
+                                            checked={formData.transfer === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="transfer"
+                                            value="No"
+                                            checked={formData.transfer === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+                                {/* Show the State / Venue field only if transfer is "Yes" */}
+                                {formData.transfer === 'Yes' && (
+                                    <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
+                                        <Form.Label column sm="4" className="text-start">
+                                            State / Venue :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                type="text"
+                                                name="state_venue"
+                                                value={formData.state_venue || ''}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter State or Venue"
+                                                required={formData.transfer === 'Yes'}  // Required only if transfer is yes
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                )}
+
+                                <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
+                                    <Form.Label column sm="4" className="text-start">
                                         Reunited :
                                     </Form.Label>
                                     <Col sm="8" className='d-flex align-items-center'>
@@ -489,6 +552,25 @@ function Admin_RescueDetails() {
                                     </Col>
                                 </Form.Group>
 
+                                {/* Show the State / Venue field only if transfer is "Yes" */}
+                                {formData.reunited === 'Yes' && (
+                                    <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
+                                        <Form.Label column sm="4" className="text-start">
+                                            State :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                type="text"
+                                                name="state"
+                                                value={formData.state || ''}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter State"
+                                                required={formData.reunited === 'Yes'}  // Required only if transfer is yes
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                )}
+
                                 <div className="mt-3 d-flex align-tems-cente justify-content-between">
                                     <Button variant="success" className="m-1" type="submit">Submit</Button>
                                     <Button variant="secondary" onClick={handleClose}>
@@ -503,7 +585,14 @@ function Admin_RescueDetails() {
             </Modal>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                <h3 className='section_title'>Rescue Discharge Information</h3>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={2}>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                    </Col>
+                    <Col md={10}>
+                        <h4 className="text-center">Rescue Discharge Information</h4>
+                    </Col>
+                </Row>
                 <Form className='rescue_details'>
                     <Row>
 
@@ -644,6 +733,68 @@ function Admin_RescueDetails() {
                             </Col>
                         </Form.Group>
 
+                        {/* Show the State / Venue field only if transfer is "Yes" */}
+                        {formData.reunited === 'Yes' && (
+                            <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
+                                <Form.Label column sm="4" className="text-start">
+                                    State :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="text"
+                                        name="state"
+                                        value={formData.state || ''}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter State"
+                                        required={formData.reunited === 'Yes'}  // Required only if transfer is yes
+                                    />
+                                </Col>
+                            </Form.Group>
+                        )}
+
+                        <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
+                            <Form.Label column sm="4" className="text-start">
+                                Transfer :
+                            </Form.Label>
+                            <Col sm="8" className='d-flex align-items-center'>
+                                <Form.Check
+                                    type="radio"
+                                    label="Yes"
+                                    name="transfer"
+                                    value="Yes"
+                                    checked={formData.transfer === 'Yes'}
+                                    onChange={handleCheckChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="No"
+                                    name="transfer"
+                                    value="No"
+                                    checked={formData.transfer === 'No'}
+                                    onChange={handleCheckChange}
+                                />
+                            </Col>
+                        </Form.Group>
+
+                        {/* Show the State / Venue field only if transfer is "Yes" */}
+                        {formData.transfer === 'Yes' && (
+                            <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
+                                <Form.Label column sm="4" className="text-start">
+                                    State / Venue :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        type="text"
+                                        name="state_venue"
+                                        value={formData.state_venue || ''}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter State or Venue"
+                                        required={formData.transfer === 'Yes'}  // Required only if transfer is yes
+                                    />
+                                </Col>
+                            </Form.Group>
+                        )}
+
                     </Row>
                 </Form>
             </div>
@@ -778,6 +929,68 @@ function Admin_RescueDetails() {
                                         />
                                     </Col>
                                 </Form.Group>
+
+                                {/* Show the State / Venue field only if transfer is "Yes" */}
+                                {formData.reunited === 'Yes' && (
+                                    <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
+                                        <Form.Label column sm="4" className="text-start">
+                                            State :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                type="text"
+                                                name="state"
+                                                value={formData.state || ''}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter State"
+                                                required={formData.reunited === 'Yes'}  // Required only if transfer is yes
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                )}
+
+                                <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
+                                    <Form.Label column sm="4" className="text-start">
+                                        Transfer :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="transfer"
+                                            value="Yes"
+                                            checked={formData.transfer === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="transfer"
+                                            value="No"
+                                            checked={formData.transfer === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+
+                                {/* Show the State / Venue field only if transfer is "Yes" */}
+                                {formData.transfer === 'Yes' && (
+                                    <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
+                                        <Form.Label column sm="4" className="text-start">
+                                            State :
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                type="text"
+                                                name="state_venue"
+                                                value={formData.state_venue || ''}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter State"
+                                                required={formData.transfer === 'Yes'}  // Required only if transfer is yes
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                )}
 
                                 <div className="mt-3 d-flex align-tems-cente justify-content-between">
                                     <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, selectedId)}>Update</Button>

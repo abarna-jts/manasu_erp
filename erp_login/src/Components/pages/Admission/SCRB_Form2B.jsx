@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function SCRB_Form2B() {
   const [admission_no, setAdmissionNumber] = useState('');
@@ -288,8 +289,8 @@ function SCRB_Form2B() {
   const navigate = useNavigate();
 
   const handleNextpage = () => {
-      navigate("/scrb_form2C");
-    
+    navigate("/scrb_form2C");
+
   }
 
   const handleBackPage = () => {
@@ -601,7 +602,14 @@ function SCRB_Form2B() {
 
           {/* pdf view content */}
           <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-            <h4 className="text-center">FORM 2B - PDF PREVIEW</h4>
+            <Row className="d-flex align-items-center justify-content-center mb-2">
+              <Col md={2}>
+                <img src={manasu_logo} className="pdf_logo" alt="" />
+              </Col>
+              <Col md={10}>
+                <h4 className="text-center">FORM 2B - PDF PREVIEW</h4>
+              </Col>
+            </Row>
             <form className='form_2B'>
               <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
                 <tbody>

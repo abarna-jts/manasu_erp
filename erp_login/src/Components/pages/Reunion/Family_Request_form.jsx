@@ -11,7 +11,7 @@ import html2canvas from "html2canvas";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
-import manasu_logo from '../Admission/manasu_logo.png';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Family_Request_form() {
     const [show, setShow] = useState(false);
@@ -789,9 +789,9 @@ function Family_Request_form() {
                         <Row className="d-flex align-items-center justify-content-center mb-2">
                             <Col md={3} className='d-flex align-items-center pdf_logo'>
                                 <img src={manasu_logo} className="pdf_logo" alt="" />
-                                <div className="logo_text">
-                                    <h4><span>MANASU</span> <br />Mental Health Charity Home <br/>Chennai,</h4>
-                                </div>
+                                {/* <div className="logo_text">
+                                    <h4><span>MANASU</span> <br />Mental Health Charity Home <br/>Chennai-43,</h4>
+                                </div> */}
                             </Col>
                             <Col md={9}>
                                 <h4 className="text-center">1. Family Request Form – Discharge of Resident</h4>

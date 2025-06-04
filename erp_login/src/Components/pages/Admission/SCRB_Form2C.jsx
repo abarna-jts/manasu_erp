@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useNavigate } from 'react-router-dom';
 import { Alert } from "react-bootstrap";
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function SCRB_Form2C() {
   const [admission_no, setAdmissionNumber] = useState('');
@@ -301,15 +302,15 @@ function SCRB_Form2C() {
   };
 
   // Trigger when admission number changes
-    useEffect(() => {
-      if (admission_no.trim() !== "") {
-        fetchRescueDetails(admission_no);
-      } else {
-        setRescueImage(null);
-        setRescueName("");
-        setError("");
-      }
-    }, [admission_no]);
+  useEffect(() => {
+    if (admission_no.trim() !== "") {
+      fetchRescueDetails(admission_no);
+    } else {
+      setRescueImage(null);
+      setRescueName("");
+      setError("");
+    }
+  }, [admission_no]);
 
   return (
     <>
@@ -389,9 +390,9 @@ function SCRB_Form2C() {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                      <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
+                      {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
                         Import Excel Sheet
-                      </button>
+                      </button> */}
                     </Form.Group>
                   </Form>
 
@@ -605,7 +606,14 @@ function SCRB_Form2C() {
 
           {/* pdf formate view  */}
           <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-            <h4 className="text-center">FORM 2C - PDF PREVIEW</h4>
+            <Row className="d-flex align-items-center justify-content-center mb-2">
+              <Col md={2}>
+                <img src={manasu_logo} className="pdf_logo" alt="" />
+              </Col>
+              <Col md={10}>
+                <h4 className="text-center">FORM 2C - PDF PREVIEW</h4>
+              </Col>
+            </Row>
             <form >
               <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
                 <tbody>
