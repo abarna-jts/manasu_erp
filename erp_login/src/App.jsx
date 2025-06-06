@@ -40,6 +40,10 @@ import Sample from './Components/authentication/sample';
 import Rescue_articles_form from './Components/pages/Recovery/Rescue_articles_form';
 import Reunion_Checklist from './Components/pages/Reunion/Reunion_Checklist';
 import Edit_ReunionChecklist from './Components/pages/Reunion/Edit_ReunionChecklist';
+import Dr_visit from './Components/pages/Residency_time/Dr_visit';
+import Dr_visitView from './Components/pages/Residency_time/Dr_visitView';
+import Medical_camp from './Components/pages/Residency_time/Medical_camp';
+import Reunion_summary from './Components/pages/Residency_time/Reunion_summary';
 
 function App() {
 
@@ -167,6 +171,15 @@ function App() {
                 element={<MainLayout><Edit_ReunionChecklist /></MainLayout>}
               />
               
+              <Route
+                path='/dr_visit'
+                element={<MainLayout><Dr_visit /></MainLayout>}
+              />
+
+              <Route
+                path='/reunion_summary'
+                element={<MainLayout><Reunion_summary /></MainLayout>}
+              />
 
               <Route
                 path='/imagepdf'
@@ -232,6 +245,18 @@ function App() {
                 path='/nurse_sheet'
                 element={<MainLayout><Nurse_Record_sheet /></MainLayout>}
               />
+              <Route
+                path='/dr_visit'
+                element={<MainLayout><Dr_visit /></MainLayout>}
+              />
+              <Route
+                path='/dr_visitView'
+                element={<MainLayout><Dr_visitView /></MainLayout>}
+              />
+              <Route
+                path='/medical_camp'
+                element={<MainLayout><Medical_camp /></MainLayout>}
+              />
             </>
 
           )}
@@ -251,6 +276,11 @@ function App() {
               <Route
                 path='/mseform'
                 element={<MainLayout><MSE_form /></MainLayout>}
+              />
+
+              <Route
+                path='/reunion_summary'
+                element={<MainLayout><Reunion_summary /></MainLayout>}
               />
             </>
           )}

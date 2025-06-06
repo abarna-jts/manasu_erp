@@ -20,7 +20,6 @@ function Nurse_Record_sheet() {
 
     const handleClose1 = () => setShow1(false);
 
-   
     const [formData, setFormData] = useState({
         admission_no: '',
         month: '',

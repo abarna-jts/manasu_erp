@@ -7,7 +7,7 @@ import html2canvas from "html2canvas";
 import { useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import manasu_logo from "../Admission/manasu_logo.png";
+import manasu_logo from "../Admission/Manasu-Logo.png";
 
 function View_annualReport() {
     const [report_details, setReportDetail] = useState([]);
@@ -299,9 +299,9 @@ function View_annualReport() {
                     <Row className="d-flex align-items-center justify-content-center mb-2">
                         <Col md={3} className='d-flex align-items-center pdf_logo'>
                             <img src={manasu_logo} className="pdf_logo" alt="" />
-                            <div className="logo_text">
+                            {/* <div className="logo_text">
                                 <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
-                            </div>
+                            </div> */}
                         </Col>
                         <Col md={9}>
                             <h4 className="text-center">Resident Activities and Events Report Form (Annual)</h4>

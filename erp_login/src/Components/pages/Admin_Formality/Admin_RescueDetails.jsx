@@ -304,7 +304,7 @@ function Admin_RescueDetails() {
                                     <th>Admitting Authority for Rescue</th>
                                     <th>Self Discharge</th>
                                     <th>Transfer</th>
-                                    <th>Transfered State</th>
+                                    <th>Transferred Place</th>
                                     <th>Escape</th>
                                     <th>Death</th>
                                     <th>Reunited</th>

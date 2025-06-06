@@ -476,6 +476,9 @@ body {
 	margin: 15px 0px;
 }
 
+.sign_class{
+	font-size: 18px;
+}
 .checklist_ul::marker{
 	font-weight: 700;
 	font-size: 19px;

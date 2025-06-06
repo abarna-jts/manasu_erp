@@ -27,7 +27,10 @@ function Formality_declaration() {
         medicine_provided: '',
         toiletries_provided: '',
         dress_provided: '',
-        travel_expenses: ''
+        travel_expenses: '',
+        medical_prescription: '',
+        discharge_summary: '',
+        travel_letter: ''
     })
 
     const apiRoute = axios.create({
@@ -74,7 +77,7 @@ function Formality_declaration() {
             const res = await apiRoute.post('/formality/createDeclaration', formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            alert('Self Declaration Form submitted successfully!');
+            alert('Document Handover Form submitted successfully!');
             window.location.reload();
         } catch (err) {
             console.error(err);
@@ -138,6 +141,9 @@ function Formality_declaration() {
                 toiletries_provided: data.toiletries_provided || '',
                 dress_provided: data.dress_provided || '',
                 travel_expenses: data.travel_expenses || '',
+                medical_prescription: data.medical_prescription || '',
+                discharge_summary: data.discharge_summary || '',
+                travel_letter: data.travel_letter || '',
             }));
 
             setPreviewRequested(true);
@@ -172,6 +178,9 @@ function Formality_declaration() {
                 toiletries_provided: data.toiletries_provided || '',
                 dress_provided: data.dress_provided || '',
                 travel_expenses: data.travel_expenses || '',
+                medical_prescription: data.medical_prescription || '',
+                discharge_summary: data.discharge_summary || '',
+                travel_letter: data.travel_letter || '',
             }));
 
             setShow(true);
@@ -412,6 +421,75 @@ function Formality_declaration() {
                                             />
                                         </Col>
                                     </Form.Group>
+                                    <Form.Group as={Row} className="mb-1">
+                                        <Form.Label column sm="4" className="text-start">
+                                            Medical Prescription :
+                                        </Form.Label>
+                                        <Col sm="8" className='d-flex align-items-center'>
+                                            <Form.Check
+                                                type="radio"
+                                                label="Yes"
+                                                name="medical_prescription"
+                                                value="Yes"
+                                                checked={formData.medical_prescription === 'Yes'}
+                                                onChange={handleCheckChange}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="No"
+                                                name="medical_prescription"
+                                                value="No"
+                                                checked={formData.medical_prescription === 'No'}
+                                                onChange={handleCheckChange}
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1">
+                                        <Form.Label column sm="4" className="text-start">
+                                            Copy of Discharge Summary :
+                                        </Form.Label>
+                                        <Col sm="8" className='d-flex align-items-center'>
+                                            <Form.Check
+                                                type="radio"
+                                                label="Yes"
+                                                name="discharge_summary"
+                                                value="Yes"
+                                                checked={formData.discharge_summary === 'Yes'}
+                                                onChange={handleCheckChange}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="No"
+                                                name="discharge_summary"
+                                                value="No"
+                                                checked={formData.discharge_summary === 'No'}
+                                                onChange={handleCheckChange}
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1">
+                                        <Form.Label column sm="4" className="text-start">
+                                            Travel Safety Letter :
+                                        </Form.Label>
+                                        <Col sm="8" className='d-flex align-items-center'>
+                                            <Form.Check
+                                                type="radio"
+                                                label="Yes"
+                                                name="travel_letter"
+                                                value="Yes"
+                                                checked={formData.travel_letter === 'Yes'}
+                                                onChange={handleCheckChange}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="No"
+                                                name="travel_letter"
+                                                value="No"
+                                                checked={formData.travel_letter === 'No'}
+                                                onChange={handleCheckChange}
+                                            />
+                                        </Col>
+                                    </Form.Group>
 
 
                                     <div className="mt-3">
@@ -572,6 +650,75 @@ function Formality_declaration() {
                                 />
                             </Col>
                         </Form.Group>
+                        <Form.Group as={Row} className="mb-1">
+                            <Form.Label column sm="4" className="text-start">
+                                Medical Prescription :
+                            </Form.Label>
+                            <Col sm="8" className='d-flex align-items-center'>
+                                <Form.Check
+                                    type="radio"
+                                    label="Yes"
+                                    name="medical_prescription"
+                                    value="Yes"
+                                    checked={formData.medical_prescription === 'Yes'}
+                                    onChange={handleCheckChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="No"
+                                    name="medical_prescription"
+                                    value="No"
+                                    checked={formData.medical_prescription === 'No'}
+                                    onChange={handleCheckChange}
+                                />
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row} className="mb-1">
+                            <Form.Label column sm="4" className="text-start">
+                                Copy of Discharge Summary :
+                            </Form.Label>
+                            <Col sm="8" className='d-flex align-items-center'>
+                                <Form.Check
+                                    type="radio"
+                                    label="Yes"
+                                    name="discharge_summary"
+                                    value="Yes"
+                                    checked={formData.discharge_summary === 'Yes'}
+                                    onChange={handleCheckChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="No"
+                                    name="discharge_summary"
+                                    value="No"
+                                    checked={formData.discharge_summary === 'No'}
+                                    onChange={handleCheckChange}
+                                />
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row} className="mb-1">
+                            <Form.Label column sm="4" className="text-start">
+                                Travel Safety Letter :
+                            </Form.Label>
+                            <Col sm="8" className='d-flex align-items-center'>
+                                <Form.Check
+                                    type="radio"
+                                    label="Yes"
+                                    name="travel_letter"
+                                    value="Yes"
+                                    checked={formData.travel_letter === 'Yes'}
+                                    onChange={handleCheckChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="No"
+                                    name="travel_letter"
+                                    value="No"
+                                    checked={formData.travel_letter === 'No'}
+                                    onChange={handleCheckChange}
+                                />
+                            </Col>
+                        </Form.Group>
                         <Col md={12}>
                             <Row className="d-flex align-items-center justify-content-center mt-3">
                                 <Col md={6} className="mt-3 down_title">
@@ -698,8 +845,8 @@ function Formality_declaration() {
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
-                                            name="t"
-                                            value="travel_expenses"
+                                            name="travel_expenses"
+                                            value="Yes"
                                             checked={formData.travel_expenses === 'Yes'}
                                             onChange={handleCheckChange}
                                         />
@@ -709,6 +856,75 @@ function Formality_declaration() {
                                             name="travel_expenses"
                                             value="No"
                                             checked={formData.travel_expenses === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-1">
+                                    <Form.Label column sm="4" className="text-start">
+                                        Medical Prescription :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="medical_prescription"
+                                            value="Yes"
+                                            checked={formData.medical_prescription === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="medical_prescription"
+                                            value="No"
+                                            checked={formData.medical_prescription === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-1">
+                                    <Form.Label column sm="4" className="text-start">
+                                        Copy of Discharge Summary :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="discharge_summary"
+                                            value="Yes"
+                                            checked={formData.discharge_summary === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="discharge_summary"
+                                            value="No"
+                                            checked={formData.discharge_summary === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-1">
+                                    <Form.Label column sm="4" className="text-start">
+                                        Travel Safety Letter :
+                                    </Form.Label>
+                                    <Col sm="8" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="travel_letter"
+                                            value="Yes"
+                                            checked={formData.travel_letter === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="travel_letter"
+                                            value="No"
+                                            checked={formData.travel_letter === 'No'}
                                             onChange={handleCheckChange}
                                         />
                                     </Col>

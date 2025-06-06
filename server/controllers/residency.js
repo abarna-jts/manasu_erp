@@ -3,17 +3,43 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, path.resolve("uploads/Resque_Condition_Images/"));
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + "-" + file.originalname);
+//   },
+// });
+
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve("uploads/Resque_Condition_Images/"));
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
+    destination: function (req, file, cb) {
+        let uploadPath;
+
+        // Map field names to folders
+        if (['summary_attach'].includes(file.fieldname)) {
+            uploadPath = path.resolve('uploads/SummaryAttach/');
+        } else {
+            uploadPath = path.resolve('uploads/Resque_Condition_Images/');
+        }
+
+        // Create the folder if it doesn't exist
+        fs.mkdirSync(uploadPath, { recursive: true });
+
+        // Pass the folder to multer
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
 });
 
 
-const upload = multer({ storage: storage }).single("recovery_photo");
+// const upload = multer({ storage: storage }).single("recovery_photo");
+const upload = multer({ storage: storage }).fields([
+    { name: 'recovery_photo', maxCount: 1 },
+    { name: 'summary_attach', maxCount: 1 },
+]);
 
 
 const createRescueCondition = (req, res) => {
@@ -621,7 +647,7 @@ const createPrescription = (req, res) => {
     hospital_name,
     department,
     masterHealthCheckup,
-    phone_no,
+    medical_type,
     instruction,
     advice,
     follow_up,
@@ -636,9 +662,9 @@ const createPrescription = (req, res) => {
 
   const sql = `
     INSERT INTO prescription (
-      admission_no, rescue_name, age, date, op_no, hospital_name, department,
-      masterHealthCheckup, phone_no, instruction, advice, follow_up
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      admission_no, rescue_name, age, created_date, op_no, hospital_name, department,
+      masterHealthCheckup, medical_type, instruction, advice, follow_up
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [
     admission_no,
@@ -649,7 +675,7 @@ const createPrescription = (req, res) => {
     hospital_name,
     department,
     masterHealthCheckup,
-    phone_no,
+    medical_type,
     instruction,
     advice,
     follow_up,
@@ -766,29 +792,29 @@ const getPrescriptionbyID = (req, res) => {
 };
 
 const updatePrescription = (req, res) => {
-    const id = req.params.id;
-    const {
-        admission_no,
-        rescue_name,
-        age,
-        op_no,
-        hospital_name,
-        department,
-        masterHealthCheckup,
-        phone_no,
-        instruction,
-        advice,
-        follow_up,
-        prescription_medicines,
-    } = req.body;
+  const id = req.params.id;
+  const {
+    admission_no,
+    rescue_name,
+    age,
+    op_no,
+    hospital_name,
+    department,
+    masterHealthCheckup,
+    phone_no,
+    instruction,
+    advice,
+    follow_up,
+    prescription_medicines,
+  } = req.body;
 
-    if (!admission_no) {
-        return res.status(400).json({ error: 'Missing admission_no' });
-    }
+  if (!admission_no) {
+    return res.status(400).json({ error: 'Missing admission_no' });
+  }
 
-    console.log("Updating prescription ID:", id);
+  console.log("Updating prescription ID:", id);
 
-    const sql = `
+  const sql = `
         UPDATE prescription SET
           admission_no = ?, 
           rescue_name = ?, 
@@ -803,39 +829,39 @@ const updatePrescription = (req, res) => {
           follow_up = ?
         WHERE id = ?`;
 
-    const values = [
-        admission_no,
-        rescue_name,
-        age,
-        op_no,
-        hospital_name,
-        department,
-        masterHealthCheckup,
-        phone_no,
-        instruction,
-        advice,
-        follow_up,
-        id,
-    ];
+  const values = [
+    admission_no,
+    rescue_name,
+    age,
+    op_no,
+    hospital_name,
+    department,
+    masterHealthCheckup,
+    phone_no,
+    instruction,
+    advice,
+    follow_up,
+    id,
+  ];
 
-    db.query(sql, values, (updateErr, result) => {
-        if (updateErr) {
-            return res.status(500).json({ message: 'Prescription update failed', error: updateErr });
-        }
+  db.query(sql, values, (updateErr, result) => {
+    if (updateErr) {
+      return res.status(500).json({ message: 'Prescription update failed', error: updateErr });
+    }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'No prescription found with this ID' });
-        }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'No prescription found with this ID' });
+    }
 
-        if (!Array.isArray(prescription_medicines) || prescription_medicines.length === 0) {
-            return res.status(200).json({ message: 'Prescription updated (no medicines provided)' });
-        }
+    if (!Array.isArray(prescription_medicines) || prescription_medicines.length === 0) {
+      return res.status(200).json({ message: 'Prescription updated (no medicines provided)' });
+    }
 
-        let completed = 0;
-        let hasError = false;
+    let completed = 0;
+    let hasError = false;
 
-        prescription_medicines.forEach((med) => {
-            const updateMedSql = `
+    prescription_medicines.forEach((med) => {
+      const updateMedSql = `
                 UPDATE prescription_medicines SET
                   medicine = ?, 
                   medicine_type = ?, 
@@ -848,35 +874,311 @@ const updatePrescription = (req, res) => {
                 WHERE id = ? AND prescription_id = ?
             `;
 
-            const medValues = [
-                med.medicine || '',
-                med.medicine_type || '',
-                med.duration || '',
-                med.intake || '',
-                med.med_instruction || '',
-                med.morning ?? null,
-                med.afternoon ?? null,
-                med.night ?? null,
-                med.id,
-                id
+      const medValues = [
+        med.medicine || '',
+        med.medicine_type || '',
+        med.duration || '',
+        med.intake || '',
+        med.med_instruction || '',
+        med.morning ?? null,
+        med.afternoon ?? null,
+        med.night ?? null,
+        med.id,
+        id
+      ];
+
+      db.query(updateMedSql, medValues, (medErr) => {
+        completed++;
+        if (medErr && !hasError) {
+          hasError = true;
+          return res.status(500).json({ message: 'Error updating medicine', error: medErr });
+        }
+
+        if (completed === prescription_medicines.length && !hasError) {
+          res.status(200).json({ message: 'Prescription and medicines updated successfully' });
+        }
+      });
+    });
+  });
+};
+
+const createDrVisit = (req, res) => {
+
+  const {
+    dr_name,
+    hospital_name,
+    date_time,
+    report,
+    resident_examinite
+  } = req.body;
+
+  const sql = 'INSERT INTO dr_visit (dr_name, hospital_name, date_time, report, resident_examinite) VALUES (?, ?, ?, ?, ?)';
+
+  db.query(sql, [
+    dr_name,
+    hospital_name,
+    date_time,
+    report,
+    resident_examinite
+  ], (err, result) => {
+    if (err) {
+      console.error('Error inserting data: ' + err.stack);
+      res.status(500).send('Error inserting data');
+      return;
+    }
+    console.log('Data inserted successfully');
+    res.status(200).send('Data inserted successfully');
+  });
+}
+
+const getAllDrVisit = (req, res) => {
+  const query = "Select * from dr_visit";
+
+  db.query(query, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res.status(201).json({ message: "Doctor Visit form Get Successfully", data: data });
+  });
+}
+
+const getDrVisitbyID = (req, res) => {
+  const id = req.params.id;
+  const query = 'SELECT * FROM dr_visit WHERE id = ?';
+
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Dr Visit Records not found' });
+    }
+
+    res.json(results[0]);
+  });
+}
+
+const UpdateDrVisit = (req, res) => {
+  const {
+    dr_name, hospital_name, date_time, resident_examinite, report
+  } = req.body;
+
+  const id = req.params.id;
+
+  const usquery = `UPDATE dr_visit SET
+                    dr_name = ?,
+                    hospital_name = ?,
+                    date_time = ?,
+                    resident_examinite = ?, 
+                    report = ?
+                    WHERE id= ?`;
+
+  const values = [
+    dr_name, hospital_name, date_time, resident_examinite, report, id
+  ];
+
+  db.query(usquery, values, (updateErr, result) => {
+    if (updateErr) {
+      return res.status(500).json({ message: "Update failed", error: updateErr });
+    }
+
+    return res.status(200).json({ message: "Dr Visit updated successfully!" });
+  });
+}
+
+const createMedicalCamp = (req, res) => {
+  const {
+    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details
+  } = req.body;
+
+  const sql = 'INSERT INTO medical_camp (camp_name, hospital_name, date, camp_type, organised_by,participants,feedback,general_details) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+
+  db.query(sql, [
+    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details || "Null"
+  ], (err, result) => {
+    if (err) {
+      console.error('Error inserting data: ' + err.stack);
+      res.status(500).send('Error inserting data');
+      return;
+    }
+    console.log('Data inserted successfully');
+    res.status(200).send('Data inserted successfully');
+  });
+}
+
+const getMedicalCamp = (req, res) => {
+  const query = "Select * from medical_camp";
+
+  db.query(query, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res.status(201).json({ message: "Medical Camp form Get Successfully", data: data });
+  });
+}
+
+const getMedicalCampID = (req, res) => {
+  const id = req.params.id;
+  const query = 'SELECT * FROM medical_camp WHERE id = ?';
+
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Medical Camp Records not found' });
+    }
+
+    res.json(results[0]);
+  });
+}
+
+const updateMedicalCamp = (req, res) => {
+  const {
+    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details
+  } = req.body;
+
+  const id = req.params.id;
+
+  const usquery = `UPDATE medical_camp SET
+                    camp_name = ?,
+                    hospital_name = ?,
+                    date = ?,
+                    camp_type = ?, 
+                    organised_by = ?,
+                    participants = ?,
+                    feedback = ?,
+                    general_details = ?
+                    WHERE id= ?`;
+
+  const values = [
+    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details,id
+  ];
+
+  db.query(usquery, values, (updateErr, result) => {
+    if (updateErr) {
+      return res.status(500).json({ message: "Update failed", error: updateErr });
+    }
+
+    return res.status(200).json({ message: "Medical Camp updated successfully!" });
+  });
+}
+
+const createSummary = (req, res) =>{
+  upload(req, res, (err) => {
+        if (err) {
+            return res.status(500).json({ message: "File upload failed", error: err });
+        }
+        const {
+            rescue_name,
+            admission_no,
+            date,
+            report
+        } = req.body;
+
+        // File paths
+        const SummaryAttachPath = req.files['summary_attach'] ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}` : null;
+
+        const q = `INSERT INTO reunion_summary(admission_no,rescue_name,date,summary_attach,report)
+                VALUES(?,?,?,?,?)`;
+
+        const values = [
+            admission_no,
+            rescue_name,
+            date,
+            SummaryAttachPath,
+            report
+        ]
+
+        db.query(q, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Reunion Summary Form Created Successfully", data: data });
+        });
+
+    });
+}
+
+const getSummary = (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM reunion_summary WHERE admission_no = ?';
+
+  db.query(query, [admission_no], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Reunion Summary not found' });
+    }
+
+    res.json(results[0]);
+  });
+};
+
+const updateSummary = (req, res) =>{
+  upload(req, res, (err) => {
+        if (err) {
+            return res.status(500).json({ message: "File upload failed", error: err });
+        }
+
+        const {
+            rescue_name,
+            date,
+            report,
+        } = req.body;
+
+        const admission_no = req.params.admission_no;
+
+        // Safely get file paths
+        const SummaryAttachPath = req.files['summary_attach']
+            ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
+            : null;
+
+        // Fetch existing image paths from DB
+        const selectQuery = "SELECT summary_attach FROM reunion_summary WHERE admission_no = ?";
+        db.query(selectQuery, [admission_no], (selectErr, selectData) => {
+            if (selectErr) {
+                return res.status(500).json({ message: "Failed to retrieve existing files", error: selectErr });
+            }
+
+            const existingSummaryPath = selectData[0]?.summary_attach;
+
+            const finalSummaryAttach = SummaryAttachPath || existingSummaryPath;
+
+            const updateQuery = `
+                UPDATE reunion_summary SET 
+                    rescue_name = ?, 
+                    date = ?, 
+                    summary_attach = ?, 
+                    report = ?
+                WHERE admission_no = ?
+            `;
+
+            const values = [
+                rescue_name,
+                date,
+                finalSummaryAttach,
+                report,
+                admission_no
             ];
 
-            db.query(updateMedSql, medValues, (medErr) => {
-                completed++;
-                if (medErr && !hasError) {
-                    hasError = true;
-                    return res.status(500).json({ message: 'Error updating medicine', error: medErr });
+            db.query(updateQuery, values, (updateErr, result) => {
+                if (updateErr) {
+                    return res.status(500).json({ message: "Update failed", error: updateErr });
                 }
 
-                if (completed === prescription_medicines.length && !hasError) {
-                    res.status(200).json({ message: 'Prescription and medicines updated successfully' });
-                }
+                return res.status(200).json({ message: "Reunion Summary updated successfully!" });
             });
         });
     });
-};
-
-
+}
 
 module.exports = {
   createRescueCondition,
@@ -899,5 +1201,10 @@ module.exports = {
   createPrescription,
   getPrescription,
   getPrescriptionbyID,
-  updatePrescription
+  updatePrescription,
+  createDrVisit,
+  getAllDrVisit,
+  getDrVisitbyID, UpdateDrVisit, createMedicalCamp,
+  getMedicalCamp, getMedicalCampID, updateMedicalCamp,
+  createSummary, getSummary, updateSummary
 };

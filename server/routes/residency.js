@@ -19,7 +19,11 @@ const { createRescueCondition,
      createPrescription,
      getPrescription,
      getPrescriptionbyID,
-     updatePrescription
+     updatePrescription,
+     createDrVisit,
+     getAllDrVisit,getDrVisitbyID,UpdateDrVisit,
+     createMedicalCamp,getMedicalCamp, getMedicalCampID, updateMedicalCamp,
+     createSummary,getSummary, updateSummary
     } = require("../controllers/residency");
 const router = express.Router();
 
@@ -53,5 +57,22 @@ router.post("/create_observation_report", createObservationReport);
 router.get("/get_observation_report",getObservationReport);
 router.get("/show_data/:id",showObservationReport);
 router.post("/updateObservationReport/:admission_no",updateObservationReport);
+
+//dr_visit
+router.post("/createDrVisit", createDrVisit);
+router.get("/getDrVisit",getAllDrVisit);
+router.get("/getDrVisitbyID/:id",getDrVisitbyID);
+router.put("/updateDrVisit/:id",UpdateDrVisit);
+
+//Medical Camp
+router.post("/createMedicalCamp",createMedicalCamp);
+router.get("/getAllMedicalCamp",getMedicalCamp);
+router.get("/getMedicalCampID/:id",getMedicalCampID);
+router.put("/updateMedicalCamp/:id",updateMedicalCamp);
+
+//Reunion summary
+router.post("/createSummary", createSummary);
+router.get("/getSummary/:admission_no",getSummary);
+router.put("/updateSummary/:admission_no", updateSummary);
 
 module.exports = router;

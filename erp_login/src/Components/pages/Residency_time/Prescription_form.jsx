@@ -17,6 +17,7 @@ function Prescription_form() {
     const handleShow = () => setShow(true);
     const handleEditClose = () => setEditShow(false);
     const [admission_no, setAdmissionNo] = useState('');
+    const [medicalType, setMedicalType] = useState('');
 
     const [formData, setFormData] = useState({
         admission_no: '',
@@ -26,6 +27,7 @@ function Prescription_form() {
         hospital_name: '',
         department: '',
         masterHealthCheckup: '',
+        medical_type: '',
         instruction: '',
         advice: '',
         follow_up: '',
@@ -54,23 +56,42 @@ function Prescription_form() {
         hospital_name: '',
         department: '',
         masterHealthCheckup: '',
+        medical_type: '',
         instruction: '',
         advice: '',
         follow_up: '',
         prescription_medicines: [
             {
-            medicine: '',
-            medicine_type: '',
-            duration: '',
-            intake: '',
-            med_instruction: '',
-            morning: '',
-            afternoon: '',
-            night: '',
+                medicine: '',
+                medicine_type: '',
+                duration: '',
+                intake: '',
+                med_instruction: '',
+                morning: '',
+                afternoon: '',
+                night: '',
             }
         ],
     });
-    
+
+    const generalMedicines = [
+        "AMLONG 5MG", "ENALAPRIL 2.5 MG", "GLYNASE 5MG", "METFORMIN 500 MG",
+        "METOPROLOL 25 MG", "DOLO 650", "BRUFEN 400 MG", "EMESET 4 MG",
+        "DULCOLAX 10 MG", "PARACETAMOL 150MG", "EMESET 2MG", "AVIL 2ML",
+        "DEXA 4MG", "BETADINE OINTMENT 15GM", "BETAMETHASONE OINTMENT 30GM",
+        "MOOV CREAM 50GM", "LIQUID PARAFFIN", "CANDID POWDER"
+    ];
+
+    const psychiatristMedicines = [
+        "AMLONG 5 MG", "B COMPLEX", "CALCIUM", "CARBAMAZEPINE 200 MG", "CHLORPROMAZINE 100 MG",
+        "CLOAZEPAM 0.5MG", "CLOZAPINE 50MG", "DIAZEPAM 5MG", "ENALAPRIL 2.5MG",
+        "FLUOXETINE 20 MG", "FST", "GLIPIZIDE 5 MG", "HALOPERIDOL 1.5 MG", "HALOPERIDOL 5 MG",
+        "LORAZEPAM 2 MG", "METFORMIN 500 MG", "METOPROLOL 25MG", "NITRAZEPAM 5MG",
+        "OLANZIPINE 5MG", "OMEZ 20 MG", "PANDAP 40GM", "PHENITION SODIUM 100 MG",
+        "PROPANOLOL 40 MG", "RANTAC 150 MG", "RISPERIDONE 2MG", "SODIUM VALPROATE 200MG",
+        "TRIHEXYPHENIDYL 2MG", "VITAMIN C"
+    ];
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -80,13 +101,15 @@ function Prescription_form() {
         }));
     };
 
-     const handleInputChange1 = (e) => {
+    const handleInputChange1 = (e) => {
         const { name, value } = e.target;
         setViewData(prevData => ({
             ...prevData,
             [name]: value
         }));
     };
+
+
 
     const handleAdmissionChange = (e) => {
         setAdmissionNo(e.target.value);
@@ -108,17 +131,17 @@ function Prescription_form() {
         setViewData(prev => ({
             ...prev,
             prescription_medicines: [
-            ...prev.prescription_medicines,
-            {
-                medicine: '',
-                medicine_type: '',
-                duration: '',
-                intake: '',
-                med_instruction: '',
-                morning: '',
-                afternoon: '',
-                night: '',
-            }
+                ...prev.prescription_medicines,
+                {
+                    medicine: '',
+                    medicine_type: '',
+                    duration: '',
+                    intake: '',
+                    med_instruction: '',
+                    morning: '',
+                    afternoon: '',
+                    night: '',
+                }
             ]
         }));
     };
@@ -197,17 +220,13 @@ function Prescription_form() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleRowChange = (index, event) => {
-        const { name, value } = event.target;
-        setRows(prevRows => {
-            const updatedRows = [...prevRows];
-            updatedRows[index] = {
-                ...updatedRows[index],
-                [name]: value,
-            };
-            return updatedRows;
-        });
+    const handleRowChange = (index, e) => {
+        const updatedRows = [...rows];
+        updatedRows[index][e.target.name] = e.target.value;
+        setRows(updatedRows);
     };
+
+    const medicineOptions = medicalType === 'General' ? generalMedicines : psychiatristMedicines;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -328,50 +347,59 @@ function Prescription_form() {
     }
 
 
-   const handleUpdate = async (e) => {
-    e.preventDefault();
+    const handleUpdate = async (e) => {
+        e.preventDefault();
 
-    try {
-        console.log("Updating prescription with ID:", viewData.id);
+        try {
+            console.log("Updating prescription with ID:", viewData.id);
 
-        const cleanedData = {
-            ...viewData,
-            prescription_medicines: (viewData.prescription_medicines || []).map(med => ({
-                id: med.id, 
-                medicine: med.medicine || '',
-                medicine_type: med.medicine_type || '',
-                duration: med.duration || '',
-                intake: med.intake || '',
-                med_instruction: med.med_instruction || '',
-                morning: med.morning ?? null,
-                afternoon: med.afternoon ?? null,
-                night: med.night ?? null,
-            }))
-        };
+            const cleanedData = {
+                ...viewData,
+                prescription_medicines: (viewData.prescription_medicines || []).map(med => ({
+                    id: med.id,
+                    medicine: med.medicine || '',
+                    medicine_type: med.medicine_type || '',
+                    duration: med.duration || '',
+                    intake: med.intake || '',
+                    med_instruction: med.med_instruction || '',
+                    morning: med.morning ?? null,
+                    afternoon: med.afternoon ?? null,
+                    night: med.night ?? null,
+                }))
+            };
 
-        const response = await apiRoute.put(`/residency/updatePrescription/${viewData.id}`, cleanedData);
+            const response = await apiRoute.put(`/residency/updatePrescription/${viewData.id}`, cleanedData);
 
-        console.log("API ROUTE", cleanedData);
+            console.log("API ROUTE", cleanedData);
 
-        if (response.status === 200) {
-            alert('Prescription updated successfully!');
-            handleEditClose(); // Close modal
-        } else {
-            alert('Failed to update prescription.');
+            if (response.status === 200) {
+                alert('Prescription updated successfully!');
+                handleEditClose(); // Close modal
+            } else {
+                alert('Failed to update prescription.');
+            }
+        } catch (error) {
+            if (error.response) {
+                console.error('Backend error:', error.response.data);
+                alert(`Update failed: ${error.response.data.message || 'Unknown error'}`);
+            } else if (error.request) {
+                console.error('No response from server:', error.request);
+                alert('Server did not respond.');
+            } else {
+                console.error('Error setting up request:', error.message);
+                alert('Error in update request.');
+            }
         }
-    } catch (error) {
-        if (error.response) {
-            console.error('Backend error:', error.response.data);
-            alert(`Update failed: ${error.response.data.message || 'Unknown error'}`);
-        } else if (error.request) {
-            console.error('No response from server:', error.request);
-            alert('Server did not respond.');
-        } else {
-            console.error('Error setting up request:', error.message);
-            alert('Error in update request.');
-        }
-    }
-};
+    };
+
+    const handleMedicalTypeChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+        setMedicalType(e.target.value);
+    };
 
 
     return (
@@ -626,24 +654,25 @@ function Prescription_form() {
                                 </Form.Group>
 
                             </Col>
-                            {/* <Col md={4}>
+                            <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
-                                        Phone Number:
+                                        Medicine Type:
                                     </Form.Label>
                                     <Col sm="6">
-                                        <Form.Control
-                                            type='number'
-                                            placeholder='Phone No'
-                                            name='phone_no'
-                                            value={formData.phone_no ?? ''}  // <-- Ensures it's not null
-                                            onChange={handleInputChange}
+                                        <Form.Select
+                                            name="medical_type"
+                                            value={formData.medical_type ?? ''}
+                                            onChange={handleMedicalTypeChange}
                                             required
-                                        />
-
+                                        >
+                                            <option value="" disabled hidden>Select Type</option>
+                                            <option value="General">General</option>
+                                            <option value="Psychiatrist">Psychiatrist</option>
+                                        </Form.Select>
                                     </Col>
                                 </Form.Group>
-                            </Col> */}
+                            </Col>
                             <Col md={3}>
 
                             </Col>
@@ -719,29 +748,18 @@ function Prescription_form() {
 
                                         <td>
                                             <div className="input-group mb-2" style={{ width: 'auto', margin: 'auto' }}>
-                                                <input
-                                                    type="text"
-                                                    id="prescription_medicine"
-                                                    className="form-control"
+                                                <select
+                                                    className="form-select"
                                                     name="medicine"
                                                     value={rows[i].medicine}
                                                     onChange={(e) => handleRowChange(i, e)}
                                                     required
-                                                    placeholder="medicine name"
                                                     style={{ width: '45%' }}
-                                                />
-                                                <select
-                                                    className="form-select"
-                                                    name="medicine_type"
-                                                    value={rows[i].medicine_type} // ← controlled via state
-                                                    onChange={(e) => handleRowChange(i, e)}
-                                                    required
-                                                    style={{ width: '20%' }}
                                                 >
-                                                    <option value="" disabled hidden>Select Type</option>
-                                                    <option value="mg">mg</option>
-                                                    <option value="dl">dl</option>
-                                                    <option value="ml">ml</option>
+                                                    <option value="" disabled hidden>Select Medicine</option>
+                                                    {medicineOptions.map((med, idx) => (
+                                                        <option key={idx} value={med}>{med}</option>
+                                                    ))}
                                                 </select>
 
                                             </div>

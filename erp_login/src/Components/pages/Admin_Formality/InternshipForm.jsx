@@ -246,9 +246,9 @@ function InternshipForm() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
                                 <Form.Label column sm="4">
-                                    Contact Numbers:
+                                    Contact Number:
                                 </Form.Label>
-                                <Col sm="4">
+                                <Col sm="8">
                                     <Form.Control
                                         name="phone"
                                         type="number"
@@ -257,7 +257,15 @@ function InternshipForm() {
                                         required
                                     />
                                 </Col>
-                                <Col sm="4">
+                                
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
+                                 <Form.Label column sm="4">
+                                        Emergency Contact Number:
+                                    </Form.Label>
+                                <Col sm="8">
+                                   
                                     <Form.Control
                                         name="secondary_phone"
                                         type="number"
@@ -314,7 +322,7 @@ function InternshipForm() {
 
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formField">
-                                <Form.Label column sm="4">Interested Field :</Form.Label>
+                                <Form.Label column sm="4">Preferred Field :</Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         as="select"
@@ -358,7 +366,7 @@ function InternshipForm() {
                             {/* From and To Date in the same row */}
                             <Form.Group as={Row} className="mb-3 text-start">
                                 <Form.Label column sm="4">
-                                    Intern Date :
+                                    Internship Date :
                                 </Form.Label>
                                 <Col sm="4">
                                     <Form.Control
