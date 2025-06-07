@@ -34,7 +34,7 @@ import Admin_RescueDetails from './Components/pages/Admin_Formality/Admin_Rescue
 import Profile from './Components/pages/Profile';
 import InternshipForm from './Components/pages/Admin_Formality/InternshipForm';
 import AllStudentDetails from './Components/pages/Admin_Formality/AllStudentDetails';
-import Prescription_form from './Components/pages/Residency_time/prescription_form';
+import Prescription_form from './Components/pages/Residency_time/Prescription_form';
 import MSE_form from './Components/pages/Recovery/MSE_form';
 import Sample from './Components/authentication/sample';
 import Rescue_articles_form from './Components/pages/Recovery/Rescue_articles_form';
@@ -44,6 +44,7 @@ import Dr_visit from './Components/pages/Residency_time/Dr_visit';
 import Dr_visitView from './Components/pages/Residency_time/Dr_visitView';
 import Medical_camp from './Components/pages/Residency_time/Medical_camp';
 import Reunion_summary from './Components/pages/Residency_time/Reunion_summary';
+import Director_essentialRecord from './Components/pages/Admin_Formality/Director_essentialRecord';
 
 function App() {
 
@@ -182,6 +183,11 @@ function App() {
               />
 
               <Route
+                path='/rescue_record_sheet'
+                element={<MainLayout><Rescue_Record_Sheet /></MainLayout>}
+              />
+
+              <Route
                 path='/imagepdf'
                 element={<MainLayout><ImagePDF /></MainLayout>}
               />
@@ -190,7 +196,30 @@ function App() {
                 path='/sample'
                 element={<MainLayout><Sample /></MainLayout>}
               />
-              
+              <Route
+                path='/dr_visitView'
+                element={<MainLayout><Dr_visitView /></MainLayout>}
+              />
+
+              <Route
+                path='/nurse_sheet'
+                element={<MainLayout><Nurse_Record_sheet /></MainLayout>}
+              />
+              <Route
+                path='/medical_camp'
+                element={<MainLayout><Medical_camp /></MainLayout>}
+              />
+
+               <Route
+                path='/observation_report'
+                element={<MainLayout><Observation_report /></MainLayout>}
+              />
+
+              <Route
+                path='/reunion_summary'
+                element={<MainLayout><Reunion_summary /></MainLayout>}
+              />
+
 
             </>
 
@@ -223,6 +252,13 @@ function App() {
                 path='/observation_report'
                 element={<MainLayout><Observation_report /></MainLayout>}
               />
+
+              <Route
+                path='/director_Document'
+                element={<MainLayout><Director_essentialRecord /></MainLayout>}
+              />
+              
+
             </>
           )}
 

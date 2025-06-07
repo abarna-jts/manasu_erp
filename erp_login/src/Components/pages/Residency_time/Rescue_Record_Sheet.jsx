@@ -7,6 +7,7 @@ import axios from 'axios';
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css
+import Cookies from 'js-cookie';
 
 function Rescue_Record_Sheet() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -17,6 +18,8 @@ function Rescue_Record_Sheet() {
     const [rescueName, setRescueName] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const userType = Cookies.get('usertype');
 
     const handleEditClose = () => setEditShow(false);
 
@@ -118,12 +121,19 @@ function Rescue_Record_Sheet() {
             const response = await apiRoute.get(`/residency/rescueConditionShow/${id}`);
             const data = response.data;
 
+             const [fromFormatted, toFormatted] = data.date.split(' to ');
+
+            const parseDate = (dmy) => {
+                const [day, month, year] = dmy.split("-");
+                return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+            };
+
             setFormData((formData) => ({
                 ...formData,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
-                date: data.date || '',
+                date: parseDate(fromFormatted) || '',
                 recovery_photo: data.recovery_photo,
             }));
 
@@ -228,9 +238,13 @@ function Rescue_Record_Sheet() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
+                                    {userType === "3" && (
                                     <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
+                                    
                                         <i className="fas fa-plus"></i>
+                                    
                                     </InputGroup.Text>
+                                    )}
 
                                 </InputGroup>
                             </Form.Group>
@@ -241,7 +255,10 @@ function Rescue_Record_Sheet() {
             <Container>
                 <Row>
                     <Col md={4}>
-                        <Button variant="success" className="m-1 d-flex justify-content-start align-items-center" type="submit" onClick={handleShow}>Enter Condition</Button>
+                        {userType === "3" && (
+                            <Button variant="success" className="m-1 d-flex justify-content-start align-items-center" type="submit" onClick={handleShow}>Enter Condition</Button>
+                        )}
+                        {/* <Button variant="success" className="m-1 d-flex justify-content-start align-items-center" type="submit" onClick={handleShow}>Enter Condition</Button> */}
                     </Col>
                     <Col md={12} className="mt-3 my-3">
 
@@ -407,6 +424,7 @@ function Rescue_Record_Sheet() {
                                     name="date"
                                     value={formData.date}
                                     onChange={handleInputChange}
+                                    required
                                 />
                             </Form.Group>
 

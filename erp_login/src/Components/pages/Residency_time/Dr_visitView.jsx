@@ -297,11 +297,11 @@ function Dr_visitView() {
                                                     handleEditform(item.id);
                                                 }}
                                             ><i className="fas fa-edit"></i> </button>
-                                            {userType === "2" && (
+                                            {/* {userType === "2" && (
                                                 <button className="btn btn-danger icon_details"
                                                     onClick={() => handleDelete(item.id)}
                                                 ><i className="fas fa-trash"></i></button>
-                                            )}
+                                            )} */}
                                         </td>
                                     </tr>
                                 ))

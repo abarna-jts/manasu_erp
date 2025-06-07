@@ -272,7 +272,9 @@ function Admin_RescueDetails() {
             <Container>
                 <Row className='d-flex align-items-center justify-content-between'>
                     <Col md={4} className='d-flex align-items-center justify-content-start'>
+                     {userType === "1" && (
                         <Button type="button" className="btn btn-success" onClick={handleShow}>Add Details</Button>
+                     )}
                     </Col>
                     <Col md={3}>
                         <div className="d-flex align-items-center px-3">
@@ -340,7 +342,7 @@ function Admin_RescueDetails() {
                                                         handleEditform(item.id);
                                                     }}
                                                 ><i className="fas fa-edit"></i> </button>
-                                                {userType === "2" && (
+                                                {/* {userType === "2" && (
                                                     <button className="btn btn-danger icon_details"
                                                         onClick={() => {
                                                             handleDelete(item.id);
@@ -348,7 +350,7 @@ function Admin_RescueDetails() {
                                                     >
                                                         <i className="fas fa-trash"></i>
                                                     </button>
-                                                )}
+                                                )} */}
                                             </td>
                                         </tr>
                                     ))

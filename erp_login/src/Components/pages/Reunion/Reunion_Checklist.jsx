@@ -303,13 +303,15 @@ function Reunion_Checklist() {
                                 ViewFormData();
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!formData.admission_no.trim()) {
-                                alert("Please enter admission number.");
-                            } else {
-                                createFormData();
-                            }
-                        }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                         {userType === "1" && (
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                                if (!formData.admission_no.trim()) {
+                                    alert("Please enter admission number.");
+                                } else {
+                                    createFormData();
+                                }
+                            }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                        )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!formData.admission_no.trim()) {
                                 alert("Please enter admission number.");
@@ -1112,7 +1114,9 @@ function Reunion_Checklist() {
 
                                 </li>
                             </ol>
+                             {userType === "1" && (
                             <Button type='submit' className='btn btn-success'>Submit</Button>
+                             )}
                         </Form>
 
                     </Col>

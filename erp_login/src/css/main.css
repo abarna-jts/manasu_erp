@@ -475,7 +475,9 @@ body {
 .checklist_ul {
 	margin: 15px 0px;
 }
-
+.modal-body{
+	overflow: overlay;
+}
 .sign_class{
 	font-size: 18px;
 }

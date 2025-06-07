@@ -41,7 +41,7 @@ router.delete("/deleteMediaConsent/:admission_no",deleteMediaConsent);
 router.post("/createDischarge_checklist",createDischargeList);
 router.get("/get_checklist/:admission_no", getReunionChecklist);
 router.get("/get_allCheckList/:admission_no", getReunionChecklistAll);
-router.post("/updatechecklist/:admisison_no",updateChecklist);
+router.post("/updatechecklist/:admission_no",updateChecklist);
 
 
 module.exports = router;

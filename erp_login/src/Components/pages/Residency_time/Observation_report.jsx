@@ -8,6 +8,7 @@ import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css
 import { Alert } from "react-bootstrap";
+import Cookies from 'js-cookie';
 
 function Observation_report() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -20,6 +21,8 @@ function Observation_report() {
     const handleShow = () => setShow(true);
 
     const handleEditClose = () => setEditShow(false);
+
+     const userType = Cookies.get('usertype');
 
     //alert box values
     const [submissionMessage, setSubmissionMessage] = useState("");
@@ -86,12 +89,19 @@ function Observation_report() {
             const response = await apiRoute.get(`/residency/show_data/${id}`);
             const data = response.data;
 
+            const [fromFormatted] = data.date.split(' to ');
+
+            const parseDate = (dmy) => {
+                const [day, month, year] = dmy.split("-");
+                return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+            };
+
             setFormData((formData) => ({
                 ...formData,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
-                date: data.date || '',
+                date: parseDate(fromFormatted) || '',
                 recovery_photo: data.recovery_photo,
             }));
 
@@ -250,9 +260,11 @@ function Observation_report() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
+                                    {userType === "4" && (
                                     <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
                                         <i className="fas fa-plus"></i>
                                     </InputGroup.Text>
+                                    )}
 
                                 </InputGroup>
                             </Form.Group>
@@ -274,7 +286,9 @@ function Observation_report() {
             <Container>
                 <Row>
                     <Col md={4}>
+                    {userType === "4" && (
                         <Button variant="success" className="m-1 d-flex justify-content-start align-items-center" type="submit" onClick={handleShow}>Enter Condition</Button>
+                    )}
                     </Col>
                     <Col md={12} className="mt-3 my-3">
 

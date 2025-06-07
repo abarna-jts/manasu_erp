@@ -277,8 +277,15 @@ const updateEssentialRecords = (req, res) => {
         } = req.body;
 
         const admission_no = req.params.admission_no;
-        const newBankPassbook = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
-        const newForm7Attach = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
+        // const newBankPassbook = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
+        // const newForm7Attach = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
+        const newBankPassbook = req.files['bank_passbook']
+            ? `uploads/Rescue_Images/${req.files['bank_passbook'][0].filename}`
+            : null;
+
+        const newForm7Attach = req.files['form7_attach']
+            ? `uploads/Rescue_Images/${req.files['form7_attach'][0].filename}`
+            : null;
 
         // Fetch the existing logo path
         const selectQuery = "SELECT bank_passbook, form7_attach FROM essential_records WHERE admission_no = ?";
@@ -1021,6 +1028,35 @@ const updateStudentDetail = (req, res) => {
     });
 }
 
+const getAllDocument = (req, res) =>{
+const query = "Select * from essential_records";
+
+    db.query(query, (err, data) => {
+        if (err) {
+            return res.status(500).json({ message: "Database Error", error: err });
+        }
+        res.status(201).json({ message: "Essential Records Details Get Successfully", data: data });
+    });
+}
+
+const getEssentialRecordshow = (req, res) =>{
+const id = req.params.id;
+    const query = 'SELECT * FROM essential_records WHERE id = ?';
+
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Essentail Records Form not found' });
+        }
+
+        res.json(results[0]);
+    });
+}
+
 module.exports = {
     createSelfDeclaration,
     getFormalityForm,
@@ -1049,5 +1085,5 @@ module.exports = {
     createCelebrationReport,
     createCommunityReport,
     createStaffReport,
-
+    getAllDocument,getEssentialRecordshow
 };

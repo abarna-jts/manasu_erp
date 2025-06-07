@@ -7,6 +7,7 @@ import { Alert } from "react-bootstrap";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
+import Cookies from 'js-cookie';
 
 function Prescription_form() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -50,18 +51,17 @@ function Prescription_form() {
     const [viewData, setViewData] = useState({
         admission_no: '',
         rescue_name: '',
-        created_date: '',
         age: '',
         op_no: '',
         hospital_name: '',
         department: '',
         masterHealthCheckup: '',
-        medical_type: '',
         instruction: '',
         advice: '',
         follow_up: '',
         prescription_medicines: [
             {
+                id: '', // required for existing records
                 medicine: '',
                 medicine_type: '',
                 duration: '',
@@ -73,6 +73,7 @@ function Prescription_form() {
             }
         ],
     });
+
 
     const generalMedicines = [
         "AMLONG 5MG", "ENALAPRIL 2.5 MG", "GLYNASE 5MG", "METFORMIN 500 MG",
@@ -146,6 +147,8 @@ function Prescription_form() {
         }));
     };
 
+    const userType = Cookies.get('usertype');
+
     const handleRemoveRow1 = (index) => {
         setViewData(prev => {
             const newMedicines = [...prev.prescription_medicines];
@@ -156,11 +159,12 @@ function Prescription_form() {
 
     const handleRowChange1 = (index, e) => {
         const { name, value } = e.target;
-        setViewData(prev => {
-            const updated = [...prev.prescription_medicines];
-            updated[index] = { ...updated[index], [name]: value };
-            return { ...prev, prescription_medicines: updated };
-        });
+        const updatedMedicines = [...viewData.prescription_medicines];
+        updatedMedicines[index] = {
+            ...updatedMedicines[index],
+            [name]: value,
+        };
+        setViewData({ ...viewData, prescription_medicines: updatedMedicines });
     };
 
     const handleRemoveRow = (index) => {
@@ -300,15 +304,24 @@ function Prescription_form() {
     const fetchPrescriptionData = async (id) => {
         try {
             const response = await apiRoute.get(`/residency/getPrescription/${id}`);
-            console.log("API response:", response.data);
-            setViewData(response.data);
+            const data = response.data;
 
-            // Wait for viewData to update in DOM before generating PDF
-            setTimeout(() => {
-                generatePDF();
-            }, 500);
-        } catch (error) {
-            console.error('Error fetching prescription:', error);
+            setViewData({
+                ...data,
+                prescription_medicines: data.prescription_medicines.map((med) => ({
+                    id: med.id, // 🔑 ensure ID is included
+                    medicine: med.medicine || '',
+                    medicine_type: med.medicine_type || '',
+                    duration: med.duration || '',
+                    intake: med.intake || '',
+                    med_instruction: med.med_instruction || '',
+                    morning: med.morning ?? '',
+                    afternoon: med.afternoon ?? '',
+                    night: med.night ?? '',
+                })),
+            });
+        } catch (err) {
+            console.error('Fetch error:', err);
         }
     };
 
@@ -351,12 +364,10 @@ function Prescription_form() {
         e.preventDefault();
 
         try {
-            console.log("Updating prescription with ID:", viewData.id);
-
             const cleanedData = {
                 ...viewData,
-                prescription_medicines: (viewData.prescription_medicines || []).map(med => ({
-                    id: med.id,
+                prescription_medicines: viewData.prescription_medicines.map((med) => ({
+                    id: med.id, // 🛑 If this is missing, UPDATE query fails
                     medicine: med.medicine || '',
                     medicine_type: med.medicine_type || '',
                     duration: med.duration || '',
@@ -365,32 +376,24 @@ function Prescription_form() {
                     morning: med.morning ?? null,
                     afternoon: med.afternoon ?? null,
                     night: med.night ?? null,
-                }))
+                })),
             };
 
             const response = await apiRoute.put(`/residency/updatePrescription/${viewData.id}`, cleanedData);
 
-            console.log("API ROUTE", cleanedData);
-
             if (response.status === 200) {
                 alert('Prescription updated successfully!');
-                handleEditClose(); // Close modal
+                handleEditClose();
             } else {
                 alert('Failed to update prescription.');
             }
-        } catch (error) {
-            if (error.response) {
-                console.error('Backend error:', error.response.data);
-                alert(`Update failed: ${error.response.data.message || 'Unknown error'}`);
-            } else if (error.request) {
-                console.error('No response from server:', error.request);
-                alert('Server did not respond.');
-            } else {
-                console.error('Error setting up request:', error.message);
-                alert('Error in update request.');
-            }
+        } catch (err) {
+            console.error('Update error:', err);
+            alert('Error updating prescription.');
         }
     };
+
+
 
     const handleMedicalTypeChange = (e) => {
         const { name, value } = e.target;
@@ -427,9 +430,11 @@ function Prescription_form() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
+                                    {userType === "3" && (
                                     <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }}>
                                         <i className="fas fa-plus"></i>
                                     </InputGroup.Text>
+                                    )}
 
                                 </InputGroup>
                             </Form.Group>
@@ -451,11 +456,13 @@ function Prescription_form() {
             <Container>
                 <Row>
                     <Col md={4}>
+                    {userType === "3" && (
                         <Button variant="success"
                             className="m-1 d-flex justify-content-start align-items-center"
                             type="submit"
                             onClick={handleShow}
                         >Add Prescription</Button>
+                    )}
                     </Col>
                     <Col md={12} className="mt-3 my-3">
 
@@ -760,6 +767,19 @@ function Prescription_form() {
                                                     {medicineOptions.map((med, idx) => (
                                                         <option key={idx} value={med}>{med}</option>
                                                     ))}
+                                                </select>
+                                                <select
+                                                    className="form-select"
+                                                    name="medicine_type"
+                                                    value={rows[i].medicine_type}
+                                                    onChange={(e) => handleRowChange(i, e)}
+                                                    required
+                                                    style={{ width: '20%' }}
+                                                >
+                                                    <option value="" disabled hidden>Select Type</option>
+                                                    <option value="mg">mg</option>
+                                                    <option value="dl">dl</option>
+                                                    <option value="ml">ml</option>
                                                 </select>
 
                                             </div>
@@ -1145,24 +1165,25 @@ function Prescription_form() {
                                 </Form.Group>
 
                             </Col>
-                            {/* <Col md={4}>
+                            <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
-                                        Phone Number:
+                                        Medicine Type:
                                     </Form.Label>
                                     <Col sm="6">
-                                        <Form.Control
-                                            type='number'
-                                            placeholder='Phone No'
-                                            name='phone_no'
-                                            value={viewData.phone_no ?? ''}  // <-- Ensures it's not null
-                                            onChange={handleInputChange1}
+                                        <Form.Select
+                                            name="medical_type"
+                                            value={viewData.medical_type}
+                                            onChange={handleMedicalTypeChange}
                                             required
-                                        />
-
+                                        >
+                                            <option value="" disabled hidden>Select Type</option>
+                                            <option value="General">General</option>
+                                            <option value="Psychiatrist">Psychiatrist</option>
+                                        </Form.Select>
                                     </Col>
                                 </Form.Group>
-                            </Col> */}
+                            </Col>
                             <Col md={3}>
 
                             </Col>
@@ -1237,17 +1258,19 @@ function Prescription_form() {
 
                                         <td>
                                             <div className="input-group mb-2" style={{ width: 'auto', margin: 'auto' }}>
-                                                <input
-                                                    type="text"
-                                                    id={`prescription_medicine_${index}`}
-                                                    className="form-control"
+                                                <select
+                                                    className="form-select"
                                                     name="medicine"
                                                     value={med.medicine}
                                                     onChange={(e) => handleRowChange1(index, e)}
                                                     required
-                                                    placeholder="Medicine name"
                                                     style={{ width: '45%' }}
-                                                />
+                                                >
+                                                    <option value="" disabled hidden>Select Medicine</option>
+                                                    {medicineOptions.map((med, idx) => (
+                                                        <option key={idx} value={med}>{med}</option>
+                                                    ))}
+                                                </select>
                                                 <select
                                                     className="form-select"
                                                     name="medicine_type"

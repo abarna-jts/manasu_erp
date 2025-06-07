@@ -731,8 +731,9 @@ const updateChecklist = (req, res) => {
             return res.status(500).json({ message: "File upload failed", error: err });
         }
 
+        const admission_no = req.params.admission_no;
+
         const {
-            admission_no,
             familyRequestLetter,
             selfDeclarationLetter,
             mediaConsentLetter,

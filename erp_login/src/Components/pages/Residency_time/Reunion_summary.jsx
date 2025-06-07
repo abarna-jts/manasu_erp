@@ -11,6 +11,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
 import { Alert } from "react-bootstrap";
+import Cookies from 'js-cookie';
 
 function Reunion_summary() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -21,6 +22,8 @@ function Reunion_summary() {
     const [error, setError] = useState("");
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
+
+     const userType = Cookies.get('usertype');
 
     const [formData, setFormData] = useState({
         rescue_name: '',
@@ -369,13 +372,15 @@ function Reunion_summary() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter admission number.");
-                            } else {
-                                createFormData(); // Fetch & populate data before generating PDF
-                            }
-                        }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                        {userType === "4" && (
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                                if (!admission_no.trim()) {
+                                    alert("Please enter admission number.");
+                                } else {
+                                    createFormData(); // Fetch & populate data before generating PDF
+                                }
+                            }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                        )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter admission number.");
@@ -445,7 +450,9 @@ function Reunion_summary() {
                                     </Col>
 
                                     <div className="mt-3">
+                                        {userType === "4" && (
                                         <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                        )}
                                     </div>
 
                                 </Row>

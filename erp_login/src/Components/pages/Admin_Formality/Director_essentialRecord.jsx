@@ -1,24 +1,22 @@
 import React from 'react';
-import { Breadcrumb, Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { Breadcrumb, Container, Row, Col, Form, InputGroup, Button, Table } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faPlus, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import axios from 'axios';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Modal from 'react-bootstrap/Modal';
-import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { id } from 'date-fns/locale';
 
-function Essential_record() {
-    const [admission_no, setAdmissionNumber] = useState('');
-    const [previewRequested, setPreviewRequested] = useState(false);
+function Director_essentialRecord() {
     const [show, setShow] = useState(false);
-    const [rescueImage, setRescueImage] = useState(null);
-    const [rescueName, setRescueName] = useState("");
-    const [error, setError] = useState("");
+    const [record_details, setRecordDetail] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [previewRequested, setPreviewRequested] = useState(false);
 
     //alert box values
     const [submissionMessage, setSubmissionMessage] = useState("");
@@ -26,7 +24,34 @@ function Essential_record() {
 
     const handleClose = () => setShow(false);
 
-    const userType = Cookies.get('usertype');
+    const filteredRescueDetails = record_details.filter((item) => {
+        const searchTerm = searchQuery.toLowerCase();
+        return (
+            String(item.rescue_name).toLowerCase().includes(searchTerm) ||
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.aadhar_card).toLowerCase().includes(searchTerm) ||
+            String(item.udid_no).toLowerCase().includes(searchTerm) ||
+            String(item.form_7).toLowerCase().includes(searchTerm) ||
+            String(item.account_no).toLowerCase().includes(searchTerm)
+        );
+    });
+
+    const apiRoute = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+    });
+
+    useEffect(() => {
+        const fetchEssentialRecord = async () => {
+            try {
+                const response = await apiRoute.get('/formality/getAllDocument');
+                setRecordDetail(response.data.data); // Should be an array
+            } catch (error) {
+                console.error("Error fetching annual report:", error);
+            }
+        };
+
+        fetchEssentialRecord();
+    }, []);
 
     const [formData, setFormData] = useState({
         admission_no: '',
@@ -58,11 +83,6 @@ function Essential_record() {
             [name]: files[0]
         }));
     };
-
-    const apiRoute = axios.create({
-        baseURL: import.meta.env.VITE_API_BASE_URL,
-    });
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -71,87 +91,9 @@ function Essential_record() {
         }));
     };
 
-    const handleCheckChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    // Automatically fetch data when admission number is typed
-    useEffect(() => {
-        if (admission_no.trim().length >= 5) { // Adjust minimum length as needed
-            fetchFormData();
-        }
-    }, [admission_no]);
-
-    const fetchFormData = async () => {
+    const ViewFormData = async (id) => {
         try {
-            const response = await apiRoute.get(`/reunion/get_information/${admission_no}`);
-            setFormData(response.data.data[0]);
-        } catch (error) {
-            console.error('Error fetching data', error);
-            alert("Admission Number Not found");
-        }
-    };
-
-    const createFormData = () => {
-        const targetElement = document.querySelector('.essential_records');
-        if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth' });
-        }
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!admission_no || admission_no.trim() === '') {
-            alert("Admission Number is required.");
-            return; // Stop form submission
-        }
-
-        const data = new FormData();
-        data.append('admission_no', admission_no);
-        data.append('rescue_name', formData.rescue_name);
-        data.append('aadhar_card', formData.aadhar_card);
-        data.append('udid_no', formData.udid_no);
-        data.append('disability_no', formData.disability_no);
-        data.append('voter_id', formData.voter_id);
-        data.append('form7_attach', files.form7_attach);
-        data.append('form_7', formData.form_7);
-        data.append('bank_name', formData.bank_name);
-        data.append('account_no', formData.account_no);
-        data.append('ifsc_code', formData.ifsc_code);
-        data.append('bank_passbook', files.bank_passbook);
-        data.append('insurance_provider', formData.insurance_provider);
-        data.append('policy_no', formData.policy_no);
-        data.append('validity_period', formData.validity_period);
-        data.append('other_gvt_scheme', formData.other_gvt_scheme);
-        data.append('any_other', formData.any_other);
-
-        try {
-            const res = await apiRoute.post('/formality/createRecords', data, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            console.log(res);
-            if (res.data.message === "Essential Records Form Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
-            } else {
-                setSubmissionMessage("Submission failed.");
-                setMessageType("danger");
-            }
-        } catch (error) {
-            console.error("Error submitting form", error);
-            setSubmissionMessage("Something went wrong.");
-            setMessageType("danger");
-        }
-    };
-
-    const ViewFormData = async () => {
-        try {
-            const response = await apiRoute.get(`/formality/getEssentialRecord/${admission_no}`);
+            const response = await apiRoute.get(`/formality/getEssentialRecordshow/${id}`);
             const data = response.data;
 
             setFormData((formData) => ({
@@ -247,9 +189,9 @@ function Essential_record() {
         }
     };
 
-    const handleShow = async (admission_no) => {
+    const handleShow = async (id) => {
         try {
-            const response = await apiRoute.get(`/formality/getEssentialRecord/${admission_no}`);
+            const response = await apiRoute.get(`/formality/getEssentialRecordshow/${id}`);
             const data = response.data;
 
             setFormData((formData) => ({
@@ -292,24 +234,6 @@ function Essential_record() {
         }
     };
 
-    // const handleUpdate = async (e, admission_no) => {
-    //     e.preventDefault();
-    //     try {
-    //         const response = await apiRoute.put(`/formality/updateEssentialRecords/${admission_no}`, formData);
-    //         console.log(response.data);
-    //         if (response.status === 200) {
-    //             alert('Form Updated successfully!');
-    //             handleClose(true);
-    //             window.location.reload();
-    //         } else {
-    //             alert('Error Updating form.');
-    //         }
-    //     } catch (error) {
-    //         console.error('There was an error Updating the form:', error);
-    //         alert('There was an error Updating the form.');
-    //     }
-    // };
-
     const handleUpdate = async (e, admission_no) => {
         e.preventDefault();
 
@@ -343,59 +267,10 @@ function Essential_record() {
         }
     };
 
-    const handleDelete = async (admission_no) => {
-        alert("Are you sure want to delete");
-        try {
-            const response = await apiRoute.delete(`/formality/deleteEssentailRecord/${admission_no}`);
-            console.log(response);
-            alert("Resident Document Form Deleted successfully");
-            // Refresh data after deletion
-            getRescueDetails(); // if this function fetches updated student list
-        } catch (error) {
-            console.error('Failed to delete item:', error);
-        }
-    };
 
-    const fetchRescueDetails = async (admission_no) => {
-        try {
-            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-            const result = response.data.data[0];
-            console.log("API Result:", result);
-
-            if (result && result.rescue_image) {
-                const imagePath = result.rescue_image.startsWith("http")
-                    ? result.rescue_image
-                    : `http://localhost:5000/${result.rescue_image}`;
-
-                setRescueImage(imagePath);
-                setRescueName(result.rescue_name || "");
-                setError(""); // clear any previous error
-            } else {
-                setRescueImage(null);
-                setRescueName("");
-                setError("Image not found for this admission number");
-            }
-        } catch (error) {
-            console.error("Error fetching data", error);
-            setRescueImage(null);
-            setRescueName("");
-            setError("Admission Number Not found");
-        }
-    };
-
-    // Trigger when admission number changes
-    useEffect(() => {
-        if (admission_no.trim() !== "") {
-            fetchRescueDetails(admission_no);
-        } else {
-            setRescueImage(null);
-            setRescueName("");
-            setError("");
-        }
-    }, [admission_no]);
 
     return (
-        <>
+        <div>
             <Container fluid>
                 <Row className='d-flex align-items-center justify-content-between'>
                     <Col md={2} className='text-start'>
@@ -406,278 +281,85 @@ function Essential_record() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Records</h6>
                     </Col>
-                    <Col md={7} className="text-center">
+                    <Col md={8} className="text-center">
                         <h3 className="section_title">Resident Document Information Form</h3>
                     </Col>
-                    <Col md={2} className='text-center'>
-                        {error && <div className="text-danger mt-2">{error}</div>}
-                        {/* Rescue Name and Image */}
-                        {rescueImage && (
-                            <div>
-                                <img
-                                    alt={rescueName || "Rescue Image"}
-                                    style={{ width: "100px", height: "100px" }}
-                                    src={rescueImage}
-                                />
-                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
-                            </div>
-                        )}
+                    <Col md={2}>
+                        <div className="d-flex align-items-center px-3">
+
+                            <Form className="navbar-search">
+                                <Form.Group id="topbarSearch">
+                                    <InputGroup className="input-group-merge search-bar">
+
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Search"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
+                            </Form>
+                        </div>
                     </Col>
                 </Row>
             </Container>
 
             <Container>
-                <Form className="navbar-search col-md-9 d-flex justify-content-center align-items-center mt-3">
-                    <Form.Group id="topbarSearch" className="d-flex align-items-center">
-                        <Col md={6}>
-                            <Form.Label>Admission Number:</Form.Label>
-                        </Col>
-                        <Col md={6}>
-                            <InputGroup className="input-group-merge search-bar">
-                                <Form.Control
-                                    type="text"
-                                    value={admission_no}
-                                    onChange={(e) => setAdmissionNumber(e.target.value)}
-                                />
-                            </InputGroup>
-                        </Col>
-                        <button type="button" className="btn btn-secondary mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
-                            } else {
-                                ViewFormData(); // Fetch & populate data before generating PDF
-                            }
-                        }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        {userType === "1" && (
-                            <button type="button" className="btn btn-success mx-1" onClick={() => {
-                                if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
-                                } else {
-                                    createFormData(); // Fetch & populate data before generating PDF
-                                }
-                            }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                        )}
-                        <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
-                            } else {
-                                handleShow(admission_no); // Fetch & populate data before generating PDF
-                            }
-                        }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {/* {userType === "2" && (
-                            <button type="button" className="btn btn-danger mx-1" onClick={() => {
-                                if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
-                                } else {
-                                    handleDelete(admission_no); // Fetch & populate data before generating PDF
-                                }
-                            }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )} */}
-                    </Form.Group>
-                </Form>
+                <Row>
+                    <Col md={12}>
+                        <Table responsive="sm">
 
-                <div>
-                    {/* Show success or error message box */}
-                    {submissionMessage && (
-                        <Alert variant={messageType} className="mt-3">
-                            {submissionMessage}
-                        </Alert>
-                    )}
-                </div>
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Admission No</th>
+                                    <th>Rescue Name</th>
+                                    <th>Aadhar Card</th>
+                                    <th>UDID No</th>
+                                    <th>Disability No</th>
+                                    <th>Form 7</th>
+                                    <th>Bank Account No</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredRescueDetails.length > 0 ? (
+                                    filteredRescueDetails.map((item, index) => (
+                                        <tr key={item.id}>
+                                            <td>{index + 1}</td>
+                                            <td>{item.admission_no}</td>
+                                            <td>{item.rescue_name || "null"}</td>
+                                            <td>{item.aadhar_card || "null"}</td>
+                                            <td>{item.udid_no || "null"}</td>
+                                            <td>{item.disability_no || "null"}</td>
+                                            <td>{item.form_7 || "null"}</td>
+                                            <td>{item.account_no || "null"}</td>
+                                            <td>
+                                                <button className="btn btn-success icon_details"
+                                                    onClick={() => {
+                                                        ViewFormData(item.id);
+                                                    }}
+                                                >
+                                                    <i className="fas fa-eye"></i>
+                                                </button>
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleShow(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
 
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="10" className="text-center text-danger">No data found</td>
+                                    </tr>
+                                )}
+                            </tbody>
 
-                <Row className='d-flex align-items-center justify-content-center'>
-                    <Col md={8} className="consultant_box my-4">
-                        <div className="consultant_details">
-                            <Form className='media_consent' onSubmit={handleSubmit}>
-                                <Row>
-                                    <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                        <Form.Label column sm="4" className='text-start'>
-                                            Name :
-                                        </Form.Label>
-                                        <Col sm="8" className='d-flex align-items-center'>
-                                            <Form.Control
-                                                type="text"
-                                                name="rescue_name"
-                                                value={formData.rescue_name}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3 text-start">
-                                        <Form.Label column sm="4">
-                                            ID Cards :
-                                        </Form.Label>
-                                        <Col sm="8">
-                                            {/* Aadhar Card */}
-                                            <Form.Label className="mb-1">Aadhaar Card Number</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="aadhar_card"
-                                                value={formData.aadhar_card}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* UDID */}
-                                            <Form.Label className="mb-1">UDID Card Number (Unique Disability ID)</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="udid_no"
-                                                value={formData.udid_no}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* Disability Passport */}
-                                            <Form.Label className="mb-1">Disability Certificate No. & Issuing Authority</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="disability_no"
-                                                value={formData.disability_no}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* Voter ID */}
-                                            <Form.Label className="mb-1">Voter ID</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="voter_id"
-                                                value={formData.voter_id}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* Form 7 */}
-                                            <Form.Label className="mb-1">Form 7</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="form_7"
-                                                value={formData.form_7}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* Form 7  attachment*/}
-                                            <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
-                                            <Form.Control
-                                                type="file"
-                                                name="form7_attach"
-                                                onChange={handleFileChange}
-                                            />
-                                        </Col>
-                                    </Form.Group>
-
-                                    <Form.Group as={Row} className="mb-3 text-start">
-                                        <Form.Label column sm="4">
-                                            Financial Details :
-                                        </Form.Label>
-                                        <Col sm="8">
-                                            {/* Aadhar Card */}
-                                            <Form.Label className="mb-1">Bank Name</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="bank_name"
-                                                value={formData.bank_name}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* UDID */}
-                                            <Form.Label className="mb-1">Account Number</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="account_no"
-                                                value={formData.account_no}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* Disability Passport */}
-                                            <Form.Label className="mb-1">IFSC Code</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="ifsc_code"
-                                                value={formData.ifsc_code}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            <Form.Label className="mb-1">Copy of Bank Passbook (attach)</Form.Label>
-                                            <Form.Control
-                                                type="file"
-                                                name="bank_passbook"
-                                                onChange={handleFileChange}
-                                            />
-                                        </Col>
-                                    </Form.Group>
-
-                                    <Form.Group as={Row} className="mb-3 text-start">
-                                        <Form.Label column sm="4">
-                                            CMCHIS(Chief Minister's Comprehensive Health Insurance Scheme):
-                                        </Form.Label>
-                                        <Col sm="8">
-                                            {/* Aadhar Card */}
-                                            <Form.Label className="mb-1">Insurance Provider</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="insurance_provider"
-                                                value={formData.insurance_provider}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* UDID */}
-                                            <Form.Label className="mb-1">Policy Number</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                name="policy_no"
-                                                value={formData.policy_no}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            {/* Disability Passport */}
-                                            <Form.Label className="mb-1">Validity Period</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="validity_period"
-                                                value={formData.validity_period}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            <Form.Label className="mb-1">Other Govt. Scheme </Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="other_gvt_scheme"
-                                                value={formData.other_gvt_scheme}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-
-                                            <Form.Label className="mb-1">Any Other </Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="any_other"
-                                                value={formData.any_other}
-                                                onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
-                                        </Col>
-                                    </Form.Group>
-
-                                    <div>
-                                        {userType === "1" && (
-                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
-                                        )}
-                                    </div>
-
-                                </Row>
-                            </Form>
-
-                        </div>
+                        </Table>
                     </Col>
                 </Row>
             </Container>
@@ -687,8 +369,8 @@ function Essential_record() {
                     <Col md={3} className='d-flex align-items-center pdf_logo'>
                         <img src={manasu_logo} className="pdf_logo" alt="" />
                         {/* <div className="logo_text">
-                            <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
-                        </div> */}
+                                        <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                                    </div> */}
                     </Col>
                     <Col md={9}>
                         <h4 className="text-center">4. Resident Document Information Form</h4>
@@ -835,11 +517,11 @@ function Essential_record() {
                                     name="insurance_provider"
                                     value={formData.insurance_provider}
                                     onChange={handleInputChange}
-                                    className="mb-2"
+                                    className="mb-5"
                                 />
 
                                 {/* UDID */}
-                                <Form.Label className="mb-1">Policy Number</Form.Label>
+                                <Form.Label className="mb-1 mt-3">Policy Number</Form.Label>
                                 <Form.Control
                                     type="number"
                                     name="policy_no"
@@ -893,6 +575,19 @@ function Essential_record() {
                             <Row>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+
+                                    <Col sm="6" className='d-flex align-items-center'>
+                                        <Form.Control
+                                            type="text"
+                                            name="admission_no"
+                                            value={formData.admission_no}
+                                            onChange={handleInputChange}
+                                            required hidden />
+                                    </Col>
+                                </Form.Group>
+
+
+                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
                                         Name :
                                     </Form.Label>
@@ -922,7 +617,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        UDID Card Number (Unique Disability ID) :
+                                        UDID Card Number :
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -936,7 +631,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Disability Certificate No. & Issuing Authority :
+                                        Disability Certificate No :
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -948,19 +643,6 @@ function Essential_record() {
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="6" className='text-start'>
-                                        Disability Certificate No. & Issuing Authority :
-                                    </Form.Label>
-                                    <Col sm="6" className='d-flex align-items-center'>
-                                        <Form.Control
-                                            type="text"
-                                            name="disability_no"
-                                            value={formData.disability_no}
-                                            onChange={handleInputChange}
-                                            required />
-                                    </Col>
-                                </Form.Group>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
@@ -970,7 +652,7 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="voter_id"
-                                            value={formData.voter_id}
+                                            value={formData.voter_id || "Null"}
                                             onChange={handleInputChange}
                                             required />
                                     </Col>
@@ -1007,7 +689,7 @@ function Essential_record() {
                                             <img
                                                 src={files.form7_attach}
                                                 alt="form7_attach"
-                                                style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
+                                                style={{ width: "70px", height: "70px", marginTop: "10px", border: "1px solid #ccc" }}
                                             />
                                         ) : (
                                             <p style={{ marginTop: "10px" }}>No new photo available</p>
@@ -1059,7 +741,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Copy of Bank Passbook (attach):
+                                        Copy of Bank Passbook:
                                     </Form.Label>
                                     <Col sm="6" className='d-flex flex-column align-items-start'>
                                         <Form.Control
@@ -1074,7 +756,7 @@ function Essential_record() {
                                             <img
                                                 src={files.bank_passbook}
                                                 alt="Bank Passbook"
-                                                style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
+                                                style={{ width: "70px", height: "70px", marginTop: "10px", border: "1px solid #ccc" }}
                                             />
                                         ) : (
                                             <p style={{ marginTop: "10px" }}>No new photo available</p>
@@ -1139,7 +821,20 @@ function Essential_record() {
                                 </Form.Group>
 
                                 <div className="mt-3 d-flex align-tems-cente justify-content-between">
-                                    <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, admission_no)}>Update</Button>
+                                    <Button
+                                        variant="success"
+                                        className="m-1"
+                                        type="submit"
+                                        onClick={(e) => {
+                                            if (formData && formData.admission_no) {
+                                                handleUpdate(e, formData.admission_no);
+                                            } else {
+                                                alert("Admission number is missing.");
+                                            }
+                                        }}
+                                    >
+                                        Update
+                                    </Button>
                                     <Button variant="secondary" onClick={handleClose}>
                                         Close
                                     </Button>
@@ -1150,8 +845,8 @@ function Essential_record() {
                     </Col>
                 </Modal.Body>
             </Modal>
-        </>
+        </div>
     )
 }
 
-export default Essential_record
+export default Director_essentialRecord

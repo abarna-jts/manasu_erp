@@ -48,7 +48,7 @@ function Formality_declaration() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >= 5) { // Adjust minimum length as needed
+        if (admission_no.trim().length >= 8) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
@@ -260,13 +260,15 @@ function Formality_declaration() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
-                            } else {
-                                createFormData(); // Fetch & populate data before generating PDF
-                            }
-                        }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                        {userType === "1" && (
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                                if (!admission_no.trim()) {
+                                    alert("Please enter your admission number.");
+                                } else {
+                                    createFormData(); // Fetch & populate data before generating PDF
+                                }
+                            }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                        )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter your admission number.");
@@ -274,7 +276,7 @@ function Formality_declaration() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {userType === "2" && (
+                        {/* {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter your admission number.");
@@ -282,7 +284,7 @@ function Formality_declaration() {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )}
+                        )} */}
                     </Form.Group>
                 </Form>
                 <Row className='d-flex align-items-center justify-content-center'>
@@ -491,10 +493,11 @@ function Formality_declaration() {
                                         </Col>
                                     </Form.Group>
 
-
-                                    <div className="mt-3">
-                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
-                                    </div>
+                                    {userType === "1" && (
+                                        <div className="mt-3">
+                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                        </div>
+                                    )}
 
                                 </Row>
                             </Form>

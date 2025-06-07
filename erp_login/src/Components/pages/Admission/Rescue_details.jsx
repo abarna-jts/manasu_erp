@@ -752,7 +752,7 @@ function Rescue_details() {
                                             onChange={handleInputChange} />
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1" controlId="formContactNo">
+                                <Form.Group as={Row} className="mb-1 mt-4" controlId="formContactNo">
                                     <Form.Label column sm="4">
                                         Contact Number :
                                     </Form.Label>

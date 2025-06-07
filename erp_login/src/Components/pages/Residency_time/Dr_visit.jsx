@@ -4,6 +4,7 @@ import { Col } from 'react-bootstrap';
 import { useState} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 function Dr_visit() {
     const[formData, setFormData] = useState({
@@ -13,6 +14,10 @@ function Dr_visit() {
         resident_examinite:'',
         report:''
     })
+
+    const userType = Cookies.get('usertype');
+
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -142,9 +147,11 @@ function Dr_visit() {
                                         </Form.Group>
                                     </Col>
 
+                                    {userType === "3" && (
                                     <div className="mt-3">
                                         <Button variant="success" className="m-1" type="submit">Submit</Button>
                                     </div>
+                                    )}
 
                                 </Row>
                             </Form>

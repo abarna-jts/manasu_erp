@@ -53,9 +53,12 @@ const createRescueCondition = (req, res) => {
       follow_up
     } = req.body;
 
-    const recovery_photo_path = req.file
-      ? `uploads/Resque_Condition_Images/${req.file.filename}`
-      : null;
+    // const recovery_photo_path = req.file
+    //   ? `uploads/Resque_Condition_Images/${req.file.filename}`
+    //   : null;
+    const recovery_photo_path = req.files['recovery_photo']
+            ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
+            : null;
 
     const formatDate = (isoDate) => {
       const d = new Date(isoDate);
@@ -421,9 +424,14 @@ const createObservationReport = (req, res) => {
       follow_up
     } = req.body;
 
-    const recovery_photo_path = req.file
-      ? `uploads/Resque_Condition_Images/${req.file.filename}`
-      : null;
+    // const recovery_photo_path = req.file
+    //   ? `uploads/Resque_Condition_Images/${req.file.filename}`
+    //   : null;
+
+    const recovery_photo_path = req.files['recovery_photo']
+            ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
+            : null;
+
 
     const formatDate = (isoDate) => {
       const d = new Date(isoDate);
@@ -801,7 +809,6 @@ const updatePrescription = (req, res) => {
     hospital_name,
     department,
     masterHealthCheckup,
-    phone_no,
     instruction,
     advice,
     follow_up,
@@ -823,7 +830,6 @@ const updatePrescription = (req, res) => {
           hospital_name = ?, 
           department = ?,
           masterHealthCheckup = ?, 
-          phone_no = ?, 
           instruction = ?, 
           advice = ?, 
           follow_up = ?
@@ -837,7 +843,6 @@ const updatePrescription = (req, res) => {
     hospital_name,
     department,
     masterHealthCheckup,
-    phone_no,
     instruction,
     advice,
     follow_up,
@@ -862,30 +867,31 @@ const updatePrescription = (req, res) => {
 
     prescription_medicines.forEach((med) => {
       const updateMedSql = `
-                UPDATE prescription_medicines SET
-                  medicine = ?, 
-                  medicine_type = ?, 
-                  duration = ?, 
-                  intake = ?, 
-                  med_instruction = ?, 
-                  morning = ?, 
-                  afternoon = ?, 
-                  night = ?
-                WHERE id = ? AND prescription_id = ?
-            `;
+        UPDATE prescription_medicines SET
+          medicine = ?, 
+          medicine_type = ?, 
+          duration = ?, 
+          intake = ?, 
+          med_instruction = ?, 
+          morning = ?, 
+          afternoon = ?, 
+          night = ?
+        WHERE id = ? AND prescription_id = ?`;
 
       const medValues = [
-        med.medicine || '',
-        med.medicine_type || '',
-        med.duration || '',
-        med.intake || '',
-        med.med_instruction || '',
-        med.morning ?? null,
-        med.afternoon ?? null,
-        med.night ?? null,
+        med.medicine,
+        med.medicine_type,
+        med.duration,
+        med.intake,
+        med.med_instruction,
+        med.morning,
+        med.afternoon,
+        med.night,
         med.id,
-        id
+        id,
       ];
+
+      console.log(medValues);
 
       db.query(updateMedSql, medValues, (medErr) => {
         completed++;

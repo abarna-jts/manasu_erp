@@ -9,6 +9,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css
 // import { addDays } from 'date-fns';
 import { Alert } from "react-bootstrap";
+import Cookies from 'js-cookie';
 
 function Nurse_Record_sheet() {
     const [show, setShow] = useState(false);
@@ -19,6 +20,8 @@ function Nurse_Record_sheet() {
     const [show1, setShow1] = useState(false);
 
     const handleClose1 = () => setShow1(false);
+
+    const userType = Cookies.get('usertype');
 
     const [formData, setFormData] = useState({
         admission_no: '',
@@ -206,9 +209,11 @@ function Nurse_Record_sheet() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
+                                    {userType === "3" && (
                                     <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
                                         <i className="fas fa-plus"></i>
                                     </InputGroup.Text>
+                                    )}
 
                                 </InputGroup>
                             </Form.Group>
@@ -229,10 +234,12 @@ function Nurse_Record_sheet() {
             <Container>
                 <Row>
                     <Col md={4}>
+                    {userType === "3" && (
                         <Button variant="success"
                             className="m-1 d-flex justify-content-start align-items-center"
                             type="submit"
                             onClick={handleShow}>Enter Condition</Button>
+                    )}
                     </Col>
                     <Col md={12} className="mt-3 my-3">
 

@@ -458,13 +458,15 @@ function Family_Request_form() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!admissionNumber.trim()) {
-                                alert("Please enter your admission number.");
-                            } else {
-                                createFormData(); // Fetch & populate data before generating PDF
-                            }
-                        }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                        {userType === "1" && (
+                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                                if (!admissionNumber.trim()) {
+                                    alert("Please enter your admission number.");
+                                } else {
+                                    createFormData(); // Fetch & populate data before generating PDF
+                                }
+                            }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                        )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
                                 alert("Please enter your admission number.");
@@ -472,7 +474,7 @@ function Family_Request_form() {
                                 handleShow(admissionNumber); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {userType === "2" && (
+                        {/* {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admissionNumber.trim()) {
                                     alert("Please enter your admission number.");
@@ -480,7 +482,7 @@ function Family_Request_form() {
                                     handleDelete(admissionNumber); // Fetch & populate data before generating PDF
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )}
+                        )} */}
                     </Form.Group>
                 </Form>
 
@@ -779,9 +781,11 @@ function Family_Request_form() {
                             </Form.Group>
 
                         </Col>
-                        <div className="mt-3 d-flex align-tems-cente justify-content-between">
-                            <Button variant="success" className="m-1" type="submit">Submit</Button>
-                        </div>
+                         {userType === "1" && (
+                            <div className="mt-3 d-flex align-tems-cente justify-content-between">
+                                <Button variant="success" className="m-1" type="submit">Submit</Button>
+                            </div>
+                         )}
 
                     </Form>
 

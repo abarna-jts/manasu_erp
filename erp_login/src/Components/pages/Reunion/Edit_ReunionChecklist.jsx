@@ -132,32 +132,33 @@ function Edit_ReunionChecklist() {
     }, [admission_no]);
 
     const updateFormData = async () => {
-  const formPayload = new FormData();
+        const formPayload = new FormData();
 
-  for (const key in formData) {
-    if (formData[key] !== null && formData[key] !== '') {
-      formPayload.append(key, formData[key]);
-    }
-  }
+        for (const key in formData) {
+            if (formData[key] !== null && formData[key] !== '') {
+                formPayload.append(key, formData[key]);
+            }
+        }
 
-  try {
-    const response = await apiRoute.post(`/reunion/updatechecklist/${admission_no}`, formPayload, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+        try {
+            const response = await apiRoute.post(`/reunion/updatechecklist/${admission_no}`, formPayload, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
 
-    if (response.status === 200) {
-      alert('Form updated successfully');
-      // reset or update state if needed
-    } else {
-      alert('Update failed');
-    }
-  } catch (error) {
-    console.error('Error updating form:', error);
-    alert('Something went wrong. Please try again later.');
-  }
-};
+            if (response.status === 200) {
+                alert('Form updated successfully');
+                window.location.reload();
+                // reset or update state if needed
+            } else {
+                alert('Update failed');
+            }
+        } catch (error) {
+            console.error('Error updating form:', error);
+            alert('Something went wrong. Please try again later.');
+        }
+    };
 
 
 
@@ -271,29 +272,29 @@ function Edit_ReunionChecklist() {
                                             />
 
                                         </Col>
-                                        
-                                            {/* File upload */}
-                                            <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="selfDeclarationFile"
-                                                    onChange={handleChange}
-                                                    required={formData.selfDeclarationFile === "Yes"}
-                                                />
-                                                {formData.selfDeclarationFile && typeof formData.selfDeclarationFile === "string" && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.selfDeclarationFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                ) || " Null"}
-                                            </Col>
+
+                                        {/* File upload */}
+                                        <Col sm="6" className="d-flex align-items-center">
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="selfDeclarationFile"
+                                                onChange={handleChange}
+                                                required={formData.selfDeclarationFile === "Yes"}
+                                            />
+                                            {formData.selfDeclarationFile && typeof formData.selfDeclarationFile === "string" && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.selfDeclarationFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* self declaration letter */}
@@ -322,31 +323,31 @@ function Edit_ReunionChecklist() {
                                                 checked={formData.mediaConsentLetter === "No"}
                                                 onChange={handleChange}
                                             />
-                                            
+
 
                                         </Col>
                                         {/* File upload */}
-                                            <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="mediaConsentFile"
-                                                    onChange={handleChange}
-                                                    required={formData.mediaConsentFile === "Yes"}
-                                                />
-                                                {formData.mediaConsentFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.mediaConsentFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                        <Col sm="6" className="d-flex align-items-center">
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="mediaConsentFile"
+                                                onChange={handleChange}
+                                                required={formData.mediaConsentFile === "Yes"}
+                                            />
+                                            {formData.mediaConsentFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.mediaConsentFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
                                 </li>
 
@@ -380,31 +381,31 @@ function Edit_ReunionChecklist() {
                                                 checked={formData.familyIDproof === "No"}
                                                 onChange={handleChange}
                                             />
-                                           
+
 
                                         </Col>
                                         {/* File upload */}
-                                            <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="familyIDproofFile"
-                                                    onChange={handleChange}
-                                                    required={formData.familyIDproofFile === "Yes"}
-                                                />
-                                                {formData.familyIDproofFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.familyIDproofFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                ) || " Null"}
-                                            </Col>
+                                        <Col sm="6" className="d-flex align-items-center">
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="familyIDproofFile"
+                                                onChange={handleChange}
+                                                required={formData.familyIDproofFile === "Yes"}
+                                            />
+                                            {formData.familyIDproofFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.familyIDproofFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Resident’s ID Proof*/}
@@ -435,27 +436,27 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         {/* File upload */}
-                                            <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="residentIDproofFile"
-                                                    onChange={handleChange}
-                                                    required={formData.residentIDproofFile === "Yes"}
-                                                />
-                                                {formData.residentIDproofFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.residentIDproofFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                        <Col sm="6" className="d-flex align-items-center">
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="residentIDproofFile"
+                                                onChange={handleChange}
+                                                required={formData.residentIDproofFile === "Yes"}
+                                            />
+                                            {formData.residentIDproofFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.residentIDproofFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Aadhar Card*/}
@@ -486,26 +487,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="aadharCardFile"
-                                                    onChange={handleChange}
-                                                    required={formData.aadharCardFile === "Yes"}
-                                                />
-                                                {formData.aadharCardFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.aadharCardFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="aadharCardFile"
+                                                onChange={handleChange}
+                                                required={formData.aadharCardFile === "Yes"}
+                                            />
+                                            {formData.aadharCardFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.aadharCardFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* UDID Card*/}
@@ -536,26 +537,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="udidCardFile"
-                                                    onChange={handleChange}
-                                                    required={formData.udidCardFile === "Yes"}
-                                                />
-                                                {formData.udidCardFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.udidCardFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="udidCardFile"
+                                                onChange={handleChange}
+                                                required={formData.udidCardFile === "Yes"}
+                                            />
+                                            {formData.udidCardFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.udidCardFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Disability Certificate*/}
@@ -586,26 +587,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="disabilityCertificateFile"
-                                                    onChange={handleChange}
-                                                    required={formData.disabilityCertificateFile === "Yes"}
-                                                />
-                                                {formData.disabilityCertificateFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.disabilityCertificateFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="disabilityCertificateFile"
+                                                onChange={handleChange}
+                                                required={formData.disabilityCertificateFile === "Yes"}
+                                            />
+                                            {formData.disabilityCertificateFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.disabilityCertificateFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Bank Passbook / ATM Card*/}
@@ -636,26 +637,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="bankPassbookFile"
-                                                    onChange={handleChange}
-                                                    required={formData.bankPassbookFile === "Yes"}
-                                                />
-                                                {formData.bankPassbookFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.bankPassbookFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="bankPassbookFile"
+                                                onChange={handleChange}
+                                                required={formData.bankPassbookFile === "Yes"}
+                                            />
+                                            {formData.bankPassbookFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.bankPassbookFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Health Insurance Document*/}
@@ -686,26 +687,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="healthInsuranceFile"
-                                                    onChange={handleChange}
-                                                    required={formData.healthInsuranceFile === "Yes"}
-                                                />
-                                                {formData.healthInsuranceFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.healthInsuranceFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="healthInsuranceFile"
+                                                onChange={handleChange}
+                                                required={formData.healthInsuranceFile === "Yes"}
+                                            />
+                                            {formData.healthInsuranceFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.healthInsuranceFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
 
@@ -741,26 +742,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="medicalReportFile"
-                                                    onChange={handleChange}
-                                                    required={formData.medicalReportFile === "Yes"}
-                                                />
-                                                {formData.medicalReportFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.medicalReportFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="medicalReportFile"
+                                                onChange={handleChange}
+                                                required={formData.medicalReportFile === "Yes"}
+                                            />
+                                            {formData.medicalReportFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.medicalReportFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Discharge Summary Report (Prepared by Social Worker) */}
@@ -791,26 +792,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="dischargeSummaryFile"
-                                                    onChange={handleChange}
-                                                    required={formData.dischargeSummaryFile === "Yes"}
-                                                />
-                                                {formData.dischargeSummaryFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.dischargeSummaryFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="dischargeSummaryFile"
+                                                onChange={handleChange}
+                                                required={formData.dischargeSummaryFile === "Yes"}
+                                            />
+                                            {formData.dischargeSummaryFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.dischargeSummaryFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* One-Month Supply of Prescribed Medications */}
@@ -841,26 +842,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="medicationsFile"
-                                                    onChange={handleChange}
-                                                    required={formData.medicationsFile === "Yes"}
-                                                />
-                                                {formData.medicationsFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.medicationsFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="medicationsFile"
+                                                onChange={handleChange}
+                                                required={formData.medicationsFile === "Yes"}
+                                            />
+                                            {formData.medicationsFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.medicationsFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                 </li>
@@ -895,26 +896,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="ClothesFile"
-                                                    onChange={handleChange}
-                                                    required={formData.ClothesFile === "Yes"}
-                                                />
-                                                {formData.medicationsFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.ClothesFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="ClothesFile"
+                                                onChange={handleChange}
+                                                required={formData.ClothesFile === "Yes"}
+                                            />
+                                            {formData.medicationsFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.ClothesFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Possessions Recovered */}
@@ -945,26 +946,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="possessionsRecoveredFile"
-                                                    onChange={handleChange}
-                                                    required={formData.possessionsRecoveredFile === "Yes"}
-                                                />
-                                                {formData.medicationsFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.possessionsRecoveredFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="possessionsRecoveredFile"
+                                                onChange={handleChange}
+                                                required={formData.possessionsRecoveredFile === "Yes"}
+                                            />
+                                            {formData.medicationsFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.possessionsRecoveredFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Discharge Allowance / Travel Expenses Provided */}
@@ -995,26 +996,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="travelExpensesFile"
-                                                    onChange={handleChange}
-                                                    required={formData.travelExpensesFile === "Yes"}
-                                                />
-                                                {formData.travelExpensesFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.travelExpensesFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="travelExpensesFile"
+                                                onChange={handleChange}
+                                                required={formData.travelExpensesFile === "Yes"}
+                                            />
+                                            {formData.travelExpensesFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.travelExpensesFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Copy of Discharge Summary */}
@@ -1045,26 +1046,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="copyOfdischargeSummaryFile"
-                                                    onChange={handleChange}
-                                                    required={formData.copyOfdischargeSummaryFile === "Yes"}
-                                                />
-                                                {formData.copyOfdischargeSummaryFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.copyOfdischargeSummaryFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="copyOfdischargeSummaryFile"
+                                                onChange={handleChange}
+                                                required={formData.copyOfdischargeSummaryFile === "Yes"}
+                                            />
+                                            {formData.copyOfdischargeSummaryFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.copyOfdischargeSummaryFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                 </li>
@@ -1100,26 +1101,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="travelSafetyLetterFile"
-                                                    onChange={handleChange}
-                                                    required={formData.travelSafetyLetterFile === "Yes"}
-                                                />
-                                                {formData.travelSafetyLetterFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.travelSafetyLetterFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="travelSafetyLetterFile"
+                                                onChange={handleChange}
+                                                required={formData.travelSafetyLetterFile === "Yes"}
+                                            />
+                                            {formData.travelSafetyLetterFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.travelSafetyLetterFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                     {/* Reunion Photo */}
@@ -1150,26 +1151,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="reunionPhotoFile"
-                                                    onChange={handleChange}
-                                                    required={formData.reunionPhotoFile === "Yes"}
-                                                />
-                                                {formData.reunionPhotoFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.reunionPhotoFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="reunionPhotoFile"
+                                                onChange={handleChange}
+                                                required={formData.reunionPhotoFile === "Yes"}
+                                            />
+                                            {formData.reunionPhotoFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.reunionPhotoFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
 
                                 </li>
@@ -1205,26 +1206,26 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         <Col sm="6" className="d-flex align-items-center">
-                                                <Form.Label column sm="3">
-                                                    Attach:
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    name="witnessSignatureFile"
-                                                    onChange={handleChange}
-                                                    required={formData.witnessSignatureFile === "Yes"}
-                                                />
-                                                {formData.witnessSignatureFile && (
-                                                    <a
-                                                        href={`http://localhost:5000/${formData.witnessSignatureFile}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ms-2"
-                                                    >
-                                                        View
-                                                    </a>
-                                                )|| " Null"}
-                                            </Col>
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="witnessSignatureFile"
+                                                onChange={handleChange}
+                                                required={formData.witnessSignatureFile === "Yes"}
+                                            />
+                                            {formData.witnessSignatureFile && (
+                                                <a
+                                                    href={`http://localhost:5000/${formData.witnessSignatureFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
+                                        </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className='icon_checkList'>
                                         <Form.Label column sm="3">Any Other:</Form.Label>

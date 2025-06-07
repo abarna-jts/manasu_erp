@@ -260,9 +260,11 @@ function Medical_camp() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
+                                    {userType === "3" && (
                                     <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
                                         <i className="fas fa-plus"></i>
                                     </InputGroup.Text>
+                                    )}
 
                                 </InputGroup>
                             </Form.Group>
@@ -320,11 +322,11 @@ function Medical_camp() {
                                                     handleEditform(item.id);
                                                 }}
                                             ><i className="fas fa-edit"></i> </button>
-                                            {userType === "2" && (
+                                            {/* {userType === "2" && (
                                                 <button className="btn btn-danger icon_details"
                                                     onClick={() => handleDelete(item.id)}
                                                 ><i className="fas fa-trash"></i></button>
-                                            )}
+                                            )} */}
                                         </td>
                                     </tr>
                                 ))

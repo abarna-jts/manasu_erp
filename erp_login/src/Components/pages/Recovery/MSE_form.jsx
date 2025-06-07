@@ -809,7 +809,7 @@ function MSE_form() {
                           // fetchFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                      <button type="button" className="btn btn-primary mx-2" onClick={() => {
+                      <button type="button" className="btn btn-success mx-2" onClick={() => {
                         if (!admission_no.trim()) {
                           alert("Please enter your admission number.");
                         } else {
