@@ -255,7 +255,7 @@ function Formality_declaration() {
                         </Col>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
@@ -263,7 +263,7 @@ function Formality_declaration() {
                         {userType === "1" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     createFormData(); // Fetch & populate data before generating PDF
                                 }
@@ -271,7 +271,7 @@ function Formality_declaration() {
                         )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
@@ -279,7 +279,7 @@ function Formality_declaration() {
                         {/* {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }

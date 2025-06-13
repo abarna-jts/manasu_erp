@@ -35,7 +35,7 @@ function Rescue_Record_Sheet() {
     });
 
     const [files, setFiles] = useState({
-        recovery_photo: null,
+        rescue_recovery_photo: null,
     });
 
     const handleInputChange = (e) => {
@@ -45,7 +45,7 @@ function Rescue_Record_Sheet() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setFiles({ ...files, recovery_photo: file });
+            setFiles({ ...files, rescue_recovery_photo: file });
         }
     };
 
@@ -58,13 +58,14 @@ function Rescue_Record_Sheet() {
         data.append('admission_no', admission_no);
         data.append('resident_name', rescueName);
         data.append('date', formData.date);
-        data.append('recovery_photo', files.recovery_photo);
+        data.append('rescue_recovery_photo', files.rescue_recovery_photo);
         data.append('follow_up', formData.follow_up);
 
         try {
             const res = await apiRoute.post('/residency/rescue_condition', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+            
             alert('Rescue Condition submitted successfully!');
             window.location.reload();
         } catch (err) {
@@ -106,7 +107,7 @@ function Rescue_Record_Sheet() {
     // const handleDelete = async (id) => {
     //     alert("Are you sure want to delete");
     //     try {
-    //         const response = await apiRoute.delete(`http://localhost:5000/residency/delete_condition_details/${id}`);
+    //         const response = await apiRoute.delete(`https://www.pahrultours.com/app2/residency/delete_condition_details/${id}`);
     //         console.log(response);
     //         alert("First Form Details Deleted successfully");
     //         // Refresh data after deletion
@@ -134,16 +135,16 @@ function Rescue_Record_Sheet() {
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
                 date: parseDate(fromFormatted) || '',
-                recovery_photo: data.recovery_photo,
+                rescue_recovery_photo: data.rescue_recovery_photo,
             }));
 
             // Base path for images
-            const recovery_photoPath = data.recovery_photo ? `http://localhost:5000/${data.recovery_photo}` : null;
+            const resrecovery_photoPath = data.rescue_recovery_photo ? `https://www.pahrultours.com/app2/${data.rescue_recovery_photo}` : null;
 
             // Set files state
             setFiles((files) => ({
                 ...files,
-                recovery_photo: recovery_photoPath,
+                rescue_recovery_photo: resrecovery_photoPath,
             }));
 
 
@@ -165,15 +166,16 @@ function Rescue_Record_Sheet() {
         data.append('follow_up', formData.follow_up);
 
         // ✅ Only append recovery photo if it's a new file
-        if (files.recovery_photo instanceof File) {
-            data.append('recovery_photo', files.recovery_photo);
+        if (files.rescue_recovery_photo instanceof File) {
+            data.append('rescue_recovery_photo', files.rescue_recovery_photo);
         }
 
         try {
             const res = await apiRoute.post(`/residency/updateRescueCondition/${formData.admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Observation updated successfully!');
+            console.log(res.data);
+            alert('Consultation Report updated successfully!');
             setEditShow(false);
             getConditionDetails(); // Refresh data
         } catch (err) {
@@ -270,7 +272,7 @@ function Rescue_Record_Sheet() {
                                     <th scope="col">Admission Number</th>
                                     <th scope="col">Resident Name</th>
                                     <th scope="col">Follow Up </th>
-                                    <th scope="col">Rescue Recovery Photo Attachment</th>
+                                    <th scope="col">Recovery Photo</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -286,7 +288,7 @@ function Rescue_Record_Sheet() {
                                             <td className='text-justify'>{item.follow_up}</td>
                                             <td>
                                                 <img
-                                                    src={`http://localhost:5000/${item.recovery_photo}`}
+                                                    src={`https://www.pahrultours.com/app2/${item.rescue_recovery_photo}`}
                                                     alt="Rescue Condition Photo"
                                                     style={{ width: "70px", height: "70px", objectFit: "cover" }}
                                                 />
@@ -356,7 +358,7 @@ function Rescue_Record_Sheet() {
                                 <Form.Control
                                     type="file"
                                     onChange={handleFileChange}
-                                    name="recovery_photo"
+                                    name="rescue_recovery_photo"
                                     required
                                 />
                             </Form.Group>
@@ -431,10 +433,10 @@ function Rescue_Record_Sheet() {
                             <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
                                 <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
                                 <div className="photorow d-flex align-items-center justify-content-between">
-                                    {files.recovery_photo ? (
+                                    {files.rescue_recovery_photo ? (
                                         <>
                                             <img
-                                                src={files.recovery_photo}
+                                                src={files.rescue_recovery_photo}
                                                 alt="Old"
                                                 style={{ width: "100px", height: "100px", marginTop: "10px" }}
                                             />
@@ -446,8 +448,8 @@ function Rescue_Record_Sheet() {
                                     <Form.Control
                                         type="file"
                                         onChange={handleFileChange}
-                                        name="recovery_photo"
-                                        required={!formData.recovery_photo}
+                                        name="rescue_recovery_photo"
+                                        required={!formData.rescue_recovery_photo}
                                     />
                                 </div>
 

@@ -23,6 +23,7 @@
 	padding-left: 15px !important;
 }
 
+
 body {
 	background-color: #fff !important;
 }
@@ -458,30 +459,36 @@ body {
 	background-color: #f2f2f2;
 }
 
-.pdf_logo .logo_text span{
+.pdf_logo .logo_text span {
 	font-size: 18px;
 }
-.pdf_logo{
-	width: 90px;
+
+.pdf_logo {
+	width: 77px;
 	height: auto;
 }
 
-.pdf_logo .logo_text h4{
+.pdf_logo .logo_text h4 {
 	font-size: 11px;
 }
-.down_title h5{
+
+.down_title h5 {
 	font-weight: 600;
 }
+
 .checklist_ul {
 	margin: 15px 0px;
 }
-.modal-body{
+
+.modal-body {
 	overflow: overlay;
 }
-.sign_class{
+
+.sign_class {
 	font-size: 18px;
 }
-.checklist_ul::marker{
+
+.checklist_ul::marker {
 	font-weight: 700;
 	font-size: 19px;
 }
@@ -491,10 +498,11 @@ body {
 	font-weight: 800;
 	text-transform: uppercase;
 }
-.checklist_ul .checkbox_class{
+
+.checklist_ul .checkbox_class {
 	font-size: 17px;
-    font-weight: normal;
-    margin: 10px 0px;
+	font-weight: normal;
+	margin: 10px 0px;
 }
 
 @media(max-width:1300px) and (min-width:1000px) {
@@ -502,9 +510,14 @@ body {
 		font-size: 15px !important;
 	}
 
+	.sidebar .nav-link {
+		font-size: 0.75rem;
+		padding: 0.55rem 0.3rem !important;
+	}
+
 	.section_title {
 		margin-bottom: 10px;
-		font-size: 1.4rem;
+		font-size: 1.4rem !important;
 		line-height: 1.16667em;
 		font-weight: 600;
 		color: #454545;
@@ -525,12 +538,44 @@ body {
 
 	.sidebar {
 		width: 100%;
-		max-width: 220px !important;
+		max-width: 180px !important;
 	}
 
 	.sidebar-wrapper {
-		width: 220px !important;
+		width: 180px !important;
 	}
+
+	.sidebar-inner .accordion-button::after {
+		height: 1.25rem;
+		width: 1rem !important;
+		display: flex !important;
+		align-items: center !important;
+		justify-content: start !important;
+	}
+
+	.sidebar-inner .accordion-button::after {
+		font-size: 0.6rem !important;
+	}
+
+	.annual_section_title {
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    line-height: 1.16667em;
+    font-weight: 600;
+    color: #454545;
+}
+.modal {
+    --bs-modal-width: 440px !important;
+}
+.rescue_detailsClass{
+	width: 60% !important;
+}
+.rescue_report{
+	width: 45% !important;
+}
+.admission_report{
+	width: 50% !important;
+}
 }
 
 /* tabs styles start */
@@ -776,17 +821,18 @@ body {
 	top: 0;
 }
 
-.icon_checkList{
+.icon_checkList {
 	position: relative;
 	list-style: none;
 	padding-left: 10px;
 	margin: 15px 0px;
 }
+
 .icon_checkList::before {
 	content: "⮞";
-    position: absolute;
-    left: 0;
-    top: 6px;
+	position: absolute;
+	left: 0;
+	top: 6px;
 	color: #83c341;
 }
 
@@ -854,8 +900,8 @@ body {
 }
 
 .form-check-input:checked {
-    background-color: #83c341 !important;
-    border-color: #83c341 !important;
+	background-color: #83c341 !important;
+	border-color: #83c341 !important;
 }
 
 .pcss3t .typography ul,
@@ -1347,4 +1393,205 @@ body {
 .pcss3t>ul,
 .pcss3t>ul>li {
 	height: 270em;
+}
+
+.sidebar_logo {
+	display: none;
+}
+
+/* sidebar css */
+
+/* sidebar.css */
+.sidebar {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	width: 260px;
+	background-color: #343a40;
+	z-index: 1040;
+	transition: transform 0.3s ease-in-out;
+	transform: translateX(0);
+}
+
+.sidebar.hidden {
+	transform: translateX(-100%);
+}
+
+.sidebar-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 100vw;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 1030;
+}
+
+
+.burger {
+	cursor: pointer;
+	position: absolute;
+	z-index: 10000;
+	top: 20px;
+	left: 0px;
+}
+
+.burger svg {
+	transition: transform 0.3s ease;
+}
+
+.dashboard_body {
+	padding-left: 3rem;
+	padding-right: 3rem;
+}
+
+@media(max-width:600px) {
+	.first_infoFormRow {
+		flex-direction: column-reverse !important;
+	}
+
+	.sidebar-wrapper {
+		width: 0px !important;
+	}
+
+	.sidebar_logo {
+		display: block;
+	}
+
+	.navbar_dropdown {
+		display: none;
+	}
+
+	.dashboard_body {
+		padding-right: 0px !important;
+		padding-left: 0px !important
+	}
+
+	.stretch-card {
+		width: 33% !important;
+	}
+
+	.card {
+		padding: 1em;
+	}
+
+	.breadcrumb_title {
+		display: none !important;
+	}
+
+	.section_title {
+		margin-bottom: 10px;
+		font-size: 1.3rem !important;
+		line-height: 1.16667em;
+		font-weight: 600;
+		color: #454545;
+		text-align: center;
+	}
+
+	.annual_section_title {
+		margin-bottom: -28px;
+		font-size: 1.2rem;
+		line-height: 1.16667em;
+		font-weight: 600;
+		color: #454545;
+	}
+
+	.annual_view {
+		padding: 6px !important;
+		font-size: 14px !important;
+	}
+
+	.form_title {
+		font-weight: 600;
+		color: #83c341;
+	}
+
+	.pdfsub_heading {
+		color: #83c341;
+	}
+
+	.checklist_ul::marker {
+		font-weight: 700;
+		font-size: 16px;
+		color: #83c341;
+	}
+
+	.checklist_ul h4 {
+		font-size: 15px;
+		font-weight: 800;
+		color: #83c341;
+		text-transform: uppercase;
+	}
+
+	.icon_checkList div {
+		flex-direction: column !important;
+		align-items: start !important;
+	}
+
+	.icon_checkList .form-check {
+		display: block !important;
+	}
+
+	.intern_class {
+		width: 50% !important;
+	}
+
+	.sidebar_mediaBody {
+		display: flex !important;
+	}
+
+	.logout_class {
+		display: flex !important;
+	}
+
+	.table-responsive {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+}
+
+.sidebar_mediaBody {
+	display: none;
+}
+
+/* Hide by default (desktop) */
+.logout_class {
+	display: none !important;
+}
+
+/* Show only on mobile */
+@media (max-width: 767px) {
+	.logout_class {
+		display: flex !important;
+	}
+}
+
+@media(max-width:1550px) and (min-width:1408px) {
+	.sidebar {
+		width: 247px !important;
+	}
+
+	.sidebar-wrapper {
+		width: 247px !important;
+	}
+
+	.section_title {
+		margin-bottom: 10px;
+		font-size: 1.6rem;
+		line-height: 1.16667em;
+		font-weight: 600;
+		color: #454545;
+	}
+
+	.sidebar .nav-link {
+		font-size: 0.9rem;
+	}
+
+	.annual_section_title {
+		margin-bottom: 10px;
+		font-size: 1.4rem;
+		line-height: 1.16667em;
+		font-weight: 600;
+		color: #454545;
+	}
 }

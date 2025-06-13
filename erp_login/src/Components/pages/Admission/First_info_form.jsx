@@ -208,6 +208,10 @@ function First_info_form() {
             govIdType
         ];
 
+        console.log(govIdType);
+        console.log(govIdNumber);
+        console.log(govIdFile);
+
         const allRequiredFilled = requiredFields.every(field => {
             if (typeof field === "string") {
                 return field.trim() !== "";
@@ -383,6 +387,14 @@ function First_info_form() {
         let valid = true;
         if (!admission_no || admission_no.trim() === "") valid = false;
         if (!admission_date || admission_date.trim() === "") valid = false;
+        if (!referred_by || referred_by.trim() === "") valid = false;
+        if (!from_place || from_place.trim() === "") valid = false;
+        if (!date_time || date_time.trim() === "") valid = false;
+        if (!police_memo || police_memo.trim() === "") valid = false;
+        if (!attach_policeMemo || attach_policeMemo.trim() === "") valid = false;
+        if (!police_station || police_station.trim() === "") valid = false;
+        if (!information_public || information_public.trim() === "") valid = false;
+        if (!rescue_image || rescue_image.trim() === "") valid = false;
         // Add other required Step 1 fields here...
         setIsStep1Invalid(!valid);
         return valid;
@@ -391,8 +403,11 @@ function First_info_form() {
     // Validate Step 2 (Example)
     const validateStep2 = () => {
         let valid = true;
-        if (!referred_by || referred_by.trim() === "") valid = false;
-        if (!from_place || from_place.trim() === "") valid = false;
+        if (!rescue_name || rescue_name.trim() === "") valid = false;
+        if (!rescue_status || rescue_status.trim() === "") valid = false;
+        if (!language1 || language1.trim() === "") valid = false;
+        if (!education || education.trim() === "") valid = false;
+        if (!govIdType || govIdType.trim() === "") valid = false;
         // Add other required Step 2 fields here...
         setIsStep2Invalid(!valid);
         return valid;
@@ -401,7 +416,7 @@ function First_info_form() {
     // Validate Step 3 (Example)
     const validateStep3 = () => {
         let valid = true;
-        if (!date_time || date_time.trim() === "") valid = false;
+        if (!father || father.trim() === "") valid = false;
         // Add other required Step 3 fields here...
         setIsStep3Invalid(!valid);
         return valid;
@@ -444,6 +459,25 @@ function First_info_form() {
 
     const handleSubmitFinallForm = async (e) => {
         e.preventDefault();
+
+        const requiredFields = [
+            rescue_name,
+            rescue_status,
+            language1,
+            education,
+            govIdType
+        ];
+
+        const allRequiredFilled = requiredFields.every(field => {
+            if (typeof field === "string") {
+                return field.trim() !== "";
+            }
+            return !!field;
+        });
+
+        console.log("All fields filled?", allRequiredFilled);
+
+        setIsStep5Invalid(!allRequiredFilled); 
 
         // Validate all steps before submitting
         const step1Valid = validateStep1();
@@ -620,18 +654,9 @@ function First_info_form() {
                 <Col md={7} className="text-center mb-4">
                     <h3 className="section_title">Resident Intake Form</h3>
                 </Col>
+                <Col md={2}></Col>
 
-                <div className="d-flex align-items-center px-3">
-
-                    <Form className="navbar-search">
-                        <Form.Group id="topbarSearch">
-                            <InputGroup className="input-group-merge search-bar">
-
-                                <Form.Control type="text" placeholder="Search" />
-                            </InputGroup>
-                        </Form.Group>
-                    </Form>
-                </div>
+                
             </div>
 
             {/* Step Progress UI */}
@@ -645,7 +670,8 @@ function First_info_form() {
                         (stepNumber === 1 && isStep1Invalid) ||
                         (stepNumber === 2 && isStep2Invalid) ||
                         (stepNumber === 3 && isStep3Invalid) ||
-                        (stepNumber === 4 && isStep4Invalid);
+                        (stepNumber === 4 && isStep4Invalid) ||
+                        (stepNumber === 5 && isStep5Invalid);
 
                     return (
                         <div
@@ -689,8 +715,8 @@ function First_info_form() {
                         <Col md={12} className="text-start">
                             <h3 className="section_title">Rescue Details</h3>
                         </Col>
-                        <Form noValidate validated={validated} onSubmit={handleNext}>
-                            <Row className="d-flex justify-content-between">
+                        <Form noValidate validated={validated} onSubmit={handleNext} className="first_infoForm">
+                            <Row className="d-flex justify-content-between first_infoFormRow">
                                 <Col md={6}>
                                     <Form.Group className="mb-3 text-start" controlId="formReferredby">
                                         <Form.Label>Rescued / Referred by: </Form.Label>
@@ -805,7 +831,7 @@ function First_info_form() {
                                         </Col>
                                     </Form.Group>
 
-                                    <Form.Group controlId="formFile" className="mb-3">
+                                    <Form.Group controlId="formFile" className="mb-3 text-start">
                                         <Form.Label>Attach Rescue Image</Form.Label>
                                         <Form.Control
                                             type="file"
@@ -832,7 +858,7 @@ function First_info_form() {
                             </Row>
 
                             <Col md={11}>
-                                <Button variant="outline-success" className="m-1" type="submit">
+                                <Button variant="outline-success" className="m-1 mb-5" type="submit">
                                     <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                 </Button>
                             </Col>
@@ -849,7 +875,7 @@ function First_info_form() {
 
 
                             <Form noValidate validated={validated} onSubmit={handleInmateForm}>
-                                <Row className="d-flex justify-content-between">
+                                <Row className="d-flex justify-content-between first_infoFormRow">
                                     <Col md={6}>
                                         <Col md={12} className="text-start">
                                             <h3 className="section_title">Resident's Details</h3>
@@ -978,6 +1004,7 @@ function First_info_form() {
                                             <Col sm={12}>
                                                 <Form.Select
                                                     value={govIdType}
+                                                    name="govIdType"
                                                     onChange={(e) => setGovIdType(e.target.value)}
                                                     required
                                                 >
@@ -1002,6 +1029,7 @@ function First_info_form() {
                                                             type="text"
                                                             placeholder={`Enter ${govIdType} number`}
                                                             value={govIdNumber}
+                                                            name="govIdNumber"
                                                             onChange={(e) => setGovIdNumber(e.target.value)}
                                                         />
                                                     </Col>
@@ -1012,6 +1040,7 @@ function First_info_form() {
                                                     <Col sm={12}>
                                                         <Form.Control
                                                             type="file"
+                                                            name="govIdFile"
                                                             accept=".pdf,image/*"
                                                             onChange={(e) => setGovIdFile(e.target.files[0])}
                                                         />
@@ -1030,10 +1059,10 @@ function First_info_form() {
                                     </Col>
                                 </Row>
                                 <Col md={11}>
-                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack}>
+                                    <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-success" className="m-1" type="submit">
+                                    <Button variant="outline-success" className="m-1 mb-5" type="submit">
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
@@ -1057,7 +1086,7 @@ function First_info_form() {
                                 <h3 className="section_title">Family Details</h3>
                             </Col>
                             <Form noValidate validated={validated} onSubmit={handleFamilyForm}>
-                                <Row className="d-flex justify-content-between">
+                                <Row className="d-flex justify-content-between first_infoFormRow">
                                     <Col md={6}>
                                         <Form.Group className="mb-3 text-start" controlId="formFather">
                                             <Form.Label>Father:</Form.Label>
@@ -1170,10 +1199,10 @@ function First_info_form() {
                                 </Row>
 
                                 <Col md={11}>
-                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack1}>
+                                    <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack1}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-success" className="m-1" type="submit">
+                                    <Button variant="outline-success" className="m-1 mb-5" type="submit">
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
@@ -1195,7 +1224,7 @@ function First_info_form() {
                                 <h3 className="section_title">Physical Appearance</h3>
                             </Col>
                             <Form noValidate validated={validated} onSubmit={handlePhysicalForm}>
-                                <Row className="d-flex justify-content-between">
+                                <Row className="d-flex justify-content-between first_infoFormRow">
                                     <Col md={6}>
                                         <Row>
                                             <Col>
@@ -1359,11 +1388,11 @@ function First_info_form() {
                                         </Form.Group>
                                     </Col>
                                 </Row>
-                                <Col md={11}>
-                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack2}>
+                                <Col md={11} className="mb-4">
+                                    <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack2}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
-                                    <Button variant="outline-success" className="m-1" type="submit">
+                                    <Button variant="outline-success" className="m-1 mb-5" type="submit">
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
@@ -1385,7 +1414,7 @@ function First_info_form() {
                                 <h3 className="section_title"> Initial Psychological Assessment.</h3>
                             </Col>
                             <Form noValidate validated={validated}>
-                                <Row className="d-flex justify-content-between">
+                                <Row className="d-flex justify-content-between first_infoFormRow">
                                     <Col md={6}>
                                         <Form.Group className="mb-3 text-start">
                                             <Form.Label>Mental status : </Form.Label>
@@ -1468,7 +1497,7 @@ function First_info_form() {
                                     </Col>
                                 </Row>
 
-                                <Col md={11}>
+                                <Col md={11} className="mb-4">
                                     <Button variant="outline-secondary" className="m-1" onClick={handleBack3}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>

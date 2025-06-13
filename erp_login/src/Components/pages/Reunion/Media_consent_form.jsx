@@ -104,7 +104,7 @@ function Media_consent_form() {
 
 
             // Handle old and new photo paths correctly
-            const scanReportPath = data.scan_report ? `http://localhost:5000/${data.scan_report}` : null;
+            const scanReportPath = data.scan_report ? `https://www.pahrultours.com/app2/${data.scan_report}` : null;
 
             console.log(scanReportPath);
             // Set files state
@@ -250,7 +250,7 @@ function Media_consent_form() {
             }));
 
             // Handle old and new photo paths correctly
-            const scanReportPath = data.scan_report ? `http://localhost:5000/${data.scan_report}` : null;
+            const scanReportPath = data.scan_report ? `https://www.pahrultours.com/app2/${data.scan_report}` : null;
 
 
             // Set files state
@@ -325,7 +325,7 @@ function Media_consent_form() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `http://localhost:5000/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");
@@ -406,7 +406,7 @@ function Media_consent_form() {
                         </Col>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
@@ -414,7 +414,7 @@ function Media_consent_form() {
                          {userType === "1" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     createFormData(); // Fetch & populate data before generating PDF
                                 }
@@ -422,7 +422,7 @@ function Media_consent_form() {
                         )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
@@ -430,7 +430,7 @@ function Media_consent_form() {
                         {/* {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }

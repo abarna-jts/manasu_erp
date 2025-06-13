@@ -103,7 +103,7 @@ function SCRB_Form2C() {
     console.log(payload);
 
     try {
-      const response = await apiRoute.post('http://localhost:5000/scrb_form/create_form_2C', payload);
+      const response = await apiRoute.post('https://www.pahrultours.com/app2/scrb_form/create_form_2C', payload);
       console.log(response.data);
       if (response.status === 201 || response.status === 200) {
         setSubmissionMessage("Form submitted successfully!");
@@ -130,17 +130,36 @@ function SCRB_Form2C() {
       return;
     }
 
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    try {
+      const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, '_blank');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      while (heightLeft > 0) {
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+        if (heightLeft > 0) {
+          pdf.addPage();
+          position = -imgHeight + heightLeft;
+        }
+      }
+
+      const pdfBlob = pdf.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+    } catch (err) {
+      console.error("Error generating PDF:", err);
+      alert("Failed to generate PDF.");
+    }
   };
 
   const createFormData = () => {
@@ -152,7 +171,7 @@ function SCRB_Form2C() {
 
   const fetchFormData = async () => {
     try {
-      const response = await apiRoute.get(`http://localhost:5000/scrb_form/get_scrb_form2cdata/${admission_no}`);
+      const response = await apiRoute.get(`/get_scrb_form2cdata/${admission_no}`);
       const data = response.data;
 
       setFormData((formData) => ({
@@ -189,7 +208,7 @@ function SCRB_Form2C() {
 
   const handleDownload = async () => {
     if (!admission_no.trim()) {
-      alert("Please enter your admission number.");
+      alert("Please enter admission number.");
       return;
     }
 
@@ -283,7 +302,7 @@ function SCRB_Form2C() {
       if (result && result.rescue_image) {
         const imagePath = result.rescue_image.startsWith("http")
           ? result.rescue_image
-          : `http://localhost:5000/${result.rescue_image}`;
+          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
         setRescueImage(imagePath);
         setRescueName(result.rescue_name || "");
@@ -385,7 +404,7 @@ function SCRB_Form2C() {
                       }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
                       <button type="button" className="btn btn-success mx-1" onClick={() => {
                         if (!admission_no.trim()) {
-                          alert("Please enter your admission number.");
+                          alert("Please enter admission number.");
                         } else {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
@@ -721,7 +740,7 @@ function SCRB_Form2C() {
                 <tbody>
                   <tr>
                     <td>
-                      <div className="mb-3 text-start">
+                      <div className="mb-2 text-start">
                         <label>Any Other Upper Dress:</label>
                         <textarea
                           className="form-control"
@@ -738,7 +757,7 @@ function SCRB_Form2C() {
 
                   <tr>
                     <td>
-                      <div className="mb-3 text-start">
+                      <div className="mb-2 text-start">
                         <label>Any Other Lower Dress:</label>
                         <textarea
                           className="form-control"
@@ -755,10 +774,9 @@ function SCRB_Form2C() {
 
                   <tr>
                     <td>
-                      <div className="mb-3 text-start">
+                      <div className="mb-5 text-start">
                         <label>Upper Dress Color:</label>
-                        <input
-                          type="text"
+                        <textarea
                           className="form-control"
                           name="upperdress_color"
                           value={formData.upperdress_color}
@@ -771,10 +789,9 @@ function SCRB_Form2C() {
 
                   <tr>
                     <td>
-                      <div className="mb-3 text-start">
+                      <div className="mb-2 mt-2 text-start">
                         <label>Lower Dress Color:</label>
-                        <input
-                          type="text"
+                        <textarea
                           className="form-control"
                           name="lowerdress_color"
                           value={formData.lowerdress_color}
@@ -787,7 +804,18 @@ function SCRB_Form2C() {
 
                 </tbody>
               </table>
+              <Col md={12}>
+                <Row className="d-flex align-items-center justify-content-center mt-3">
+                  <Col md={6} className="mt-3 down_title">
+                    <h5 className="text-start">Signature / Thumprint</h5>
+                  </Col>
+                  <Col md={6} className="mt-3 down_title">
+                    <h5 className="text-end">Manasu Seal</h5>
+                  </Col>
+                </Row>
+              </Col>
             </form>
+
           </div>
 
         </Row>

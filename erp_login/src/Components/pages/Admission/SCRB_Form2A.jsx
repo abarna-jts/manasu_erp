@@ -51,17 +51,36 @@ function SCRB_Form2A() {
       return;
     }
 
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    try {
+      const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, '_blank');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      while (heightLeft > 0) {
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+        if (heightLeft > 0) {
+          pdf.addPage();
+          position = -imgHeight + heightLeft;
+        }
+      }
+
+      const pdfBlob = pdf.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+    } catch (err) {
+      console.error("Error generating PDF:", err);
+      alert("Failed to generate PDF.");
+    }
   };
 
   const handleAdmissionChange = (e) => {
@@ -184,7 +203,7 @@ function SCRB_Form2A() {
 
   const handleDownload = async () => {
     if (!admission_no.trim()) {
-      alert("Please enter your admission number.");
+      alert("Please enter admission number.");
       return;
     }
 
@@ -253,7 +272,7 @@ function SCRB_Form2A() {
       if (result && result.rescue_image) {
         const imagePath = result.rescue_image.startsWith("http")
           ? result.rescue_image
-          : `http://localhost:5000/${result.rescue_image}`;
+          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
         setRescueImage(imagePath);
         setRescueName(result.rescue_name || "");
@@ -356,7 +375,7 @@ function SCRB_Form2A() {
                       }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
                       <button type="button" className="btn btn-success mx-2" onClick={() => {
                         if (!admission_no.trim()) {
-                          alert("Please enter your admission number.");
+                          alert("Please enter admission number.");
                         } else {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
@@ -669,7 +688,7 @@ function SCRB_Form2A() {
                   <tbody>
                     <tr>
                       <td>
-                        <div className="mb-3 text-start">
+                        <div className="mb-1 text-start">
                           <label>Any Other Category:</label>
                           <textarea
                             className="form-control"
@@ -680,7 +699,7 @@ function SCRB_Form2A() {
                             required
                           ></textarea>
                         </div>
-                        <div className="mb-3 text-start">
+                        <div className="mb-1 text-start">
                           <label>Any Other Complexion:</label>
                           <textarea
                             className="form-control"
@@ -691,7 +710,7 @@ function SCRB_Form2A() {
                             required
                           ></textarea>
                         </div>
-                        <div className="mb-3 text-start">
+                        <div className="mb-1 text-start">
                           <label>Any Other Face:</label>
                           <textarea
                             className="form-control"
@@ -706,11 +725,17 @@ function SCRB_Form2A() {
                     </tr>
                   </tbody>
                 </table>
-                <div className="mb-3">
-
-
-                </div>
               </form>
+              <Col md={12}>
+                <Row className="d-flex align-items-center justify-content-center mt-3">
+                  <Col md={6} className="mt-1 down_title">
+                    <h5 className="text-start">Signature / Thumprint</h5>
+                  </Col>
+                  <Col md={6} className="mt-1 down_title">
+                    <h5 className="text-end">Manasu Seal</h5>
+                  </Col>
+                </Row>
+              </Col>
             </div>
 
 

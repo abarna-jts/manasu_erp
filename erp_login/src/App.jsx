@@ -45,6 +45,8 @@ import Dr_visitView from './Components/pages/Residency_time/Dr_visitView';
 import Medical_camp from './Components/pages/Residency_time/Medical_camp';
 import Reunion_summary from './Components/pages/Residency_time/Reunion_summary';
 import Director_essentialRecord from './Components/pages/Admin_Formality/Director_essentialRecord';
+import Reunited_people from './Components/pages/Admission/Reunited_people';
+import Psychiatrics_form from './Components/pages/Recovery/psychiatrics_form';
 
 function App() {
 
@@ -218,6 +220,21 @@ function App() {
               <Route
                 path='/reunion_summary'
                 element={<MainLayout><Reunion_summary /></MainLayout>}
+              />
+
+              <Route
+                path='/prescription_form'
+                element={<MainLayout><Prescription_form /></MainLayout>}
+              />
+
+               <Route
+                path='/reunited_people'
+                element={<MainLayout><Reunited_people /></MainLayout>}
+              />
+
+               <Route
+                path='/psychatrics_form'
+                element={<MainLayout><Psychiatrics_form /></MainLayout>}
               />
 
 

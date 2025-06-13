@@ -90,7 +90,7 @@ function Reunion_summary() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `http://localhost:5000/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");
@@ -155,7 +155,7 @@ function Reunion_summary() {
 
 
             // Handle old and new photo paths correctly
-            const summaryAttachPath = data.summary_attach ? `http://localhost:5000/${data.summary_attach}` : null;
+            const summaryAttachPath = data.summary_attach ? `https://www.pahrultours.com/app2/${data.summary_attach}` : null;
 
             console.log(summaryAttachPath);
             // Set files state
@@ -270,7 +270,7 @@ function Reunion_summary() {
             }));
 
             // Handle old and new photo paths correctly
-            const summaryAttachPath = data.summary_attach ? `http://localhost:5000/${data.summary_attach}` : null;
+            const summaryAttachPath = data.summary_attach ? `https://www.pahrultours.com/app2/${data.summary_attach}` : null;
 
             // Set files state
             setFiles((files) => ({
@@ -299,6 +299,7 @@ function Reunion_summary() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert("Updated Successfully");
+            window.location.reload();
         } catch (err) {
             console.error(err);
             alert('Update failed.');

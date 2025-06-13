@@ -224,11 +224,11 @@ function Family_Request_form() {
             console.log("Fetched Data:", data);
 
             // Handle old and new photo paths correctly
-            const aadharCardPath = data.f_aadhar_card ? `http://localhost:5000/${data.f_aadhar_card}` : null;
-            const rationCardPath = data.f_ration_card ? `http://localhost:5000/${data.f_ration_card}` : null;
-            const residentaadharCardPath = data.r_aadhar_card ? `http://localhost:5000/${data.r_aadhar_card}` : null;
-            const residentrationCardPath = data.r_ration_card ? `http://localhost:5000/${data.r_ration_card}` : null;
-            const govt_idPath = data.govt_id ? `http://localhost:5000/${data.govt_id}` : null;
+            const aadharCardPath = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
+            const rationCardPath = data.f_ration_card ? `https://www.pahrultours.com/app2/${data.f_ration_card}` : null;
+            const residentaadharCardPath = data.r_aadhar_card ? `https://www.pahrultours.com/app2/${data.r_aadhar_card}` : null;
+            const residentrationCardPath = data.r_ration_card ? `https://www.pahrultours.com/app2/${data.r_ration_card}` : null;
+            const govt_idPath = data.govt_id ? `https://www.pahrultours.com/app2/${data.govt_id}` : null;
             // Set files state
             setFiles((files) => ({
                 ...files,
@@ -273,11 +273,11 @@ function Family_Request_form() {
             }));
 
             // Handle old and new photo paths correctly
-            const aadharCardPath = data.f_aadhar_card ? `http://localhost:5000/${data.f_aadhar_card}` : null;
-            const rationCardPath = data.f_ration_card ? `http://localhost:5000/${data.f_ration_card}` : null;
-            const residentaadharCardPath = data.r_aadhar_card ? `http://localhost:5000/${data.r_aadhar_card}` : null;
-            const residentrationCardPath = data.r_ration_card ? `http://localhost:5000/${data.r_ration_card}` : null;
-            const govt_idPath = data.govt_id ? `http://localhost:5000/${data.govt_id}` : null;
+            const aadharCardPath = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
+            const rationCardPath = data.f_ration_card ? `https://www.pahrultours.com/app2/${data.f_ration_card}` : null;
+            const residentaadharCardPath = data.r_aadhar_card ? `https://www.pahrultours.com/app2/${data.r_aadhar_card}` : null;
+            const residentrationCardPath = data.r_ration_card ? `https://www.pahrultours.com/app2/${data.r_ration_card}` : null;
+            const govt_idPath = data.govt_id ? `https://www.pahrultours.com/app2/${data.govt_id}` : null;
 
 
             // Set files state
@@ -352,7 +352,7 @@ function Family_Request_form() {
     const handleDelete = async (admissionNumber) => {
         alert("Are you sure want to delete");
         try {
-            const response = await axios.delete(`http://localhost:5000/reunion/deleteFamilyRequest/${admissionNumber}`);
+            const response = await apiRoute.delete(`/reunion/deleteFamilyRequest/${admissionNumber}`);
             console.log(response);
             alert("First Form Details Deleted successfully");
             // Refresh data after deletion
@@ -371,7 +371,7 @@ function Family_Request_form() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `http://localhost:5000/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");
@@ -453,7 +453,7 @@ function Family_Request_form() {
                         </Col>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
@@ -461,7 +461,7 @@ function Family_Request_form() {
                         {userType === "1" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admissionNumber.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     createFormData(); // Fetch & populate data before generating PDF
                                 }
@@ -469,7 +469,7 @@ function Family_Request_form() {
                         )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 handleShow(admissionNumber); // Fetch & populate data before generating PDF
                             }
@@ -477,7 +477,7 @@ function Family_Request_form() {
                         {/* {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admissionNumber.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     handleDelete(admissionNumber); // Fetch & populate data before generating PDF
                                 }
@@ -952,7 +952,7 @@ function Family_Request_form() {
                                             required />
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-3 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Aadhar Card No(Relation) :
                                     </Form.Label>
@@ -970,7 +970,7 @@ function Family_Request_form() {
                                         )}
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-3 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Ration Card (Relation):
                                     </Form.Label>
@@ -1025,7 +1025,7 @@ function Family_Request_form() {
                                         )}
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-4 mt-5 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-5 mt-5 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Any other Government ID :
                                     </Form.Label>
@@ -1044,7 +1044,7 @@ function Family_Request_form() {
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-1 mt-5 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Description :
                                     </Form.Label>

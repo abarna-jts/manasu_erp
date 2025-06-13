@@ -19,7 +19,7 @@ const ImagePDF = () => {
     const doc = new jsPDF();
 
     // Image URLs
-    const oldImageURL = 'http://localhost:5000/uploads/form_2a/1746522094905-manasu_logo.png';
+    const oldImageURL = 'https://www.pahrultours.com/app2/uploads/form_2a/1746522094905-manasu_logo.png';
     const newImageURL = newPhotoPath;
 
     try {
@@ -49,7 +49,7 @@ const ImagePDF = () => {
         <div className="text-center" style={{ border: "1px solid #6c6c6c", borderRadius: '5px' }}>
           <label>Old Photo</label><br />
           <img
-            src="http://localhost:5000/uploads/form_2a/1746522094905-manasu_logo.png"
+            src="https://www.pahrultours.com/app2/uploads/form_2a/1746522094905-manasu_logo.png"
             alt="Old"
             style={{ width: "100px", height: "100px" }}
           />

@@ -251,7 +251,7 @@ function InternshipForm() {
                                 <Col sm="8">
                                     <Form.Control
                                         name="phone"
-                                        type="number"
+                                        type="text"
                                         value={formData.phone}
                                         onChange={handleInputChange}
                                         required
@@ -268,7 +268,7 @@ function InternshipForm() {
                                    
                                     <Form.Control
                                         name="secondary_phone"
-                                        type="number"
+                                        type="text"
                                         value={formData.secondary_phone}
                                         onChange={handleInputChange}
                                     />
@@ -334,9 +334,11 @@ function InternshipForm() {
                                         <option value="">-- Select --</option>
 
                                         <optgroup label="Social Worker">
+                                            <option value="Medical and Psychiatry">Medical and Psychiatry</option>
                                             <option value="Community Development">Community Development</option>
-                                            <option value="Child Welfare">Child Welfare</option>
-                                            <option value="Mental Health">Mental Health</option>
+                                            <option value="Human Resource Management">Human Resource Management</option>
+                                            <option value="Human Rights">Human Rights</option>
+                                            <option value="Any other">Any other</option>
                                         </optgroup>
                                         
                                         <option value="Social Services">Social Services</option>
@@ -368,7 +370,7 @@ function InternshipForm() {
                                 <Form.Label column sm="4">
                                     Internship Date :
                                 </Form.Label>
-                                <Col sm="4">
+                                <Col sm="4" className='intern_class'>
                                     <Form.Control
                                         name="from_date"
                                         type="date"
@@ -377,7 +379,7 @@ function InternshipForm() {
                                         required
                                     />
                                 </Col>
-                                <Col sm="4">
+                                <Col sm="4" className='intern_class'>
                                     <Form.Control
                                         name="to_date"
                                         type="date"

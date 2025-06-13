@@ -8,6 +8,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Cookies from 'js-cookie';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Prescription_form() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -18,6 +19,7 @@ function Prescription_form() {
     const handleShow = () => setShow(true);
     const handleEditClose = () => setEditShow(false);
     const [admission_no, setAdmissionNo] = useState('');
+    const [previewRequested, setPreviewRequested] = useState(false);
     const [medicalType, setMedicalType] = useState('');
 
     const [formData, setFormData] = useState({
@@ -59,20 +61,9 @@ function Prescription_form() {
         instruction: '',
         advice: '',
         follow_up: '',
-        prescription_medicines: [
-            {
-                id: '', // required for existing records
-                medicine: '',
-                medicine_type: '',
-                duration: '',
-                intake: '',
-                med_instruction: '',
-                morning: '',
-                afternoon: '',
-                night: '',
-            }
-        ],
+        prescription_medicines: [],
     });
+
 
 
     const generalMedicines = [
@@ -129,23 +120,25 @@ function Prescription_form() {
     };
 
     const handleAddRow1 = () => {
-        setViewData(prev => ({
-            ...prev,
-            prescription_medicines: [
-                ...prev.prescription_medicines,
-                {
-                    medicine: '',
-                    medicine_type: '',
-                    duration: '',
-                    intake: '',
-                    med_instruction: '',
-                    morning: '',
-                    afternoon: '',
-                    night: '',
-                }
-            ]
+        const newRow = {
+            prescription_id: viewData.prescription_id, // Auto assign existing prescription ID
+            medicine: '',
+            medicine_type: '',
+            duration: '',
+            intake: '',
+            med_instruction: '',
+            morning: '',
+            afternoon: '',
+            night: '',
+        };
+
+        setViewData((prevData) => ({
+            ...prevData,
+            prescription_medicines: [...prevData.prescription_medicines, newRow],
         }));
     };
+
+
 
     const userType = Cookies.get('usertype');
 
@@ -159,13 +152,23 @@ function Prescription_form() {
 
     const handleRowChange1 = (index, e) => {
         const { name, value } = e.target;
+
+        if (name === 'id') return; // prevent changing ID
+
         const updatedMedicines = [...viewData.prescription_medicines];
         updatedMedicines[index] = {
             ...updatedMedicines[index],
             [name]: value,
         };
-        setViewData({ ...viewData, prescription_medicines: updatedMedicines });
+
+        setViewData((prev) => ({
+            ...prev,
+            prescription_medicines: updatedMedicines,
+        }));
     };
+
+
+
 
     const handleRemoveRow = (index) => {
         setRows(prevRows => prevRows.filter((_, i) => i !== index));
@@ -259,10 +262,7 @@ function Prescription_form() {
             const res = await apiRoute.post('/residency/createPrescription', data);
             console.log(res);
 
-            if (
-                res.data.message === "Prescription Created Successfully" ||
-                res.data.message === "Prescription Created Successfully with Medicines"
-            ) {
+            if (res.data.message === "Prescription and Medicine Summary Saved Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
                 setTimeout(() => window.location.reload(), 3000);
@@ -306,25 +306,59 @@ function Prescription_form() {
             const response = await apiRoute.get(`/residency/getPrescription/${id}`);
             const data = response.data;
 
-            setViewData({
-                ...data,
-                prescription_medicines: data.prescription_medicines.map((med) => ({
-                    id: med.id, // 🔑 ensure ID is included
-                    medicine: med.medicine || '',
-                    medicine_type: med.medicine_type || '',
-                    duration: med.duration || '',
-                    intake: med.intake || '',
-                    med_instruction: med.med_instruction || '',
-                    morning: med.morning ?? '',
-                    afternoon: med.afternoon ?? '',
-                    night: med.night ?? '',
-                })),
-            });
+            const meds = data.prescription_medicines;
+
+            // Check if data is row-wise (array of objects)
+            if (Array.isArray(meds) && meds.length > 0 && typeof meds[0].medicine === "string" && !meds[0].medicine.startsWith("[")) {
+                // Plain strings like "CALCIUM"
+                setViewData({
+                    ...data,
+                    prescription_medicines: meds,
+                });
+            } else {
+                // Data is column-wise JSON stringified
+                const medData = meds[0];
+
+                const medicines = JSON.parse(medData.medicine);
+                const types = JSON.parse(medData.medicine_type);
+                const durations = JSON.parse(medData.duration);
+                const instructions = JSON.parse(medData.med_instruction);
+                const mornings = JSON.parse(medData.morning);
+                const afternoons = JSON.parse(medData.afternoon);
+                const nights = JSON.parse(medData.night);
+                const intakes = JSON.parse(medData.intake);
+
+                setViewData({
+                    ...data,
+                    prescription_medicines: medicines.map((_, i) => ({
+                        medicine: medicines[i],
+                        medicine_type: types[i],
+                        duration: durations[i],
+                        med_instruction: instructions[i],
+                        morning: mornings[i],
+                        afternoon: afternoons[i],
+                        night: nights[i],
+                        intake: intakes[i],
+                    })),
+                });
+            }
+
+            setPreviewRequested(true);
         } catch (err) {
-            console.error('Fetch error:', err);
+            console.error("Fetch error:", err);
         }
     };
 
+
+    useEffect(() => {
+        if (previewRequested) {
+            // Delay slightly to allow DOM updates
+            setTimeout(() => {
+                generatePDF();
+                setPreviewRequested(false);
+            }, 100); // 100ms delay is often enough
+        }
+    }, [previewRequested]);
 
     const formRef = useRef();
 
@@ -367,7 +401,7 @@ function Prescription_form() {
             const cleanedData = {
                 ...viewData,
                 prescription_medicines: viewData.prescription_medicines.map((med) => ({
-                    id: med.id, // 🛑 If this is missing, UPDATE query fails
+                    id: med.id || null, // ✅ Keep correct medicine id
                     medicine: med.medicine || '',
                     medicine_type: med.medicine_type || '',
                     duration: med.duration || '',
@@ -383,6 +417,7 @@ function Prescription_form() {
 
             if (response.status === 200) {
                 alert('Prescription updated successfully!');
+                window.location.reload();
                 handleEditClose();
             } else {
                 alert('Failed to update prescription.');
@@ -431,9 +466,9 @@ function Prescription_form() {
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                     {userType === "3" && (
-                                    <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }}>
-                                        <i className="fas fa-plus"></i>
-                                    </InputGroup.Text>
+                                        <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }}>
+                                            <i className="fas fa-plus"></i>
+                                        </InputGroup.Text>
                                     )}
 
                                 </InputGroup>
@@ -456,13 +491,13 @@ function Prescription_form() {
             <Container>
                 <Row>
                     <Col md={4}>
-                    {userType === "3" && (
-                        <Button variant="success"
-                            className="m-1 d-flex justify-content-start align-items-center"
-                            type="submit"
-                            onClick={handleShow}
-                        >Add Prescription</Button>
-                    )}
+                        {userType === "3" && (
+                            <Button variant="success"
+                                className="m-1 d-flex justify-content-start align-items-center"
+                                type="submit"
+                                onClick={handleShow}
+                            >Add Prescription</Button>
+                        )}
                     </Col>
                     <Col md={12} className="mt-3 my-3">
 
@@ -883,10 +918,20 @@ function Prescription_form() {
             </Modal>
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                        {/* <div className="logo_text">
+                                            <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                                        </div> */}
+                    </Col>
+                    <Col md={9}>
+                        <h4 className="text-center">Prescription Medicine Details</h4>
+                    </Col>
+                </Row>
                 <Container>
                     <Row>
                         <Col md={12}>
-                            <h4 className="text-center">Prescription Medicine Details</h4>
                             <Form>
                                 <Row>
                                     <Col md={6}>
@@ -908,15 +953,14 @@ function Prescription_form() {
                                 </Row>
                                 <Row>
                                     <Col md={6}>
-                                        {viewData.prescription_medicines.map((med, index) => (
-                                            <Form.Group as={Row} className="mb-3">
-                                                <Form.Label column sm="5">Prescription ID:</Form.Label>
-                                                <Col sm="7">
-                                                    <Form.Control readOnly value={med.prescription_id} />
-                                                </Col>
-                                            </Form.Group>
-                                        ))}
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="5">Prescription ID:</Form.Label>
+                                            <Col sm="7">
+                                                <Form.Control readOnly value={viewData.prescription_medicines[0]?.prescription_id || ''} />
+                                            </Col>
+                                        </Form.Group>
                                     </Col>
+
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Age:</Form.Label>
@@ -937,7 +981,7 @@ function Prescription_form() {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Name of the Hospital:</Form.Label>
+                                            <Form.Label column sm="5">Hospital Name:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.hospital_name} />
                                             </Col>
@@ -1251,6 +1295,7 @@ function Prescription_form() {
                             <tbody id="medicine">
                                 {viewData.prescription_medicines.map((med, index) => (
                                     <tr key={med.id}>
+
                                         <td>
                                             <button type="button" className="btn btn-sm btn-primary add" onClick={handleAddRow1}>+</button>{' '}
                                             <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow1(index)}>-</button>

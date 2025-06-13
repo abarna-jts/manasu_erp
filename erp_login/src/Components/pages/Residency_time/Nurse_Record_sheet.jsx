@@ -247,7 +247,8 @@ function Nurse_Record_sheet() {
                             <thead className="thead-light">
                                 <tr>
                                     <th scope="col">S.No.</th>
-                                    <th scope="col">Rescue Name</th>
+                                    <th scope="col">Admission No.</th>
+                                    <th scope="col">Resident Name</th>
                                     <th scope="col">Month</th>
                                     <th scope="col">Date</th>
                                     <th scope="col">Temperature</th>
@@ -263,6 +264,7 @@ function Nurse_Record_sheet() {
                                         <>
                                             <tr key={item.id}>
                                                 <td>{index + 1}</td>
+                                                <td>{item.admission_no}</td>
                                                 <td>{item.rescue_name}</td>
                                                 <td>{item.month}</td>
                                                 <td>{item.date}</td>

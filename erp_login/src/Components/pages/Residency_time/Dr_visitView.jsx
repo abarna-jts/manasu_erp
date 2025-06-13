@@ -264,14 +264,13 @@ function Dr_visitView() {
             <Container>
                 <Row>
                     <Table responsive="sm">
-
                         <thead>
                             <tr>
                                 <th>S.No</th>
                                 <th>Doctor Name</th>
                                 <th>Hospital Name</th>
                                 <th>Date & Time</th>
-                                <th>No. of Resident Examinite</th>
+                                <th>No. of Resident Checked</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -372,7 +371,7 @@ function Dr_visitView() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                 <Form.Label column sm="5" className='text-start'>
-                                    No. of Resident examinite :
+                                    No. of Resident Checked :
                                 </Form.Label>
                                 <Col sm="7">
                                     <Form.Control

@@ -1536,7 +1536,7 @@ function MSE_form() {
           <h4 className="section_title_1">Mental Status Examination (MSE)</h4>
         </Col>
 
-        {error && <div className="text-danger mb-2">{error}</div>}
+        {/* {error && <div className="text-danger mb-2">{error}</div>}
         <Col md={1} className="d-flex align-items-center flex-column justify-content-end">
           {rescue_image ? (
             <>
@@ -1551,7 +1551,7 @@ function MSE_form() {
           ) : (
             <p>{error || "No image to display"}</p>
           )}
-        </Col>
+        </Col> */}
 
 
       </div>
@@ -2581,7 +2581,7 @@ function MSE_form() {
                     <ul>
                       <Form onSubmit={handleJudgementSubmit}>
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Personal judgment:</h4>
+                          <h4 style={{ display: "inline" }}>Personal judgement:</h4>
                           <Form.Group className="mb-3">
                             <Form.Control as="textarea" rows={2}
                               name='personal_judgement'
@@ -2591,7 +2591,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Social judgment:</h4>
+                          <h4 style={{ display: "inline" }}>Social judgement:</h4>
                           <Form.Group className="mb-3">
                             <Form.Control as="textarea" rows={2}
                               name='social_judgement'
@@ -2602,7 +2602,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Test judgment:</h4>
+                          <h4 style={{ display: "inline" }}>Test judgement:</h4>
                           <Form.Group className="mb-3">
                             <Form.Label>Please explain what actions you would take in the following situations: a house on fire, a man lying on the road, and a sealed, stamped envelope on the street.</Form.Label>
                             <Form.Control as="textarea" rows={2}
@@ -2613,7 +2613,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Judgment:</h4>
+                          <h4 style={{ display: "inline" }}>Judgement:</h4>
                           <Form.Group>
                             <div>
                               {["Good", "Intact", "Normal", "Poor", "Impaired", "Abnormal"].map((value) => (
@@ -3363,7 +3363,7 @@ function MSE_form() {
               {/* Judgment */}
               {judgementData.judgement?.length > 0 && (
                 <li className='d-flex'>
-                  <strong>Judgment:</strong>
+                  <strong>Judgement:</strong>
                   <p className='mx-3'>{judgementData.judgement}</p>
                 </li>
               )}
@@ -3979,7 +3979,7 @@ function MSE_form() {
           <Col md={12}>
             <Form>
               <li className="icon-li">
-                <h4 style={{ display: "inline" }}>Personal judgment:</h4>
+                <h4 style={{ display: "inline" }}>Personal judgement:</h4>
                 <Form.Group className="mb-3">
                   <Form.Control as="textarea" rows={2}
                     name='personal_judgement'
@@ -3989,7 +3989,7 @@ function MSE_form() {
               </li>
 
               <li className="icon-li">
-                <h4 style={{ display: "inline" }}>Social judgment:</h4>
+                <h4 style={{ display: "inline" }}>Social judgement:</h4>
                 <Form.Group className="mb-3">
                   <Form.Control as="textarea" rows={2}
                     name='social_judgement'
@@ -4000,7 +4000,7 @@ function MSE_form() {
               </li>
 
               <li className="icon-li">
-                <h4 style={{ display: "inline" }}>Test judgment:</h4>
+                <h4 style={{ display: "inline" }}>Test judgement:</h4>
                 <Form.Group className="mb-3">
                   <Form.Label>Please explain what actions you would take in the following situations: a house on fire, a man lying on the road, and a sealed, stamped envelope on the street.</Form.Label>
                   <Form.Control as="textarea" rows={2}
@@ -4011,7 +4011,7 @@ function MSE_form() {
               </li>
 
               <li className="icon-li">
-                <h4 style={{ display: "inline" }}>Judgment:</h4>
+                <h4 style={{ display: "inline" }}>Judgement:</h4>
                 <Form.Group>
                   <div>
                     {["Good", "Intact", "Normal", "Poor", "Impaired", "Abnormal"].map((value) => (

@@ -88,7 +88,7 @@ function AllStudentDetails() {
             const student = response.data.data[0]; // Access the first object in the 'data' array
 
             const photoUrl = student.stud_photo
-                ? `http://localhost:5000/${student.stud_photo}`
+                ? `https://www.pahrultours.com/app2/${student.stud_photo}`
                 : ''; // fallback if photo not available
 
             console.log(photoUrl);

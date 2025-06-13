@@ -4,8 +4,8 @@ const { createFirstForm, getFirstForm, getForm2Data, DeleteFirstForm,UpdateFirst
     // getSCRB2AFormData,
     // getSCRB2BFormData,
     // getSCRB2CFormData,
-    checkAdmissionNo,
-    getAllSCRBFormData
+    checkAdmissionNo,UpdateStatus,
+    getAllSCRBFormData, getReunionData, getStatusData, getStatusById
 } = require("../controllers/admission");
 const router = express.Router();
 
@@ -19,6 +19,11 @@ router.put('/update_first_form/:id',UpdateFirstForm);
 router.get('/get_scrb_formdata/:admission_no',getFirst2AForm);
 router.get("/get_scrbform2data/:admission_no",getForm2Data);
 router.get('/get_rescue_details/:id',getRescueDetailsPDF);
+
+router.put('/updateStatus/:id',UpdateStatus);
+router.get("/get_reunionPeople", getReunionData);
+router.get("/getByStatus/:status", getStatusData);
+router.get("/getById/:id", getStatusById);
 
 // router.get('/getSCRBFormData/:admissionNumber',getSCRBFormData);
 // router.get('/getSCRB2AFormData/:admissionNumber',getSCRB2AFormData);

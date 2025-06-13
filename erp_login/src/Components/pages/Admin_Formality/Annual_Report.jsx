@@ -368,8 +368,7 @@ function Annual_Report() {
         "Community Programs",
         "Staff Programs",
     ];
-
-
+    
 
     return (
         <>
@@ -383,8 +382,8 @@ function Annual_Report() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Report</h6>
                     </Col>
-                    <Col md={8} className="text-start mb-4">
-                        <h3 className="section_title">Resident Activities and Events Report Form (Annual)</h3>
+                    <Col md={9} className="text-start mb-4">
+                        <h3 className="section_title">Resident Activities and Events Report / Annual Report</h3>
                     </Col>
                 </Row>
             </Container>
@@ -443,9 +442,9 @@ function Annual_Report() {
                                 <Col md={8} className="text-start">
                                     <h3 className="annual_section_title mt-3">Event / Awareness / Outing Details</h3>
                                 </Col>
-                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
-                                    <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
-                                </Col>
+                                {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                    <Button type='button' className='btn btn-success annual_view' onClick={handleViewAll}>View All</Button>
+                                </Col> */}
                             </Row>
 
                             <Form noValidate validated={validated} onSubmit={handleEventSubmit}>
@@ -733,9 +732,9 @@ function Annual_Report() {
                                 <Col md={8} className="text-start">
                                     <h3 className="annual_section_title mt-3">General Celebration Details</h3>
                                 </Col>
-                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
                                     <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
-                                </Col>
+                                </Col> */}
                             </Row>
 
                             <Form noValidate validated={validated} onSubmit={handleCelebrationSubmit}>
@@ -851,9 +850,9 @@ function Annual_Report() {
                                 <Col md={8} className="text-start">
                                     <h3 className="annual_section_title mt-3">Community Programs</h3>
                                 </Col>
-                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
                                     <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
-                                </Col>
+                                </Col> */}
                             </Row>
 
                             <Form noValidate validated={validated} onSubmit={handleCommunitySubmit}>
@@ -981,9 +980,9 @@ function Annual_Report() {
                                 <Col md={8} className="text-start">
                                     <h3 className="annual_section_title mt-3">Staff Programs</h3>
                                 </Col>
-                                <Col md={4} className="text-start d-flex align-items-center justify-content-end">
+                                {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
                                     <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
-                                </Col>
+                                </Col> */}
                             </Row>
 
                             <Form noValidate validated={validated} onSubmit={handleStaffSubmit}>

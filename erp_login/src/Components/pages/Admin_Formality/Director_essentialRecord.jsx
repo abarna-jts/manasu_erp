@@ -115,8 +115,8 @@ function Director_essentialRecord() {
                 any_other: data.any_other || '',
             }));
 
-            const passbookPath = data.bank_passbook ? `http://localhost:5000/${data.bank_passbook}` : null;
-            const Form7Path = data.form7_attach ? `http://localhost:5000/${data.form7_attach}` : null;
+            const passbookPath = data.bank_passbook ? `https://www.pahrultours.com/app2/${data.bank_passbook}` : null;
+            const Form7Path = data.form7_attach ? `https://www.pahrultours.com/app2/${data.form7_attach}` : null;
 
             console.log("bank_passbook path:", data.bank_passbook);
             console.log("Full URL:", passbookPath);
@@ -215,8 +215,8 @@ function Director_essentialRecord() {
 
 
             // Handle old and new photo paths correctly
-            const bankPassbookPath = data.bank_passbook ? `http://localhost:5000/${data.bank_passbook}` : null;
-            const Form7Path = data.form7_attach ? `http://localhost:5000/${data.form7_attach}` : null;
+            const bankPassbookPath = data.bank_passbook ? `https://www.pahrultours.com/app2/${data.bank_passbook}` : null;
+            const Form7Path = data.form7_attach ? `https://www.pahrultours.com/app2/${data.form7_attach}` : null;
 
 
             // Set files state

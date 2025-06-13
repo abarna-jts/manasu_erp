@@ -17,9 +17,9 @@ const storage = multer.diskStorage({
         if (file.fieldname === 'bank_passbook' || file.fieldname === 'form7_attach') {
             cb(null, path.resolve('uploads/Rescue_Images/'));
         }
-        else if(file.fieldname === 'stud_photo'){
+        else if (file.fieldname === 'stud_photo') {
             cb(null, path.resolve('uploads/Internship_photos/'));
-        } 
+        }
         else {
             cb(null, path.resolve('uploads/Event_Photos/'));
         }
@@ -50,7 +50,7 @@ const createSelfDeclaration = (req, res) => {
         toiletries_provided,
         dress_provided,
         travel_expenses,
-        medical_prescription, 
+        medical_prescription,
         discharge_summary,
         travel_letter
     } = req.body;
@@ -648,19 +648,18 @@ const createAnnualReport = (req, res) => {
 const getAnnualReport = (req, res) => {
     const query = `
         SELECT 
-    e.*, 
-    c.*, 
-    cm.*, 
-    s.* 
-FROM 
-    event_report e
-INNER JOIN 
-    celebration_report c ON e.id = c.id
-INNER JOIN 
-    community_report cm ON e.id = cm.id
-INNER JOIN 
-    staff_report s ON e.id = s.id;
-
+            e.*, 
+            c.*, 
+            cm.*, 
+            s.* 
+        FROM 
+            event_report e
+        INNER JOIN 
+            celebration_report c ON e.id = c.id
+        INNER JOIN 
+            community_report cm ON e.id = cm.id
+        INNER JOIN 
+            staff_report s ON e.id = s.id;
     `;
 
     db.query(query, (err, results) => {
@@ -712,36 +711,35 @@ const updateAnnualReport = (req, res) => {
         staff_date,
         staff_place,
         staff_rescue_count
-
     } = req.body;
 
     const reportId = req.params.id;
 
     // Update the catalogue
     const updateQuery = `
-            UPDATE annual_report SET 
-                event_name = ?, 
-                event_date = ?, 
-                event_place = ?, 
-                event_rescue_count = ?, 
-                celebration_name = ?, 
-                celebration_date = ?, 
-                celebration_place = ?, 
-                celebration_rescue_count = ?,
-                program_name = ?,
-                program_date = ?,
-                program_place = ?,
-                program_rescue_count = ?,
-                internship_duration = ?,
-                internship_date = ?,
-                internship_place = ?,
-                internship_rescue_count = ?,
-                staff_name = ?,
-                staff_date = ?,
-                staff_place = ?,
-                staff_rescue_count = ?
-            WHERE id = ?
-            `;
+        UPDATE annual_report SET 
+            event_name = ?, 
+            event_date = ?, 
+            event_place = ?, 
+            event_rescue_count = ?, 
+            celebration_name = ?, 
+            celebration_date = ?, 
+            celebration_place = ?, 
+            celebration_rescue_count = ?,
+            program_name = ?,
+            program_date = ?,
+            program_place = ?,
+            program_rescue_count = ?,
+            internship_duration = ?,
+            internship_date = ?,
+            internship_place = ?,
+            internship_rescue_count = ?,
+            staff_name = ?,
+            staff_date = ?,
+            staff_place = ?,
+            staff_rescue_count = ?
+        WHERE id = ?
+        `;
 
 
     const values = [
@@ -876,7 +874,7 @@ const getDischargeSummaryID = (req, res) => {
 
 const updateDischargeSummary = (req, res) => {
     const {
-        rescue_name, referred_by, escape, death, discharge, reunited,transfer, state_venue,state
+        rescue_name, referred_by, escape, death, discharge, reunited, transfer, state_venue, state
     } = req.body;
 
     const rescueID = req.params.id;
@@ -933,43 +931,43 @@ const createInternForm = (req, res) => {
         if (err) {
             return res.status(400).json({ message: "File upload error", error: err });
         }
-    const {
-        stud_name,
-        stud_id,
-        department,
-        email,
-        phone,
-        secondary_phone,
-        field,
-        clg_name,
-        duration,
-        from_date,
-        to_date,
-        supervisor_name,
-        supervisor_email,
-        supervisor_phone,
-        choose_intern
-    } = req.body;
+        const {
+            stud_name,
+            stud_id,
+            department,
+            email,
+            phone,
+            secondary_phone,
+            field,
+            clg_name,
+            duration,
+            from_date,
+            to_date,
+            supervisor_name,
+            supervisor_email,
+            supervisor_phone,
+            choose_intern
+        } = req.body;
 
-    const studentPhotoPath = req.files['stud_photo']
+        const studentPhotoPath = req.files['stud_photo']
             ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
             : null;
 
-    const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, stud_photo, department, email, phone, secondary_phone, field, clg_name, duration,from_date, 
+        const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, stud_photo, department, email, phone, secondary_phone, field, clg_name, duration,from_date, 
                         to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern)
                         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    const values = [
-        stud_name, stud_id, studentPhotoPath, department, email, phone, secondary_phone, field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
-    ];
+        const values = [
+            stud_name, stud_id, studentPhotoPath, department, email, phone, secondary_phone, field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
+        ];
 
-    db.query(insertQuery, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
-        }
-        res.status(201).json({ message: "Internship Form Created successfully", data: data });
+        db.query(insertQuery, values, (dbErr, data) => {
+            if (dbErr) {
+                return res.status(500).json({ message: "Database Error", error: dbErr });
+            }
+            res.status(201).json({ message: "Internship Form Created successfully", data: data });
+        });
     });
-});
 }
 
 const getStudentDetails = (req, res) => {
@@ -1028,8 +1026,8 @@ const updateStudentDetail = (req, res) => {
     });
 }
 
-const getAllDocument = (req, res) =>{
-const query = "Select * from essential_records";
+const getAllDocument = (req, res) => {
+    const query = "Select * from essential_records";
 
     db.query(query, (err, data) => {
         if (err) {
@@ -1039,8 +1037,8 @@ const query = "Select * from essential_records";
     });
 }
 
-const getEssentialRecordshow = (req, res) =>{
-const id = req.params.id;
+const getEssentialRecordshow = (req, res) => {
+    const id = req.params.id;
     const query = 'SELECT * FROM essential_records WHERE id = ?';
 
     db.query(query, [id], (err, results) => {
@@ -1085,5 +1083,5 @@ module.exports = {
     createCelebrationReport,
     createCommunityReport,
     createStaffReport,
-    getAllDocument,getEssentialRecordshow
+    getAllDocument, getEssentialRecordshow
 };

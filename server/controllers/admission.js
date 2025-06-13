@@ -1,6 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const db = require('../db');
+const fs = require('fs');
 
 // Storage strategy based on fieldname
 const storage = multer.diskStorage({
@@ -173,15 +174,17 @@ const createFirstForm = (req, res) => {
 
 
 const getFirstForm = (req, res) => {
-  const query = "Select * from first_information";
+  const query = "SELECT * FROM first_information";
 
   db.query(query, (err, data) => {
     if (err) {
+      console.error("SQL Error:", err);  // Add this line
       return res.status(500).json({ message: "Database Error", error: err });
     }
     res.status(201).json({ message: "First Information form Get Successfully", data: data });
   });
 };
+
 
 const getFirst2AForm = (req, res) => {
   const admission_no = req.params.admission_no;
@@ -390,8 +393,10 @@ const UpdateFirstForm = (req, res) => {
     } = req.body;
 
     const rescueId = req.params.id;
-
-    const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
+    const newRescueImage = req.files['rescue_image']
+      ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}`
+      : null;
+    // const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
     const newAttachPoliceMemo = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
     const newgovIdFile = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
 
@@ -505,13 +510,15 @@ const UpdateFirstForm = (req, res) => {
         rescueId
       ];
 
+      console.log("Final Rescue Image Path:", finalRescuePath);
+
 
       db.query(updateQuery, values, (updateErr, data) => {
         if (updateErr) {
           return res.status(500).json({ message: "Update failed", error: updateErr });
         }
 
-        if (newRescueImage && existingRescuePath) {
+        if (newRescueImage && existingRescuePath && fs.existsSync(existingRescuePath)) {
           fs.unlink(existingRescuePath, (fsErr) => {
             if (fsErr) console.warn("Failed to delete old logo:", fsErr);
           });
@@ -575,6 +582,73 @@ const getRescueDetailsPDF = (req, res) => {
   });
 }
 
+const UpdateStatus = (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
+  }
+
+  const query = 'UPDATE first_information SET resident_status = ? WHERE id = ?';
+
+  db.query(query, [status, id], (err, result) => {
+    if (err) {
+      console.error('Database update error:', err);
+      return res.status(500).json({ message: 'Database error', error: err });
+    }
+
+    return res.status(200).json({ message: 'Status updated successfully', result });
+  });
+}
+
+const getReunionData = (req, res) =>{
+  const query = `Select * from first_information where resident_status='Reunion' `;
+
+  db.query(query, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res.status(201).json({ message: "First Information form Get Successfully", data: data });
+  });
+}
+
+const getStatusData = (req, res) => {
+  const { status } = req.params;
+
+  const query = `SELECT * FROM first_information WHERE resident_status = ?`;
+  const values = [status];
+
+  db.query(query, values, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res.status(200).json({
+      message: "First Information fetched successfully",
+      data: data,
+    });
+  });
+};
+
+const getStatusById = (req, res) =>{
+  const id = req.params.id;
+
+    const query = 'SELECT id, resident_status FROM first_information WHERE id = ?';
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching resident_status:', err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Record not found' });
+        }
+
+        res.json(results[0]); // Return the matching record
+    });
+}
+
+
 module.exports = {
   checkAdmissionNo,
   createFirstForm,
@@ -589,5 +663,7 @@ module.exports = {
   getSCRB2BFormData,
   getSCRB2CFormData,
   getAllSCRBFormData,
-  getForm2Data
+  getForm2Data,
+  UpdateStatus,
+  getReunionData, getStatusData, getStatusById
 };

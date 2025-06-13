@@ -52,7 +52,7 @@ function Rescue_articles_form() {
       if (result && result.rescue_image) {
         const imagePath = result.rescue_image.startsWith("http")
           ? result.rescue_image
-          : `http://localhost:5000/${result.rescue_image}`;
+          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
         setRescueImage(imagePath);
         setRescueName(result.rescue_name || "");
@@ -153,7 +153,7 @@ function Rescue_articles_form() {
 
 
       // Handle old and new photo paths correctly
-      const attachItemsPath = data.attach_items ? `http://localhost:5000/${data.attach_items}` : null;
+      const attachItemsPath = data.attach_items ? `https://www.pahrultours.com/app2/${data.attach_items}` : null;
       console.log(attachItemsPath);
       // Set files state
       setFiles((files) => ({
@@ -231,7 +231,7 @@ function Rescue_articles_form() {
         collected_items: data.collected_items || '',
       }));
 
-      const attachItemsPath = data.attach_items ? `http://localhost:5000/${data.attach_items}` : null;
+      const attachItemsPath = data.attach_items ? `https://www.pahrultours.com/app2/${data.attach_items}` : null;
       console.log(attachItemsPath);
       // Set files state
       setFiles((files) => ({

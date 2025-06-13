@@ -7,7 +7,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 
-
 export default function TopNavbar() {
   const [notifications, setNotifications] = useState([]);
   const areNotificationsRead = notifications.reduce((acc, notif) => acc && notif.read, true);
@@ -21,11 +20,14 @@ export default function TopNavbar() {
   };
 
   const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.removeItem('jwt'); // Clear JWT token
-    alert('You have been logged out');
-    navigate('/'); // Redirect to login page
+   const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+    if (confirmLogout) {
+      localStorage.removeItem('jwt'); 
+      navigate('/'); // Redirect to login page
+    }
   };
+
 
   const handleProfile = () => {
     navigate('/profile');
@@ -56,14 +58,14 @@ export default function TopNavbar() {
     <Navbar variant="dark p-2 mb-3" expanded >
       <Container fluid className="px-0">
         <div className="d-flex justify-content-between w-100">
-          <div className="d-flex align-items-center px-3">
+          <div className="d-flex align-items-center px-3 navbar-logo">
             <img src={m_logo} alt="" />
             <div className="logo_text">
               <h4><span>MANASU</span> <br />Mental Health Charity Home</h4>
             </div>
           </div>
           <Nav className="align-items-center px-3 d-flex flex-row">
-            <Nav.Item as="li" className="me-lg-3">
+            {/* <Nav.Item as="li" className="me-lg-3">
               <Nav.Link href="#" className="text-dark icon-notifications" onClick={markNotificationsAsRead}>
                 <span className="icon icon-sm position-relative">
                   <i className="bi bi-bell-fill fs-5"></i>
@@ -72,16 +74,16 @@ export default function TopNavbar() {
                   )}
                 </span>
               </Nav.Link>
-            </Nav.Item>
+            </Nav.Item> */}
 
 
-            <Dropdown >
+            <Dropdown className="navbar_dropdown">
               <Dropdown.Toggle variant="link" className="pt-1 px-0 text-dark d-flex align-items-center">
                 <div className="media d-flex align-items-center">
                   <Image src={m_logo} className="user-avatar md-avatar rounded-circle" />
                   <div className="media-body ms-2 d-none d-lg-block">
                     <span className="mb-0 font-small fw-bold">
-                      {userType === "1" ? "Admin" : userType === "2" ? "Director" : userType === "3" ? "Nurse": userType === "4" ? "Social Worker" : "User"}
+                      {userType === "1" ? "Office Admin" : userType === "2" ? "Director" : userType === "3" ? "Nurse": userType === "4" ? "Social Worker" : "User"}
                     </span>
                   </div>
                 </div>

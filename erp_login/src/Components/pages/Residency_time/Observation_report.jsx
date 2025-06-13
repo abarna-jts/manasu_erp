@@ -106,8 +106,8 @@ function Observation_report() {
             }));
 
             // Base path for images
-            const basePath = "http://localhost:5000/uploads/form_2a";
-            const recovery_photoPath = data.recovery_photo ? `http://localhost:5000/${data.recovery_photo}` : null;
+            const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
+            const recovery_photoPath = data.recovery_photo ? `https://www.pahrultours.com/app2/${data.recovery_photo}` : null;
 
             // Set files state
             setFiles((files) => ({
@@ -300,7 +300,7 @@ function Observation_report() {
                                     <th scope="col">Admission Number</th>
                                     <th scope="col">Resident Name</th>
                                     <th scope="col">Follow Up </th>
-                                    <th scope="col">Rescue Recovery Photo Attachment</th>
+                                    <th scope="col">Recovery Photo</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -315,7 +315,7 @@ function Observation_report() {
                                             <td className='text-justify'>{item.follow_up}</td>
                                             <td>
                                                 <img
-                                                    src={`http://localhost:5000/${item.recovery_photo}`}
+                                                    src={`https://www.pahrultours.com/app2/${item.recovery_photo}`}
                                                     alt="Rescue Condition Photo"
                                                     style={{ width: "70px", height: "70px", objectFit: "cover" }}
                                                 />

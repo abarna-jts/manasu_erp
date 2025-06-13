@@ -78,7 +78,7 @@ function Essential_record() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >= 5) { // Adjust minimum length as needed
+        if (admission_no.trim().length >= 8) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
@@ -173,8 +173,8 @@ function Essential_record() {
                 any_other: data.any_other || '',
             }));
 
-            const passbookPath = data.bank_passbook ? `http://localhost:5000/${data.bank_passbook}` : null;
-            const Form7Path = data.form7_attach ? `http://localhost:5000/${data.form7_attach}` : null;
+            const passbookPath = data.bank_passbook ? `https://www.pahrultours.com/app2/${data.bank_passbook}` : null;
+            const Form7Path = data.form7_attach ? `https://www.pahrultours.com/app2/${data.form7_attach}` : null;
 
             console.log("bank_passbook path:", data.bank_passbook);
             console.log("Full URL:", passbookPath);
@@ -273,8 +273,8 @@ function Essential_record() {
 
 
             // Handle old and new photo paths correctly
-            const bankPassbookPath = data.bank_passbook ? `http://localhost:5000/${data.bank_passbook}` : null;
-            const Form7Path = data.form7_attach ? `http://localhost:5000/${data.form7_attach}` : null;
+            const bankPassbookPath = data.bank_passbook ? `https://www.pahrultours.com/app2/${data.bank_passbook}` : null;
+            const Form7Path = data.form7_attach ? `https://www.pahrultours.com/app2/${data.form7_attach}` : null;
 
 
             // Set files state
@@ -365,7 +365,7 @@ function Essential_record() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `http://localhost:5000/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");
@@ -399,7 +399,7 @@ function Essential_record() {
             <Container fluid>
                 <Row className='d-flex align-items-center justify-content-between'>
                     <Col md={2} className='text-start'>
-                        <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
+                        <Breadcrumb className="d-none d-md-inline-block mb-0 mobile_breadcrumb" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
                             <Breadcrumb.Item>Home</Breadcrumb.Item>
                             <Breadcrumb.Item active>Admin Formality</Breadcrumb.Item>
@@ -443,7 +443,7 @@ function Essential_record() {
                         </Col>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
@@ -451,7 +451,7 @@ function Essential_record() {
                         {userType === "1" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     createFormData(); // Fetch & populate data before generating PDF
                                 }
@@ -459,7 +459,7 @@ function Essential_record() {
                         )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
                             if (!admission_no.trim()) {
-                                alert("Please enter your admission number.");
+                                alert("Please enter admission number.");
                             } else {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
@@ -467,7 +467,7 @@ function Essential_record() {
                         {/* {userType === "2" && (
                             <button type="button" className="btn btn-danger mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
-                                    alert("Please enter your admission number.");
+                                    alert("Please enter admission number.");
                                 } else {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }
@@ -505,7 +505,7 @@ function Essential_record() {
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-3 text-start">
-                                        <Form.Label column sm="4">
+                                        <Form.Label className='form_title' column sm="4">
                                             ID Cards :
                                         </Form.Label>
                                         <Col sm="8">
@@ -570,7 +570,7 @@ function Essential_record() {
                                     </Form.Group>
 
                                     <Form.Group as={Row} className="mb-3 text-start">
-                                        <Form.Label column sm="4">
+                                        <Form.Label className='form_title' column sm="4">
                                             Financial Details :
                                         </Form.Label>
                                         <Col sm="8">
@@ -614,7 +614,7 @@ function Essential_record() {
                                     </Form.Group>
 
                                     <Form.Group as={Row} className="mb-3 text-start">
-                                        <Form.Label column sm="4">
+                                        <Form.Label column sm="4" className='form_title'>
                                             CMCHIS(Chief Minister's Comprehensive Health Insurance Scheme):
                                         </Form.Label>
                                         <Col sm="8">
@@ -839,7 +839,7 @@ function Essential_record() {
                                 />
 
                                 {/* UDID */}
-                                <Form.Label className="mb-1">Policy Number</Form.Label>
+                                <Form.Label className="mb-1 mt-5">Policy Number</Form.Label>
                                 <Form.Control
                                     type="number"
                                     name="policy_no"

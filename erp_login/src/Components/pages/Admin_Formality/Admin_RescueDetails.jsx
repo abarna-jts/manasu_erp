@@ -303,7 +303,6 @@ function Admin_RescueDetails() {
                                     <th>S.No</th>
                                     <th>Resident's Id</th>
                                     <th>Resident's Name</th>
-                                    <th>Admitting Authority for Rescue</th>
                                     <th>Self Discharge</th>
                                     <th>Transfer</th>
                                     <th>Transferred Place</th>
@@ -321,7 +320,6 @@ function Admin_RescueDetails() {
                                             <td>{index + 1}</td>
                                             <td>{item.admission_no || "Null"}</td>
                                             <td>{item.rescue_name || "Null"}</td>
-                                            <td>{item.referred_by || "Null"}</td>
                                             <td>{item.discharge || "Null"}</td>
                                             <td>{item.transfer || "Null"}</td>
                                             <td>{item.state_venue || "Null"}</td>

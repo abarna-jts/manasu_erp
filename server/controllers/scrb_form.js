@@ -50,12 +50,12 @@ const createForm2 = (req, res) => {
       ? `/uploads/form_2a/${req.files['new_photo'][0].filename}`
       : null;
 
-    const signature_path = req.files['new_photo']
-      ? `/uploads/form_2a/${req.files['new_photo'][0].filename}`
+    const signature_path = req.files['signature']
+      ? `/uploads/form_2a/${req.files['signature'][0].filename}`
       : null;
 
-    const seal_path = req.files['new_photo']
-      ? `/uploads/form_2a/${req.files['new_photo'][0].filename}`
+    const seal_path = req.files['seal']
+      ? `/uploads/form_2a/${req.files['seal'][0].filename}`
       : null;
 
     const q = 'INSERT INTO form_2 (name_ngo, admission_no, koppu_en,rescue_name, parent_name, gender, found_date, marital_status, language, district, police_station, addition_info, old_photo, new_photo, name_rescue, phone_no, signature, seal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';

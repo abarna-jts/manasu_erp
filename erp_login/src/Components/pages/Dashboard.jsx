@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from '@themesberg/react-bootstrap';
 import { useNavigate } from "react-router-dom";
+import circle from "../img/icons/circle.png";
 import Sidebar from "./Sidebar";
 import { Container, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -91,11 +92,11 @@ function Dashboard() {
                         </div>
                     </Col>
                 </Row>
-                <div className="row px-5">
+                <div className="row dashboard_body">
                     <div className="col-md-4 stretch-card grid-margin">
                         <div className="card bg-gradient-danger card-img-holder text-white">
                             <div className="card-body">
-                                <img src="../src/Components/img/icons/circle.png" className="card-img-absolute" alt="circle" />
+                                <img src={circle} className="card-img-absolute" alt="circle" />
                                 <h4 className="font-weight-normal mb-2">
                                     No. of Rescue <FontAwesomeIcon icon={faUsers} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
                                 </h4>
@@ -108,7 +109,7 @@ function Dashboard() {
                     <div className="col-md-4 stretch-card grid-margin">
                         <div className="card bg-gradient-info card-img-holder text-white">
                             <div className="card-body">
-                                <img src="../src/Components/img/icons/circle.png" className="card-img-absolute" alt="circle" />
+                                <img src={circle} className="card-img-absolute" alt="circle" />
                                 <h4 className="font-weight-normal mb-2">
                                     No. of Organisation <FontAwesomeIcon icon={faSitemap} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
                                 </h4>
@@ -121,7 +122,7 @@ function Dashboard() {
                     <div className="col-md-4 stretch-card grid-margin">
                         <div className="card bg-gradient-success card-img-holder text-white">
                             <div className="card-body">
-                                <img src="../src/Components/img/icons/circle.png" className="card-img-absolute" alt="circle" />
+                                <img src={circle} className="card-img-absolute" alt="circle" />
                                 <h4 className="font-weight-normal mb-2">
                                     No. of Admission <FontAwesomeIcon icon={faClipboardList} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
                                 </h4>
@@ -132,7 +133,7 @@ function Dashboard() {
                     </div>
                 </div>
                 <Row className="d-flex align-items-center justify-content-center mb-3">
-                    <Col md={5}>
+                    <Col md={5} className="rescue_report">
                         <h5>Monthly Rescue Report</h5>
                         <ResponsiveContainer width="100%" height={350}>
                             <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
@@ -145,7 +146,7 @@ function Dashboard() {
                             </BarChart>
                         </ResponsiveContainer>
                     </Col>
-                    <Col md={5}>
+                    <Col md={5} className="admission_report">
                         <h5>Monthly Admission Report</h5>
                         <div style={{ display: "flex", alignItems: "center", justifyContent:"center", gap: "2rem" }}>
                             {/* Pie Chart */}
@@ -203,7 +204,7 @@ function Dashboard() {
                     </Col>
                 </Row>
                 <Row className="d-flex align-items-center justify-content-center mb-3">
-                    <Col md={7}>
+                    <Col md={7}className="rescue_detailsClass">
                     <h5 className="text-start">Recent Rescue Details</h5>
                     <div className="table-responsive">
                         <table className="table table-bordered">

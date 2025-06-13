@@ -130,7 +130,7 @@ function Reunion_Checklist() {
             const data = response.data;
 
             // Prefix file fields with server path
-            const getFilePath = (file) => file ? `http://localhost:5000/${file}` : null;
+            const getFilePath = (file) => file ? `https://www.pahrultours.com/app2/${file}` : null;
 
             // Update normal form fields
             setFormData((prevFormData) => ({
@@ -263,7 +263,7 @@ function Reunion_Checklist() {
                 </div>
                 <div className="text-center col-md-8"><h3 className="section_title">Resident Discharge Summary and Checklist</h3></div>
 
-                <div className="d-flex align-items-center px-3">
+                <div className="d-flex align-items-center px-3 justify-content-center">
 
                     <Form className="navbar-search">
                         <Form.Group id="topbarSearch">
@@ -319,7 +319,7 @@ function Reunion_Checklist() {
                                 handleShow(formData.admission_no);
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {userType === "2" && (
+                        {/* {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!formData.admission_no.trim()) {
                                     alert("Please enter admission number.");
@@ -327,7 +327,7 @@ function Reunion_Checklist() {
                                     // handleDelete(admission_no); 
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )}
+                        )} */}
                     </Form.Group>
                 </Form>
             </Container>

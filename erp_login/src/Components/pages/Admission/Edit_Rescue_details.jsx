@@ -3,6 +3,7 @@ import { Breadcrumb, Col, Container, Form, Row, Button } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 function Edit_Rescue_details() {
   const [formData, setFormData] = useState({
@@ -233,6 +234,7 @@ function Edit_Rescue_details() {
 
       if (response.status === 200) {
         alert("Rescue details updated successfully.");
+        navigate("/rescue_details");
       } else {
         console.error("Update failed:", response.data.message);
       }
@@ -240,7 +242,7 @@ function Edit_Rescue_details() {
       console.error("Error while updating:", err.response?.data || err.message);
     }
   };
-
+const navigate = useNavigate();
 
 
   return (
@@ -324,14 +326,14 @@ function Edit_Rescue_details() {
                   </Form.Group>
 
                   <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">
-                    <Form.Label column sm="5">
+                    <Form.Label column sm="4">
                       Copy of Police Memo :
                     </Form.Label>
-                    <Col sm="7 d-flex flex-row align-items-center">
+                    <Col sm="8 d-flex flex-row align-items-center">
 
                       {formData.attach_policeMemo_url && (
                         <img
-                          src={`http://localhost:5000/${formData.attach_policeMemo_url}`}
+                          src={`https://www.pahrultours.com/app2/${formData.attach_policeMemo_url}`}
                           alt="Rescue Preview"
                           style={{ marginTop: '10px', width: '100px', maxHeight: '200px', objectFit: 'cover' }}
                         />
@@ -411,7 +413,7 @@ function Edit_Rescue_details() {
 
                       {formData.rescue_image_url && (
                         <img
-                          src={`http://localhost:5000/${formData.rescue_image_url}`}
+                          src={`https://www.pahrultours.com/app2/${formData.rescue_image_url}`}
                           alt="Rescue Preview"
                           style={{ marginTop: '10px', width: '100px', maxHeight: '200px', objectFit: 'cover' }}
                         />

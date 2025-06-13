@@ -14,6 +14,11 @@ import manasu_logo from '../Admission/Manasu-Logo.png';
 function Rescue_details() {
     const [rescue_details, setRescueDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedItems, setSelectedItems] = useState({});
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const [filteredRescueDetails, setFilteredRescueDetails] = useState([]);
+
+
 
     const userType = Cookies.get('usertype');
 
@@ -36,6 +41,7 @@ function Rescue_details() {
         language3: '',
         education: '',
         govIdType: '',
+        govIdNumber: '',
         father: '',
         mother: '',
         other_relation: '',
@@ -52,11 +58,11 @@ function Rescue_details() {
         weight: '',
         things_carried: '',
         remark: '',
-        mental_status:'',
-        behaviour:'',
-        community_ability:'',
-        self_careCapacity:'',
-        diagnosis:''
+        mental_status: '',
+        behaviour: '',
+        community_ability: '',
+        self_careCapacity: '',
+        diagnosis: ''
         // symptoms: '',
         // rescued_by: '',
         // information: '',
@@ -88,7 +94,7 @@ function Rescue_details() {
 
     const getRescueDetails = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/admision/get_first_form');
+            const response = await apiRoute.get('/admision/get_first_form');
             console.log("API response:", response.data);
             setRescueDetails(response.data.data);
         } catch (error) {
@@ -151,17 +157,27 @@ function Rescue_details() {
 
     // search function 
 
-    const filteredRescueDetails = rescue_details.filter((item) => {
-        const searchTerm = searchQuery.toLowerCase();
-        return (
-            String(item.admission_no).toLowerCase().includes(searchTerm) ||
-            String(item.rescue_name).toLowerCase().includes(searchTerm) ||
-            String(item.referred_by).toLowerCase().includes(searchTerm) ||
-            String(item.from_place).toLowerCase().includes(searchTerm) ||
-            String(item.police_memo).toLowerCase().includes(searchTerm) ||
-            String(item.information_public).toLowerCase().includes(searchTerm)
-        );
-    });
+    const searchFilteredRescueDetails = rescue_details
+        .filter((item) => {
+            // First filter by status if one is selected
+            if (selectedStatus && item.resident_status !== selectedStatus) {
+                return false;
+            }
+            return true;
+        })
+        .filter((item) => {
+            // Then apply the search filter
+            const searchTerm = searchQuery.toLowerCase();
+            return (
+                String(item.admission_no).toLowerCase().includes(searchTerm) ||
+                String(item.rescue_name).toLowerCase().includes(searchTerm) ||
+                String(item.referred_by).toLowerCase().includes(searchTerm) ||
+                String(item.from_place).toLowerCase().includes(searchTerm) ||
+                String(item.police_memo).toLowerCase().includes(searchTerm) ||
+                String(item.information_public).toLowerCase().includes(searchTerm)
+            );
+        });
+
 
 
     //delete function 
@@ -169,7 +185,7 @@ function Rescue_details() {
     const handleDelete = async (id) => {
         alert("Are you sure want to delete");
         try {
-            const response = await axios.delete(`http://localhost:5000/admision/delete_first_form/${id}`);
+            const response = await apiRoute.delete(`/admision/delete_first_form/${id}`);
             console.log(response);
             alert("Family Request Letter Form Deleted successfully");
             // Refresh data after deletion
@@ -273,7 +289,7 @@ function Rescue_details() {
     const fetchFormData = async (id) => {
         try {
 
-            const response = await axios.get(`http://localhost:5000/admision/get_rescue_details/${id}`);
+            const response = await apiRoute.get(`/admision/get_rescue_details/${id}`);
             const data = response.data;
 
             setFormData((formData) => ({
@@ -295,6 +311,7 @@ function Rescue_details() {
                 language3: data.language3 || '',
                 education: data.education || '',
                 govIdType: data.govIdType || '',
+                govIdNumber: data.govIdNumber || '',
                 father: data.father || '',
                 mother: data.mother || '',
                 other_relation: data.other_relation || '',
@@ -314,7 +331,7 @@ function Rescue_details() {
                 behaviour: data.behaviour || '',
                 community_ability: data.community_ability || '',
                 self_careCapacity: data.self_careCapacity || '',
-                diagnosis:data.diagnosis || ''
+                diagnosis: data.diagnosis || ''
                 // symptoms: data.symptoms || '',
                 // rescued_by: data.rescued_by || '',
                 // information: data.information || '',
@@ -327,15 +344,17 @@ function Rescue_details() {
             }));
 
             // Base path for images
-            const basePath = "http://localhost:5000/uploads/Rescue_Images";
-            const RescueImage = data.rescue_image ? `http://localhost:5000/${data.rescue_image}` : null;
-            // const FamilyAadharCard = data.f_aadhar_card ? `http://localhost:5000/${data.f_aadhar_card}` : null;
-            // const FamilyRationCard = data.f_ration_card ? `http://localhost:5000/${data.f_ration_card}` : null;
-            // const RescueAadharCard = data.res_aadhar_card ? `http://localhost:5000/${data.res_aadhar_card}` : null;
-            const policeMemoAttach = data.attach_policeMemo ? `http://localhost:5000/${data.attach_policeMemo}` : null;
+            const basePath = "https://www.pahrultours.com/app2/uploads/Rescue_Images";
+            const RescueImage = data.rescue_image ? `https://www.pahrultours.com/app2/${data.rescue_image}` : null;
+            const govtFilePath = data.govIdFile ? `https://www.pahrultours.com/app2/${data.govIdFile}` : null;
+            // const FamilyAadharCard = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
+            // const FamilyRationCard = data.f_ration_card ? `https://www.pahrultours.com/app2/${data.f_ration_card}` : null;
+            // const RescueAadharCard = data.res_aadhar_card ? `https://www.pahrultours.com/app2/${data.res_aadhar_card}` : null;
+            const policeMemoAttach = data.attach_policeMemo ? `https://www.pahrultours.com/app2/${data.attach_policeMemo}` : null;
 
             console.log("Rescue Image Path", RescueImage);
             console.log("Police Memo Attachment", policeMemoAttach);
+            console.log("Govertnment Id File", govtFilePath);
             // Set files state
             setFiles((files) => ({
                 ...files,
@@ -343,7 +362,8 @@ function Rescue_details() {
                 // f_aadhar_card: FamilyAadharCard,
                 // f_ration_card: FamilyRationCard,
                 // res_aadhar_card: RescueAadharCard,
-                attach_policeMemo: policeMemoAttach
+                attach_policeMemo: policeMemoAttach,
+                govIdFile: govtFilePath
             }));
 
             setTimeout(() => {
@@ -354,6 +374,57 @@ function Rescue_details() {
             console.error("Error fetching form data:", error);
         }
     }
+
+    const apiRoute = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+    });
+
+    useEffect(() => {
+        if (selectedStatus !== "") {
+            fetchFilteredData(selectedStatus);
+        } else {
+            setFilteredRescueDetails([]);
+        }
+    }, [selectedStatus]);
+
+    const fetchFilteredData = async (status) => {
+        try {
+            const response = await apiRoute.get(`/admision/getByStatus/${status}`);
+            setFilteredRescueDetails(response.data.data); // ✅ make sure `.data` is used properly here
+        } catch (err) {
+            console.error("Error fetching filtered data:", err);
+        }
+    };
+
+
+    const handleCheckboxChange = (e, id) => {
+        const checked = e.target.checked;
+        setSelectedItems((prev) => {
+            const updated = { ...prev };
+            if (checked) {
+                updated[id] = "";
+            } else {
+                delete updated[id];
+            }
+            return updated;
+        });
+    };
+
+    const handleAssignStatus = async (id, status) => {
+        setSelectedItems((prev) => ({
+            ...prev,
+            [id]: status,
+        }));
+
+        try {
+            await apiRoute.put(`/admision/updateStatus/${id}`, {
+                status,
+            });
+            alert("Status updated successfully");
+        } catch (err) {
+            console.error("Failed to update status:", err);
+        }
+    };
 
     return (
         <>
@@ -368,6 +439,9 @@ function Rescue_details() {
                     <h6 className="breadcrumb_title">Rescue Details</h6>
 
                 </div>
+                <Col md={4} className="text-start">
+                    <h3 className="section_title px-4">Resident Rescue Details</h3>
+                </Col>
 
                 <div className="d-flex align-items-center px-3">
 
@@ -387,14 +461,25 @@ function Rescue_details() {
                 </div>
             </div>
 
+            <Form.Select
+                aria-label="Filter by Status"
+                value={selectedStatus}
+                name="status"
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{ width: "250px", marginBottom: "20px" , marginLeft:"15px"}}
+            >
+                <option value="">-- Choose Status --</option>
+                <option value="Resident">Resident</option>
+                <option value="Reunion">Discharge</option>
+            </Form.Select>
+
             <div className="first_table mt-2 mb-4">
-                <Col md={12} className="text-start">
-                    <h3 className="section_title px-4">Resident Rescue Details</h3>
-                </Col>
-                <Table responsive="sm">
+
+                <Table responsive="sm" className="table-bordered">
 
                     <thead>
                         <tr>
+                            {/* <th><Form.Check aria-label="option 1" /></th> */}
                             <th>S.No</th>
                             <th>Admission Number</th>
                             <th>Rescue Photo</th>
@@ -402,19 +487,26 @@ function Rescue_details() {
                             <th>Rescue Name</th>
                             <th>Taken from</th>
                             <th>Date & Time</th>
-                            <th>Police Memo</th>
+                            <th>Resident Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredRescueDetails.length > 0 ? (
-                            filteredRescueDetails.map((item, index) => (
+                        {searchFilteredRescueDetails.length > 0 ? (
+                            searchFilteredRescueDetails.map((item, index) => (
                                 <tr key={item.id}>
+                                    {/* <td>
+                                        <Form.Check
+                                            type="checkbox"
+                                            checked={selectedItems[item.id] !== undefined}
+                                            onChange={(e) => handleCheckboxChange(e, item.id)}
+                                        />
+                                    </td> */}
                                     <td>{index + 1}</td>
                                     <td>{item.admission_no}</td>
                                     <td>
                                         <img
-                                            src={`http://localhost:5000/${item.rescue_image}`}
+                                            src={`https://www.pahrultours.com/app2/${item.rescue_image}`}
                                             alt="Rescue Profile"
                                             style={{ width: "70px", height: "70px", objectFit: "cover" }}
                                         />
@@ -423,7 +515,21 @@ function Rescue_details() {
                                     <td>{item.rescue_name}</td>
                                     <td>{item.from_place}</td>
                                     <td>{formatDateTime(item.date_time)}</td>
-                                    <td>{item.police_memo}</td>
+                                    {userType === "2" && (
+                                    <td>{item.resident_status}</td>
+                                    )}
+                                    {userType === "1" && (
+                                    <td>
+                                        <Form.Select
+                                            value={selectedItems[item.id] || item.resident_status || ""}
+                                            onChange={(e) => handleAssignStatus(item.id, e.target.value)}
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="Resident">Resident</option>
+                                            <option value="Reunion">Discharge</option>
+                                        </Form.Select>
+                                    </td>
+                                    )}
                                     <td>
                                         <button className="btn btn-success icon_details"
                                             onClick={() => {
@@ -437,11 +543,11 @@ function Rescue_details() {
                                                 handleEditform(item.id);
                                             }}
                                         ><i className="fas fa-edit"></i> </button>
-                                        {userType === "2" && (
+                                        {/* {userType === "2" && (
                                             <button className="btn btn-danger icon_details"
                                                 onClick={() => handleDelete(item.id)}
                                             ><i className="fas fa-trash"></i></button>
-                                        )}
+                                        )} */}
                                     </td>
                                 </tr>
                             ))
@@ -704,6 +810,34 @@ function Rescue_details() {
                                             onChange={handleInputChange} />
                                     </Col>
                                 </Form.Group>
+                                {formData.govIdType !== 'NA' && formData.govIdType !== '' && (
+                                    <>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder={`Enter ${formData.govIdType} number`}
+                                            value={formData.govIdNumber}
+                                            onChange={(e) =>
+                                                setFormData({ ...formData, govIdNumber: e.target.value })
+                                            }
+                                        />
+
+
+                                        <Form.Group className="mb-3 text-start d-flex">
+                                            <Form.Label column sm={4}>{formData.govIdType} File:</Form.Label>
+                                            <Col sm={7}>
+                                                {files.govIdFile ? (
+                                                    <img
+                                                        src={files.govIdFile}
+                                                        alt="Rescue"
+                                                        style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
+                                                    />
+                                                ) : (
+                                                    <div>No Governtment Id Available</div>
+                                                )}
+                                            </Col>
+                                        </Form.Group>
+                                    </>
+                                )}
 
                             </Col>
                             <Col md={11}>
@@ -719,7 +853,7 @@ function Rescue_details() {
                                             onChange={handleInputChange} />
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1" controlId="formMother">
+                                <Form.Group as={Row} className="mb-3" controlId="formMother">
                                     <Form.Label column sm="4">
                                         Mother :
                                     </Form.Label>
@@ -730,7 +864,7 @@ function Rescue_details() {
                                             onChange={handleInputChange} />
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1" controlId="formanyother">
+                                <Form.Group as={Row} className="mb-1 mt-5" controlId="formanyother">
                                     <Form.Label column sm="4">
                                         Any Other Relationship:
                                     </Form.Label>
@@ -915,6 +1049,7 @@ function Rescue_details() {
                                         <Form.Control
                                             as="textarea"
                                             name="mental_status"
+                                            rows={1}
                                             value={formData.mental_status}
                                             onChange={handleInputChange} />
                                     </Col>
@@ -925,7 +1060,9 @@ function Rescue_details() {
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
+                                            as="textarea"
                                             name="behaviour"
+                                            rows={1}
                                             value={formData.behaviour}
                                             onChange={handleInputChange} />
                                     </Col>
@@ -936,6 +1073,8 @@ function Rescue_details() {
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
+                                            as="textarea"
+                                            rows={1}
                                             name="community_ability"
                                             value={formData.community_ability}
                                             onChange={handleInputChange} />
@@ -947,6 +1086,8 @@ function Rescue_details() {
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
+                                            as="textarea"
+                                            rows={1}
                                             name="self_careCapacity"
                                             value={formData.self_careCapacity}
                                             onChange={handleInputChange} />
@@ -958,6 +1099,8 @@ function Rescue_details() {
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
+                                            as="textarea"
+                                            rows={1}
                                             name="diagnosis"
                                             value={formData.diagnosis}
                                             onChange={handleInputChange} />
@@ -965,7 +1108,7 @@ function Rescue_details() {
                                 </Form.Group>
 
                             </Col>
-                            
+
                             <Row className="d-flex align-items-center justify-content-center">
                                 <Col md={6} className="mt-3">
                                     <h4 className="text-start sign_class">Signature / Thumbprint of Resident's</h4>

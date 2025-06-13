@@ -10,6 +10,10 @@ function Register (){
         confirmPassword: ''
       });
     const navigate = useNavigate();
+
+    const apiRoute = axios.create({
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+    });
     
     const handleChange = (e) => {
         setForm({ ...formData, [e.target.name]: e.target.value });
@@ -25,7 +29,7 @@ function Register (){
         }
       
         try {
-          const response = await axios.post('http://localhost:5000/api/register', {
+          const response = await apiRoute.post('/api/register', {
             email: formData.email,
             password: formData.password
           });

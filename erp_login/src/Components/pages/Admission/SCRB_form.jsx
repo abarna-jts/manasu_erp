@@ -69,7 +69,7 @@ function SCRB_form() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `http://localhost:5000/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 console.log(imagePath);
                 setRescueImage(imagePath);
@@ -213,13 +213,13 @@ function SCRB_form() {
             }));
 
             // Base path for images
-            const basePath = "http://localhost:5000/uploads/form_2a";
+            const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
 
             // Handle old and new photo paths correctly
-            const oldPhotoPath = data.old_photo ? `http://localhost:5000${data.old_photo}` : null;
-            const newPhotoPath = data.new_photo ? `http://localhost:5000${data.new_photo}` : null;
-            const signaturepath = data.signature ? `http://localhost:5000${data.signature}` : null;
-            const sealpath = data.seal ? `http://localhost:5000${data.seal}` : null;
+            const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2/${data.old_photo}` : null;
+            const newPhotoPath = data.new_photo ? `https://www.pahrultours.com/app2/${data.new_photo}` : null;
+            const signaturepath = data.signature ? `https://www.pahrultours.com/app2/${data.signature}` : null;
+            const sealpath = data.seal ? `https://www.pahrultours.com/app2/${data.seal}` : null;
 
 
 
@@ -253,7 +253,7 @@ function SCRB_form() {
     //excel sheet code 
     const handleDownload = async () => {
         if (!admission_no.trim()) {
-            alert("Please enter your admission number.");
+            alert("Please enter admission number.");
             return;
         }
 
@@ -844,6 +844,7 @@ function SCRB_form() {
                                                 name="name_rescue"
                                                 className="form-control"
                                                 onChange={handleInputChange}
+                                                value={formData.rescue_name}
                                                 required
                                             />
                                         </td>
@@ -862,6 +863,7 @@ function SCRB_form() {
                                                 name="phone_no"
                                                 onChange={handleInputChange}
                                                 className="form-control"
+                                                value={formData.phone_no}
                                                 required
                                             />
                                         </td>
@@ -1294,7 +1296,7 @@ function SCRB_form() {
 
                                 </tbody>
                             </table>
-                            <table className="table table-border" style={{ border: "2px solid rgb(143 143 143)" }}>
+                            <table className="table table-border" style={{ border: "2px solid rgb(143 143 143)", marginBottom:"60px", marginTop:"50px"}}>
                                 <tbody>
                                     <tr>
                                         <td>
@@ -1317,14 +1319,14 @@ function SCRB_form() {
                             <table className="table">
                                 <tbody>
                                     <tr>
-                                        <td style={{marginBottom:"20px", paddingBottom:"20px"}}>
+                                        <td style={{marginTop:"40px"}}>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
                                                     <label>SIGNATURE / கையொப்பம் : </label>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style={{marginBottom:"20px", paddingBottom:"70px"}}>
+                                        <td style={{marginBottom:"20px"}}>
                                             {files.signature ? (
                                                 <>
                                                     <img
@@ -1352,7 +1354,7 @@ function SCRB_form() {
                                                 name="name_rescue"
                                                 className="form-control"
                                                 onChange={handleInputChange}
-                                                value={formData.name_rescue}
+                                                value={formData.rescue_name}
                                                 required
                                             />
                                         </td>
