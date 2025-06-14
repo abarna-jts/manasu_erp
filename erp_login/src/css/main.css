@@ -558,24 +558,28 @@ body {
 	}
 
 	.annual_section_title {
-    margin-bottom: 10px;
-    font-size: 1.3rem;
-    line-height: 1.16667em;
-    font-weight: 600;
-    color: #454545;
-}
-.modal {
-    --bs-modal-width: 440px !important;
-}
-.rescue_detailsClass{
-	width: 60% !important;
-}
-.rescue_report{
-	width: 45% !important;
-}
-.admission_report{
-	width: 50% !important;
-}
+		margin-bottom: 10px;
+		font-size: 1.3rem;
+		line-height: 1.16667em;
+		font-weight: 600;
+		color: #454545;
+	}
+
+	.modal {
+		--bs-modal-width: 440px !important;
+	}
+
+	.rescue_detailsClass {
+		width: 60% !important;
+	}
+
+	.rescue_report {
+		width: 45% !important;
+	}
+
+	.admission_report {
+		width: 50% !important;
+	}
 }
 
 /* tabs styles start */
@@ -1547,6 +1551,28 @@ body {
 	.table-responsive {
 		overflow-x: auto;
 		-webkit-overflow-scrolling: touch;
+	}
+
+	.logo_text h4 {
+		font-size: 0.8rem;
+	}
+
+	.logo_text {
+		padding-left: 5px !important;
+	}
+
+	.navbar-logo {
+		padding-right: 0px !important;
+		padding-left: 0px !important;
+	}
+
+	.pcss3t .typography h1 {
+		font-size: 22px;
+		line-height: 28px !important;
+		font-weight: 600;
+	}
+	.mse_search{
+		flex-direction: column !important;
 	}
 }
 

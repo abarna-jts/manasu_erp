@@ -58,7 +58,7 @@ export default function TopNavbar() {
     <Navbar variant="dark p-2 mb-3" expanded >
       <Container fluid className="px-0">
         <div className="d-flex justify-content-between w-100">
-          <div className="d-flex align-items-center px-3 navbar-logo">
+          <div className="d-flex align-items-center navbar-logo">
             <img src={m_logo} alt="" />
             <div className="logo_text">
               <h4><span>MANASU</span> <br />Mental Health Charity Home</h4>
@@ -80,7 +80,6 @@ export default function TopNavbar() {
             <Dropdown className="navbar_dropdown">
               <Dropdown.Toggle variant="link" className="pt-1 px-0 text-dark d-flex align-items-center">
                 <div className="media d-flex align-items-center">
-                  <Image src={m_logo} className="user-avatar md-avatar rounded-circle" />
                   <div className="media-body ms-2 d-none d-lg-block">
                     <span className="mb-0 font-small fw-bold">
                       {userType === "1" ? "Office Admin" : userType === "2" ? "Director" : userType === "3" ? "Nurse": userType === "4" ? "Social Worker" : "User"}

@@ -25,6 +25,8 @@ function Login() {
         try {
             const res = await apiRoute.post('/api/login', form);
 
+            console.log(res);
+
             // Save JWT token
             setToken(res.data.token);
             localStorage.setItem('jwt', res.data.token);

@@ -15,68 +15,142 @@ import axios from "axios";
 
 
 function Dashboard() {
+    const [totalRescue, setTotalRescue] = useState(0);
+    const [totalResident, setTotalResident] = useState(0);
+    const [totalReunion, setTotalReunion] = useState(0);
+    const [nurseRecordData, setNurseRecordData] = useState([]);
+
+    useEffect(() => {
+        const fetchTotalRescue = async () => {
+            try {
+                const response = await apiRoute.get("/dashboard/totalRescue");
+                setTotalRescue(response.data[0].totalRescue);
+            } catch (error) {
+                console.error("Failed to fetch rescue data:", error);
+            }
+        };
+
+        fetchTotalRescue(); // Call the async function
+    }, []);
+
+    useEffect(() => {
+        const fetchTotalResident = async () => {
+            try {
+                const response = await apiRoute.get("/dashboard/totalResident");
+                setTotalResident(response.data[0].totalResident);
+            } catch (error) {
+                console.error("Failed to fetch Resident data:", error);
+            }
+        };
+
+        fetchTotalResident(); // Call the async function
+    }, []);
+
+    useEffect(() => {
+        const fetchTotalReunion = async () => {
+            try {
+                const response = await apiRoute.get("/dashboard/totalReunion");
+                setTotalReunion(response.data[0].totalReunion);
+            } catch (error) {
+                console.error("Failed to fetch Resident data:", error);
+            }
+        };
+
+        fetchTotalReunion(); // Call the async function
+    }, []);
+
+    useEffect(() => {
+        const fetchNurseRecord = async () => {
+            try {
+                const res = await apiRoute.get("/dashboard/getMonthlyResidentConditions");
+                console.log("API response for nurse record:", res.data);
+
+                // Normalize and align the data
+                const fullData = MONTHS.map(monthShort => {
+                    const found = res.data.find(item =>
+                        item.month.toLowerCase().startsWith(monthShort.toLowerCase())
+                    );
+                    return {
+                        month: monthShort,
+                        value: found ? found.value : 0
+                    };
+                });
+
+                setNurseRecordData(fullData);
+            } catch (error) {
+                console.error("Error fetching nurse record data:", error);
+            }
+        };
+
+        fetchNurseRecord();
+    }, []);
+
+
     const handleLogout = () => {
         localStorage.removeItem('jwt'); // Clear JWT token
         alert('You have been logged out');
         navigate('/'); // Redirect to login page
     };
 
-    const data = [
-        { month: 'Jan', rescues: 10 },
-        { month: 'Feb', rescues: 15 },
-        { month: 'Mar', rescues: 8 },
-        { month: 'Apr', rescues: 20 },
-        { month: 'May', rescues: 12 },
-        { month: 'Jun', rescues: 18 },
-        { month: 'Jul', rescues: 25 },
-        { month: 'Aug', rescues: 17 },
-        { month: 'Sep', rescues: 9 },
-        { month: 'Oct', rescues: 14 },
-        { month: 'Nov', rescues: 22 },
-        { month: 'Dec', rescues: 19 },
-    ];
+    // const data = [
+    //     { month: 'Jan', rescues: 4 },
+    //     { month: 'Feb', rescues: 1 },
+    //     { month: 'Mar', rescues: 0 },
+    //     { month: 'Apr', rescues: 0 },
+    //     { month: 'May', rescues: 4 },
+    //     { month: 'Jun', rescues: 0 },
+    //     { month: 'Jul', rescues: 5 },
+    //     { month: 'Aug', rescues: 4 },
+    //     { month: 'Sep', rescues: 0 },
+    //     { month: 'Oct', rescues: 3 },
+    //     { month: 'Nov', rescues: 4 },
+    //     { month: 'Dec', rescues: 1 },
+    // ];
 
     const COLORS = ["#fe7096", "#90caf9", "#84d9d2", "#92a6f8", "#ffc7ad", "#ffbccc"];
 
     const admissionData = [
-        { month: "Jan", value: 30 },
-        { month: "Feb", value: 40 },
-        { month: "Mar", value: 25 },
-        { month: "Apr", value: 35 },
-        { month: "May", value: 20 },
-        { month: "Jun", value: 50 },
-        { month: "Jul", value: 30 },
-        { month: "Aug", value: 40 },
-        { month: "Sep", value: 20 },
-        { month: "Oct", value: 20 },
-        { month: "Nov", value: 30 },
-        { month: "Dec", value: 20 },
+        { month: 'Jan', value: 4 },
+        { month: 'Feb', value: 3 },
+        { month: 'Mar', value: 0 },
+        { month: 'Apr', value: 0 },
+        { month: 'May', value: 4 },
+        { month: 'Jun', value: 0 },
+        { month: 'Jul', value: 5 },
+        { month: 'Aug', value: 4 },
+        { month: 'Sep', value: 0 },
+        { month: 'Oct', value: 3 },
+        { month: 'Nov', value: 4 },
+        { month: 'Dec', value: 1 },
     ];
+
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
     const [rescues, setRescues] = useState([]);
 
     const navigate = useNavigate();
 
-    const handleChange = () =>{
+    const handleChange = () => {
         navigate('/rescue_details');
     }
 
-      const apiRoute = axios.create({
+    const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-            const response = await apiRoute.get("/dashboard/get_recent_rescue");
-            setRescues(response.data);
+                const response = await apiRoute.get("/dashboard/get_recent_rescue");
+                setRescues(response.data);
             } catch (error) {
-            console.error("Failed to fetch rescue data:", error);
+                console.error("Failed to fetch rescue data:", error);
             }
         };
 
         fetchData(); // Call the async function
-        }, []);
+    }, []);
 
     return (
         <>
@@ -100,7 +174,7 @@ function Dashboard() {
                                 <h4 className="font-weight-normal mb-2">
                                     No. of Rescue <FontAwesomeIcon icon={faUsers} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
                                 </h4>
-                                <h2 className="mb-3">30</h2>
+                                <h2 className="mb-3">{totalRescue}</h2>
                                 <h6 className="card-text">Increased by 60%</h6>
                             </div>
                         </div>
@@ -111,9 +185,9 @@ function Dashboard() {
                             <div className="card-body">
                                 <img src={circle} className="card-img-absolute" alt="circle" />
                                 <h4 className="font-weight-normal mb-2">
-                                    No. of Organisation <FontAwesomeIcon icon={faSitemap} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
+                                    No. of Resident <FontAwesomeIcon icon={faSitemap} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
                                 </h4>
-                                <h2 className="mb-3">4</h2>
+                                <h2 className="mb-3">{totalResident}</h2>
                                 <h6 className="card-text">Increased by 80%</h6>
                             </div>
                         </div>
@@ -124,9 +198,9 @@ function Dashboard() {
                             <div className="card-body">
                                 <img src={circle} className="card-img-absolute" alt="circle" />
                                 <h4 className="font-weight-normal mb-2">
-                                    No. of Admission <FontAwesomeIcon icon={faClipboardList} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
+                                    No. of Reunion <FontAwesomeIcon icon={faClipboardList} className="float-end" size="lg" style={{ fontSize: "2rem" }} />
                                 </h4>
-                                <h2 className="mb-3">20</h2>
+                                <h2 className="mb-3">{totalReunion}</h2>
                                 <h6 className="card-text">Increased by 10%</h6>
                             </div>
                         </div>
@@ -134,21 +208,25 @@ function Dashboard() {
                 </div>
                 <Row className="d-flex align-items-center justify-content-center mb-3">
                     <Col md={5} className="rescue_report">
-                        <h5>Monthly Rescue Report</h5>
+                        <h5>Monthly Health Report by Nurse</h5>
                         <ResponsiveContainer width="100%" height={350}>
-                            <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                            <BarChart data={nurseRecordData}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="month" />
-                                <YAxis label={{ value: 'Rescues', angle: -90, position: 'insideLeft' }} />
+                                <YAxis
+                                    ticks={[0, 2, 4, 6, 8, 10]}
+                                    domain={[0, 'dataMax + 2']}
+                                />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey="rescues" fill="#92a6f8" name="Monthly Rescues" barSize={20} />
+                                <Bar dataKey="value" fill="#92a6f8" name="Monthly Entries" />
                             </BarChart>
                         </ResponsiveContainer>
+
                     </Col>
                     <Col md={5} className="admission_report">
                         <h5>Monthly Admission Report</h5>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent:"center", gap: "2rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
                             {/* Pie Chart */}
                             <div style={{ width: 350, height: 350 }}>
                                 <ResponsiveContainer width="100%" height="100%">
@@ -204,39 +282,39 @@ function Dashboard() {
                     </Col>
                 </Row>
                 <Row className="d-flex align-items-center justify-content-center mb-3">
-                    <Col md={7}className="rescue_detailsClass">
-                    <h5 className="text-start">Recent Rescue Details</h5>
-                    <div className="table-responsive">
-                        <table className="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>S.no</th>
-                                <th>Admission No</th>
-                                <th>Rescue Name</th>
-                                <th>Referred By</th>
-                                <th>Admission Date</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {rescues.map((rescue, index) => (
-                                <tr key={rescue.id || index}>
-                                <th scope="row">{index + 1}</th>
-                                <td>{rescue.admission_no}</td>
-                                <td>{rescue.rescue_name}</td>
-                                <td>{rescue.referred_by}</td>
-                                <td>
-                                    {new Date(rescue.admission_date).toLocaleDateString("en-GB", {
-                                        day: "2-digit",
-                                        month: "2-digit",
-                                        year: "numeric"
-                                    })}
-                                    </td>
-                                <td><button className="btn btn-primary" onClick={handleChange}>View All</button></td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                    <Col md={7} className="rescue_detailsClass">
+                        <h5 className="text-start">Recent Rescue Details</h5>
+                        <div className="table-responsive">
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>S.no</th>
+                                        <th>Admission No</th>
+                                        <th>Rescue Name</th>
+                                        <th>Referred By</th>
+                                        <th>Admission Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {rescues.map((rescue, index) => (
+                                        <tr key={rescue.id || index}>
+                                            <th scope="row">{index + 1}</th>
+                                            <td>{rescue.admission_no}</td>
+                                            <td>{rescue.rescue_name}</td>
+                                            <td>{rescue.referred_by}</td>
+                                            <td>
+                                                {new Date(rescue.admission_date).toLocaleDateString("en-GB", {
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "numeric"
+                                                })}
+                                            </td>
+                                            <td><button className="btn btn-primary" onClick={handleChange}>View All</button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </Col>
                     <Col md={4}>

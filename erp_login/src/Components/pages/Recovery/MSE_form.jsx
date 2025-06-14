@@ -1562,7 +1562,7 @@ function MSE_form() {
           <Col md={12}>
             <Row>
               <Col md="9">
-                <div className="d-flex align-items-center px-3">
+                <div className="d-flex align-items-center px-3 mse_search">
 
                   <Form className="navbar-search col-md-8">
                     <Form.Group id="topbarSearch" className="d-flex align-items-center">

@@ -939,6 +939,7 @@ const createInternForm = (req, res) => {
             phone,
             secondary_phone,
             field,
+            other_field,
             clg_name,
             duration,
             from_date,
@@ -953,12 +954,12 @@ const createInternForm = (req, res) => {
             ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
             : null;
 
-        const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, stud_photo, department, email, phone, secondary_phone, field, clg_name, duration,from_date, 
+        const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, stud_photo, department, email, phone, secondary_phone, field, other_field, clg_name, duration,from_date, 
                         to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern)
-                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         const values = [
-            stud_name, stud_id, studentPhotoPath, department, email, phone, secondary_phone, field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
+            stud_name, stud_id, studentPhotoPath, department, email, phone, secondary_phone, field, other_field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
         ];
 
         db.query(insertQuery, values, (dbErr, data) => {
@@ -998,7 +999,8 @@ const getStudendDetailsbyID = (req, res) => {
 
 const updateStudentDetail = (req, res) => {
     const {
-        stud_name, stud_id, department, clg_name, duration, from_date, to_date
+        stud_name, stud_id, department, email, phone, secondary_phone,
+        clg_name, duration, from_date, to_date
     } = req.body;
 
     const id = req.params.id;

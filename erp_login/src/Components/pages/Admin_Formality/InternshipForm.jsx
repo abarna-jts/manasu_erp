@@ -69,6 +69,7 @@ function InternshipForm() {
             data.append("phone", formData.phone);
             data.append("secondary_phone", formData.secondary_phone);
             data.append("field", formData.field);
+            // data.append("other_field", formData.other_field);
             data.append("clg_name", formData.clg_name);
             data.append("duration", formData.duration);
             data.append("from_date", formData.from_date);
@@ -113,7 +114,7 @@ function InternshipForm() {
                         <h6 className="breadcrumb_title">Internship</h6>
                     </Col>
                     <Col md={7} className="text-start">
-                        <h3 className="section_title">Intern Information Form</h3>
+                        <h3 className="section_title">Internship Information Form</h3>
                     </Col>
 
                 </Row>
@@ -257,15 +258,15 @@ function InternshipForm() {
                                         required
                                     />
                                 </Col>
-                                
+
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
-                                 <Form.Label column sm="4">
-                                        Emergency Contact Number:
-                                    </Form.Label>
+                                <Form.Label column sm="4">
+                                    Emergency Contact Number:
+                                </Form.Label>
                                 <Col sm="8">
-                                   
+
                                     <Form.Control
                                         name="secondary_phone"
                                         type="text"
@@ -340,13 +341,28 @@ function InternshipForm() {
                                             <option value="Human Rights">Human Rights</option>
                                             <option value="Any other">Any other</option>
                                         </optgroup>
-                                        
+
                                         <option value="Social Services">Social Services</option>
                                         <option value="Psychology">Psychology</option>
 
                                     </Form.Control>
                                 </Col>
                             </Form.Group>
+
+                            {/* {formData.field === 'Any other' && (
+                                <Form.Group as={Row} className="mb-1">
+                                    <Form.Label column sm="4" className='text-start'>Any Other Field:</Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="text"
+                                            name="other_field"
+                                            value={formData.other_field}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </Col>
+                                </Form.Group>
+                            )} */}
 
 
 
