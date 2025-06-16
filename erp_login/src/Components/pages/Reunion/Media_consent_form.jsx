@@ -485,7 +485,7 @@ function Media_consent_form() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
                                         <Form.Label column sm="4" className="text-start">
-                                            Is our rescue's face used on social media? :
+                                            Did the Resident give the Media Consent? :
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Check

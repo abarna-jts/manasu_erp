@@ -50,13 +50,14 @@ const createSelfDeclaration = (req, res) => {
         toiletries_provided,
         dress_provided,
         travel_expenses,
+        welfare_expenses,
         medical_prescription,
         discharge_summary,
         travel_letter
     } = req.body;
 
 
-    const q = "INSERT INTO formality_declaration (admission_no,rescue_name,age,medicine_provided,toiletries_provided,dress_provided,travel_expenses, medical_prescription, discharge_summary, travel_letter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const q = "INSERT INTO formality_declaration (admission_no,rescue_name,age,medicine_provided,toiletries_provided,dress_provided,travel_expenses, welfare_expenses, medical_prescription, discharge_summary, travel_letter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     const values = [
         admission_no,
@@ -66,6 +67,7 @@ const createSelfDeclaration = (req, res) => {
         toiletries_provided,
         dress_provided,
         travel_expenses,
+        welfare_expenses,
         medical_prescription,
         discharge_summary,
         travel_letter

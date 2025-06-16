@@ -44,7 +44,6 @@ router.post("/updateCognition/:admission_no", updateCognition);
 
 //all mse form data
 router.get("/mseAllForm/:admission_no",getMseAllForm);
-
 router.post("/create_articles", createArticles);
 router.get("/getArticles/:admission_no",getArticles);
 router.post("/updateArticles/:admission_no",updateArticles);

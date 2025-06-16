@@ -177,7 +177,7 @@ const Sidebar = () => {
 
                   <CollapsableNavItem title="2. Social Worker User" icon={faMapPin}>
                     <NavItem title="1. Observation Report" to="/observation_report" icon={faUserNurse} />
-                    <NavItem title="2. Psychatrics Case History" to="/psychatrics_form" icon={faBrain} />
+                    <NavItem title="2. Psychiatric Case History" to="/psychatrics_form" icon={faBrain} />
                     <NavItem title="3. MSE Form" to="/mseform" icon={faNotesMedical} />
                     <NavItem title="4. Reunion Summary" to="/reunion_summary" icon={faNotesMedical} />
                   </CollapsableNavItem>
@@ -205,7 +205,7 @@ const Sidebar = () => {
                 <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate} />
 
                 {/* Reunion Member Details */}
-                <NavItem title="Discharge People" to="/reunited_people" icon={faHandshake} />
+                {/* <NavItem title="Reunited Resident" to="/reunited_people" icon={faHandshake} /> */}
 
                 {/* Logout */}
                 {/* <NavItem title="Logout" className="logout_class" onClick={handleLogout} icon={faSignOutAlt} /> */}
@@ -282,7 +282,18 @@ const Sidebar = () => {
                 <NavItem title="Intern Information" to="/allStudentDetails" icon={faUserGraduate} />
 
                 {/* Reunion Member Details */}
-                <NavItem title="Reunited Member Details" to="/reunited_people" icon={faHandshake} />
+                {/* <NavItem title="Reunited Resident" to="/reunited_people" icon={faHandshake} /> */}
+
+                {/* Logout */}
+                {/* <NavItem title="Logout" className="logout_class" onClick={handleLogout} icon={faSignOutAlt} /> */}
+                <div className="nav-item logout_class" onClick={handleLogout}>
+                  <a role="button" className="d-flex justify-content-between align-items-center nav-link" href="#">
+                    <span className="d-flex align-items-center">
+                      <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
+                      Logout
+                    </span>
+                  </a>
+                </div>
               </>
             )}
 
@@ -295,15 +306,35 @@ const Sidebar = () => {
                 <NavItem title="Prescription Form" to="/prescription_form" icon={faNotesMedical} />
                 <NavItem title="Doctor Visit" to="/dr_visit" icon={faStethoscope} />
                 <NavItem title="Medical Camp" to="/medical_camp" icon={faNotesMedical} />
+                {/* Logout */}
+                {/* <NavItem title="Logout" className="logout_class" onClick={handleLogout} icon={faSignOutAlt} /> */}
+                <div className="nav-item logout_class" onClick={handleLogout}>
+                  <a role="button" className="d-flex justify-content-between align-items-center nav-link" href="#">
+                    <span className="d-flex align-items-center">
+                      <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
+                      Logout
+                    </span>
+                  </a>
+                </div>
               </>
             )}
 
             {userType === '4' && (
               <>
                 <NavItem title="Observation Report" to="/observation_report" icon={faUserNurse} />
-                <NavItem title="Psychatrics Case History" to="" icon={faBrain} />
+                <NavItem title="Psychiatric Case History" to="" icon={faBrain} />
                 <NavItem title="MSE Form" to="/mseform" icon={faNotesMedical} />
                 <NavItem title="Reunion Summary" to="/reunion_summary" icon={faNotesMedical} />
+                {/* Logout */}
+                {/* <NavItem title="Logout" className="logout_class" onClick={handleLogout} icon={faSignOutAlt} /> */}
+                <div className="nav-item logout_class" onClick={handleLogout}>
+                  <a role="button" className="d-flex justify-content-between align-items-center nav-link" href="#">
+                    <span className="d-flex align-items-center">
+                      <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
+                      Logout
+                    </span>
+                  </a>
+                </div>
               </>
             )}
 

@@ -6,9 +6,12 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
-connection.connect(err => {
-  if (err) throw err;
-  console.log('MySQL Connected!');
+connection.connect((err) => {
+  if (err) {
+    console.error('❌ MySQL connection failed:', err.message);
+    return;
+  }
+  console.log('✅ MySQL connected successfully!');
 });
 
 module.exports = connection;

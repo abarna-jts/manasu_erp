@@ -545,6 +545,16 @@ body {
 		width: 180px !important;
 	}
 
+	.psychiatrics_tab>label {
+		padding: 0 5px !important;
+		margin: 5px 3px !important;
+	}
+
+	.pcss3t>label {
+		font-size: 12px !important;
+		line-height: 29px !important;
+	}
+
 	.sidebar-inner .accordion-button::after {
 		height: 1.25rem;
 		width: 1rem !important;
@@ -1571,9 +1581,28 @@ body {
 		line-height: 28px !important;
 		font-weight: 600;
 	}
-	.mse_search{
+
+	.mse_search {
 		flex-direction: column !important;
 	}
+
+	.modal-dialog {
+		position: absolute !important;
+		top: 0;
+		right: 0;
+		width: 50% !important;
+		height: 100vh !important;
+		margin-top: 0px !important;
+		margin-bottom: 0px !important;
+	}
+
+	.modal-backdrop {
+		width: 100% !important;
+	}
+}
+
+.psychiatrics_tab>label {
+	padding: 0 5px;
 }
 
 .sidebar_mediaBody {
@@ -1619,5 +1648,10 @@ body {
 		line-height: 1.16667em;
 		font-weight: 600;
 		color: #454545;
+	}
+
+	.pcss3t>label {
+		font-size: 14px !important;
+		line-height: 35px !important;
 	}
 }

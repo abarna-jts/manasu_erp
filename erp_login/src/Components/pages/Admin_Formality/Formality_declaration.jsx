@@ -28,6 +28,7 @@ function Formality_declaration() {
         toiletries_provided: '',
         dress_provided: '',
         travel_expenses: '',
+        welfare_expenses: '',
         medical_prescription: '',
         discharge_summary: '',
         travel_letter: ''
@@ -73,15 +74,47 @@ function Formality_declaration() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const updatedFormData = { ...formData, admission_no };
+
+        const data = new FormData();
+        data.append('name_ngo', 'MANASU (Mental Health Charity Home)');
+        data.append('admission_no', updatedFormData.admission_no);
+        data.append('koppu_en', formData.koppu_en);
+        data.append('rescue_name', formData.rescue_name);
+        data.append('father', formData.father);
+        data.append('date_time', formData.date_time);
+        data.append('gender', 'Male');
+        data.append('rescue_status', formData.rescue_status);
+        data.append('language1', formData.language1);
+        data.append('police_station', formData.police_station);
+        data.append('place', formData.place);
+        data.append('addition_info', formData.addition_info);
+        data.append('old_photo', files.old_photo);
+        data.append('new_photo', files.new_photo);
+        data.append('signature', files.signature);
+        data.append('seal', files.seal);
+        data.append('name_rescue', formData.name_rescue);
+        data.append('phone_no', formData.phone_no);
+
         try {
-            const res = await apiRoute.post('/formality/createDeclaration', formData, {
-                headers: { 'Content-Type': 'application/json' },
+            const res = await apiRoute.post('/scrb_form/create_form2', data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Document Handover Form submitted successfully!');
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
-            alert('Submission failed.');
+            console.log(res);
+            if (res.data.message === "SCRRB Form2 Created Successfully") {
+                setSubmissionMessage("Form submitted successfully!");
+                setMessageType("success");
+
+                // Optionally reload after 3 seconds
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
         }
     };
 
@@ -141,6 +174,7 @@ function Formality_declaration() {
                 toiletries_provided: data.toiletries_provided || '',
                 dress_provided: data.dress_provided || '',
                 travel_expenses: data.travel_expenses || '',
+                welfare_expenses: data.welfare_expenses || '',
                 medical_prescription: data.medical_prescription || '',
                 discharge_summary: data.discharge_summary || '',
                 travel_letter: data.travel_letter || '',
@@ -178,6 +212,7 @@ function Formality_declaration() {
                 toiletries_provided: data.toiletries_provided || '',
                 dress_provided: data.dress_provided || '',
                 travel_expenses: data.travel_expenses || '',
+                welfare_expenses: data.welfare_expenses || '',
                 medical_prescription: data.medical_prescription || '',
                 discharge_summary: data.discharge_summary || '',
                 travel_letter: data.travel_letter || '',
@@ -319,19 +354,6 @@ function Formality_declaration() {
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
-                                        <Form.Label column sm="4" className='text-start'>
-                                            Admission No. :
-                                        </Form.Label>
-                                        <Col sm="8">
-                                            <Form.Control
-                                                type="number"
-                                                name="admission_no"
-                                                value={formData.admission_no}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
                                             30 days Medicine Provided :
                                         </Form.Label>
@@ -402,7 +424,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            Discharge Allowance / Travel Expenses Provided:
+                                            Travel Expenses Provided:
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -419,6 +441,29 @@ function Formality_declaration() {
                                                 name="travel_expenses"
                                                 value="No"
                                                 checked={formData.travel_expenses === 'No'}
+                                                onChange={handleCheckChange}
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1">
+                                        <Form.Label column sm="4" className="text-start">
+                                            Welfare Expenses :
+                                        </Form.Label>
+                                        <Col sm="8" className='d-flex align-items-center'>
+                                            <Form.Check
+                                                type="radio"
+                                                label="Yes"
+                                                name="welfare_expenses"
+                                                value="Yes"
+                                                checked={formData.welfare_expenses === 'Yes'}
+                                                onChange={handleCheckChange}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="No"
+                                                name="welfare_expenses"
+                                                value="No"
+                                                checked={formData.welfare_expenses === 'No'}
                                                 onChange={handleCheckChange}
                                             />
                                         </Col>
@@ -655,6 +700,29 @@ function Formality_declaration() {
                         </Form.Group>
                         <Form.Group as={Row} className="mb-1">
                             <Form.Label column sm="4" className="text-start">
+                                Welfare Expenses :
+                            </Form.Label>
+                            <Col sm="8" className='d-flex align-items-center'>
+                                <Form.Check
+                                    type="radio"
+                                    label="Yes"
+                                    name="welfare_expenses"
+                                    value="Yes"
+                                    checked={formData.welfare_expenses === 'Yes'}
+                                    onChange={handleCheckChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="No"
+                                    name="welfare_expenses"
+                                    value="No"
+                                    checked={formData.welfare_expenses === 'No'}
+                                    onChange={handleCheckChange}
+                                />
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row} className="mb-1">
+                            <Form.Label column sm="4" className="text-start">
                                 Medical Prescription :
                             </Form.Label>
                             <Col sm="8" className='d-flex align-items-center'>
@@ -745,10 +813,10 @@ function Formality_declaration() {
                         <Form className='self_declaration'>
                             <Row>
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="6" className='text-start'>
                                         Name :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
@@ -758,10 +826,10 @@ function Formality_declaration() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="6" className='text-start'>
                                         Age :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         <Form.Control
                                             type="text"
                                             name="age"
@@ -771,10 +839,10 @@ function Formality_declaration() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className="text-start">
+                                    <Form.Label column sm="6" className="text-start">
                                         30 days Medicine Provided :
                                     </Form.Label>
-                                    <Col sm="8" className='d-flex align-items-center'>
+                                    <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -794,10 +862,10 @@ function Formality_declaration() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className="text-start">
+                                    <Form.Label column sm="6" className="text-start">
                                         Toiletries provided :
                                     </Form.Label>
-                                    <Col sm="8" className='d-flex align-items-center'>
+                                    <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -817,10 +885,10 @@ function Formality_declaration() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className="text-start">
+                                    <Form.Label column sm="6" className="text-start">
                                         1 month dress provided :
                                     </Form.Label>
-                                    <Col sm="8" className='d-flex align-items-center'>
+                                    <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -841,10 +909,10 @@ function Formality_declaration() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className="text-start">
+                                    <Form.Label column sm="6" className="text-start">
                                         Discharge Allowance / Travel Expenses Provided :
                                     </Form.Label>
-                                    <Col sm="8" className='d-flex align-items-center'>
+                                    <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -864,10 +932,33 @@ function Formality_declaration() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className="text-start">
+                                    <Form.Label column sm="6" className="text-start">
+                                        Welfare Expenses :
+                                    </Form.Label>
+                                    <Col sm="6" className='d-flex align-items-center'>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Yes"
+                                            name="welfare_expenses"
+                                            value="Yes"
+                                            checked={formData.welfare_expenses === 'Yes'}
+                                            onChange={handleCheckChange}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="No"
+                                            name="welfare_expenses"
+                                            value="No"
+                                            checked={formData.welfare_expenses === 'No'}
+                                            onChange={handleCheckChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-1">
+                                    <Form.Label column sm="6" className="text-start">
                                         Medical Prescription :
                                     </Form.Label>
-                                    <Col sm="8" className='d-flex align-items-center'>
+                                    <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -887,10 +978,10 @@ function Formality_declaration() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className="text-start">
+                                    <Form.Label column sm="6" className="text-start">
                                         Copy of Discharge Summary :
                                     </Form.Label>
-                                    <Col sm="8" className='d-flex align-items-center'>
+                                    <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -910,10 +1001,10 @@ function Formality_declaration() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className="text-start">
+                                    <Form.Label column sm="6" className="text-start">
                                         Travel Safety Letter :
                                     </Form.Label>
-                                    <Col sm="8" className='d-flex align-items-center'>
+                                    <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"

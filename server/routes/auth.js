@@ -6,43 +6,74 @@ const db = require('../db');
 
 // Register
 router.post('/register', async (req, res) => {
-  const { email, password } = req.body;
-  const hashed = await bcrypt.hash(password, 10);
+  const { email, password, user_type } = req.body;
 
-  db.query(
-    'INSERT INTO users (email, password) VALUES (?, ?)',
-    [email, hashed],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: err });
-      res.status(201).json({ message: 'User registered' });
-    }
-  );
+  try {
+    // Step 1: Check if email already exists
+    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, users) => {
+      if (err) return res.status(500).json({ message: 'Database error' });
+
+      if (users.length > 0) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      // Step 2: Hash password
+      const hashed = await bcrypt.hash(password, 10);
+
+      // Step 3: Insert new user
+      db.query(
+        'INSERT INTO users (email, password, user_type) VALUES (?, ?, ?)',
+        [email, hashed, user_type],
+        (err, result) => {
+          if (err) return res.status(500).json({ message: 'Error saving user' });
+          res.status(201).json({ message: 'User registered successfully' });
+        }
+      );
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error during registration' });
+  }
 });
 
 // Login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, users) => {
-    if (err) return res.status(500).json({ message: 'Database error' });
-    if (users.length === 0) return res.status(401).json({ message: 'Invalid email' });
+  try {
+    // Query user by email
+    const [users] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
 
-    const valid = await bcrypt.compare(password, users[0].password);
-    if (!valid) return res.status(401).json({ message: 'Invalid password' });
+    if (users.length === 0) {
+      return res.status(401).json({ message: 'Invalid email' });
+    }
 
-    const token = jwt.sign({ id: users[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const user = users[0];
 
-    // DEBUG: check if usertype exists
-    console.log("User login successful:", users[0]);
+    // Compare passwords
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
 
-    res.status(200).json({
+    // Create JWT
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    console.log("User login successful:", user);
+
+    // Send response
+    return res.status(200).json({
       message: 'Login successful',
       token,
-      usertype: users[0].user_type 
-      // username:users[0].username
+      usertype: user.user_type
+      // username: user.username
     });
-  });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ message: 'Server error during login' });
+  }
 });
-  
+
+
 
 module.exports = router;

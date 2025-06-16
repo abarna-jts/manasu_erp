@@ -712,7 +712,7 @@ function Annual_Report() {
 
 
 
-                                <Col md={12} className='d-flex align-items-center justify-content-end'>
+                                <Col md={12} className='d-flex align-items-center justify-content-end mb-5'>
                                     <Button variant='btn btn-success' className='m-1' type="submit">Submit</Button>
                                     <Button variant="outline-success" className="m-1" type="button" onClick={handleNext}>
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
@@ -957,7 +957,7 @@ function Annual_Report() {
                                         />
                                     </Col>
                                 </Form.Group>
-                                <Col md={12} className='d-flex align-items-center justify-content-between'>
+                                <Col md={12} className='d-flex align-items-center justify-content-between mb-5'>
                                     <Button variant="outline-secondary" className="m-1" onClick={handleBack1}>
                                         <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
                                     </Button>
