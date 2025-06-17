@@ -9,7 +9,6 @@ function Register() {
         email: '',
         password: '',
         confirmPassword: '',
-        user_type: ''
     });
     const navigate = useNavigate();
 
@@ -34,14 +33,21 @@ function Register() {
             const response = await apiRoute.post('/api/register', {
                 email: formData.email,
                 password: formData.password,
-                user_type: formData.user_type
             });
             console.log(response);
             alert('Registered successfully');
             navigate('/');
-        } catch (err) {
-            console.error(err);
-            alert('Registration error');
+        }catch (err) {
+            const status = err.response?.status;
+            const message = err.response?.data?.message || 'Registration error';
+
+            if (status === 400 && message === "Email already registered") {
+                alert("Email ID is already registered");
+            } else {
+                alert(message);
+            }
+
+            console.error("Registration error:", message);
         }
     };
 
@@ -92,24 +98,6 @@ function Register() {
                                                     value={formData.confirmPassword}
                                                     onChange={handleChange}
                                                 />
-                                            </InputGroup>
-                                        </Form.Group>
-
-                                        <Form.Group id="chooseUser" className="mb-4 text-start">
-                                            <Form.Label>Choose User</Form.Label>
-                                            <InputGroup>
-                                                <Form.Select
-                                                    aria-label="Default select example"
-                                                    name="user_type"
-                                                    value={formData.user_type}
-                                                    onChange={(e) => setForm({ ...formData, user_type: e.target.value })}
-                                                >
-                                                    <option value="">Select User</option>
-                                                    <option value="1">Office Admin</option>
-                                                    <option value="2">Director</option>
-                                                    <option value="3">Nurse</option>
-                                                    <option value="4">Social Worker</option>
-                                                </Form.Select>
                                             </InputGroup>
                                         </Form.Group>
 

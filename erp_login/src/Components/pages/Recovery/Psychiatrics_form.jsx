@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faPlus, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Psychiatrics_form() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -16,23 +17,86 @@ function Psychiatrics_form() {
     const [formData, setFormData] = useState({
         patient_name: '',
         patient_age: '',
-        patient_phone: '',
-        patient_address: '',
         patient_dob: '',
+        rescue_place:'',
+        rescue_agency:'',
+        identification:'',
         patient_gender: 'Male',
-        patient_status: '',
-        referred_by: '',
-        referral_reason: ''
+        referral_reason:'',
+        initial_condition:'',
+        admission_date:'',
     });
 
     const [historyData, setHistoryData] = useState({
-        patient_history:'',
-        current_mental:'',
+        patient_history: '',
+        current_mental: '',
+        other_psychiatric: '',
+        risk_Consideration: ''
     });
+
+    const [psychiatricData, setPsychiatricData] = useState({
+        diagnosis: '',
+        specify_diagnosis: '',
+        treatment_GP: '',
+        specify_GP: '',
+        treatment_name: '',
+        treatment_date: '',
+        treatment_effectiveness: '',
+        mental_act: '',
+        self_harm: ''
+    });
+
+    const [medicalDrugData, setMedicalDrugData] = useState({
+        medical_history: '',
+        current_medication: '',
+        compliance: '',
+        side_effect: '',
+        otc_meditation: '',
+        drug_allergies: ''
+    })
+
+    const [premorbidData, setPremorbidData] = useState({
+        patient_ill: '',
+        frd_description: '',
+        relation_style: '',
+        mood_description: '',
+        hobbies: '',
+        stress_response: ''
+    })
+
+    const [MSEData, setMSEData] = useState({
+        appearance_behavious: '',
+        mood: '',
+    })
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleInputChange1 = (e) => {
+        const { name, value } = e.target;
+        setHistoryData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleInputChange2 = (e) => {
+        const { name, value } = e.target;
+        setPsychiatricData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleInputChange3 = (e) => {
+        const { name, value } = e.target;
+        setMedicalDrugData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleInputChange4 = (e) => {
+        const { name, value } = e.target;
+        setPremorbidData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleInputChange5 = (e) => {
+        const { name, value } = e.target;
+        setMSEData((prev) => ({ ...prev, [name]: value }));
     };
 
 
@@ -129,6 +193,25 @@ function Psychiatrics_form() {
             setMessageType("danger");
         }
     }
+
+    const handleCheckChange = (e) => {
+        const { name, value } = e.target;
+        setPsychiatricData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const navigate = useNavigate();
+
+    const handleNavigateMSE = () =>{
+        navigate("/mseform");
+    }
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setRescueImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
 
     return (
         <>
@@ -248,7 +331,7 @@ function Psychiatrics_form() {
                                 <input type="radio" name="pcss3t" id="tab6" className="tab-content-6" />
                                 <label htmlFor="tab6">Premorbid Personality</label>
 
-                                <input type="radio" name="pcss3t" id="tab7" className="tab-content-7" />
+                                <input type="radio" name="pcss3t" id="tab7" className="tab-content-7" onClick={handleNavigateMSE}/>
                                 <label htmlFor="tab7">MSE</label>
 
                                 <input type="radio" name="pcss3t" id="tab8" className="tab-content-8" />
@@ -267,11 +350,11 @@ function Psychiatrics_form() {
                                             <h1>Patient Identification & Referral - Basic details</h1>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
-                                            <Col md={7}>
+                                            <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleSubmit}>
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Full Name: </Form.Label>
-                                                        <Col sm="9">
+                                                        <Form.Label column sm="4">Name (if known): </Form.Label>
+                                                        <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='patient_name'
                                                                 value={formData.patient_name}
@@ -282,8 +365,8 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Age: </Form.Label>
-                                                        <Col sm="9">
+                                                        <Form.Label column sm="4">Approximate Age: </Form.Label>
+                                                        <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='patient_age'
                                                                 value={formData.patient_age}
@@ -294,20 +377,8 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Date of Birth: </Form.Label>
-                                                        <Col sm="9">
-                                                            <Form.Control type='date'
-                                                                name='patient_dob'
-                                                                value={formData.patient_dob}
-                                                                onChange={handleInputChange}
-                                                                required
-                                                            />
-                                                        </Col>
-                                                    </Form.Group>
-
-                                                    <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Gender: </Form.Label>
-                                                        <Col sm="9">
+                                                        <Form.Label column sm="4">Gender: </Form.Label>
+                                                        <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='patient_gender'
                                                                 value={formData.patient_gender}
@@ -318,23 +389,45 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Marital Status: </Form.Label>
-                                                        <Col sm="9">
+                                                        <Form.Label column sm="4">Date & Place of Rescue: </Form.Label>
+                                                        <Col sm="4">
+                                                            <Form.Control type='date'
+                                                                name='patient_dob'
+                                                                value={formData.patient_dob}
+                                                                onChange={handleInputChange}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                         <Col sm="4">
+                                                            <Form.Control type='text'
+                                                                name='rescue_place'
+                                                                value={formData.rescue_place}
+                                                                onChange={handleInputChange}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="4">Rescue Agency: </Form.Label>
+                                                        <Col sm="8">
                                                             <Form.Select aria-label="Default select example"
-                                                                name='patient_status' required>
-                                                                <option>Select Status</option>
-                                                                <option value="1">Single</option>
-                                                                <option value="2">Married</option>
+                                                                name='rescue_agency' required>
+                                                                <option>Select Agency</option>
+                                                                <option value="Police">Police</option>
+                                                                <option value="NGO">NGO</option>
+                                                                <option value="Public">Public</option>
+                                                                <option value="Volunteer">Volunteer</option>
                                                             </Form.Select>
                                                         </Col>
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Phone Number: </Form.Label>
-                                                        <Col sm="9">
+                                                        <Form.Label column sm="4">Identification Method: </Form.Label>
+                                                        <Col sm="8">
                                                             <Form.Control type='text'
-                                                                name='patient_phone'
-                                                                value={formData.patient_phone}
+                                                                name='identification'
+                                                                value={formData.identification}
                                                                 onChange={handleInputChange}
                                                                 required
                                                             />
@@ -342,43 +435,325 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Permanent Address: </Form.Label>
-                                                        <Col sm="9">
+                                                        <Form.Label column sm="4">Referral Reason: </Form.Label>
+                                                        <Col sm="8">
                                                             <Form.Control type='text'
-                                                                name='patient_address'
-                                                                value={formData.patient_address}
-                                                                onChange={handleInputChange}
-                                                                required
-                                                            />
-                                                        </Col>
-                                                    </Form.Group>
-
-                                                    <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Reffered By: </Form.Label>
-                                                        <Col sm="9">
-                                                            <Form.Control type='text'
-                                                                name='referred_by'
-                                                                value={formData.referred_by}
-                                                                onChange={handleInputChange}
-                                                                required
-                                                            />
-                                                        </Col>
-                                                    </Form.Group>
-
-                                                    <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="3">Referral Reason: </Form.Label>
-                                                        <Col sm="9">
-                                                            <Form.Control as="textarea" rows={3}
                                                                 name='referral_reason'
                                                                 value={formData.referral_reason}
                                                                 onChange={handleInputChange}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="4">Initial Condition Noted: </Form.Label>
+                                                        <Col sm="8">
+                                                            <Form.Control type='text'
+                                                                name='initial_condition'
+                                                                value={formData.initial_condition}
+                                                                onChange={handleInputChange}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="4">Admission Date to Home: </Form.Label>
+                                                        <Col sm="8">
+                                                            <Form.Control type='text'
+                                                                name='admission_date'
+                                                                value={formData.admission_date}
+                                                                onChange={handleInputChange}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="4">Photograph: </Form.Label>
+                                                        <Col sm="8">
+                                                            <Form.Control type="file" 
+                                                            name='rescue_photo'
+                                                            onChange={handleImageChange}/>
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Col md={12} className='d-flex align-items-center justify-content-center mt-4'>
+                                                        <Button className='btn btn-success' type='submit'>Submit</Button>
+                                                    </Col>
+
+                                                </Form>
+                                            </Col>
+                                            {/* <Col md={2} className='d-flex flex-column align-items-end'>
+                                                {error && <div className="text-danger mt-2">{error}</div>}
+                                                {rescueImage && (
+                                                    <div>
+                                                        <img
+                                                            alt={rescueName || "Rescue Image"}
+                                                            style={{ width: "100px", height: "120px" }}
+                                                            src={rescueImage}
+                                                        />
+                                                        {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                                    </div>
+                                                )}
+                                            </Col> */}
+                                        </Row>
+
+
+                                    </li>
+                                    {/* Basic details END*/}
+
+                                    {/* Clinical History START*/}
+                                    <li className="tab-content tab-content-2 typography">
+                                        <div className="update_class d-flex align-items-center justify-content-center">
+                                            <h1>Presenting Complaint & History of Presenting Illness</h1>
+                                        </div>
+                                        <Row className='d-flex justify-content-around'>
+                                            <Col md={9}>
+                                                <Form className='mt-4'>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Current Symptoms: </Form.Label>
+                                                        <Col sm="7">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='current_symptoms'
+                                                                value={historyData.current_symptoms}
+                                                                onChange={handleInputChange1}
                                                                 required />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Duration of Symptoms: </Form.Label>
+                                                        <Col sm="7">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='duration_symptoms'
+                                                                value={historyData.duration_symptoms}
+                                                                onChange={handleInputChange1}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Behavior Noticed During Rescue: </Form.Label>
+                                                        <Col sm="7">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='behaviour'
+                                                                value={historyData.behaviour}
+                                                                onChange={handleInputChange1}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Any Known History Provided by Patient (if oriented): </Form.Label>
+                                                        <Col sm="7">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='history_provider'
+                                                                value={historyData.history_provider}
+                                                                onChange={handleInputChange1}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Informants: </Form.Label>
+                                                        <Col sm="7">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='informants'
+                                                                value={historyData.informants}
+                                                                onChange={handleInputChange1}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Insight into Illness: </Form.Label>
+                                                        <Col sm="7">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='insight_illness'
+                                                                value={historyData.insight_illness}
+                                                                onChange={handleInputChange1}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+
+                                                    <Col md={12} className='d-flex align-items-center justify-content-center mt-4'>
+                                                        <Button className='btn btn-success' type='submit'>Submit</Button>
+                                                    </Col>
+                                                </Form>
+
+                                            </Col>
+                                            <Col md={2} className='d-flex flex-column align-items-end'>
+                                                {error && <div className="text-danger mt-2">{error}</div>}
+                                                {/* Rescue Name and Image */}
+                                                {rescueImage && (
+                                                    <div>
+                                                        <img
+                                                            alt={rescueName || "Rescue Image"}
+                                                            style={{ width: "100px", height: "120px" }}
+                                                            src={rescueImage}
+                                                        />
+                                                        {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                                    </div>
+                                                )}
+                                            </Col>
+                                        </Row>
+                                    </li>
+                                    {/* Clinical History END*/}
+
+                                    {/* Psychiatric History START*/}
+                                    <li className="tab-content tab-content-3 typography">
+                                        <div className="update_class d-flex align-items-center justify-content-center">
+                                            <h1>Past Psychiatric History</h1>
+                                        </div>
+                                        <Row className='d-flex justify-content-around'>
+                                            <Col md={7}>
+                                                <Form className='mt-4'>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="7">Has the patient been diagnosed with any medical or mental health condition? </Form.Label>
+                                                        <Col sm="5" className='d-flex align-items-center justify-content-start'>
+                                                            <Form.Check
+                                                                type="radio"
+                                                                label="Yes"
+                                                                name="diagnosis"
+                                                                value="Yes"
+                                                                checked={psychiatricData.diagnosis === 'Yes'}
+                                                                onChange={handleCheckChange}
+                                                            />
+                                                            <Form.Check
+                                                                type="radio"
+                                                                label="No"
+                                                                name="diagnosis"
+                                                                checked={psychiatricData.diagnosis === 'No'}
+                                                                onChange={handleCheckChange}
+                                                                value="No"
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    {psychiatricData.diagnosis === 'Yes' && (
+                                                        <Form.Group as={Row} className="mb-1">
+                                                            <Form.Label column sm="7" className='text-start'>If yes, please specify:</Form.Label>
+                                                            <Col sm="5">
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    name="specify_diagnosis"
+                                                                    value={psychiatricData.specify_diagnosis}
+                                                                    onChange={handleInputChange2}
+                                                                    required
+                                                                />
+                                                            </Col>
+                                                        </Form.Group>
+                                                    )}
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="7" className='text-start'>When Was the Patient First Referred to Psychiatry?</Form.Label>
+                                                        <Col sm="5">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="specify_diagnosis"
+                                                                value={psychiatricData.psychiatry_referal}
+                                                                onChange={handleInputChange2}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="7">Has the patient received treatment for mental illness from a General Practitioner (GP)? </Form.Label>
+                                                        <Col sm="5" className='d-flex align-items-center justify-content-start'>
+                                                            <Form.Check
+                                                                type="radio"
+                                                                label="Yes"
+                                                                name="treatment_GP"
+                                                                value="Yes"
+                                                                checked={psychiatricData.treatment_GP === 'Yes'}
+                                                                onChange={handleCheckChange}
+                                                            />
+                                                            <Form.Check
+                                                                type="radio"
+                                                                label="No"
+                                                                name="treatment_GP"
+                                                                checked={psychiatricData.treatment_GP === 'No'}
+                                                                onChange={handleCheckChange}
+                                                                value="No"
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    {psychiatricData.treatment_GP === 'Yes' && (
+                                                        <Form.Group as={Row} className="mb-1">
+                                                            <Form.Label column sm="7" className='text-start'>If yes, please specify:</Form.Label>
+                                                            <Col sm="5">
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    name="specify_GP"
+                                                                    value={psychiatricData.specify_GP}
+                                                                    onChange={handleInputChange2}
+                                                                    required
+                                                                />
+                                                            </Col>
+                                                        </Form.Group>
+                                                    )}
+                                                    <Form.Group as={Row} className="mb-3">
+                                                        <Form.Label column sm="4" className="text-start">
+                                                            Previous Treatments
+                                                        </Form.Label>
+                                                        <Col sm="8">
+                                                            <Row>
+                                                                <Col sm={4}>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        name="treatment_name"
+                                                                        placeholder="Treatment"
+                                                                        value={psychiatricData.treatment_name}
+                                                                        onChange={handleInputChange2}
+                                                                        required
+                                                                    />
+                                                                </Col>
+                                                                <Col sm={4}>
+                                                                    <Form.Control
+                                                                        type="date"
+                                                                        name="treatment_date"
+                                                                        value={psychiatricData.treatment_date}
+                                                                        onChange={handleInputChange2}
+                                                                        required
+                                                                    />
+                                                                </Col>
+                                                                <Col sm={4}>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        name="treatment_effectiveness"
+                                                                        placeholder="Effectiveness"
+                                                                        value={psychiatricData.treatment_effectiveness}
+                                                                        onChange={handleInputChange2}
+                                                                        required
+                                                                    />
+                                                                </Col>
+                                                            </Row>
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="7" className='text-start'>Previous Detentions Under the Mental Health Act:</Form.Label>
+                                                        <Col sm="5">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="mental_act"
+                                                                value={psychiatricData.mental_act}
+                                                                onChange={handleInputChange2}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="7" className='text-start'>Previous deliberate self harm:</Form.Label>
+                                                        <Col sm="5">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="self_harm"
+                                                                value={psychiatricData.self_harm}
+                                                                onChange={handleInputChange2}
+                                                                required
+                                                            />
                                                         </Col>
                                                     </Form.Group>
                                                     <Col md={12} className='d-flex align-items-center justify-content-center mt-4'>
                                                         <Button className='btn btn-success' type='submit'>Submit</Button>
                                                     </Col>
-
                                                 </Form>
                                             </Col>
                                             <Col md={2} className='d-flex flex-column align-items-end'>
@@ -396,63 +771,107 @@ function Psychiatrics_form() {
                                                 )}
                                             </Col>
                                         </Row>
-
-
-                                    </li>
-                                    {/* Basic details END*/}
-
-                                    {/* Clinical History START*/}
-                                    <li className="tab-content tab-content-2 typography">
-                                        <div className="update_class d-flex align-items-center">
-                                            <h1>Presenting Complaint & History of Presenting Illness</h1>
-
-                                            <Form>
-                                                <Row>
-                                                    <Col md={7}>
-                                                        <Form.Group as={Row} className="mb-2 text-start" >
-                                                            <Form.Label column sm="3">Patient's History in their own words: </Form.Label>
-                                                            <Col sm="9">
-                                                                <Form.Control as="textarea" rows={3}
-                                                                    name='patient_history'
-                                                                    value={historyData.patient_history}
-                                                                    onChange={handleInputChange}
-                                                                    required />
-                                                            </Col>
-                                                        </Form.Group>
-                                                        <Form.Group as={Row} className="mb-2 text-start" >
-                                                            <Form.Label column sm="3">Current Mental Health Complaints: </Form.Label>
-                                                            <Col sm="9">
-                                                                <Form.Control as="textarea" rows={3}
-                                                                    name='current_mental'
-                                                                    value={historyData.current_mental}
-                                                                    onChange={handleInputChange}
-                                                                    required />
-                                                            </Col>
-                                                        </Form.Group>
-                                                    </Col>
-                                                    <Col md={5}>
-                                                    </Col>
-                                                </Row>
-                                            </Form>
-                                        </div>
-                                    </li>
-                                    {/* Clinical History END*/}
-
-                                    {/* Psychiatric History START*/}
-                                    <li className="tab-content tab-content-3 typography">
-                                        <div className="update_class d-flex align-items-center">
-                                            <h1>Past Psychiatric History</h1>
-
-                                        </div>
                                     </li>
                                     {/* Psychiatric History END*/}
 
                                     {/* Medical & Drug History START*/}
                                     <li className="tab-content tab-content-4 typography">
-                                        <div className="update_class d-flex align-items-center">
+                                        <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>Past Medical & Drug History</h1>
-
                                         </div>
+                                        <Row className='d-flex justify-content-around'>
+                                            <Col md={7}>
+                                                <Form className='mt-4'>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Any significant past or current medical history: </Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control as="textarea" rows={3}
+                                                                name='medical_history'
+                                                                value={medicalDrugData.medical_history}
+                                                                onChange={handleInputChange3}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="5" className='text-start'>Current medication:</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="current_medication"
+                                                                value={medicalDrugData.current_medication}
+                                                                onChange={handleInputChange3}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="5" className='text-start'>Compliance:</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="compliance"
+                                                                value={medicalDrugData.compliance}
+                                                                onChange={handleInputChange3}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="5" className='text-start'>Side effects:</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="side_effect"
+                                                                value={medicalDrugData.side_effect}
+                                                                onChange={handleInputChange3}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="5" className='text-start'>Over the counter medication:</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="otc_meditation"
+                                                                value={medicalDrugData.otc_meditation}
+                                                                onChange={handleInputChange3}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="5" className='text-start'>Drug allergies:</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="drug_allergies"
+                                                                value={medicalDrugData.drug_allergies}
+                                                                onChange={handleInputChange3}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Col md={12} className='d-flex align-items-center justify-content-center mt-4'>
+                                                        <Button className='btn btn-success' type='submit'>Submit</Button>
+                                                    </Col>
+                                                </Form>
+                                            </Col>
+                                            <Col md={2} className='d-flex flex-column align-items-end'>
+                                                {error && <div className="text-danger mt-2">{error}</div>}
+                                                {/* Rescue Name and Image */}
+                                                {rescueImage && (
+                                                    <div>
+                                                        <img
+                                                            alt={rescueName || "Rescue Image"}
+                                                            style={{ width: "100px", height: "120px" }}
+                                                            src={rescueImage}
+                                                        />
+                                                        {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                                    </div>
+                                                )}
+                                            </Col>
+                                        </Row>
                                     </li>
                                     {/* Medical & Drug History END*/}
 
@@ -467,10 +886,102 @@ function Psychiatrics_form() {
 
                                     {/* Premorbid Personality START*/}
                                     <li className="tab-content tab-content-6 typography">
-                                        <div className="update_class d-flex align-items-center">
+                                        <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>Premorbid Personality </h1>
-
                                         </div>
+                                        <Row className='d-flex justify-content-around'>
+                                            <Col md={7}>
+                                                <Form className='mt-4'>
+                                                    <Form.Group as={Row} className="mb-1">
+                                                        <Form.Label column sm="5" className='text-start'>Ask the patient to describe what they were like before they became:</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="patient_ill"
+                                                                value={premorbidData.patient_ill}
+                                                                onChange={handleInputChange4}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">How would their friends describe them? </Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='frd_description'
+                                                                value={premorbidData.frd_description}
+                                                                onChange={handleInputChange4}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Relationship Style </Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control as="textarea" rows={2}
+                                                                name='relation_style'
+                                                                value={premorbidData.relation_style}
+                                                                placeholder="E.g., shy, makes friends easily"
+                                                                onChange={handleInputChange4}
+                                                                required />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start">
+                                                        <Form.Label column sm="5">Prevailing Mood and Mood Changes</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                as="textarea" rows={2}
+                                                                name="mood_description"
+                                                                placeholder="E.g., generally cheerful, sudden mood changes"
+                                                                value={premorbidData.mood_description}
+                                                                onChange={handleInputChange4}
+                                                            />
+                                                        </Col>
+
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">Hobbies and interests</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="hobbies"
+                                                                value={premorbidData.hobbies}
+                                                                onChange={handleInputChange4}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Form.Group as={Row} className="mb-2 text-start" >
+                                                        <Form.Label column sm="5">How would they usually respond to stress ?</Form.Label>
+                                                        <Col sm="6">
+                                                            <Form.Control
+                                                                type="text"
+                                                                name="stress_response"
+                                                                value={premorbidData.stress_response}
+                                                                onChange={handleInputChange4}
+                                                                required
+                                                            />
+                                                        </Col>
+                                                    </Form.Group>
+                                                    <Col md={12} className='d-flex align-items-center justify-content-center mt-4'>
+                                                        <Button className='btn btn-success' type='submit'>Submit</Button>
+                                                    </Col>
+                                                </Form>
+                                            </Col>
+                                            <Col md={2} className='d-flex flex-column align-items-end'>
+                                                {error && <div className="text-danger mt-2">{error}</div>}
+                                                {/* Rescue Name and Image */}
+                                                {rescueImage && (
+                                                    <div>
+                                                        <img
+                                                            alt={rescueName || "Rescue Image"}
+                                                            style={{ width: "100px", height: "120px" }}
+                                                            src={rescueImage}
+                                                        />
+                                                        {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                                    </div>
+                                                )}
+                                            </Col>
+                                        </Row>
                                     </li>
                                     {/* Premorbid Personality END*/}
 
@@ -478,8 +989,8 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-7 typography">
                                         <div className="update_class d-flex align-items-center">
                                             <h1>Mental Status Examination (MSE) </h1>
-
                                         </div>
+                                        
                                     </li>
                                     {/* MSE END*/}
 
@@ -515,7 +1026,7 @@ function Psychiatrics_form() {
                         </div>
                     </Col>
                 </Row>
-            </Container>
+            </Container >
 
 
 

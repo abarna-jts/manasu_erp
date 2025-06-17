@@ -16,8 +16,8 @@ function Rescue_details() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedItems, setSelectedItems] = useState({});
     const [selectedStatus, setSelectedStatus] = useState("");
-    const [filteredRescueDetails, setFilteredRescueDetails] = useState([]);
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
 
     const userType = Cookies.get('usertype');
@@ -92,16 +92,6 @@ function Rescue_details() {
         information_public: "",
     });
 
-    const getRescueDetails = async () => {
-        try {
-            const response = await apiRoute.get('/admision/get_first_form');
-            console.log("API response:", response.data);
-            setRescueDetails(response.data.data);
-        } catch (error) {
-            console.error('Error fetching Student:', error);
-        }
-    };
-
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
         if (isNaN(date)) return ""; // Handle invalid dates
@@ -126,10 +116,6 @@ function Rescue_details() {
         return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
     };
 
-    useEffect(() => {
-        getRescueDetails();
-    }, []);
-
     //formate Date time for edit table
     function formatDateForInput(dateString, type = 'date') {
         if (!dateString) return '';
@@ -150,95 +136,6 @@ function Rescue_details() {
             return '';
         }
     }
-
-
-
-
-
-    // search function 
-
-    const searchFilteredRescueDetails = rescue_details
-        .filter((item) => {
-            // First filter by status if one is selected
-            if (selectedStatus && item.resident_status !== selectedStatus) {
-                return false;
-            }
-            return true;
-        })
-        .filter((item) => {
-            // Then apply the search filter
-            const searchTerm = searchQuery.toLowerCase();
-            return (
-                String(item.admission_no).toLowerCase().includes(searchTerm) ||
-                String(item.rescue_name).toLowerCase().includes(searchTerm) ||
-                String(item.referred_by).toLowerCase().includes(searchTerm) ||
-                String(item.from_place).toLowerCase().includes(searchTerm) ||
-                String(item.police_memo).toLowerCase().includes(searchTerm) ||
-                String(item.information_public).toLowerCase().includes(searchTerm)
-            );
-        });
-
-
-
-    //delete function 
-
-    const handleDelete = async (id) => {
-        alert("Are you sure want to delete");
-        try {
-            const response = await apiRoute.delete(`/admision/delete_first_form/${id}`);
-            console.log(response);
-            alert("Family Request Letter Form Deleted successfully");
-            // Refresh data after deletion
-            getRescueDetails(); // if this function fetches updated student list
-        } catch (error) {
-            console.error('Failed to delete item:', error);
-        }
-    };
-
-    //modal handling function 
-
-    // const handleClose = () => setShowEditModal(false);
-
-    // handleShow functionality
-    const navigate = useNavigate();
-    const handleEditform = (id) => {
-        navigate(`/edit_rescue_details/${id}`);
-    };
-
-    // //update function
-    // const handleUpdate = async () => {
-    //     try {
-    //       const formData = new FormData();
-    //       formData.append("admission_date", editData.admission_date);
-    //       formData.append("admission_no", editData.admission_no);
-    //       formData.append("referred_by", editData.referred_by);
-    //       formData.append("from_place", editData.from_place);
-    //       formData.append("date_time", editData.date_time);
-    //       formData.append("police_memo", editData.police_memo);
-    //       formData.append("information_public", editData.information_public);
-
-    //       if (editData.rescue_image instanceof File) {
-    //         formData.append("rescue_image", editData.rescue_image); // append only if it's a file
-    //       }
-
-    //       await axios.put(
-    //         `http://localhost:5000/admision/update_first_form/${editData.id}`,
-    //         formData,
-    //         {
-    //           headers: {
-    //             "Content-Type": "multipart/form-data",
-    //           },
-    //         }
-    //       );
-
-    //       alert("Updated successfully");
-    //       getRescueDetails();
-    //       setShowEditModal(false);
-    //     } catch (error) {
-    //       console.error("Error updating data", error);
-    //     }
-    //   };
-
 
     const formRef = useRef();
 
@@ -379,23 +276,53 @@ function Rescue_details() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
-    useEffect(() => {
-        if (selectedStatus !== "") {
-            fetchFilteredData(selectedStatus);
-        } else {
-            setFilteredRescueDetails([]);
-        }
-    }, [selectedStatus]);
-
-    const fetchFilteredData = async (status) => {
+    const getRescueDetails = async () => {
         try {
-            const response = await apiRoute.get(`/admision/getByStatus/${status}`);
-            setFilteredRescueDetails(response.data.data); // ✅ make sure `.data` is used properly here
-        } catch (err) {
-            console.error("Error fetching filtered data:", err);
+            const response = await apiRoute.get('/admision/get_first_form');
+            console.log("API response:", response.data);
+            setRescueDetails(response.data.data);
+        } catch (error) {
+            console.error('Error fetching Student:', error);
         }
     };
 
+    useEffect(() => {
+        getRescueDetails();
+        
+    }, []);
+
+    // search function 
+
+    const searchFilteredRescueDetails = rescue_details
+        .filter((item) => {
+            // First filter by status if one is selected
+            if (selectedStatus && item.resident_status !== selectedStatus) {
+                return false;
+            }
+            return true;
+        })
+        .filter((item) => {
+            // Then apply the search filter
+            const searchTerm = searchQuery.toLowerCase();
+            return (
+                String(item.admission_no).toLowerCase().includes(searchTerm) ||
+                String(item.rescue_name).toLowerCase().includes(searchTerm) ||
+                String(item.referred_by).toLowerCase().includes(searchTerm) ||
+                String(item.from_place).toLowerCase().includes(searchTerm) ||
+                String(item.police_memo).toLowerCase().includes(searchTerm) ||
+                String(item.information_public).toLowerCase().includes(searchTerm)
+            );
+        });
+
+    //modal handling function 
+
+    // const handleClose = () => setShowEditModal(false);
+
+    // handleShow functionality
+    const navigate = useNavigate();
+    const handleEditform = (id) => {
+        navigate(`/edit_rescue_details/${id}`);
+    };
 
     const handleCheckboxChange = (e, id) => {
         const checked = e.target.checked;
@@ -425,6 +352,13 @@ function Rescue_details() {
             console.error("Failed to update status:", err);
         }
     };
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+
 
     return (
         <>
@@ -466,7 +400,7 @@ function Rescue_details() {
                 value={selectedStatus}
                 name="status"
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                style={{ width: "250px", marginBottom: "20px" , marginLeft:"15px"}}
+                style={{ width: "250px", marginBottom: "20px", marginLeft: "15px" }}
             >
                 <option value="">-- Choose Status --</option>
                 <option value="Resident">Resident</option>
@@ -492,8 +426,8 @@ function Rescue_details() {
                         </tr>
                     </thead>
                     <tbody>
-                        {searchFilteredRescueDetails.length > 0 ? (
-                            searchFilteredRescueDetails.map((item, index) => (
+                        {currentItems.length > 0 ? (
+                            currentItems.map((item, index) => (
                                 <tr key={item.id}>
                                     {/* <td>
                                         <Form.Check
@@ -502,7 +436,7 @@ function Rescue_details() {
                                             onChange={(e) => handleCheckboxChange(e, item.id)}
                                         />
                                     </td> */}
-                                    <td>{index + 1}</td>
+                                    <td>{indexOfFirstItem + index + 1}</td>
                                     <td>{item.admission_no}</td>
                                     <td>
                                         <img
@@ -516,19 +450,19 @@ function Rescue_details() {
                                     <td>{item.from_place}</td>
                                     <td>{formatDateTime(item.date_time)}</td>
                                     {userType === "2" && (
-                                    <td>{item.resident_status}</td>
+                                        <td>{item.resident_status}</td>
                                     )}
                                     {userType === "1" && (
-                                    <td>
-                                        <Form.Select
-                                            value={selectedItems[item.id] || item.resident_status || ""}
-                                            onChange={(e) => handleAssignStatus(item.id, e.target.value)}
-                                        >
-                                            <option value="">Select</option>
-                                            <option value="Resident">Resident</option>
-                                            <option value="Reunion">Discharge</option>
-                                        </Form.Select>
-                                    </td>
+                                        <td>
+                                            <Form.Select
+                                                value={selectedItems[item.id] || item.resident_status || ""}
+                                                onChange={(e) => handleAssignStatus(item.id, e.target.value)}
+                                            >
+                                                <option value="">Select</option>
+                                                <option value="Resident">Resident</option>
+                                                <option value="Reunion">Discharge</option>
+                                            </Form.Select>
+                                        </td>
                                     )}
                                     <td>
                                         <button className="btn btn-success icon_details"
@@ -538,7 +472,7 @@ function Rescue_details() {
                                         >
                                             <i className="fas fa-eye"></i>
                                         </button>
-                                        <button className="btn btn-primary icon_details"
+                                        <button className="btn btn-secondary icon_details"
                                             onClick={() => {
                                                 handleEditform(item.id);
                                             }}
@@ -559,6 +493,25 @@ function Rescue_details() {
                     </tbody>
 
                 </Table>
+                <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                    <button
+                        className="btn btn-success me-2"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        <i className="fas fa-chevron-left"></i>
+                    </button>
+
+                    <span> Page {currentPage} of {totalPages} </span>
+
+                    <button
+                        className="btn btn-success ms-2"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        <i className="fas fa-chevron-right"></i>
+                    </button>
+                </div>
 
 
                 <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>

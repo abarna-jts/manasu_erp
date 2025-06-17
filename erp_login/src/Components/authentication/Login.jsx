@@ -39,10 +39,19 @@ function Login() {
             console.log(res.data);
 
             console.log("Login successful:", res.data);
+
             navigate('/dashboard');
         } catch (err) {
-            console.error("Login error:", err.response?.data || err.message);
-            alert(err.response?.data?.message || 'Login error');
+            const status = err.response?.status;
+            const message = err.response?.data?.message || 'Registration error';
+
+            if (status === 400 && message === "Email already registered") {
+                alert("Email ID is already registered");
+            } else {
+                alert(message);
+            }
+
+            console.error("Registration error:", message);
         }
     };
 

@@ -391,10 +391,10 @@ function First_info_form() {
         if (!from_place || from_place.trim() === "") valid = false;
         if (!date_time || date_time.trim() === "") valid = false;
         if (!police_memo || police_memo.trim() === "") valid = false;
-        if (!attach_policeMemo || attach_policeMemo.trim() === "") valid = false;
+        if (!attach_policeMemo) valid = false;
         if (!police_station || police_station.trim() === "") valid = false;
         if (!information_public || information_public.trim() === "") valid = false;
-        if (!rescue_image || rescue_image.trim() === "") valid = false;
+        if (!rescue_image) valid = false;
         // Add other required Step 1 fields here...
         setIsStep1Invalid(!valid);
         return valid;
