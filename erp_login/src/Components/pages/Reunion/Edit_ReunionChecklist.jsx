@@ -1,7 +1,7 @@
 import React from 'react';
 import { Breadcrumb, Col, Container, Form, Row, Button } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function Edit_ReunionChecklist() {
@@ -131,6 +131,8 @@ function Edit_ReunionChecklist() {
         fetchDetails();
     }, [admission_no]);
 
+    const navigate = useNavigate();
+
     const updateFormData = async () => {
         const formPayload = new FormData();
 
@@ -149,7 +151,7 @@ function Edit_ReunionChecklist() {
 
             if (response.status === 200) {
                 alert('Form updated successfully');
-                window.location.reload();
+                navigate("/reunion_checklist")
                 // reset or update state if needed
             } else {
                 alert('Update failed');

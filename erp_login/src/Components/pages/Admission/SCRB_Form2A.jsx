@@ -124,7 +124,7 @@ function SCRB_Form2A() {
     try {
       const response = await apiRoute.post('/scrb_form/create_form_2A', payload);
       console.log(response.data);
-      if (response.data.message === "SCRB form2A Created Successfully") {
+      if (response.data.message === "SCRB Form2A Created Successfully") {
         setSubmissionMessage("Form submitted successfully!");
         setMessageType("success");
 

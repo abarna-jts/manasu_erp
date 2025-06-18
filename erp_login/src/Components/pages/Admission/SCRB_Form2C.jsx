@@ -171,7 +171,7 @@ function SCRB_Form2C() {
 
   const fetchFormData = async () => {
     try {
-      const response = await apiRoute.get(`/get_scrb_form2cdata/${admission_no}`);
+      const response = await apiRoute.get(`/scrb_form/get_scrb_form2cdata/${admission_no}`);
       const data = response.data;
 
       setFormData((formData) => ({

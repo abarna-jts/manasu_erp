@@ -3,11 +3,10 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../db');
-const validationError = require('../error/ApiError');
 
 // Register
 router.post('/register', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, user_type } = req.body;
 
   try {
     // Step 1: Check if email already exists
@@ -23,8 +22,8 @@ router.post('/register', async (req, res) => {
 
       // Step 3: Insert new user
       db.query(
-        'INSERT INTO users (email, password) VALUES (?, ?)',
-        [email, hashed],
+        'INSERT INTO users (email, password, user_type) VALUES (?, ?, ?)',
+        [email, hashed, user_type],
         (err, result) => {
           if (err) return res.status(500).json({ message: 'Error saving user' });
           res.status(201).json({ message: 'User registered successfully' });
@@ -36,7 +35,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-
+// Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 

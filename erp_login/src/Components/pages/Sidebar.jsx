@@ -108,7 +108,7 @@ const Sidebar = () => {
       </Button>
 
       <SimpleBar className={`sidebar d-md-block text-white ${show ? "show" : ""}`}>
-        <div className="sidebar-inner px-2 pt-3">
+        <div className="sidebar-inner pt-3">
 
 
           {/* Close button (mobile) - Now on LEFT */}
@@ -177,7 +177,7 @@ const Sidebar = () => {
 
                   <CollapsableNavItem title="2. Social Worker User" icon={faMapPin}>
                     <NavItem title="1. Observation Report" to="/observation_report" icon={faUserNurse} />
-                    {/* <NavItem title="2. Psychiatric Case History" to="/psychatrics_form" icon={faBrain} /> */}
+                    <NavItem title="2. Psychiatric Case History" to="" icon={faBrain} />
                     <NavItem title="3. MSE Form" to="/mseform" icon={faNotesMedical} />
                     <NavItem title="4. Reunion Summary" to="/reunion_summary" icon={faNotesMedical} />
                   </CollapsableNavItem>
@@ -233,7 +233,7 @@ const Sidebar = () => {
                 </CollapsableNavItem>
 
                 {/* SCRB Form Menu */}
-                <NavItem title="Document Information" to="/director_Document" icon={faClipboardList} />
+                <NavItem title="Resident Document" to="/essential_record" icon={faClipboardList} />
                 <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} />
                 {/* <CollapsableNavItem title="SCRB Form" icon={faBook}>
                   <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
@@ -256,7 +256,7 @@ const Sidebar = () => {
 
                   <CollapsableNavItem title="2. Social Worker User" icon={faMapPin}>
                     <NavItem title="1. Observation Report" to="/observation_report" icon={faUserNurse} />
-                    {/* <NavItem title="2. Psychiatric Case History" to="" icon={faBrain} /> */}
+                    <NavItem title="2. Psychiatric Case History" to="" icon={faBrain} />
                     <NavItem title="3. MSE Form" to="/mseform" icon={faNotesMedical} />
                     <NavItem title="4. Reunion Summary" to="/reunion_summary" icon={faNotesMedical} />
                   </CollapsableNavItem>
@@ -322,7 +322,7 @@ const Sidebar = () => {
             {userType === '4' && (
               <>
                 <NavItem title="Observation Report" to="/observation_report" icon={faUserNurse} />
-                {/* <NavItem title="Psychiatric Case History" to="" icon={faBrain} /> */}
+                <NavItem title="Psychiatric Case History" to="" icon={faBrain} />
                 <NavItem title="MSE Form" to="/mseform" icon={faNotesMedical} />
                 <NavItem title="Reunion Summary" to="/reunion_summary" icon={faNotesMedical} />
                 {/* Logout */}

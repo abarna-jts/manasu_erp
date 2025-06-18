@@ -1307,7 +1307,7 @@ function Reunion_Checklist() {
                                     />
                                 </Col>
                             </Form.Group>
-                            <Form.Group as={Row} className="mb-2 align-items-center">
+                            <Form.Group as={Row} className="mb-5 align-items-center">
                                 <Form.Label column sm="4">Possessions Recovered at Time of Rescue:</Form.Label>
                                 <Col sm="3">
                                     <Form.Control
@@ -1318,7 +1318,7 @@ function Reunion_Checklist() {
                                     />
                                 </Col>
                             </Form.Group>
-                            <Form.Group as={Row} className="mb-2 align-items-center">
+                            <Form.Group as={Row} className="mb-2 mt-5 align-items-center">
                                 <Form.Label column sm="4">Discharge Allowance / Travel Expenses Provided:</Form.Label>
                                 <Col sm="3">
                                     <Form.Control

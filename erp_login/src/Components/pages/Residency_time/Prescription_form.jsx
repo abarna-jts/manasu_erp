@@ -385,48 +385,116 @@ function Prescription_form() {
     const handleEditform = async (id) => {
         try {
             const response = await apiRoute.get(`/residency/getPrescription/${id}`);
-            console.log("API response:", response.data);
-            setViewData(response.data);
-            setEditShow(true);
+            const data = response.data;
+            const meds = data.prescription_medicines;
+
+            // Helper function to safely parse JSON strings
+            const safeParse = (value) => {
+                try {
+                    return JSON.parse(value);
+                } catch {
+                    return value;
+                }
+            };
+
+            if (
+                Array.isArray(meds) &&
+                meds.length > 0 &&
+                typeof meds[0].medicine === "string" &&
+                !meds[0].medicine.trim().startsWith("[")
+            ) {
+                // ✅ Row-wise data format (already good for rendering)
+                console.log("Detected row-wise medicine format.");
+                setViewData({
+                    ...data,
+                    prescription_medicines: meds || [],
+                });
+            } else if (Array.isArray(meds) && meds.length > 0) {
+                // 🔄 Column-wise format — parse each field
+                console.log("Detected column-wise medicine format.");
+                const medData = meds[0]; // Only one row where all fields are arrays
+
+                const medicines = safeParse(medData.medicine);
+                const types = safeParse(medData.medicine_type);
+                const durations = safeParse(medData.duration);
+                const instructions = safeParse(medData.med_instruction);
+                const mornings = safeParse(medData.morning);
+                const afternoons = safeParse(medData.afternoon);
+                const nights = safeParse(medData.night);
+                const intakes = safeParse(medData.intake);
+
+                const normalizedMeds = medicines.map((_, i) => ({
+                    medicine: medicines[i] || '',
+                    medicine_type: types[i] || '',
+                    duration: durations[i] || '',
+                    med_instruction: instructions[i] || '',
+                    morning: mornings[i] || '',
+                    afternoon: afternoons[i] || '',
+                    night: nights[i] || '',
+                    intake: intakes[i] || '',
+                }));
+
+                setViewData({
+                    ...data,
+                    prescription_medicines: normalizedMeds,
+                });
+            } else {
+                // ❌ No prescription data
+                console.warn("No valid prescription_medicines data.");
+                setViewData({
+                    ...data,
+                    prescription_medicines: [],
+                });
+            }
+
+            setEditShow(true); // Show the modal or section
         } catch (error) {
             console.error('Error fetching prescription:', error);
         }
-    }
+    };
 
 
     const handleUpdate = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        try {
-            const cleanedData = {
-                ...viewData,
-                prescription_medicines: viewData.prescription_medicines.map((med) => ({
-                    id: med.id || null, // ✅ Keep correct medicine id
-                    medicine: med.medicine || '',
-                    medicine_type: med.medicine_type || '',
-                    duration: med.duration || '',
-                    intake: med.intake || '',
-                    med_instruction: med.med_instruction || '',
-                    morning: med.morning ?? null,
-                    afternoon: med.afternoon ?? null,
-                    night: med.night ?? null,
-                })),
-            };
+    const admissionNumber = admission_no || formData.admission_no;
 
-            const response = await apiRoute.put(`/residency/updatePrescription/${viewData.id}`, cleanedData);
+    if (!admissionNumber || admissionNumber.trim() === '') {
+        setSubmissionMessage("Admission number is required.");
+        setMessageType("danger");
+        return;
+    }
 
-            if (response.status === 200) {
-                alert('Prescription updated successfully!');
-                window.location.reload();
-                handleEditClose();
-            } else {
-                alert('Failed to update prescription.');
-            }
-        } catch (err) {
-            console.error('Update error:', err);
-            alert('Error updating prescription.');
-        }
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    // Construct updated data
+    const updatedData = {
+        ...formData,
+        admission_no: admissionNumber.trim(),
+        current_date: todayDate,
+        prescription_medicines: rows,  // ← updated dynamic table data
     };
+
+    console.log("Updating data:", updatedData);
+
+    try {
+        const res = await apiRoute.put(`/residency/updatePrescription/${formData.id}`, updatedData); // Make sure formData.id holds the prescription ID
+
+        if (res.data.message === "Prescription and Medicine Summary Updated Successfully") {
+            setSubmissionMessage("Prescription updated successfully!");
+            setMessageType("success");
+            setTimeout(() => window.location.reload(), 3000);
+        } else {
+            setSubmissionMessage("Update failed.");
+            setMessageType("danger");
+        }
+    } catch (error) {
+        console.error("Error updating prescription", error);
+        setSubmissionMessage("Something went wrong.");
+        setMessageType("danger");
+    }
+};
+
 
 
 

@@ -450,8 +450,8 @@ function Annual_Report() {
                             <Form noValidate validated={validated} onSubmit={handleEventSubmit}>
                                 {/* Dropdown for selecting type */}
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>Select Type:</Form.Label>
-                                    <Col sm="8">
+                                    <Form.Label column sm="5" className='text-start'>Select Type:</Form.Label>
+                                    <Col sm="7">
                                         <Form.Select
                                             name="event_type"
                                             value={eventData.event_type}
@@ -470,8 +470,8 @@ function Annual_Report() {
                                 {eventData.event_type === 'event' && (
                                     <>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Name of the Event:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Name of the Event:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="event_name"
@@ -482,8 +482,8 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="date"
                                                     name="event_date"
@@ -495,8 +495,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Venue:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="event_place"
@@ -508,8 +508,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>No. of Participants:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="event_rescue_count"
@@ -521,8 +521,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="file"
                                                     name="event_photos"
@@ -533,8 +533,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Event Report:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Event Report:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     as="textarea"
                                                     name="event_report"
@@ -553,8 +553,8 @@ function Annual_Report() {
                                 {eventData.event_type === 'awareness' && (
                                     <>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Awareness Camp Name:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Awareness Camp Name:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="awareness_name"
@@ -565,8 +565,8 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="date"
                                                     name="awarness_date"
@@ -578,8 +578,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Venue:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="awarness_place"
@@ -591,8 +591,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>No. of Participants:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="awarness_rescue_count"
@@ -603,8 +603,8 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="file"
                                                     name="awarness_photos"
@@ -614,8 +614,8 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Awareness Report:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Awareness Report:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     as="textarea"
                                                     name="awarness_report"
@@ -633,8 +633,8 @@ function Annual_Report() {
                                 {eventData.event_type === 'outing' && (
                                     <>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Outing Name:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Outing Name:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="outing_name"
@@ -645,8 +645,8 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Date:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="date"
                                                     name="outing_date"
@@ -658,8 +658,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Venue:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Venue:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="outing_place"
@@ -671,8 +671,8 @@ function Annual_Report() {
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>No. of Participants:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>No. of Participants:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="text"
                                                     name="outing_rescue_count"
@@ -683,8 +683,8 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     type="file"
                                                     name="outing_photos"
@@ -694,8 +694,8 @@ function Annual_Report() {
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4" className='text-start'>Outing Report:</Form.Label>
-                                            <Col sm="8">
+                                            <Form.Label column sm="5" className='text-start'>Outing Report:</Form.Label>
+                                            <Col sm="7">
                                                 <Form.Control
                                                     as="textarea"
                                                     name="outing_report"
@@ -739,10 +739,10 @@ function Annual_Report() {
 
                             <Form noValidate validated={validated} onSubmit={handleCelebrationSubmit}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Name of the Celebration :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Select
                                             name="celebration_name"
                                             value={celebrationData.celebration_name}
@@ -762,10 +762,10 @@ function Annual_Report() {
                                 </Form.Group>
                                 {celebrationData.celebration_name === "Any other" && (
                                     <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="4" className="text-start">
+                                        <Form.Label column sm="5" className="text-start">
                                             Specify Other Celebration:
                                         </Form.Label>
-                                        <Col sm="8">
+                                        <Col sm="7">
                                             <Form.Control
                                                 type="text"
                                                 name="other_celebration"
@@ -778,10 +778,10 @@ function Annual_Report() {
                                     </Form.Group>
                                 )}
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Date:
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="date"
                                             name="celebration_date"
                                             value={celebrationData.celebration_date}
@@ -790,10 +790,10 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Venue :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="celebration_place"
                                             value={celebrationData.celebration_place}
@@ -802,10 +802,10 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         No. of Participants
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="celebration_rescue_count"
                                             value={celebrationData.celebration_rescue_count}
@@ -814,8 +814,8 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>Celebration Report:</Form.Label>
-                                    <Col sm="8">
+                                    <Form.Label column sm="5" className='text-start'>Celebration Report:</Form.Label>
+                                    <Col sm="7">
                                         <Form.Control
                                             as="textarea"
                                             name="celebration_report"
@@ -857,10 +857,10 @@ function Annual_Report() {
 
                             <Form noValidate validated={validated} onSubmit={handleCommunitySubmit}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Name of the Program :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="program_name"
                                             value={programData.program_name}
@@ -870,10 +870,10 @@ function Annual_Report() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         College Name :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="clg_name"
                                             value={programData.clg_name}
@@ -883,10 +883,10 @@ function Annual_Report() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         College Department :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="clg_dept"
                                             value={programData.clg_dept}
@@ -896,10 +896,10 @@ function Annual_Report() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Resource Person :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="resource_person"
                                             value={programData.resource_person}
@@ -909,10 +909,10 @@ function Annual_Report() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Date:
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="date"
                                             name="program_date"
                                             value={programData.program_date}
@@ -921,10 +921,10 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Venue :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="program_place"
                                             value={programData.program_place}
@@ -933,10 +933,10 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         No. of Participants
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="program_rescue_count"
                                             value={programData.program_rescue_count}
@@ -945,8 +945,8 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>Report:</Form.Label>
-                                    <Col sm="8">
+                                    <Form.Label column sm="5" className='text-start'>Report:</Form.Label>
+                                    <Col sm="7">
                                         <Form.Control
                                             as="textarea"
                                             name="program_report"
@@ -987,10 +987,10 @@ function Annual_Report() {
 
                             <Form noValidate validated={validated} onSubmit={handleStaffSubmit}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Name of the Programs :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="staff_name"
                                             value={staffData.staff_name}
@@ -999,10 +999,10 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Date:
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="date"
                                             name="staff_date"
                                             value={staffData.staff_date}
@@ -1011,10 +1011,10 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         Venue :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="staff_place"
                                             value={staffData.staff_place}
@@ -1023,10 +1023,10 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="5" className='text-start'>
                                         No. of Participants
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="7">
                                         <Form.Control type="text"
                                             name="staff_rescue_count"
                                             value={staffData.staff_rescue_count}
@@ -1035,8 +1035,8 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="4" className='text-start'>Report:</Form.Label>
-                                    <Col sm="8">
+                                    <Form.Label column sm="5" className='text-start'>Report:</Form.Label>
+                                    <Col sm="7">
                                         <Form.Control
                                             as="textarea"
                                             name="staff_report"

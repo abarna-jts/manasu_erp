@@ -230,7 +230,7 @@ function SCRB_Form2B() {
 
   const fetchFormData = async () => {
     try {
-      const response = await apiRoute.get(`/get_scrb_form2bdata/${admission_no}`);
+      const response = await apiRoute.get(`/scrb_form/get_scrb_form2bdata/${admission_no}`);
       const data = response.data;
 
       setFormData((prev) => ({

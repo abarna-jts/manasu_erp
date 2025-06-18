@@ -107,6 +107,7 @@ const updateFormalityForm = (req, res) => {
         toiletries_provided,
         dress_provided,
         travel_expenses,
+        welfare_expenses,
         medical_prescription,
         discharge_summary,
         travel_letter
@@ -121,6 +122,7 @@ const updateFormalityForm = (req, res) => {
                             toiletries_provided = ?,
                             dress_provided = ?,
                             travel_expenses = ?,
+                            welfare_expenses= ?,
                             medical_prescription = ?,
                             discharge_summary = ?,
                             travel_letter = ?
@@ -133,6 +135,7 @@ const updateFormalityForm = (req, res) => {
         toiletries_provided,
         dress_provided,
         travel_expenses,
+        welfare_expenses,
         medical_prescription,
         discharge_summary,
         travel_letter,

@@ -515,6 +515,14 @@ body {
 		padding: 0.55rem 0.3rem !important;
 	}
 
+	.sidebar-inner {
+		padding-left: 0rem !important;
+	}
+
+	.sidebar .multi-level .nav-link {
+		padding-left: 8px !important;
+	}
+
 	.section_title {
 		margin-bottom: 10px;
 		font-size: 1.4rem !important;

@@ -308,6 +308,17 @@ function App() {
           />
 
           <Route
+            path='/director_Document'
+            element={
+              userType === '1' || userType === '2' ? (
+                <MainLayout><Director_essentialRecord /></MainLayout>
+              ) : (
+                <MainLayout><Director_essentialRecord /></MainLayout>
+              )
+            }
+          />
+
+          <Route
             path='/reunited_people'
             element={
               userType === '1' || userType === '2' ? (

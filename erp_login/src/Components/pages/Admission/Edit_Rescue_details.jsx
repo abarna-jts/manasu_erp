@@ -379,19 +379,7 @@ const navigate = useNavigate();
                   </Form.Group>
                 </Col>
                 <Col md={4}>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formDate">
-                    <Form.Label column sm="5">
-                      Date :
-                    </Form.Label>
-                    <Col sm="7">
-                      <Form.Control
-                        name="date"
-                        type='date'
-                        value={formatDateOnly(formData.admission_date)}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
+                 
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formAdmissionNo">
                     <Form.Label column sm="5">
                       Admission Number :
@@ -402,7 +390,7 @@ const navigate = useNavigate();
                         type='number'
                         value={formData.admission_no}
                         onChange={handleInputChange}
-                        required />
+                        readOnly />
                     </Col>
                   </Form.Group>
                   <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">

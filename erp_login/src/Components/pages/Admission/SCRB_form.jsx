@@ -110,7 +110,7 @@ function SCRB_form() {
         data.append('koppu_en', formData.koppu_en);
         data.append('rescue_name', formData.rescue_name);
         data.append('father', formData.father);
-        data.append('date_time', formData.date_time);
+        data.append('date_time', formatDateOnly(formData.date_time));
         data.append('gender', 'Male');
         data.append('rescue_status', formData.rescue_status);
         data.append('language1', formData.language1);
@@ -220,8 +220,6 @@ function SCRB_form() {
             const newPhotoPath = data.new_photo ? `https://www.pahrultours.com/app2/${data.new_photo}` : null;
             const signaturepath = data.signature ? `https://www.pahrultours.com/app2/${data.signature}` : null;
             const sealpath = data.seal ? `https://www.pahrultours.com/app2/${data.seal}` : null;
-
-
 
             // Set files state
             setFiles((files) => ({

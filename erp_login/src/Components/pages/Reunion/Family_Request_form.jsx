@@ -88,6 +88,15 @@ function Family_Request_form() {
 
     const handleInputChange1 = (e) => {
         setStoreData({ ...storeData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === "f_aadhar_card_no" || name=== "r_aadhar_card_no") {
+            // Allow only digits and format as xxxx xxxx xxxx
+            let formatted = value.replace(/\D/g, '').slice(0, 12); // Remove non-digits, limit to 12 digits
+            formatted = formatted.replace(/(.{4})/g, '$1 ').trim(); // Insert space every 4 digits
+            setStoreData({ ...storeData, [name]: formatted });
+        } else {
+            setStoreData({ ...storeData, [name]: value });
+        }
     };
 
     const handleInputChange2 = (e) => {
@@ -655,7 +664,9 @@ function Family_Request_form() {
                                         type="text"
                                         name='f_aadhar_card_no'
                                         value={storeData.f_aadhar_card_no}
-                                        onChange={handleInputChange1} />
+
+                                        onChange={handleInputChange1}
+                                        required />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -678,7 +689,8 @@ function Family_Request_form() {
                                         type="text"
                                         name="f_ration_card_no"
                                         value={storeData.f_ration_card_no}
-                                        onChange={handleInputChange1} />
+                                        onChange={handleInputChange1}
+                                        required />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -702,7 +714,8 @@ function Family_Request_form() {
                                         type="text"
                                         name='r_aadhar_card_no'
                                         value={storeData.r_aadhar_card_no}
-                                        onChange={handleInputChange1} />
+                                        onChange={handleInputChange1}
+                                        required />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -725,7 +738,7 @@ function Family_Request_form() {
                                         type="text"
                                         name="r_ration_card_no"
                                         value={storeData.r_ration_card_no}
-                                        onChange={handleInputChange1} />
+                                        onChange={handleInputChange1} required />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -781,11 +794,11 @@ function Family_Request_form() {
                             </Form.Group>
 
                         </Col>
-                         {userType === "1" && (
+                        {userType === "1" && (
                             <div className="mt-3 d-flex align-tems-cente justify-content-between">
                                 <Button variant="success" className="m-1" type="submit">Submit</Button>
                             </div>
-                         )}
+                        )}
 
                     </Form>
 
@@ -1044,7 +1057,7 @@ function Family_Request_form() {
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row} className="mb-1 mt-5 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-5 mt-5 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Description :
                                     </Form.Label>

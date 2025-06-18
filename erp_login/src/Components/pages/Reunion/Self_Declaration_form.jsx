@@ -226,6 +226,7 @@ function Self_Declaration_form() {
             const res = await apiRoute.post(`/reunion/updateSelfDecl/${admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+            alert("Self Declaration Form Updated successfully");
             window.location.reload();
         } catch (err) {
             console.error(err);

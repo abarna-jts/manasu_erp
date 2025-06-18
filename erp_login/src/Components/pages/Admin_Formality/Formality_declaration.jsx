@@ -74,47 +74,15 @@ function Formality_declaration() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const updatedFormData = { ...formData, admission_no };
-
-        const data = new FormData();
-        data.append('name_ngo', 'MANASU (Mental Health Charity Home)');
-        data.append('admission_no', updatedFormData.admission_no);
-        data.append('koppu_en', formData.koppu_en);
-        data.append('rescue_name', formData.rescue_name);
-        data.append('father', formData.father);
-        data.append('date_time', formData.date_time);
-        data.append('gender', 'Male');
-        data.append('rescue_status', formData.rescue_status);
-        data.append('language1', formData.language1);
-        data.append('police_station', formData.police_station);
-        data.append('place', formData.place);
-        data.append('addition_info', formData.addition_info);
-        data.append('old_photo', files.old_photo);
-        data.append('new_photo', files.new_photo);
-        data.append('signature', files.signature);
-        data.append('seal', files.seal);
-        data.append('name_rescue', formData.name_rescue);
-        data.append('phone_no', formData.phone_no);
-
         try {
-            const res = await apiRoute.post('/scrb_form/create_form2', data, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+            const res = await apiRoute.post('/formality/createDeclaration', formData, {
+                headers: { 'Content-Type': 'application/json' },
             });
-            console.log(res);
-            if (res.data.message === "SCRRB Form2 Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
-            } else {
-                setSubmissionMessage("Submission failed.");
-                setMessageType("danger");
-            }
-        } catch (error) {
-            console.error("Error submitting form", error);
-            setSubmissionMessage("Something went wrong.");
-            setMessageType("danger");
+            alert('Document Handover Form submitted successfully!');
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert('Submission failed.');
         }
     };
 

@@ -29,230 +29,168 @@ const upload = multer({ storage: storage }).fields([
 const checkAdmissionNo = (req, res) => {
   const admission_no = req.params.admission_no;
 
-  // Optional: Check if param is missing
-  if (!admission_no) {
-    return res.status(400).json({ error: 'Admission number is required' });
-  }
-
   const query = 'SELECT * FROM first_information WHERE admission_no = ?';
 
-  try {
-    db.query(query, [admission_no], (err, results) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: 'Database query failed' });
-      }
+  db.query(query, [admission_no], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
 
-      if (results.length > 0) {
-        return res.json({ exists: true });
-      } else {
-        return res.json({ exists: false });
-      }
-    });
-  } catch (err) {
-    // This will only catch synchronous errors before db.query is called
-    console.error('Unexpected error in checkAdmissionNo:', err);
-    return res.status(500).json({ error: 'Internal server error in checkAdmissionNo' });
-  }
-};
+    if (results.length > 0) {
+      return res.json({ exists: true });
+    } else {
+      return res.json({ exists: false });
+    }
+  });
 
+}
 
 
 const createFirstForm = (req, res) => {
-  try {
-    upload(req, res, (err) => {
-      if (err) {
-        return res.status(500).json({ message: "File upload failed", error: err });
+  upload(req, res, (err) => {
+    if (err) {
+      return res.status(500).json({ message: "File upload failed", error: err });
+    }
+
+    const {
+      referred_by,
+      from_place,
+      date_time,
+      police_memo,
+      police_station,
+      information_public,
+      admission_date,
+      admission_no,
+      rescue_name,
+      age,
+      rescue_status,
+      religion,
+      language1,
+      language2,
+      language3,
+      education,
+      father,
+      mother,
+      other_relation,
+      place,
+      phone_no,
+      phone_no_two,
+      clothing,
+      dress_code,
+      complexion,
+      indentification_mark,
+      tattoo,
+      wound_infection,
+      height,
+      weight,
+      things_carried,
+      remark,
+      mental_status,
+      behaviour,
+      community_ability,
+      self_careCapacity,
+      diagnosis,
+      // symptoms,
+      // rescued_by,
+      // information,
+      govIdType,
+      govIdNumber
+      // articles_carried,
+      // f_member_name,
+      // f_member_phone,
+      // f_member_address
+    } = req.body;
+
+    // File paths
+    const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
+    const policeMemoPath = req.files['attach_policeMemo'] ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}` : null;
+    const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
+    // const f_ration_card_path = req.files['f_ration_card'] ? `uploads/FamilyDetails/${req.files['f_ration_card'][0].filename}` : null;
+    // const res_aadhar_card_path = req.files['res_aadhar_card'] ? `uploads/FamilyDetails/${req.files['res_aadhar_card'][0].filename}` : null;
+    console.log("rescue_image path:", rescue_image_path);
+    const q = "INSERT INTO first_information (referred_by, from_place, date_time, police_memo, attach_policeMemo, police_station, information_public, admission_date, admission_no, rescue_name, age, rescue_status, religion, language1, language2, language3, education, father, mother, other_relation, place, phone_no, phone_no_two, clothing, dress_code, complexion, indentification_mark, tattoo, wound_infection, height, weight, things_carried, remark, mental_status,behaviour, community_ability, self_careCapacity, diagnosis, govIdType, govIdNumber, govIdFile, rescue_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    const values = [
+      referred_by,
+      from_place,
+      date_time,
+      police_memo,
+      policeMemoPath,
+      police_station,
+      information_public,
+      admission_date,
+      admission_no,
+      rescue_name,
+      age || null,
+      rescue_status,
+      religion || null,
+      language1,
+      language2 || null,
+      language3 || null,
+      education,
+      father || null,
+      mother || null,
+      other_relation || null,
+      place || null,
+      phone_no || null,
+      phone_no_two || null,
+      clothing || null,
+      dress_code || null,
+      complexion || null,
+      indentification_mark || null,
+      tattoo || null,
+      wound_infection || null,
+      height,
+      weight,
+      things_carried || null,
+      remark || null,
+      mental_status,
+      behaviour,
+      community_ability,
+      self_careCapacity,
+      diagnosis,
+      govIdType,
+      govIdNumber || null,
+      govIdFile_path || null,
+      rescue_image_path,
+      // articles_carried,
+      // f_member_name,
+      // f_member_phone,
+      // f_member_address,
+      // f_aadhar_card_path,
+      // f_ration_card_path,
+      // res_aadhar_card_path
+    ];
+
+    db.query(q, values, (dbErr, data) => {
+      if (dbErr) {
+        return res.status(500).json({ message: "Database Error", error: dbErr });
       }
-      try {
-        const {
-          referred_by,
-          from_place,
-          date_time,
-          police_memo,
-          police_station,
-          information_public,
-          admission_date,
-          admission_no,
-          rescue_name,
-          age,
-          rescue_status,
-          religion,
-          language1,
-          language2,
-          language3,
-          education,
-          father,
-          mother,
-          other_relation,
-          place,
-          phone_no,
-          phone_no_two,
-          clothing,
-          dress_code,
-          complexion,
-          indentification_mark,
-          tattoo,
-          wound_infection,
-          height,
-          weight,
-          things_carried,
-          remark,
-          mental_status,
-          behaviour,
-          community_ability,
-          self_careCapacity,
-          diagnosis,
-          // symptoms,
-          // rescued_by,
-          // information,
-          govIdType,
-          govIdNumber
-          // articles_carried,
-          // f_member_name,
-          // f_member_phone,
-          // f_member_address
-        } = req.body;
-
-        // File paths
-        const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
-        const policeMemoPath = req.files['attach_policeMemo'] ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}` : null;
-        const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
-        // const f_ration_card_path = req.files['f_ration_card'] ? `uploads/FamilyDetails/${req.files['f_ration_card'][0].filename}` : null;
-        // const res_aadhar_card_path = req.files['res_aadhar_card'] ? `uploads/FamilyDetails/${req.files['res_aadhar_card'][0].filename}` : null;
-        console.log("rescue_image path:", rescue_image_path);
-        const q = "INSERT INTO first_information (referred_by, from_place, date_time, police_memo, attach_policeMemo, police_station, information_public, admission_date, admission_no, rescue_name, age, rescue_status, religion, language1, language2, language3, education, father, mother, other_relation, place, phone_no, phone_no_two, clothing, dress_code, complexion, indentification_mark, tattoo, wound_infection, height, weight, things_carried, remark, mental_status,behaviour, community_ability, self_careCapacity, diagnosis, govIdType, govIdNumber, govIdFile, rescue_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        const values = [
-          referred_by,
-          from_place,
-          date_time,
-          police_memo,
-          policeMemoPath,
-          police_station,
-          information_public,
-          admission_date,
-          admission_no,
-          rescue_name,
-          age || null,
-          rescue_status,
-          religion || null,
-          language1,
-          language2 || null,
-          language3 || null,
-          education,
-          father || null,
-          mother || null,
-          other_relation || null,
-          place || null,
-          phone_no || null,
-          phone_no_two || null,
-          clothing || null,
-          dress_code || null,
-          complexion || null,
-          indentification_mark || null,
-          tattoo || null,
-          wound_infection || null,
-          height,
-          weight,
-          things_carried || null,
-          remark || null,
-          mental_status,
-          behaviour,
-          community_ability,
-          self_careCapacity,
-          diagnosis,
-          govIdType,
-          govIdNumber || null,
-          govIdFile_path || null,
-          rescue_image_path,
-          // articles_carried,
-          // f_member_name,
-          // f_member_phone,
-          // f_member_address,
-          // f_aadhar_card_path,
-          // f_ration_card_path,
-          // res_aadhar_card_path
-        ];
-
-        db.query(q, values, (dbErr, data) => {
-          if (dbErr) {
-            return res.status(500).json({ message: "First Info Database Error", error: dbErr });
-          }
-          res.status(201).json({ message: "First Form Created Successfully", data: data });
-        });
-      } catch (innererr) {
-        console.log("First Info Inner Error log:", innererr);
-        return res.status(500).json({ message: "First Info Unexpected error during form processing", error: innerErr });
-      }
+      res.status(201).json({ message: "First Form Created Successfully", data: data });
     });
-
-  } catch (outererr) {
-    console.log("First Info Outer error log:", outererr);
-    return res.status(500).json({ message: "First Info Upload error on multer", outererr })
-  }
-}
-
+  });
+};
 
 
 const getFirstForm = (req, res) => {
   const query = "SELECT * FROM first_information";
-  try {
-    db.query(query, (err, data) => {
-      if (err) {
-        console.error("SQL Error:", err);  // Add this line
-        return res.status(500).json({ error: 'Database query failed' });
-      }
-      res.status(201).json({ message: "First Information form Get Successfully", data: data });
-    });
-  }
-  catch (err) {
-    console.log("Unexpected error on getting first form", err);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
+
+  db.query(query, (err, data) => {
+    if (err) {
+      console.error("SQL Error:", err);  // Add this line
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    res.status(201).json({ message: "First Information form Get Successfully", data: data });
+  });
 };
 
 
 const getFirst2AForm = (req, res) => {
   const admission_no = req.params.admission_no;
-  // Optional: Check if param is missing
-  if (!admission_no) {
-    return res.status(400).json({ error: 'Admission number is required' });
-  }
-
   const query = "SELECT * FROM first_information WHERE admission_no = ?";
 
-  try {
-    db.query(query, [admission_no], (err, data) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ message: "Database Error", error: err });
-      }
-      if (data.length === 0) {
-        return res.status(404).json({ message: "No data found for the given admission number" });
-      }
-      res.status(200).json({ message: "First Information form fetched successfully", data: data });
-    });
-  } catch (err) {
-    // This will only catch synchronous errors before db.query is called
-    console.error('Unexpected error in getting SCRB Form1:', err);
-    return res.status(500).json({ error: 'Internal server error in getting SCRB Form1' });
-  }
-};
-
-
-const getForm2Data = (req, res) => {
-  const admission_no = req.params.admission_no;
-
-  if (!admission_no) {
-    return res.status(400).json({ error: 'Admission number is required' });
-  }
-
-
-  const query = "SELECT * FROM first_information WHERE admission_no = ?";
-
-  try{
-    db.query(query, [admission_no], (err, data) => {
+  db.query(query, [admission_no], (err, data) => {
     if (err) {
       return res.status(500).json({ message: "Database Error", error: err });
     }
@@ -261,12 +199,21 @@ const getForm2Data = (req, res) => {
     }
     res.status(200).json({ message: "First Information form fetched successfully", data: data });
   });
-  } catch (err) {
-    // This will only catch synchronous errors before db.query is called
-    console.error('Unexpected error in getting SCRB Form1:', err);
-    return res.status(500).json({ error: 'Internal server error in getting SCRB Form1' });
-  }
-  
+};
+
+const getForm2Data = (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = "SELECT * FROM first_information WHERE admission_no = ?";
+
+  db.query(query, [admission_no], (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No data found for the given admission number" });
+    }
+    res.status(200).json({ message: "First Information form fetched successfully", data: data });
+  });
 }
 
 const getSCRBFormData = (req, res) => {
@@ -398,80 +345,79 @@ const DeleteFirstForm = (req, res) => {
 }
 
 const UpdateFirstForm = (req, res) => {
-  try {
-    upload(req, res, (err) => {
-      if (err) {
-        return res.status(500).json({ message: "File upload failed", error: err });
+  upload(req, res, (err) => {
+    if (err) {
+      return res.status(500).json({ message: "File upload failed", error: err });
+    }
+
+    const {
+      referred_by,
+      from_place,
+      date_time,
+      police_memo,
+      police_station,
+      information_public,
+      admission_date,
+      admission_no,
+      rescue_name,
+      age,
+      rescue_status,
+      religion,
+      language1,
+      language2,
+      language3,
+      education,
+      father,
+      mother,
+      other_relation,
+      place,
+      dress_code,
+      complexion,
+      indentification_mark,
+      wound_infection,
+      height,
+      weight,
+      phone_no,
+      phone_no_two,
+      clothing,
+      things_carried,
+      remark,
+      mental_status,
+      behaviour,
+      community_ability,
+      self_careCapacity,
+      govIdType,
+      govIdNumber,
+      diagnosis,
+      tattoo
+    } = req.body;
+
+    const rescueId = req.params.id;
+    const newRescueImage = req.files['rescue_image']
+      ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}`
+      : null;
+    // const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
+    const newAttachPoliceMemo = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
+    const newgovIdFile = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
+
+    // Fetch the existing logo path
+    const selectQuery = "SELECT rescue_image, attach_policeMemo, govIdFile FROM first_information WHERE id = ?";
+    db.query(selectQuery, [rescueId], (selectErr, selectData) => {
+      if (selectErr) {
+        return res.status(500).json({ message: "Failed to retrieve Rescue Image", error: selectErr });
       }
-      try {
-        const {
-          referred_by,
-          from_place,
-          date_time,
-          police_memo,
-          police_station,
-          information_public,
-          admission_date,
-          admission_no,
-          rescue_name,
-          age,
-          rescue_status,
-          religion,
-          language1,
-          language2,
-          language3,
-          education,
-          father,
-          mother,
-          other_relation,
-          place,
-          dress_code,
-          complexion,
-          indentification_mark,
-          wound_infection,
-          height,
-          weight,
-          phone_no,
-          phone_no_two,
-          clothing,
-          things_carried,
-          remark,
-          mental_status,
-          behaviour,
-          community_ability,
-          self_careCapacity,
-          govIdType,
-          govIdNumber,
-          diagnosis,
-          tattoo
-        } = req.body;
 
-        const rescueId = req.params.id;
-        const newRescueImage = req.files['rescue_image']
-          ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}`
-          : null;
-        // const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
-        const newAttachPoliceMemo = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
-        const newgovIdFile = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
+      const existingRescuePath = selectData[0]?.rescue_image;
+      const finalRescuePath = newRescueImage || existingRescuePath;
 
-        // Fetch the existing logo path
-        const selectQuery = "SELECT rescue_image, attach_policeMemo, govIdFile FROM first_information WHERE id = ?";
-        db.query(selectQuery, [rescueId], (selectErr, selectData) => {
-          if (selectErr) {
-            return res.status(500).json({ message: "Failed to retrieve Rescue Image", error: selectErr });
-          }
+      const existingPoliceMemo = selectData[0]?.attach_policeMemo;
+      const finalPoliceMemo = newAttachPoliceMemo || existingPoliceMemo;
 
-          const existingRescuePath = selectData[0]?.rescue_image;
-          const finalRescuePath = newRescueImage || existingRescuePath;
+      const existingGovtID = selectData[0]?.govIdFile;
+      const finalGovtID = newgovIdFile || existingGovtID;
 
-          const existingPoliceMemo = selectData[0]?.attach_policeMemo;
-          const finalPoliceMemo = newAttachPoliceMemo || existingPoliceMemo;
-
-          const existingGovtID = selectData[0]?.govIdFile;
-          const finalGovtID = newgovIdFile || existingGovtID;
-
-          // Update the catalogue
-          const updateQuery = `
+      // Update the catalogue
+      const updateQuery = `
         UPDATE first_information SET 
           referred_by = ?, 
           from_place = ?, 
@@ -518,92 +464,83 @@ const UpdateFirstForm = (req, res) => {
         WHERE id = ?`;
 
 
-          const values = [
-            referred_by,
-            from_place,
-            date_time,
-            police_memo,
-            finalPoliceMemo,
-            police_station,
-            information_public,
-            admission_date,
-            admission_no,
-            rescue_name,
-            age,
-            rescue_status,
-            religion,
-            language1,
-            language2,
-            language3,
-            education,
-            father,
-            mother,
-            other_relation,
-            place,
-            phone_no,
-            phone_no_two,
-            clothing,
-            dress_code,
-            complexion,
-            indentification_mark,
-            tattoo,
-            wound_infection,
-            height,
-            weight,
-            things_carried,
-            remark,
-            mental_status,
-            behaviour,
-            community_ability,
-            self_careCapacity,
-            diagnosis,
-            govIdType,
-            govIdNumber,
-            finalGovtID,
-            finalRescuePath,
-            rescueId
-          ];
+      const values = [
+        referred_by,
+        from_place,
+        date_time,
+        police_memo,
+        finalPoliceMemo,
+        police_station,
+        information_public,
+        admission_date,
+        admission_no,
+        rescue_name,
+        age,
+        rescue_status,
+        religion,
+        language1,
+        language2,
+        language3,
+        education,
+        father,
+        mother,
+        other_relation,
+        place,
+        phone_no,
+        phone_no_two,
+        clothing,
+        dress_code,
+        complexion,
+        indentification_mark,
+        tattoo,
+        wound_infection,
+        height,
+        weight,
+        things_carried,
+        remark,
+        mental_status,
+        behaviour,
+        community_ability,
+        self_careCapacity,
+        diagnosis,
+        govIdType,
+        govIdNumber,
+        finalGovtID,
+        finalRescuePath,
+        rescueId
+      ];
 
-          console.log("Final Rescue Image Path:", finalRescuePath);
+      console.log("Final Rescue Image Path:", finalRescuePath);
 
 
-          db.query(updateQuery, values, (updateErr, data) => {
-            if (updateErr) {
-              return res.status(500).json({ message: "Update failed", error: updateErr });
-            }
+      db.query(updateQuery, values, (updateErr, data) => {
+        if (updateErr) {
+          return res.status(500).json({ message: "Update failed", error: updateErr });
+        }
 
-            if (newRescueImage && existingRescuePath && fs.existsSync(existingRescuePath)) {
-              fs.unlink(existingRescuePath, (fsErr) => {
-                if (fsErr) console.warn("Failed to delete old logo:", fsErr);
-              });
-            }
-
-            if (newAttachPoliceMemo && existingPoliceMemo) {
-              fs.unlink(existingPoliceMemo, (fsErr) => {
-                if (fsErr) console.warn("Failed to delete Police Memo:", fsErr);
-              });
-            }
-
-            if (newgovIdFile && existingGovtID) {
-              fs.unlink(existingGovtID, (fsErr) => {
-                if (fsErr) console.warn("Failed to delete Government ID type:", fsErr);
-              });
-            }
-
-            res.status(200).json({ message: "Rescue updated successfully" });
+        if (newRescueImage && existingRescuePath && fs.existsSync(existingRescuePath)) {
+          fs.unlink(existingRescuePath, (fsErr) => {
+            if (fsErr) console.warn("Failed to delete old logo:", fsErr);
           });
+        }
 
-        });
-      } catch (uInnerErr) {
-        console.log("Uploading file error on updating first info", uInnerErr);
-        return res.status(500).json({ message: "Internal server error", error: innerError });
-      }
+        if (newAttachPoliceMemo && existingPoliceMemo) {
+          fs.unlink(existingPoliceMemo, (fsErr) => {
+            if (fsErr) console.warn("Failed to delete Police Memo:", fsErr);
+          });
+        }
+
+        if (newgovIdFile && existingGovtID) {
+          fs.unlink(existingGovtID, (fsErr) => {
+            if (fsErr) console.warn("Failed to delete Government ID type:", fsErr);
+          });
+        }
+
+        res.status(200).json({ message: "Rescue updated successfully" });
+      });
+
     });
-  }
-  catch (uOuterErr) {
-    console.log("Backend server error in updating first Info", uOuterErr);
-    return res.status(500).json({ message: "Unexpected error", error: outerError });
-  }
+  });
 }
 
 
@@ -646,33 +583,26 @@ const getRescueDetailsPDF = (req, res) => {
 }
 
 const UpdateStatus = (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
+  const { id } = req.params;
+  const { status } = req.body;
 
-    if (!status) {
-      return res.status(400).json({ message: "Status is required" });
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
+  }
+
+  const query = 'UPDATE first_information SET resident_status = ? WHERE id = ?';
+
+  db.query(query, [status, id], (err, result) => {
+    if (err) {
+      console.error('Database update error:', err);
+      return res.status(500).json({ message: 'Database error', error: err });
     }
 
-    const query = 'UPDATE first_information SET resident_status = ? WHERE id = ?';
+    return res.status(200).json({ message: 'Status updated successfully', result });
+  });
+}
 
-    db.query(query, [status, id], (err, result) => {
-      if (err) {
-        console.error('Database update error:', err);
-        return res.status(500).json({ message: 'Database error', error: err });
-      }
-
-      return res.status(200).json({ message: 'Status updated successfully', result });
-    });
-  }
-  catch (error) {
-    console.error('Unexpected server error in updating Status:', error);
-    return res.status(500).json({ message: 'Server error in updating Status', error });
-  }
-
-};
-
-const getReunionData = (req, res) => {
+const getReunionData = (req, res) =>{
   const query = `Select * from first_information where resident_status='Reunion' `;
 
   db.query(query, (err, data) => {
@@ -700,22 +630,22 @@ const getStatusData = (req, res) => {
   });
 };
 
-const getStatusById = (req, res) => {
+const getStatusById = (req, res) =>{
   const id = req.params.id;
 
-  const query = 'SELECT id, resident_status FROM first_information WHERE id = ?';
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error('Error fetching resident_status:', err);
-      return res.status(500).json({ message: 'Database error' });
-    }
+    const query = 'SELECT id, resident_status FROM first_information WHERE id = ?';
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching resident_status:', err);
+            return res.status(500).json({ message: 'Database error' });
+        }
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Record not found' });
-    }
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Record not found' });
+        }
 
-    res.json(results[0]); // Return the matching record
-  });
+        res.json(results[0]); // Return the matching record
+    });
 }
 
 
