@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const dotenv = require("dotenv");
 const authRoutes = require('./routes/auth');
 const admissionRoutes = require('./routes/admission');
 const scrbFormRoutes = require('./routes/scrb_form');
@@ -11,13 +10,16 @@ const formalityRoutes = require('./routes/formality');
 const dashboardRoutes = require('./routes/dashboard');
 const recoveryRoutes = require('./routes/recovery');
 
-dotenv.config();
-
 const app = express();
-app.use(cors());
+// CORS with options
+app.use(cors({
+  origin: ["https://erp.manasu.org.in","http://localhost:5173"],
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use('/uploads', express.static('uploads'));
+// app.use('/uploads', express.static('uploads'));
 app.use('/api', authRoutes);
 app.use('/admision',admissionRoutes);
 app.use('/scrb_form',scrbFormRoutes);
@@ -27,6 +29,7 @@ app.use('/reunion',reunionRoutes);
 app.use('/formality',formalityRoutes);
 app.use('/dashboard',dashboardRoutes);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+app.listen(process.env.PORT || 5002, () => {
+  console.log(`Server running on port ${process.env.PORT || '5002'}`);
 });
+

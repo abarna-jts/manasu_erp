@@ -408,7 +408,7 @@ function SCRB_form() {
                     </div>
 
 
-                    <div className="container mt-2">
+                    <div className="container mt-2 scrb_form_container">
                         <form onSubmit={handleSubmit}>
                             <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
 

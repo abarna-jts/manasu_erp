@@ -562,7 +562,7 @@ function AllStudentDetails() {
                 <Modal.Body>
                     <Col md={12}>
                         <Form>
-                            <Col md={12} className="my-2 p-3">
+                            <Col md={12} className="my-2 edit_modal_padding">
                                 <Row>
 
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">

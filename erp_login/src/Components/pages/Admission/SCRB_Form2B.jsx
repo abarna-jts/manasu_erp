@@ -464,7 +464,7 @@ function SCRB_Form2B() {
             )}
           </div>
 
-          <div className="container mt-3">
+          <div className="container mt-3 form_2B_container">
             <form className='form_2B' onSubmit={handleSubmit}>
               <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
                 <tbody>

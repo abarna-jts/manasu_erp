@@ -1628,7 +1628,7 @@ function MSE_form() {
         </Row>
       </Container>
 
-      <Container>
+      <Container className='mse_container'>
         <Row>
           <Col>
             <div className="page">

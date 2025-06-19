@@ -322,7 +322,7 @@ function SCRB_Form2A() {
             <h4 className="section_title_1">FORM 2A - FOUND PERSON DETAILS - PHYSICAL PARAMETERS -1</h4>
           </Col>
 
-          <Col md={1} className='text-center'>
+          <Col md={2} className='text-center'>
             {error && <div className="text-danger mt-2">{error}</div>}
 
             {/* Rescue Name and Image */}
@@ -410,7 +410,7 @@ function SCRB_Form2A() {
 
 
 
-          <div className="container mt-3">
+          <div className="container mt-3 form_2A_container">
             <form onSubmit={handleSubmit} className='form_2A'>
               <table className="table table-bordered" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "0rem" }}>
                 <tbody>

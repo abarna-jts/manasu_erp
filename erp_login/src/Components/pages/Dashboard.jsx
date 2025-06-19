@@ -24,7 +24,7 @@ function Dashboard() {
         const fetchTotalRescue = async () => {
             try {
                 const response = await apiRoute.get("/dashboard/totalRescue");
-                setTotalRescue(response.data[0].totalRescue);
+                setTotalRescue(response.data.totalRescue);
             } catch (error) {
                 console.error("Failed to fetch rescue data:", error);
             }
@@ -37,7 +37,7 @@ function Dashboard() {
         const fetchTotalResident = async () => {
             try {
                 const response = await apiRoute.get("/dashboard/totalResident");
-                setTotalResident(response.data[0].totalResident);
+                setTotalResident(response.data.totalResident);
             } catch (error) {
                 console.error("Failed to fetch Resident data:", error);
             }
@@ -50,7 +50,7 @@ function Dashboard() {
         const fetchTotalReunion = async () => {
             try {
                 const response = await apiRoute.get("/dashboard/totalReunion");
-                setTotalReunion(response.data[0].totalReunion);
+                setTotalReunion(response.data.totalReunion);
             } catch (error) {
                 console.error("Failed to fetch Resident data:", error);
             }
@@ -84,28 +84,6 @@ function Dashboard() {
 
         fetchNurseRecord();
     }, []);
-
-
-    const handleLogout = () => {
-        localStorage.removeItem('jwt'); // Clear JWT token
-        alert('You have been logged out');
-        navigate('/'); // Redirect to login page
-    };
-
-    // const data = [
-    //     { month: 'Jan', rescues: 4 },
-    //     { month: 'Feb', rescues: 1 },
-    //     { month: 'Mar', rescues: 0 },
-    //     { month: 'Apr', rescues: 0 },
-    //     { month: 'May', rescues: 4 },
-    //     { month: 'Jun', rescues: 0 },
-    //     { month: 'Jul', rescues: 5 },
-    //     { month: 'Aug', rescues: 4 },
-    //     { month: 'Sep', rescues: 0 },
-    //     { month: 'Oct', rescues: 3 },
-    //     { month: 'Nov', rescues: 4 },
-    //     { month: 'Dec', rescues: 1 },
-    // ];
 
     const COLORS = ["#fe7096", "#90caf9", "#84d9d2", "#92a6f8", "#ffc7ad", "#ffbccc"];
 

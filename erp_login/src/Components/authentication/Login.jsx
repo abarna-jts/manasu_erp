@@ -25,35 +25,34 @@ function Login() {
         try {
             const res = await apiRoute.post('/api/login', form);
 
-            console.log(res);
-
             // Save JWT token
             setToken(res.data.token);
             localStorage.setItem('jwt', res.data.token);
 
             const userType = res.data.usertype;
-            console.log("UserType:", userType);
             Cookies.set('usertype', userType);
-            // console.log("Name:",username);
-
-            console.log(res.data);
 
             console.log("Login successful:", res.data);
 
             navigate('/dashboard');
         } catch (err) {
             const status = err.response?.status;
-            const message = err.response?.data?.message || 'Registration error';
+            const message = err.response?.data?.message || 'Login failed. Please try again.';
 
-            if (status === 400 && message === "Email already registered") {
-                alert("Email ID is already registered");
+            if (status === 401 && message === "Invalid email or password") {
+                alert("Invalid email or password");
+            } else if (status === 404 && message === "User not found") {
+                alert("User not found. Please register first.");
+            } else if (status === 400 && message === "Email already registered") {
+                alert("Email ID is already registered"); // Usually not a login case, but still handling it
             } else {
-                alert(message);
+                alert(message); // Generic fallback
             }
 
-            console.error("Registration error:", message);
+            console.error("Login error:", message);
         }
     };
+
 
 
     return (

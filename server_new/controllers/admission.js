@@ -2,6 +2,8 @@ const multer = require('multer');
 const path = require('path');
 const db = require('../db');
 const fs = require('fs');
+const { uploadAsync } = require('../util/uploadMulter');
+
 
 // Storage strategy based on fieldname
 const storage = multer.diskStorage({
@@ -36,7 +38,7 @@ const checkAdmissionNo = async (req, res) => {
   const query = 'SELECT * FROM first_information WHERE admission_no = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.promise().query(query, [admission_no]);
 
     if (results.length > 0) {
       return res.json({ exists: true });
@@ -50,161 +52,106 @@ const checkAdmissionNo = async (req, res) => {
 };
 
 
-
-
-const createFirstForm = (req, res) => {
+const createFirstForm = async (req, res) => {
   try {
-    upload(req, res, (err) => {
-      if (err) {
-        return res.status(500).json({ message: "File upload failed", error: err });
-      }
-      try {
-        const {
-          referred_by,
-          from_place,
-          date_time,
-          police_memo,
-          police_station,
-          information_public,
-          admission_date,
-          admission_no,
-          rescue_name,
-          age,
-          rescue_status,
-          religion,
-          language1,
-          language2,
-          language3,
-          education,
-          father,
-          mother,
-          other_relation,
-          place,
-          phone_no,
-          phone_no_two,
-          clothing,
-          dress_code,
-          complexion,
-          indentification_mark,
-          tattoo,
-          wound_infection,
-          height,
-          weight,
-          things_carried,
-          remark,
-          mental_status,
-          behaviour,
-          community_ability,
-          self_careCapacity,
-          diagnosis,
-          // symptoms,
-          // rescued_by,
-          // information,
-          govIdType,
-          govIdNumber
-          // articles_carried,
-          // f_member_name,
-          // f_member_phone,
-          // f_member_address
-        } = req.body;
+    // Await multer file upload
+    await uploadAsync(req, res);
 
-        // File paths
-        const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
-        const policeMemoPath = req.files['attach_policeMemo'] ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}` : null;
-        const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
-        // const f_ration_card_path = req.files['f_ration_card'] ? `uploads/FamilyDetails/${req.files['f_ration_card'][0].filename}` : null;
-        // const res_aadhar_card_path = req.files['res_aadhar_card'] ? `uploads/FamilyDetails/${req.files['res_aadhar_card'][0].filename}` : null;
-        console.log("rescue_image path:", rescue_image_path);
-        const q = "INSERT INTO first_information (referred_by, from_place, date_time, police_memo, attach_policeMemo, police_station, information_public, admission_date, admission_no, rescue_name, age, rescue_status, religion, language1, language2, language3, education, father, mother, other_relation, place, phone_no, phone_no_two, clothing, dress_code, complexion, indentification_mark, tattoo, wound_infection, height, weight, things_carried, remark, mental_status,behaviour, community_ability, self_careCapacity, diagnosis, govIdType, govIdNumber, govIdFile, rescue_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const {
+      referred_by,
+      from_place,
+      date_time,
+      police_memo,
+      police_station,
+      information_public,
+      admission_date,
+      admission_no,
+      rescue_name,
+      age,
+      rescue_status,
+      religion,
+      language1,
+      language2,
+      language3,
+      education,
+      father,
+      mother,
+      other_relation,
+      place,
+      phone_no,
+      phone_no_two,
+      clothing,
+      dress_code,
+      complexion,
+      indentification_mark,
+      tattoo,
+      wound_infection,
+      height,
+      weight,
+      things_carried,
+      remark,
+      mental_status,
+      behaviour,
+      community_ability,
+      self_careCapacity,
+      diagnosis,
+      govIdType,
+      govIdNumber
+    } = req.body;
 
-        const values = [
-          referred_by,
-          from_place,
-          date_time,
-          police_memo,
-          policeMemoPath,
-          police_station,
-          information_public,
-          admission_date,
-          admission_no,
-          rescue_name,
-          age || null,
-          rescue_status,
-          religion || null,
-          language1,
-          language2 || null,
-          language3 || null,
-          education,
-          father || null,
-          mother || null,
-          other_relation || null,
-          place || null,
-          phone_no || null,
-          phone_no_two || null,
-          clothing || null,
-          dress_code || null,
-          complexion || null,
-          indentification_mark || null,
-          tattoo || null,
-          wound_infection || null,
-          height,
-          weight,
-          things_carried || null,
-          remark || null,
-          mental_status,
-          behaviour,
-          community_ability,
-          self_careCapacity,
-          diagnosis,
-          govIdType,
-          govIdNumber || null,
-          govIdFile_path || null,
-          rescue_image_path,
-          // articles_carried,
-          // f_member_name,
-          // f_member_phone,
-          // f_member_address,
-          // f_aadhar_card_path,
-          // f_ration_card_path,
-          // res_aadhar_card_path
-        ];
+    // File paths
+    const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
+    const policeMemoPath = req.files['attach_policeMemo'] ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}` : null;
+    const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
 
-        db.query(q, values, (dbErr, data) => {
-          if (dbErr) {
-            return res.status(500).json({ message: "First Info Database Error", error: dbErr });
-          }
-          res.status(201).json({ message: "First Form Created Successfully", data: data });
-        });
-      } catch (innererr) {
-        console.log("First Info Inner Error log:", innererr);
-        return res.status(500).json({ message: "First Info Unexpected error during form processing", error: innerErr });
-      }
-    });
+    const q = `
+      INSERT INTO first_information (
+        referred_by, from_place, date_time, police_memo, attach_policeMemo,
+        police_station, information_public, admission_date, admission_no, rescue_name,
+        age, rescue_status, religion, language1, language2, language3,
+        education, father, mother, other_relation, place,
+        phone_no, phone_no_two, clothing, dress_code, complexion,
+        indentification_mark, tattoo, wound_infection, height, weight,
+        things_carried, remark, mental_status, behaviour, community_ability,
+        self_careCapacity, diagnosis, govIdType, govIdNumber, govIdFile,
+        rescue_image
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-  } catch (outererr) {
-    console.log("First Info Outer error log:", outererr);
-    return res.status(500).json({ message: "First Info Upload error on multer", outererr })
-  }
-}
+    const values = [
+      referred_by, from_place, date_time, police_memo, policeMemoPath,
+      police_station, information_public, admission_date, admission_no, rescue_name,
+      age || null, rescue_status, religion || null, language1, language2 || null, language3 || null,
+      education, father || null, mother || null, other_relation || null, place || null,
+      phone_no || null, phone_no_two || null, clothing || null, dress_code || null, complexion || null,
+      indentification_mark || null, tattoo || null, wound_infection || null, height, weight,
+      things_carried || null, remark || null, mental_status, behaviour, community_ability,
+      self_careCapacity, diagnosis, govIdType, govIdNumber || null, govIdFile_path || null,
+      rescue_image_path
+    ];
 
+    // Promise-based query
+    const [result] = await db.promise().query(q, values);
 
+    return res.status(201).json({ message: "First Form Created Successfully", data: result });
 
-const getFirstForm = (req, res) => {
-  const query = "SELECT * FROM first_information";
-  try {
-    db.query(query, (err, data) => {
-      if (err) {
-        console.error("SQL Error:", err);  // Add this line
-        return res.status(500).json({ error: 'Database query failed' });
-      }
-      res.status(201).json({ message: "First Information form Get Successfully", data: data });
-    });
-  }
-  catch (err) {
-    console.log("Unexpected error on getting first form", err);
-    return res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+    console.error("Create First Form Error:", err);
+    return res.status(500).json({ message: "Server error while creating first form", error: err });
   }
 };
+
+const getFirstForm = async (req, res) => {
+  const query = "SELECT * FROM first_information";
+  try {
+    const [results] = await db.promise().query(query);
+    res.status(200).json({ message: "First Information form fetched successfully", data: results });
+  } catch (err) {
+    console.error("SQL Error:", err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+};
+
 
 
 const getFirst2AForm = (req, res) => {
