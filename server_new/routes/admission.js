@@ -1,33 +1,29 @@
-const express = require('express');
-const { createFirstForm, getFirstForm, getForm2Data, DeleteFirstForm,UpdateFirstForm, getFirst2AForm, getRescueDetailsPDF,
-    // getSCRBFormData,
-    // getSCRB2AFormData,
-    // getSCRB2BFormData,
-    // getSCRB2CFormData,
+import express from 'express';
+import{createFirstForm, getFirstForm,
+    UpdateFirstForm, getRescueDetailsPDF,
     checkAdmissionNo,UpdateStatus,
-    getAllSCRBFormData, getReunionData, getStatusData, getStatusById
-} = require("../controllers/admission");
+
+}from "../controllers/admission.js";
 const router = express.Router();
 
+//checking Admission Number(first_information.jsx)
 router.get("/check_admission_no/:admission_no",checkAdmissionNo); // completed
 
+//First Information form creation(first_information.jsx)
 router.post("/create_first_form", createFirstForm); // completed
+
+//Get First Information form(Rescue_details.jsx)
 router.get("/get_first_form", getFirstForm); // completed
-// router.delete('/delete_first_form/:id',DeleteFirstForm);
-router.put('/update_first_form/:id',UpdateFirstForm); //
 
-// router.get('/get_scrb_formdata/:admission_no',getFirst2AForm); // 
-router.get("/get_scrbform2data/:admission_no",getForm2Data);
-router.get('/get_rescue_details/:id',getRescueDetailsPDF);
+//Updating First Information Form(Edit_RescueDetails.jsx)
+router.put('/update_first_form/:id',UpdateFirstForm); //completed
 
-router.put('/updateStatus/:id',UpdateStatus); // 
-router.get("/get_reunionPeople", getReunionData);
-router.get("/getById/:id", getStatusById);
+//get rescue detail for PDF(Rescue_details.jsx)
+router.get('/get_rescue_details/:id',getRescueDetailsPDF); // completed
 
-// router.get('/getSCRBFormData/:admissionNumber',getSCRBFormData);
-// router.get('/getSCRB2AFormData/:admissionNumber',getSCRB2AFormData);
-// router.get('/getSCRB2BFormData/:admissionNumber',getSCRB2BFormData);
-// router.get('/getSCRB2CFormData/:admissionNumber',getSCRB2CFormData);
+//Resident Status Updation(Rescue_details.jsx)
+router.put('/updateStatus/:id',UpdateStatus); //completed
 
-router.get("/getallSCRBFormData/:admission_no",getAllSCRBFormData);
-module.exports = router;
+
+
+export default router;

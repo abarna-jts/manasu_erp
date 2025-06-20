@@ -20,7 +20,7 @@ function SCRB_form() {
     const [admission_no, setAdmissionNumber] = useState('');
     const [rescue_image, setRescueImage] = useState(null);
     const [error, setError] = useState("");
-    const [rescue_name, setRescueName] = useState(null);
+    const [rescueName, setRescueName] = useState(null);
     const [formData, setFormData] = useState({
         koppu_en: '',
         admission_no: '',
@@ -61,22 +61,25 @@ function SCRB_form() {
 
     const handleSearch = async () => {
         try {
-            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-            const result = response.data.data[0];
-            setFormData(result);
+            const response = await apiRoute.get(`/scrb_form/get_scrbform2data/${admission_no}`);
+            const result = response.data;
+
             console.log("API Result:", result);
 
-            if (result && result.rescue_image) {
-                const imagePath = result.rescue_image.startsWith("http")
-                    ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+            if (result && result.data) {
+                setFormData(result.data);
+                
+                const rescueName = result.data.rescue_name;
+                setRescueName(rescueName);
+                console.log("Rescue Name", rescueName);
 
-                console.log(imagePath);
+                const imagePath = result.data.rescue_image.startsWith("http")
+                    ? result.data.rescue_image
+                    : `https://www.pahrultours.com/app2/${result.data.rescue_image}`;
+
                 setRescueImage(imagePath);
-
-                const name = result.rescue_name;
-                console.log(name);
-                setRescueName(name);  // <-- Set the name here
+                console.log("Image Path:", imagePath);
+                
             } else {
                 setRescueImage(null);
                 setError("Image not found for this admission number");
@@ -129,7 +132,7 @@ function SCRB_form() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log(res);
-            if (res.data.message === "SCRRB Form2 Created Successfully") {
+            if (res.data.message === "SCRB FORM2 Created Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
 
@@ -145,8 +148,6 @@ function SCRB_form() {
             setMessageType("danger");
         }
     };
-
-
 
 
     const formRef = useRef();
@@ -302,9 +303,9 @@ function SCRB_form() {
     const navigate = useNavigate();
 
     const handleNextpage = () => {
-        
-            navigate("/scrb_form2A");
-        
+
+        navigate("/scrb_form2A");
+
 
     }
 
@@ -336,7 +337,7 @@ function SCRB_form() {
                                 className="img-fluid rounded"
                                 style={{ width: "100px", height: "100px" }}
                             />
-                            <p className="mt-2 text-start">{rescue_name ? rescue_name : "No name available"}</p>  {/* display name below */}
+                            <p className="mt-2 text-start">{rescueName || "Not available"}</p>  {/* display name below */}
                         </>
                     ) : (
                         <p>{error || "No image to display"}</p>
@@ -839,7 +840,7 @@ function SCRB_form() {
                                         <td>
                                             <input
                                                 type="text"
-                                                name="name_rescue"
+                                                name="rescue_name"
                                                 className="form-control"
                                                 onChange={handleInputChange}
                                                 value={formData.rescue_name}
@@ -1294,7 +1295,7 @@ function SCRB_form() {
 
                                 </tbody>
                             </table>
-                            <table className="table table-border" style={{ border: "2px solid rgb(143 143 143)", marginBottom:"60px", marginTop:"50px"}}>
+                            <table className="table table-border" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "60px", marginTop: "50px" }}>
                                 <tbody>
                                     <tr>
                                         <td>
@@ -1317,14 +1318,14 @@ function SCRB_form() {
                             <table className="table">
                                 <tbody>
                                     <tr>
-                                        <td style={{marginTop:"40px"}}>
+                                        <td style={{ marginTop: "40px" }}>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
                                                     <label>SIGNATURE / கையொப்பம் : </label>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style={{marginBottom:"20px"}}>
+                                        <td style={{ marginBottom: "20px" }}>
                                             {files.signature ? (
                                                 <>
                                                     <img
@@ -1349,7 +1350,7 @@ function SCRB_form() {
                                         <td>
                                             <input
                                                 type="text"
-                                                name="name_rescue"
+                                                name="rescue_name"
                                                 className="form-control"
                                                 onChange={handleInputChange}
                                                 value={formData.rescue_name}

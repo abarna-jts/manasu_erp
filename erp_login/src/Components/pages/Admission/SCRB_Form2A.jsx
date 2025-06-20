@@ -124,7 +124,7 @@ function SCRB_Form2A() {
     try {
       const response = await apiRoute.post('/scrb_form/create_form_2A', payload);
       console.log(response.data);
-      if (response.data.message === "SCRB Form2A Created Successfully") {
+      if (response.data.message === "SCRB Form 2A created successfully") {
         setSubmissionMessage("Form submitted successfully!");
         setMessageType("success");
 
@@ -265,17 +265,17 @@ function SCRB_Form2A() {
   // Mock API call or fetch
   const fetchRescueDetails = async (admission_no) => {
     try {
-      const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-      const result = response.data.data[0];
+      const response = await apiRoute.get(`/scrb_form/get_scrbform2data/${admission_no}`);
+      const result = response.data;
       console.log("API Result:", result);
 
-      if (result && result.rescue_image) {
-        const imagePath = result.rescue_image.startsWith("http")
-          ? result.rescue_image
-          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+      if (result && result.data) {
+        const imagePath = result.data.rescue_image.startsWith("http")
+          ? result.data.rescue_image
+          : `https://www.pahrultours.com/app2/${result.data.rescue_image}`;
 
         setRescueImage(imagePath);
-        setRescueName(result.rescue_name || "");
+        setRescueName(result.data.rescue_name || "");
         setError(""); // clear any previous error
       } else {
         setRescueImage(null);

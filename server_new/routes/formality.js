@@ -1,5 +1,6 @@
-const express = require('express');
-const { createSelfDeclaration,
+import express from "express";
+import {
+createSelfDeclaration,
     getFormalityForm,
     updateFormalityForm,
     deleteFormalityForm,
@@ -26,7 +27,8 @@ const { createSelfDeclaration,
     createCelebrationReport,
     createCommunityReport,
     createStaffReport,getAllDocument,getEssentialRecordshow
-} = require("../controllers/formality");
+}from "../controllers/formality.js";
+
 const router = express.Router();
 
 router.post("/createDeclaration", createSelfDeclaration);
@@ -70,4 +72,4 @@ router.put("/updateStudentDetail/:id",updateStudentDetail);
 router.get("/getAllDocument",getAllDocument);
 
 
-module.exports = router;
+export default router;

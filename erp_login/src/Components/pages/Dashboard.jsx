@@ -13,7 +13,6 @@ import {
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-
 function Dashboard() {
     const [totalRescue, setTotalRescue] = useState(0);
     const [totalResident, setTotalResident] = useState(0);

@@ -208,7 +208,6 @@ function Edit_Rescue_details() {
     formDataToSend.append("govIdType", formData.govIdType);
     formDataToSend.append("govIdNumber", formData.govIdNumber);
     formDataToSend.append("diagnosis", formData.diagnosis);
-    
 
     if (formData.rescue_image) {
       formDataToSend.append("rescue_image", formData.rescue_image);
@@ -232,7 +231,7 @@ function Edit_Rescue_details() {
       );
       console.log(response);
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         alert("Rescue details updated successfully.");
         navigate("/rescue_details");
       } else {

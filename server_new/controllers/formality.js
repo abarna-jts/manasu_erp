@@ -1,47 +1,7 @@
-const db = require('../db');
-const path = require('path');
-const multer = require('multer');
-const fs = require('fs');
-
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, path.resolve("uploads/Resident_DocumentFile/"));
-//     },
-//     filename: function (req, file, cb) {
-//         cb(null, Date.now() + "-" + file.originalname);
-//     },
-// });
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        if (file.fieldname === 'bank_passbook' || file.fieldname === 'form7_attach') {
-            cb(null, path.resolve('uploads/Rescue_Images/'));
-        }
-        else if (file.fieldname === 'stud_photo') {
-            cb(null, path.resolve('uploads/Internship_photos/'));
-        }
-        else {
-            cb(null, path.resolve('uploads/Event_Photos/'));
-        }
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    },
-});
-
-// const upload = multer({ storage: storage }).single("bank_passbook");
-
-const upload = multer({ storage: storage }).fields([
-    { name: 'bank_passbook', maxCount: 1 },
-    { name: 'form7_attach', maxCount: 1 },
-    { name: 'event_photos', maxCount: 1 },
-    { name: 'awarness_photos', maxCount: 1 },
-    { name: 'outing_photos', maxCount: 1 },
-    { name: 'stud_photo', maxCount: 1 }
-]);
+import db from "../db.js";
 
 
-const createSelfDeclaration = (req, res) => {
+const createSelfDeclaration = async(req, res) => {
     const {
         admission_no,
         rescue_name,
@@ -73,12 +33,19 @@ const createSelfDeclaration = (req, res) => {
         travel_letter
     ];
 
-    db.query(q, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
-        }
-        res.status(201).json({ message: "Document Handover Form submitted successfully", data: data });
-    });
+    try{
+        const [data] = await db.query(q, values);
+        res.status(201).json({
+            message:"Document Handover Form submitted successfully",
+            data:data
+        });
+    }catch(err){
+        console.error("Error inserting into formality Declaration:", err);
+        res.status(500).json({
+            message:"Database Error",
+            error:err.message
+        });
+    }
 }
 
 const getFormalityForm = (req, res) => {
@@ -1062,7 +1029,7 @@ const getEssentialRecordshow = (req, res) => {
     });
 }
 
-module.exports = {
+export{
     createSelfDeclaration,
     getFormalityForm,
     updateFormalityForm,

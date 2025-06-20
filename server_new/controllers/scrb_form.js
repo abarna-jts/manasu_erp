@@ -1,46 +1,25 @@
-const multer = require('multer');
-const path = require('path');
-const db = require('../db');
-
+import db from '../db.js';
+import { SCRBAsync } from '../util/SCRBMulter.js';
 // Setup storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/form_2a/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
 
-// Accept two files
-const upload = multer({ storage: storage }).fields([
-  { name: 'old_photo', maxCount: 1 },
-  { name: 'new_photo', maxCount: 1 },
-  { name: 'signature', maxCount: 1 },
-  { name: 'seal', maxCount: 1 }
-]);
-
-const createForm2 = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: 'File upload failed', error: err });
-    }
-
-    const { name_ngo, 
-        admission_no,
-        koppu_en,
-        name_rescue, 
-        phone_no,
-        rescue_name,
-        father,
-        gender,
-        date_time,
-        rescue_status,
-        language1,
-        place,
-        police_station,
-        addition_info,
-        } = req.body;
+const createForm2 = async (req, res) => {
+  try {
+    await SCRBAsync(req, res);
+    const { name_ngo,
+      admission_no,
+      koppu_en,
+      name_rescue,
+      phone_no,
+      rescue_name,
+      father,
+      gender,
+      date_time,
+      rescue_status,
+      language1,
+      place,
+      police_station,
+      addition_info,
+    } = req.body;
 
     const old_photo = req.files['old_photo']
       ? `/uploads/form_2a/${req.files['old_photo'][0].filename}`
@@ -59,52 +38,79 @@ const createForm2 = (req, res) => {
       : null;
 
     const q = 'INSERT INTO form_2 (name_ngo, admission_no, koppu_en,rescue_name, parent_name, gender, found_date, marital_status, language, district, police_station, addition_info, old_photo, new_photo, name_rescue, phone_no, signature, seal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const values = [name_ngo, 
-        admission_no,
-        koppu_en,
-        rescue_name,
-        father,
-        gender,
-        date_time,
-        rescue_status,
-        language1,
-        place,
-        police_station,
-        addition_info,
-        old_photo, 
-        new_photo, 
-        name_rescue,
-        phone_no, 
-        signature_path, 
-        seal_path];
+    const values = [name_ngo,
+      admission_no,
+      koppu_en,
+      rescue_name,
+      father,
+      gender,
+      date_time,
+      rescue_status,
+      language1,
+      place,
+      police_station,
+      addition_info,
+      old_photo,
+      new_photo,
+      name_rescue,
+      phone_no,
+      signature_path,
+      seal_path];
 
-    db.query(q, values, (dbErr, data) => {
-      if (dbErr) {
-        return res.status(500).json({ message: 'Database Error', error: dbErr });
-      }
-      res.status(201).json({ message: 'SCRRB Form2 Created Successfully', data: data });
-    });
-  });
+    const [result] = await db.query(q, values);
+
+    return res.status(201).json({ message: "SCRB FORM2 Created Successfully", data: result });
+
+  } catch (err) {
+    console.error("Create SCRB FORM2 Error:", err);
+    return res.status(500).json({ message: "Server error while creating SCRB FORM2", error: err });
+  }
 };
 
-const createForm2A = (req,res) =>{
-  const { name_ngo,admission_no, file_no, category, complexion, face, addition_category, addition_complexion, addition_face } = req.body;
 
-  const sql = 'INSERT INTO form_2A (name_ngo, admission_no, file_no, category, complexion, face, addition_category,addition_complexion,addition_face) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)';
-  db.query(
-    sql,
-    [name_ngo,admission_no, file_no, category.join(', '), complexion.join(', '), face.join(', '),addition_category,addition_complexion,addition_face],
-    (err, result) => {
-      if (err) {
-        console.error('Error inserting data:', err);
-        return res.status(500).send('Database error');
-      }
-      res.json({ message: "SCRB form2A Created Successfully" });
-    }
-  );
+const createForm2A = async (req, res) => {
+  const {
+    name_ngo,
+    admission_no,
+    file_no,
+    category,
+    complexion,
+    face,
+    addition_category,
+    addition_complexion,
+    addition_face,
+  } = req.body;
+
+  const sql = `
+    INSERT INTO form_2A (
+      name_ngo, admission_no, file_no, category, complexion, face,
+      addition_category, addition_complexion, addition_face
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  try {
+    const [result] = await db.query(sql, [
+      name_ngo,
+      admission_no,
+      file_no,
+      category?.join(', ') || '',
+      complexion?.join(', ') || '',
+      face?.join(', ') || '',
+      addition_category || '',
+      addition_complexion || '',
+      addition_face || '',
+    ]);
+
+    res.status(201).json({ message: "SCRB Form 2A created successfully", insertId: result.insertId });
+  } catch (err) {
+    console.error("Error inserting SCRB Form 2A:", err);
+    res.status(500).json({ message: "Database error", error: err.message });
+  }
 };
 
-const createForm2B = (req, res) => {
+
+const createForm2B = async (req, res) => {
   const {
     name_ngo,
     file_no,
@@ -120,123 +126,157 @@ const createForm2B = (req, res) => {
     return res.status(400).send('All fields are required');
   }
 
-  const create_sql = `
-    INSERT INTO form_2b (name_ngo, admission_no, file_no, tatoo, addition_tatoo, scar, mole, height)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+  const create_sql = `INSERT INTO form_2b (name_ngo, admission_no, file_no, tatoo, addition_tatoo, scar, mole, height)VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  db.query(
-    create_sql,
-    [name_ngo, admission_no, file_no, tattoo, addition_tatoo, scar, mole, height],
-    (err, result) => {
-      if (err) {
-        console.error('Error inserting data:', err);
-        return res.status(500).send('Database error');
-      }
-      res.status(201).send('SCRB form2A Created Successfully');
-    }
-  );
+  try {
+    const [result] = await db.query(create_sql, [
+      name_ngo, admission_no, file_no, tattoo, addition_tatoo, scar, mole, height
+    ]);
+
+    res.status(201).json({ message: "SCRB Form 2B created Successfully", insertId: result.insertId });
+  } catch (err) {
+    console.error("Error inserting SCRB Form 2B:", err)
+  }
 };
 
-
-const createForm2C = (req, res) =>{
-  const { name_ngo,admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color } = req.body;
+const createForm2C = async(req, res) => {
+  const { name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color } = req.body;
 
   const Csql = 'INSERT INTO form_2C (name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress,addition_lowerdress,upperdress_color, lowerdress_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-  db.query(
-    Csql,
-    [name_ngo, admission_no, file_no, 
-      (upperdress_1 || []).join(', '), 
-      (upperdress_2 || []).join(', '), 
-      (lowerdress || []).join(', '), 
-      addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color],     
-    (err, result) => {
-      if (err) {
-        console.error('Error inserting data:', err);
-        return res.status(500).send('Database error');
-      }
-      res.send('Form saved successfully');
-    }
-  );
-}
 
+  try {
+    const [result] = await db.query(Csql, [
+      name_ngo, admission_no, file_no,
+      (upperdress_1 || []).join(', '),
+      (upperdress_2 || []).join(', '),
+      (lowerdress || []).join(', '),
+      addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color
+    ]);
+    res.status(201).json({message:"SCRB Form 2C created Successfully", insertId:result.insertId});
+  } catch (err) {
+    console.error("Error inserting SCRB Form 2C:", err)
+  }
+
+}
 
 
 //pdf view controllers
-const getForm2APDF = (req,res) =>{
+const getForm2APDF = async(req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2a WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try{
+    const [results] = await db.query(query, [admission_no]);
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Form 2A not found' });
+    if(results.length === 0){
+      return res.status(404).json({message:"Form 2A not found"});
     }
-
-    res.json(results[0]);
-  });
+    res.status(200).json(results[0]);
+  }catch(err){
+    console.error("Error fetching Form 2A:", err);
+    res.status(500).json({message:"Database Error", error:err.message});
+  }
 }
 
-const getForm2BPDF = (req,res) =>{
+const getForm2BPDF = async(req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2b WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try{
+    const [results] = await db.query(query, [admission_no]);
+    res.status(200).json(results[0]);
+  }catch(err){
+    console.error("Error fetching Form 2B:", err);
+    res.status(500).json({message:"Database Error", error:err.message});
+  }
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Form 2B not found' });
-    }
-
-    res.json(results[0]);
-  });
 }
 
 
-const getForm2CPDF = (req,res) =>{
+const getForm2CPDF = async(req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2c WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Form 2A not found' });
-    }
-
-    res.json(results[0]);
-  });
+  try{
+    const [results] = await db.query(query,[admission_no]);
+    res.status(200).json(results[0]);
+  }catch(err){
+    console.error("Error fetching Form 2A:", err);
+    res.status(500).json({message:"Database Error", error:err.message});
+  }
 }
 
-const getForm2PDF = (req,res) =>{
+const getForm2PDF = async(req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2 WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try{
+    const [results] = await db.query(query, [admission_no]);
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Form 2A not found' });
+    if(results.length === 0){
+      return res.status(404).json({message:"Form 2 not found"});
     }
-
-    res.json(results[0]);
-  });
+    res.status(200).json(results[0]);
+  }catch(err){
+    console.error("Error fetching Form 2:", err);
+    res.status(500).json({message:"Database Error", error:err.message});
+  }
 }
 
-module.exports = {
+const getForm2Data = async (req, res) => {
+  const admission_no = req.params.admission_no;
+
+  if (!admission_no) {
+    return res.status(400).json({ error: 'Admission number is required' });
+  }
+
+  const query = "SELECT * FROM first_information WHERE admission_no = ?";
+
+  try {
+    const [results] = await db.query(query, [admission_no]);
+
+    if (results.length > 0) {
+      return res.status(200).json({
+        message: "First Information Data fetched successfully",
+        data: results[0]  // assuming admission_no is unique
+      });
+    } else {
+      return res.status(404).json({ error: 'No data found for the given admission number' });
+    }
+
+  } catch (err) {
+    console.error('Unexpected error in getting SCRB Form2:', err);
+    return res.status(500).json({ error: 'Internal server error in getting SCRB Form2' });
+  }
+};
+
+const getAllSCRBFormData = async (req, res) => {
+  const admission_no = req.params.admission_no;
+
+  const query1 = `SELECT name_ngo, admission_no, koppu_en, rescue_name, parent_name, gender, found_date, marital_status, language, district, police_station, addition_info, old_photo, new_photo, name_rescue, phone_no, signature, seal FROM form_2 WHERE admission_no = ?`;
+  const query2 = `SELECT name_ngo, admission_no, file_no, category, complexion, face, addition_category, addition_complexion, addition_face FROM form_2a WHERE admission_no = ?`;
+  const query3 = `SELECT name_ngo, admission_no, file_no, tatoo, addition_tatoo, scar, mole, height FROM form_2b WHERE admission_no = ?`;
+  const query4 = `SELECT name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color FROM form_2c WHERE admission_no = ?`;
+
+  try {
+    const [results1] = await db.query(query1, [admission_no]);
+    const [results2] = await db.query(query2, [admission_no]);
+    const [results3] = await db.query(query3, [admission_no]);
+    const [results4] = await db.query(query4, [admission_no]);
+
+    return res.status(200).json({
+      form_2: results1[0] || null,
+      form_2a: results2[0] || null,
+      form_2b: results3[0] || null,
+      form_2c: results4[0] || null,
+    });
+  } catch (err) {
+    console.error("Error fetching SCRB form data:", err);
+    return res.status(500).json({ error: 'Failed to fetch SCRB form data', details: err.message });
+  }
+};
+
+export {
   createForm2,
   createForm2A,
   createForm2B,
@@ -244,5 +284,7 @@ module.exports = {
   getForm2APDF,
   getForm2BPDF,
   getForm2CPDF,
-  getForm2PDF
+  getForm2PDF,
+  getForm2Data,
+  getAllSCRBFormData
 };
