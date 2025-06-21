@@ -125,6 +125,51 @@ const getFirstForm = async (req, res) => {
   }
 };
 
+const getForm2Data = async (req, res) => {
+  const admission_no = req.params.admission_no;
+
+  if (!admission_no) {
+    return res.status(400).json({ error: 'Admission number is required' });
+  }
+
+  const query = "SELECT * FROM first_information WHERE admission_no = ?";
+
+  try {
+    const [data] = await db.query(query, [admission_no]);
+
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No data found for the given admission number" });
+    }
+
+    return res.status(200).json({ message: "First Information form fetched successfully", data: data });
+  } catch (err) {
+    console.error('Unexpected error in getting SCRB Form2:', err);
+    return res.status(500).json({ error: 'Internal server error in getting SCRB Form2', details: err });
+  }
+};
+
+const getFirst2AForm = async(req, res) => {
+  const admission_no = req.params.admission_no;
+
+  if (!admission_no) {
+    return res.status(400).json({ error: 'Admission number is required' });
+  }
+
+  const query = "SELECT * FROM first_information WHERE admission_no = ?";
+
+  try {
+    const [data] = await db.query(query, [admission_no]);
+
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No data found for the given admission number" });
+    }
+
+    return res.status(200).json({ message: "First Information form fetched successfully", data: data });
+  } catch (err) {
+    console.error('Unexpected error in getting SCRB Form2:', err);
+    return res.status(500).json({ error: 'Internal server error in getting SCRB Form2', details: err });
+  }
+};
 
 
 
@@ -359,8 +404,6 @@ const getReunionData = async (req, res) => {
 
 
 
-
-
 export{
   checkAdmissionNo,
   createFirstForm,
@@ -369,4 +412,6 @@ export{
   getRescueDetailsPDF,
   UpdateStatus,
   getReunionData, 
+  getForm2Data,
+  getFirst2AForm
 };

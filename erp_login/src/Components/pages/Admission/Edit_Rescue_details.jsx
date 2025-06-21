@@ -169,14 +169,25 @@ function Edit_Rescue_details() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const formatToMySQLDateTime = (isoString) => {
+      const date = new Date(isoString);
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const mi = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+    };
+
     const formDataToSend = new FormData();
     formDataToSend.append("referred_by", formData.referred_by);
     formDataToSend.append("from_place", formData.from_place);
-    formDataToSend.append("date_time", formData.date_time);
+    formDataToSend.append("date_time", formatToMySQLDateTime(formData.date_time));
     formDataToSend.append("police_memo", formData.police_memo);
     formDataToSend.append("police_station", formData.police_station);
     formDataToSend.append("information_public", formData.information_public);
-    formDataToSend.append("admission_date", formData.admission_date);
+    formDataToSend.append("admission_date", formatToMySQLDateTime(formData.admission_date));
     formDataToSend.append("admission_no", formData.admission_no);
     formDataToSend.append("rescue_name", formData.rescue_name);
     formDataToSend.append("age", formData.age);
@@ -241,7 +252,7 @@ function Edit_Rescue_details() {
       console.error("Error while updating:", err.response?.data || err.message);
     }
   };
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
 
   return (
@@ -378,8 +389,19 @@ const navigate = useNavigate();
                   </Form.Group>
                 </Col>
                 <Col md={4}>
-                 
+
                   <Form.Group as={Row} className="mb-1 text-start" controlId="formAdmissionNo">
+                    <Form.Label column sm="5">
+                      Admission Date :
+                    </Form.Label>
+                    <Col sm="7">
+                      <Form.Control
+                        name="admission_date"
+                        type='date'
+                        value={formatDateOnly(formData.admission_date)}
+                        onChange={handleInputChange}
+                        required />
+                    </Col>
                     <Form.Label column sm="5">
                       Admission Number :
                     </Form.Label>
@@ -831,7 +853,7 @@ const navigate = useNavigate();
                         required />
                     </Col>
                   </Form.Group>
-                   <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                  <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
                     <Form.Label column sm="4">
                       Self-Care Capacity :
                     </Form.Label>
@@ -846,7 +868,7 @@ const navigate = useNavigate();
                         required />
                     </Col>
                   </Form.Group>
-                   <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                  <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
                     <Form.Label column sm="4">
                       Diagnosis :
                     </Form.Label>
@@ -862,7 +884,7 @@ const navigate = useNavigate();
                     </Col>
                   </Form.Group>
                 </Col>
-                
+
               </Row>
               <Button type="submit">Update</Button>
             </Form>

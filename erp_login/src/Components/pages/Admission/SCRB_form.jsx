@@ -75,7 +75,7 @@ function SCRB_form() {
 
                 const imagePath = result.data.rescue_image.startsWith("http")
                     ? result.data.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.data.rescue_image}`;
+                    : `https://www.pahrultours.com/app2${result.data.rescue_image}`;
 
                 setRescueImage(imagePath);
                 console.log("Image Path:", imagePath);
@@ -217,10 +217,10 @@ function SCRB_form() {
             const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
 
             // Handle old and new photo paths correctly
-            const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2/${data.old_photo}` : null;
-            const newPhotoPath = data.new_photo ? `https://www.pahrultours.com/app2/${data.new_photo}` : null;
-            const signaturepath = data.signature ? `https://www.pahrultours.com/app2/${data.signature}` : null;
-            const sealpath = data.seal ? `https://www.pahrultours.com/app2/${data.seal}` : null;
+            const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2${data.old_photo}` : null;
+            const newPhotoPath = data.new_photo ? `https://www.pahrultours.com/app2${data.new_photo}` : null;
+            const signaturepath = data.signature ? `https://www.pahrultours.com/app2${data.signature}` : null;
+            const sealpath = data.seal ? `https://www.pahrultours.com/app2${data.seal}` : null;
 
             // Set files state
             setFiles((files) => ({

@@ -170,7 +170,7 @@ function Self_Declaration_form() {
             const res = await apiRoute.post('/reunion/create_selfDeclaration', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Self Declaration Form submitted successfully!');
+            alert('Self Declaration Form Created Successfully!');
             window.location.reload();
         } catch (err) {
             console.error(err);

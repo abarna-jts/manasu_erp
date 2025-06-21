@@ -72,23 +72,7 @@ function Media_consent_form() {
     };
 
     const ViewFormData = async () => {
-        // try {
-        //     const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
-        //     const data = response.data;
-
-        //     setFormData((formData) => ({
-        //         ...formData,
-        //         admission_no: data.admission_no || '',
-        //         rescue_name: data.rescue_name || '',
-        //         social_media_consent: data.social_media_consent || '',
-        //         description: data.description || ''
-        //     }));
-
-        //     setPreviewRequested(true); // trigger the effect after state updates
-        // } catch (error) {
-        //     console.error("Error fetching form data:", error);
-        //     alert("Admission Number not found");
-        // }
+        
         try {
             const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
             const data = response.data;

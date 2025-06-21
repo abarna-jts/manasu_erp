@@ -82,7 +82,7 @@ const createForm2A = async (req, res) => {
   } = req.body;
 
   const sql = `
-    INSERT INTO form_2A (
+    INSERT INTO form_2a (
       name_ngo, admission_no, file_no, category, complexion, face,
       addition_category, addition_complexion, addition_face
     )
@@ -142,7 +142,7 @@ const createForm2B = async (req, res) => {
 const createForm2C = async(req, res) => {
   const { name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color } = req.body;
 
-  const Csql = 'INSERT INTO form_2C (name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress,addition_lowerdress,upperdress_color, lowerdress_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  const Csql = 'INSERT INTO form_2c (name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress,addition_lowerdress,upperdress_color, lowerdress_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
   try {
     const [result] = await db.query(Csql, [
