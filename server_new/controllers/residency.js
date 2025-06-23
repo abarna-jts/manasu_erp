@@ -1,51 +1,11 @@
-const db = require('../db');
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
 
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, path.resolve("uploads/Resque_Condition_Images/"));
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + "-" + file.originalname);
-//   },
-// });
+import db from '../db.js';
+import { residencyAsync } from '../util/residentMulter.js';
+import fs from 'fs';
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath;
-
-    // Map field names to folders
-    if (['summary_attach'].includes(file.fieldname)) {
-      uploadPath = path.resolve('uploads/SummaryAttach/');
-    } else {
-      uploadPath = path.resolve('uploads/Resque_Condition_Images/');
-    }
-
-    // Create the folder if it doesn't exist
-    fs.mkdirSync(uploadPath, { recursive: true });
-
-    // Pass the folder to multer
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-
-// const upload = multer({ storage: storage }).single("recovery_photo");
-const upload = multer({ storage: storage }).fields([
-  { name: 'recovery_photo', maxCount: 1 },
-  { name: 'rescue_recovery_photo', maxCount: 1 },
-  { name: 'summary_attach', maxCount: 1 },
-]);
-
-
-const createRescueCondition = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) return res.status(500).json({ message: 'File Upload Error', error: err });
+const createRescueCondition = async (req, res) => {
+  try {
+    await residencyAsync(req, res);
 
     const {
       admission_no,
@@ -83,27 +43,27 @@ const createRescueCondition = (req, res) => {
       follow_up
     ];
 
-
-    db.query(q, values, (dbErr, data) => {
-      if (dbErr) {
-        return res.status(500).json({ message: "Database Error", error: dbErr });
-      }
-      res.status(201).json({ message: "Rescue Condition Created Successfully", data });
-    });
-  });
-};
+    const [result] = await db.query(q, values);
+    res.status(201).json({ message: "Rescue Condition Created Successfully", data: result });
+  } catch (err) {
+    console.error('Error creating rescue condition:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
 
 
-const getConditionDetails = (req, res) => {
+const getConditionDetails = async (req, res) => {
   const query = "Select * from rescue_condition";
 
-  db.query(query, (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: "Database Error", error: err });
-    }
+  try {
+    const [data] = await db.query(query);
     res.status(201).json({ message: "Condition Details Get Successfully", data: data });
-  });
+  } catch (err) {
+    console.error('Error fetching condition details:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
 }
+
 
 const deleteConditionDetails = (req, res) => {
   const rescueId = req.params.id;
@@ -123,114 +83,114 @@ const deleteConditionDetails = (req, res) => {
   });
 }
 
-const getEditData = (req, res) => {
+const getEditData = async (req, res) => {
   const { id } = req.params;
 
   const query = 'SELECT * FROM rescue_condition WHERE id = ?';
-  db.query(query, [id], (err, result) => {
-    if (err) {
-      console.error('DB error:', err);
-      return res.status(500).send('Server error');
-    }
 
+  try {
+    const [result] = await db.query(query, [id]);
     if (result.length === 0) {
-      return res.status(404).send('Rescue Condition not found');
+      return res.status(404).json({ message: 'Rescue Condition not found' });
     }
-
     res.json({
       message: "Rescue Condition Fetched Successfully", data: result[0]
     });
-  });
-};
-
-
-const createRecord = (req, res) => {
-  console.log("req.body:", req.body);
-
-  const {
-    admission_no,
-    month,
-    date,
-    temperature,
-    bp,
-    pulse,
-    weight
-  } = req.body;
-
-
-  const formatDate = (isoDate) => {
-    const d = new Date(isoDate);
-    if (isNaN(d)) return null;
-
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-    const year = d.getFullYear();
-
-    return `${day}-${month}-${year}`; // dd-mm-yyyy
-  };
-
-
-  const dateFormatted = formatDate(date);
-
-  if (!dateFormatted) {
-    return res.status(400).json({ message: "Invalid date format" });
+  } catch (err) {
+    console.error('Error fetching rescue condition:', err);
+    res.status(500).json({ message: "Database Error", error: err });
   }
+}
 
-  const q = `
+
+
+const createRecord = async (req, res) => {
+  console.log("req.body:", req.body);
+  try {
+    const {
+      admission_no,
+      month,
+      date,
+      temperature,
+      bp,
+      pulse,
+      weight
+    } = req.body;
+
+    const formatDate = (isoDate) => {
+      const d = new Date(isoDate);
+      if (isNaN(d)) return null;
+
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+      const year = d.getFullYear();
+
+      return `${day}-${month}-${year}`; // dd-mm-yyyy
+    };
+
+    const dateFormatted = formatDate(date);
+
+    if (!dateFormatted) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    const q = `
     INSERT INTO nurse_record 
       (admission_no, month, date, temperature, bp, pulse, weight) 
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    month,
-    dateFormatted,
-    temperature,
-    bp,
-    pulse,
-    weight
-  ];
-
-  db.query(q, values, (dbErr, data) => {
-    if (dbErr) {
-      return res.status(500).json({ message: "Database Error", error: dbErr });
-    }
-    res.status(201).json({ message: "Nurse Record Sheet Created Successfully", data });
-  });
+    const values = [
+      admission_no,
+      month,
+      dateFormatted,
+      temperature,
+      bp,
+      pulse,
+      weight
+    ];
+    const [result] = await db.query(q, values);
+    console.log("Record created successfully:", result);
+    res.status(201).json({ message: "Nurse Record Sheet Created Successfully", data: result });
+  } catch (err) {
+    console.error('Error creating nurse record:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
 };
 
-const updateNurseRecords = (req, res) => {
-  const {
-    currentMonth,
-    temperature,
-    bp,
-    pulse,
-    weight,
-    date
-  } = req.body;
 
-  const recordID = req.params.id;
+const updateNurseRecords = async (req, res) => {
+  try {
+    const {
+      currentMonth,
+      temperature,
+      bp,
+      pulse,
+      weight,
+      date
+    } = req.body;
 
-  const formatDate = (isoDate) => {
-    const d = new Date(isoDate);
-    if (isNaN(d)) return null;
+    const recordID = req.params.id;
 
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-    const year = d.getFullYear();
+    const formatDate = (isoDate) => {
+      const d = new Date(isoDate);
+      if (isNaN(d)) return null;
 
-    return `${day}-${month}-${year}`; // dd-mm-yyyy
-  };
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+      const year = d.getFullYear();
+
+      return `${day}-${month}-${year}`; // dd-mm-yyyy
+    };
 
 
-  const dateFormatted = formatDate(date);
+    const dateFormatted = formatDate(date);
 
-  if (!dateFormatted) {
-    return res.status(400).json({ message: "Invalid date format" });
-  }
+    if (!dateFormatted) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
 
-  const recordupdate = `UPDATE nurse_record SET
+    const recordupdate = `UPDATE nurse_record SET
                        month=?,
                        date=?,
                        temperature=?,
@@ -239,101 +199,112 @@ const updateNurseRecords = (req, res) => {
                        weight=?
                       WHERE id=? `;
 
-  const values = [
-    currentMonth,
-    dateFormatted,
-    temperature,
-    bp,
-    pulse,
-    weight,
-    recordID
-  ];
-
-  db.query(recordupdate, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
+    const values = [
+      currentMonth,
+      dateFormatted,
+      temperature,
+      bp,
+      pulse,
+      weight,
+      recordID
+    ];
+    const [updateResult] = await db.query(recordupdate, values);
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ message: "No record found with this ID" });
     }
-
     return res.status(200).json({ message: "Nurse Record updated successfully!" });
-  });
+  } catch (err) {
+    console.error('Error updating nurse record:', err);
+    return res.status(500).json({ message: "Database Error", error: err });
+  }
 }
 
 
-const createDrConsultant = (req, res) => {
-  const { rescue_name,
-    admissionNumber,
-    rescue_age,
-    rescue_gender,
-    mfm_no,
-    ward_no,
-    bed_no,
-    consultants,
-    dr_name,
-    dr_qualification,
-    consult_dr_name,
-    consult_dr_quali
-  } = req.body;
-  const sql = 'INSERT INTO dr_consultancy (rescue_name, admissionNumber, rescue_age, rescue_gender, mfm_no, ward_no, bed_no, consultants, dr_name, dr_qualification, consult_dr_name, consult_dr_quali) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-  db.query(sql, [
-    rescue_name,
-    admissionNumber,
-    rescue_age,
-    rescue_gender,
-    mfm_no,
-    ward_no,
-    bed_no,
-    consultants,
-    dr_name,
-    dr_qualification,
-    consult_dr_name,
-    consult_dr_quali
-  ], (err, result) => {
-    if (err) {
-      console.error('Error inserting data: ' + err.stack);
-      res.status(500).send('Error inserting data');
-      return;
-    }
+const createDrConsultant = async (req, res) => {
+  try {
+    const {
+      rescue_name,
+      admissionNumber,
+      rescue_age,
+      rescue_gender,
+      mfm_no,
+      ward_no,
+      bed_no,
+      consultants,
+      dr_name,
+      dr_qualification,
+      consult_dr_name,
+      consult_dr_quali
+    } = req.body;
+
+    const sql = `
+      INSERT INTO dr_consultancy (
+        rescue_name, admissionNumber, rescue_age, rescue_gender,
+        mfm_no, ward_no, bed_no, consultants,
+        dr_name, dr_qualification, consult_dr_name, consult_dr_quali
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    const values = [
+      rescue_name,
+      admissionNumber,
+      rescue_age,
+      rescue_gender,
+      mfm_no,
+      ward_no,
+      bed_no,
+      consultants,
+      dr_name,
+      dr_qualification,
+      consult_dr_name,
+      consult_dr_quali
+    ];
+
+    const [result] = await db.query(sql, values);
+
     console.log('Data inserted successfully');
-    res.status(200).send('Data inserted successfully');
-  });
-}
+    res.status(200).json({ message: 'Data inserted successfully', result });
 
-const getDrConsultant = (req, res) => {
+  } catch (err) {
+    console.error('Error inserting data:', err);
+    res.status(500).json({ message: 'Error inserting data', error: err });
+  }
+};
+
+const getDrConsultant = async (req, res) => {
   const admissionNumber = req.params.admissionNumber;
   const query = 'SELECT * FROM dr_consultancy WHERE admissionNumber = ?';
 
-  db.query(query, [admissionNumber], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admissionNumber]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Doctor Consultant not found' });
     }
+    return res.json(results[0]);
+  } catch (err) {
+    console.error('Error fetching doctor consultant:', err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+};
 
-    res.json(results[0]);
-  });
-}
+const UpdateDrConsultant = async (req, res) => {
+  try {
+    const {
+      rescue_name,
+      rescue_age,
+      rescue_gender,
+      mfm_no,
+      ward_no,
+      bed_no,
+      consultants,
+      dr_name,
+      dr_qualification,
+      consult_dr_name,
+      consult_dr_quali
+    } = req.body;
 
-const UpdateDrConsultant = (req, res) => {
-  const {
-    rescue_name,
-    rescue_age,
-    rescue_gender,
-    mfm_no,
-    ward_no,
-    bed_no,
-    consultants,
-    dr_name,
-    dr_qualification,
-    consult_dr_name,
-    consult_dr_quali
-  } = req.body;
+    const admissionNumber = req.params.admissionNumber;
 
-  const admissionNumber = req.params.admissionNumber;
-
-  const updateQuery = `
+    const updateQuery = `
     UPDATE dr_consultancy SET 
       rescue_name = ?, 
       rescue_age = ?, 
@@ -349,32 +320,34 @@ const UpdateDrConsultant = (req, res) => {
     WHERE admissionNumber = ?
   `;
 
-  const values = [
-    rescue_name,
-    rescue_age,
-    rescue_gender,
-    mfm_no,
-    ward_no,
-    bed_no,
-    consultants,
-    dr_name,
-    dr_qualification,
-    consult_dr_name,
-    consult_dr_quali,
-    admissionNumber
-  ];
-
-  db.query(updateQuery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
+    const values = [
+      rescue_name,
+      rescue_age,
+      rescue_gender,
+      mfm_no,
+      ward_no,
+      bed_no,
+      consultants,
+      dr_name,
+      dr_qualification,
+      consult_dr_name,
+      consult_dr_quali,
+      admissionNumber
+    ];
+    const [result] = await db.query(updateQuery, values);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "No doctor consultancy found with this admission number" });
     }
-
-    return res.status(200).json({ message: "Self Declaration updated successfully!" });
-  });
+    return res.status(200).json({ message: "Doctor Consultancy updated successfully" });
+  } catch (err) {
+    console.error('Error updating doctor consultancy:', err);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
 };
 
 
-const getNurseRecord = (req, res) => {
+
+const getNurseRecord = async (req, res) => {
   const query = `
     SELECT 
       nurse_record.*, 
@@ -387,36 +360,39 @@ const getNurseRecord = (req, res) => {
       nurse_record.admission_no = first_information.admission_no
   `;
 
-  db.query(query, (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: "Database Error", error: err });
+  try {
+    const [data] = await db.query(query);
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No Nurse Records found" });
     }
-    res.status(201).json({ message: "Nurse Records Retrieved Successfully", data: data });
-  });
-};
+    res.status(200).json({ message: "Nurse Records Retrieved Successfully", data: data });
+  } catch (err) {
+    console.error('Error fetching nurse records:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
 
-const getNurseRecordbyID = (req, res) => {
+const getNurseRecordbyID = async (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM nurse_record WHERE id = ?';
 
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Nurse Records not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error('Error fetching nurse record by ID:', err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 };
 
 
-const createObservationReport = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) return res.status(500).json({ message: 'File Upload Error', error: err });
+const createObservationReport = async (req, res) => {
+  try {
+    // Await file upload
+    await residencyAsync(req, res);
 
     const {
       admission_no,
@@ -425,15 +401,11 @@ const createObservationReport = (req, res) => {
       follow_up
     } = req.body;
 
-    // const recovery_photo_path = req.file
-    //   ? `uploads/Resque_Condition_Images/${req.file.filename}`
-    //   : null;
-
     const recovery_photo_path = req.files['recovery_photo']
       ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
       : null;
 
-
+    // Format date (dd-mm-yyyy)
     const formatDate = (isoDate) => {
       const d = new Date(isoDate);
       if (isNaN(d)) return 'Invalid';
@@ -443,10 +415,10 @@ const createObservationReport = (req, res) => {
     const obdateFormatted = formatDate(date);
 
     const q = `
-          INSERT INTO observation_report 
-            (admission_no, resident_name, date, recovery_photo, follow_up) 
-          VALUES (?, ?, ?, ?, ?)
-        `;
+      INSERT INTO observation_report 
+        (admission_no, resident_name, date, recovery_photo, follow_up) 
+      VALUES (?, ?, ?, ?, ?)
+    `;
 
     const values = [
       admission_no,
@@ -456,49 +428,50 @@ const createObservationReport = (req, res) => {
       follow_up
     ];
 
-    db.query(q, values, (dbErr, data) => {
-      if (dbErr) {
-        return res.status(500).json({ message: "Database Error", error: dbErr });
-      }
-      res.status(201).json({ message: "Rescue Condition Created Successfully", data });
-    });
-  });
-}
+    const [result] = await db.query(q, values);
 
-const getObservationReport = (req, res) => {
+    res.status(201).json({ message: "Rescue Condition Created Successfully", result });
+
+  } catch (err) {
+    console.error("Error in createObservationReport:", err);
+    res.status(500).json({ message: "Server Error", error: err });
+  }
+};
+
+const getObservationReport = async (req, res) => {
   const query = "Select * from observation_report";
-
-  db.query(query, (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: "Database Error", error: err });
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No Observation Report found" });
     }
-    res.status(201).json({ message: "Condition Details Get Successfully", data: data });
-  });
+    res.status(200).json({ message: "Observation Report Retrieved Successfully", data: result });
+  } catch (err) {
+    console.error('Error fetching Observation report:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+
 }
 
-const showObservationReport = (req, res) => {
+const showObservationReport = async (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM observation_report WHERE id = ?';
-
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
+  try {
+    const [result] = await db.query(query, [id]);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No Observation Report found" });
     }
+    res.json(result[0]);
+  } catch (err) {
+    console.error('Error fetching Observation report:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Observation Report not found' });
-    }
-
-    res.json(results[0]);
-  });
 }
 
-const updateObservationReport = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: "File upload failed", error: err });
-    }
+const updateObservationReport = async (req, res) => {
+  try {
+    await residencyAsync(req, res);
     const {
       resident_name,
       date,
@@ -511,16 +484,24 @@ const updateObservationReport = (req, res) => {
       ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
       : null;
 
-    const editQuery = "SELECT recovery_photo FROM observation_report WHERE admission_no = ?";
-    db.query(editQuery, [admission_no], (editErr, editData) => {
-      if (editErr) {
-        return res.status(500).json({ message: "Failed to retrieve logo", error: editErr });
-      }
+    const [existingData] = await db.query(
+      "SELECT recovery_photo FROM observation_report WHERE admission_no = ?",
+      [admission_no]
+    );
 
-      const existingRecoveryPath = editData[0]?.recovery_photo;
-      const finalRecoveryPath = newRecoveryPhoto || existingRecoveryPath;
+    const existingRecoveryPath = existingData[0]?.recovery_photo;
+    const finalRecoveryPath = newRecoveryPhoto || existingRecoveryPath;
 
-      const updateQuery = `
+    // Format date to dd-mm-yyyy
+    const formatDate = (isoDate) => {
+      const d = new Date(isoDate);
+      if (isNaN(d)) return 'Invalid';
+      return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+    };
+
+    const obdateFormatted = formatDate(date);
+
+    const updateQuery = `
         UPDATE observation_report SET
         resident_name=?,
         date = ?,
@@ -528,65 +509,50 @@ const updateObservationReport = (req, res) => {
         follow_up = ?
         WHERE admission_no = ?`;
 
-      const formatDate = (isoDate) => {
-        const d = new Date(isoDate);
-        if (isNaN(d)) return 'Invalid';
-        return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
-      };
+    const values = [
+      resident_name,
+      obdateFormatted,
+      finalRecoveryPath,
+      follow_up,
+      admission_no
+    ];
 
-      const obdateFormatted = formatDate(date);
-
-      const values = [
-        resident_name,
-        obdateFormatted,
-        finalRecoveryPath,
-        follow_up,
-        admission_no
-      ]
-
-      db.query(updateQuery, values, (updateErr, data) => {
-        if (updateErr) {
-          return res.status(500).json({ message: "Update failed", error: updateErr });
-        }
-
-        if (newRecoveryPhoto && existingRecoveryPath) {
-          // Delete the old logo file
-          fs.unlink(existingRecoveryPath, (fsErr) => {
-            if (fsErr) console.warn("Failed to delete old logo:", fsErr);
-          });
-        }
-
-        res.status(200).json({ message: "Observation updated successfully" });
+    const [updateResult] = await db.query(updateQuery, values);
+    // Delete old file if a new one was uploaded
+    if (newRecoveryPhoto && existingRecoveryPath) {
+      fs.unlink(existingRecoveryPath, (fsErr) => {
+        if (fsErr) console.warn("Failed to delete old photo:", fsErr);
       });
+    }
 
-    })
+    res.status(200).json({ message: "Observation updated successfully" });
 
-  });
+  } catch (err) {
+    console.error("Error in updateObservationReport:", err);
+    res.status(500).json({ message: "Server Error", error: err });
+  }
 };
 
-const showRescueCondition = (req, res) => {
+const showRescueCondition = async (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM rescue_condition WHERE id = ?';
 
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
-      return res.status(404).json({ message: 'Observation Report not found' });
+      return res.status(404).json({ message: 'Rescue Condition not found' });
     }
-
     res.json(results[0]);
-  });
-}
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+};
 
-const updateRescueCondition = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: "File upload failed", error: err });
-    }
+
+const updateRescueCondition = async (req, res) => {
+  try {
+    await residencyAsync(req, res);
     const {
       resident_name,
       date,
@@ -595,20 +561,21 @@ const updateRescueCondition = (req, res) => {
 
     const admission_no = req.params.admission_no;
 
-    const newRecoveryPhoto =  req.files['rescue_recovery_photo']
+    const newRecoveryPhoto = req.files['rescue_recovery_photo']
       ? `uploads/Resque_Condition_Images/${req.files['rescue_recovery_photo'][0].filename}`
       : null;
 
-    const editQuery = "SELECT rescue_recovery_photo FROM rescue_condition WHERE admission_no = ?";
-    db.query(editQuery, [admission_no], (editErr, editData) => {
-      if (editErr) {
-        return res.status(500).json({ message: "Failed to retrieve logo", error: editErr });
-      }
+    const [selectData] = await db.query("SELECT rescue_recovery_photo FROM rescue_condition WHERE admission_no = ?", [admission_no]);
+    if (selectData.length === 0) {
+      return res.status(404).json({ message: "Rescue Condition not found" });
+    }
+    const existingRecoveryPath = selectData[0].rescue_recovery_photo;
+    const finalRecoveryPath = newRecoveryPhoto || existingRecoveryPath;
+    if (!finalRecoveryPath) {
+      return res.status(400).json({ message: "No recovery photo provided" });
+    }
 
-      const existingRecoveryPath = editData[0]?.rescue_recovery_photo;
-      const finalRecoveryPath = newRecoveryPhoto || existingRecoveryPath;
-
-      const updateQuery = `
+    const updateQuery = `
         UPDATE rescue_condition SET
         resident_name=?,
         date = ?,
@@ -616,88 +583,84 @@ const updateRescueCondition = (req, res) => {
         follow_up = ?
         WHERE admission_no = ?`;
 
-      const formatDate = (isoDate) => {
-        const d = new Date(isoDate);
-        if (isNaN(d)) return 'Invalid';
-        return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
-      };
+    const formatDate = (isoDate) => {
+      const d = new Date(isoDate);
+      if (isNaN(d)) return 'Invalid';
+      return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+    };
 
-      const dateFormatted = formatDate(date);
+    const dateFormatted = formatDate(date);
 
-      const values = [
-        resident_name,
-        dateFormatted,
-        finalRecoveryPath,
-        follow_up,
-        admission_no
-      ]
+    const values = [
+      resident_name,
+      dateFormatted,
+      finalRecoveryPath,
+      follow_up,
+      admission_no
+    ]
 
-      db.query(updateQuery, values, (updateErr, data) => {
-        if (updateErr) {
-          return res.status(500).json({ message: "Update failed", error: updateErr });
-        }
-
-        if (newRecoveryPhoto && existingRecoveryPath) {
-          // Delete the old logo file
-          fs.unlink(existingRecoveryPath, (fsErr) => {
-            if (fsErr) console.warn("Failed to delete old logo:", fsErr);
-          });
-        }
-
-        res.status(200).json({ message: "Consultation Report updated successfully" });
+    const [result] = await db.query(updateQuery, values);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "No rescue condition found with this admission number" });
+    }
+    if (newRecoveryPhoto && existingRecoveryPath) {
+      // Delete the old logo file
+      fs.unlink(existingRecoveryPath, (fsErr) => {
+        if (fsErr) console.warn("Failed to delete old logo:", fsErr);
       });
-    })
-  });
-}
-
-const createPrescription = (req, res) => {
-  const {
-    admission_no,
-    rescue_name,
-    age,
-    current_date,
-    op_no,
-    hospital_name,
-    department,
-    masterHealthCheckup,
-    medical_type,
-    instruction,
-    advice,
-    follow_up,
-    prescription_medicines, // <-- array of row data
-  } = req.body;
-
-  if (!admission_no) {
-    return res.status(400).json({ error: 'Missing admission_no' });
+    }
+    res.status(200).json({ message: "Rescue Condition updated successfully" });
+  } catch (err) {
+    console.error('Error updating rescue condition:', err);
+    res.status(500).json({ message: "Database Error", error: err });
   }
 
-  // Insert into prescription table
-  const sql = `
+}
+
+const createPrescription = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      rescue_name,
+      age,
+      current_date,
+      op_no,
+      hospital_name,
+      department,
+      masterHealthCheckup,
+      medical_type,
+      instruction,
+      advice,
+      follow_up,
+      prescription_medicines, // <-- array of row data
+    } = req.body;
+
+    if (!admission_no) {
+      return res.status(400).json({ error: 'Missing admission_no' });
+    }
+
+    // Insert into prescription table
+    const sql = `
     INSERT INTO prescription (
       admission_no, rescue_name, age, created_date, op_no, hospital_name, department,
       masterHealthCheckup, medical_type, instruction, advice, follow_up
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  const values = [
-    admission_no,
-    rescue_name,
-    age,
-    current_date,
-    op_no,
-    hospital_name,
-    department,
-    masterHealthCheckup,
-    medical_type,
-    instruction,
-    advice,
-    follow_up,
-  ];
-
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database Error', error: err });
-    }
-
+    const values = [
+      admission_no,
+      rescue_name,
+      age,
+      current_date,
+      op_no,
+      hospital_name,
+      department,
+      masterHealthCheckup,
+      medical_type,
+      instruction,
+      advice,
+      follow_up,
+    ];
+    const [result] = await db.query(sql, values);
     const prescription_id = result.insertId;
 
     // If no medicine rows, just return
@@ -751,33 +714,40 @@ const createPrescription = (req, res) => {
       JSON.stringify(medicineData.night),
     ];
 
-    db.query(medSql, medValues, (medErr, medResult) => {
-      if (medErr) {
-        return res.status(500).json({ message: 'Error inserting medicine summary', error: medErr });
-      }
-
-      res.status(201).json({
-        message: 'Prescription and Medicine Summary Saved Successfully',
-        prescriptionId: prescription_id,
-      });
+    const [medResult] = await db.query(medSql, medValues);
+    if (medResult.affectedRows === 0) {
+      return res.status(500).json({ message: 'Error inserting medicine summary' });
+    }
+    res.status(201).json({
+      message: 'Prescription and Medicine Summary Saved Successfully',
+      prescriptionId: prescription_id,
     });
-  });
-};
+  } catch (err) {
+    console.error('Error creating prescription:', err);
+    res.status(500).json({ message: 'Database Error', error: err });
+  }
+}
 
-const getPrescription = (req, res) => {
+
+
+const getPrescription = async (req, res) => {
   const query = `SELECT DISTINCT prescription.*,prescription_medicines.prescription_id
 FROM prescription
 JOIN prescription_medicines ON prescription.id = prescription_medicines.prescription_id;`;
 
-  db.query(query, (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: "Database Error", error: err });
+  try {
+    const [data] = await db.query(query);
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No Prescription Records found" });
     }
-    res.status(201).json({ message: "Condition Details Get Successfully", data: data });
-  });
+    res.status(200).json({ message: "Prescription Records Retrieved Successfully", data: data });
+  } catch (err) {
+    console.error('Error fetching prescription records:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
 }
 
-const getPrescriptionbyID = (req, res) => {
+const getPrescriptionbyID = async (req, res) => {
   const id = req.params.id;
 
   const query = `
@@ -786,17 +756,11 @@ const getPrescriptionbyID = (req, res) => {
     LEFT JOIN prescription_medicines pm ON p.id = pm.prescription_id
     WHERE p.id = ?;
   `;
-
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Prescription not found' });
     }
-
     const prescription = {
       id: results[0].id,
       admission_no: results[0].admission_no,
@@ -824,14 +788,15 @@ const getPrescriptionbyID = (req, res) => {
         night: row.night,
       })),
     };
-
-    res.json(prescription);
-  });
+    res.status(200).json({ prescription });
+  } catch (err) {
+    console.error('Error fetching prescription by ID:', err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 };
 
 
-
-const updatePrescription = (req, res) => {
+const updatePrescription = async (req, res) => {
   const id = req.params.id;
   const {
     admission_no,
@@ -851,55 +816,51 @@ const updatePrescription = (req, res) => {
     return res.status(400).json({ error: 'Missing admission_no' });
   }
 
-  console.log("Updating prescription ID:", id);
+  try {
+    // 1. Update main prescription
+    const sql = `
+      UPDATE prescription SET
+        admission_no = ?, 
+        rescue_name = ?, 
+        age = ?, 
+        op_no = ?, 
+        hospital_name = ?, 
+        department = ?,
+        masterHealthCheckup = ?, 
+        instruction = ?, 
+        advice = ?, 
+        follow_up = ?
+      WHERE id = ?`;
 
-  const sql = `
-    UPDATE prescription SET
-      admission_no = ?, 
-      rescue_name = ?, 
-      age = ?, 
-      op_no = ?, 
-      hospital_name = ?, 
-      department = ?,
-      masterHealthCheckup = ?, 
-      instruction = ?, 
-      advice = ?, 
-      follow_up = ?
-    WHERE id = ?`;
+    const values = [
+      admission_no,
+      rescue_name,
+      age,
+      op_no,
+      hospital_name,
+      department,
+      masterHealthCheckup,
+      instruction,
+      advice,
+      follow_up,
+      id,
+    ];
 
-  const values = [
-    admission_no,
-    rescue_name,
-    age,
-    op_no,
-    hospital_name,
-    department,
-    masterHealthCheckup,
-    instruction,
-    advice,
-    follow_up,
-    id,
-  ];
-
-  db.query(sql, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: 'Prescription update failed', error: updateErr });
-    }
+    const [result] = await db.query(sql, values);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'No prescription found with this ID' });
     }
 
+    // 2. If no medicines, return success for prescription update only
     if (!Array.isArray(prescription_medicines) || prescription_medicines.length === 0) {
       return res.status(200).json({ message: 'Prescription updated (no medicines provided)' });
     }
 
-    let completed = 0;
-    let hasError = false;
-
-    prescription_medicines.forEach((med) => {
+    // 3. Process medicines (update or insert)
+    for (const med of prescription_medicines) {
       if (med.id) {
-        // ✅ UPDATE existing medicine
+        // 🔄 UPDATE existing medicine
         const updateMedSql = `
           UPDATE prescription_medicines SET
             medicine = ?, 
@@ -925,19 +886,9 @@ const updatePrescription = (req, res) => {
           id,
         ];
 
-        db.query(updateMedSql, medValues, (medErr) => {
-          completed++;
-          if (medErr && !hasError) {
-            hasError = true;
-            return res.status(500).json({ message: 'Error updating medicine', error: medErr });
-          }
-          if (completed === prescription_medicines.length && !hasError) {
-            return res.status(200).json({ message: 'Prescription and medicines updated successfully' });
-          }
-        });
-
+        await db.query(updateMedSql, medValues);
       } else {
-        // ✅ INSERT new medicine (no id)
+        // ➕ INSERT new medicine
         const insertMedSql = `
           INSERT INTO prescription_medicines 
           (prescription_id, medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night)
@@ -955,24 +906,22 @@ const updatePrescription = (req, res) => {
           med.night,
         ];
 
-        db.query(insertMedSql, medValues, (medErr) => {
-          completed++;
-          if (medErr && !hasError) {
-            hasError = true;
-            return res.status(500).json({ message: 'Error inserting medicine', error: medErr });
-          }
-          if (completed === prescription_medicines.length && !hasError) {
-            return res.status(200).json({ message: 'Prescription and medicines updated/added successfully' });
-          }
-        });
+        await db.query(insertMedSql, medValues);
       }
-    });
-  });
+    }
+
+    // ✅ All updates done
+    return res.status(200).json({ message: 'Prescription and medicines updated successfully' });
+
+  } catch (err) {
+    console.error('Error in updatePrescription:', err);
+    return res.status(500).json({ message: 'Server Error', error: err });
+  }
 };
 
 
-const createDrVisit = (req, res) => {
 
+const createDrVisit = async (req, res) => {
   const {
     dr_name,
     hospital_name,
@@ -981,62 +930,70 @@ const createDrVisit = (req, res) => {
     resident_examinite
   } = req.body;
 
-  const sql = 'INSERT INTO dr_visit (dr_name, hospital_name, date_time, report, resident_examinite) VALUES (?, ?, ?, ?, ?)';
+  const sql = `
+    INSERT INTO dr_visit (
+      dr_name, hospital_name, date_time, report, resident_examinite
+    ) VALUES (?, ?, ?, ?, ?)
+  `;
 
-  db.query(sql, [
+  const values = [
     dr_name,
     hospital_name,
     date_time,
     report,
     resident_examinite
-  ], (err, result) => {
-    if (err) {
-      console.error('Error inserting data: ' + err.stack);
-      res.status(500).send('Error inserting data');
-      return;
-    }
-    console.log('Data inserted successfully');
-    res.status(200).send('Data inserted successfully');
-  });
-}
+  ];
 
-const getAllDrVisit = (req, res) => {
+  try {
+    const [result] = await db.query(sql, values);
+    console.log('Data inserted successfully:', result);
+    res.status(201).json({ message: 'Doctor visit data inserted successfully' });
+  } catch (err) {
+    console.error('Error inserting doctor visit data:', err);
+    res.status(500).json({ message: 'Database error', error: err });
+  }
+};
+
+
+const getAllDrVisit = async (req, res) => {
   const query = "Select * from dr_visit";
-
-  db.query(query, (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: "Database Error", error: err });
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Dr Visit is not found" });
     }
-    res.status(201).json({ message: "Doctor Visit form Get Successfully", data: data });
-  });
+    return res.status(200).json({ message: "Doctor Visit form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Dr visit:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
 }
 
-const getDrVisitbyID = (req, res) => {
+const getDrVisitbyID = async (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM dr_visit WHERE id = ?';
 
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
+  try {
+    const [result] = await db.query(query, [id]);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No Observation Report found" });
     }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Dr Visit Records not found' });
-    }
-
-    res.json(results[0]);
-  });
+    res.json(result[0]);
+  } catch (err) {
+    console.error('Error fetching Dr Visit:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
 }
 
-const UpdateDrVisit = (req, res) => {
-  const {
-    dr_name, hospital_name, date_time, resident_examinite, report
-  } = req.body;
+const UpdateDrVisit = async (req, res) => {
+  try {
+    const {
+      dr_name, hospital_name, date_time, resident_examinite, report
+    } = req.body;
 
-  const id = req.params.id;
+    const id = req.params.id;
 
-  const usquery = `UPDATE dr_visit SET
+    const usquery = `UPDATE dr_visit SET
                     dr_name = ?,
                     hospital_name = ?,
                     date_time = ?,
@@ -1044,104 +1001,155 @@ const UpdateDrVisit = (req, res) => {
                     report = ?
                     WHERE id= ?`;
 
-  const values = [
-    dr_name, hospital_name, date_time, resident_examinite, report, id
-  ];
+    const values = [
+      dr_name, hospital_name, date_time, resident_examinite, report, id
+    ];
 
-  db.query(usquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
+    const [result] = await db.query(usquery, values);
+    if(result.affectedRows === 0){
+      return res.status(404).json({ message: "No record found with this ID" });
     }
-
     return res.status(200).json({ message: "Dr Visit updated successfully!" });
-  });
+  }catch(err){
+    console.error('Error updating Dr Visit:', err);
+    return res.status(500).json({ message: "Database Error", error: err });
+  }
+  
 }
 
-const createMedicalCamp = (req, res) => {
+const createMedicalCamp = async (req, res) => {
   const {
-    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details
+    camp_name,
+    hospital_name,
+    date,
+    camp_type,
+    organised_by,
+    participants,
+    feedback,
+    general_details
   } = req.body;
 
-  const sql = 'INSERT INTO medical_camp (camp_name, hospital_name, date, camp_type, organised_by,participants,feedback,general_details) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+  const sql = `
+    INSERT INTO medical_camp (
+      camp_name, hospital_name, date, camp_type,
+      organised_by, participants, feedback, general_details
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
-  db.query(sql, [
-    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details || "Null"
-  ], (err, result) => {
-    if (err) {
-      console.error('Error inserting data: ' + err.stack);
-      res.status(500).send('Error inserting data');
-      return;
-    }
+  const values = [
+    camp_name,
+    hospital_name,
+    date,
+    camp_type,
+    organised_by,
+    participants,
+    feedback,
+    general_details || "Null"
+  ];
+
+  try {
+    const [result] = await db.query(sql, values);
     console.log('Data inserted successfully');
-    res.status(200).send('Data inserted successfully');
-  });
-}
+    res.status(201).json({ message: 'Medical camp created successfully', result });
+  } catch (err) {
+    console.error('Error inserting medical camp data:', err);
+    res.status(500).json({ message: 'Database error', error: err });
+  }
+};
 
-const getMedicalCamp = (req, res) => {
-  const query = "Select * from medical_camp";
 
-  db.query(query, (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: "Database Error", error: err });
+const getMedicalCamp = async (req, res) => {
+  const query = "SELECT * FROM medical_camp";
+  try {
+    const [results] = await db.query(query);
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Medical Camp records not found" });
     }
-    res.status(201).json({ message: "Medical Camp form Get Successfully", data: data });
-  });
-}
+    return res.status(200).json({
+      message: "Medical Camp form fetched successfully",
+      data: results   // ✅ Send the actual data here
+    });
+  } catch (err) {
+    console.log("Error getting medical camp data", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+};
 
-const getMedicalCampID = (req, res) => {
+
+const getMedicalCampID = async(req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM medical_camp WHERE id = ?';
-
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
+  try{
+    const [result] = await db.query(query, [id]);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No Medical Report found" });
     }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Medical Camp Records not found' });
-    }
-
-    res.json(results[0]);
-  });
+    res.json(result[0]);
+  } catch (err) {
+    console.error('Error fetching Medical Camp data:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
 }
 
-const updateMedicalCamp = (req, res) => {
+const updateMedicalCamp = async (req, res) => {
   const {
-    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details
+    camp_name,
+    hospital_name,
+    date,
+    camp_type,
+    organised_by,
+    participants,
+    feedback,
+    general_details
   } = req.body;
 
   const id = req.params.id;
 
-  const usquery = `UPDATE medical_camp SET
-                    camp_name = ?,
-                    hospital_name = ?,
-                    date = ?,
-                    camp_type = ?, 
-                    organised_by = ?,
-                    participants = ?,
-                    feedback = ?,
-                    general_details = ?
-                    WHERE id= ?`;
+  const usquery = `
+    UPDATE medical_camp SET
+      camp_name = ?,
+      hospital_name = ?,
+      date = ?,
+      camp_type = ?, 
+      organised_by = ?,
+      participants = ?,
+      feedback = ?,
+      general_details = ?
+    WHERE id = ?
+  `;
 
   const values = [
-    camp_name, hospital_name, date, camp_type, organised_by, participants, feedback, general_details, id
+    camp_name,
+    hospital_name,
+    date,
+    camp_type,
+    organised_by,
+    participants,
+    feedback,
+    general_details,
+    id
   ];
 
-  db.query(usquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
+  try {
+    const [result] = await db.query(usquery, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "No medical camp found with this ID." });
     }
 
     return res.status(200).json({ message: "Medical Camp updated successfully!" });
-  });
-}
+  } catch (error) {
+    console.error("Error updating medical camp:", error);
+    return res.status(500).json({ message: "Database error during update", error });
+  }
+};
 
-const createSummary = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: "File upload failed", error: err });
-    }
+
+const createSummary = async (req, res) => {
+  try {
+    // Await file upload
+    await residencyAsync(req, res);
+
     const {
       rescue_name,
       admission_no,
@@ -1149,11 +1157,15 @@ const createSummary = (req, res) => {
       report
     } = req.body;
 
-    // File paths
-    const SummaryAttachPath = req.files['summary_attach'] ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}` : null;
+    // File path
+    const SummaryAttachPath = req.files?.['summary_attach']
+      ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
+      : null;
 
-    const q = `INSERT INTO reunion_summary(admission_no,rescue_name,date,summary_attach,report)
-                VALUES(?,?,?,?,?)`;
+    const q = `
+      INSERT INTO reunion_summary(admission_no, rescue_name, date, summary_attach, report)
+      VALUES (?, ?, ?, ?, ?)
+    `;
 
     const values = [
       admission_no,
@@ -1161,41 +1173,43 @@ const createSummary = (req, res) => {
       date,
       SummaryAttachPath,
       report
-    ]
+    ];
 
-    db.query(q, values, (dbErr, data) => {
-      if (dbErr) {
-        return res.status(500).json({ message: "Database Error", error: dbErr });
-      }
-      res.status(201).json({ message: "Reunion Summary Form Created Successfully", data: data });
+    const [result] = await db.query(q, values);
+
+    res.status(201).json({
+      message: "Reunion Summary Form Created Successfully",
+      data: result
     });
 
-  });
-}
-
-const getSummary = (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM reunion_summary WHERE admission_no = ?';
-
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Reunion Summary not found' });
-    }
-
-    res.json(results[0]);
-  });
+  } catch (err) {
+    console.error("Error creating reunion summary:", err);
+    res.status(500).json({
+      message: "Server error while creating reunion summary",
+      error: err
+    });
+  }
 };
 
-const updateSummary = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: "File upload failed", error: err });
+const getSummary = async(req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM reunion_summary WHERE admission_no = ?';
+  try{
+    const [result] = await db.query(query, [admission_no]);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No Summary Details found" });
     }
+    res.json(result[0]);
+  }catch (err) {
+    console.error('Error fetching Summary Details:', err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+};
+
+const updateSummary = async (req, res) => {
+  try {
+    // Wait for file upload to complete
+    await residencyAsync(req, res);
 
     const {
       rescue_name,
@@ -1205,51 +1219,45 @@ const updateSummary = (req, res) => {
 
     const admission_no = req.params.admission_no;
 
-    // Safely get file paths
-    const SummaryAttachPath = req.files['summary_attach']
+    const SummaryAttachPath = req.files?.['summary_attach']
       ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
       : null;
 
-    // Fetch existing image paths from DB
+    // Get existing file path from DB
     const selectQuery = "SELECT summary_attach FROM reunion_summary WHERE admission_no = ?";
-    db.query(selectQuery, [admission_no], (selectErr, selectData) => {
-      if (selectErr) {
-        return res.status(500).json({ message: "Failed to retrieve existing files", error: selectErr });
-      }
+    const [selectData] = await db.query(selectQuery, [admission_no]);
 
-      const existingSummaryPath = selectData[0]?.summary_attach;
+    const existingSummaryPath = selectData[0]?.summary_attach;
+    const finalSummaryAttach = SummaryAttachPath || existingSummaryPath;
 
-      const finalSummaryAttach = SummaryAttachPath || existingSummaryPath;
+    const updateQuery = `
+      UPDATE reunion_summary SET 
+        rescue_name = ?, 
+        date = ?, 
+        summary_attach = ?, 
+        report = ?
+      WHERE admission_no = ?
+    `;
 
-      const updateQuery = `
-                UPDATE reunion_summary SET 
-                    rescue_name = ?, 
-                    date = ?, 
-                    summary_attach = ?, 
-                    report = ?
-                WHERE admission_no = ?
-            `;
+    const values = [
+      rescue_name,
+      date,
+      finalSummaryAttach,
+      report,
+      admission_no
+    ];
 
-      const values = [
-        rescue_name,
-        date,
-        finalSummaryAttach,
-        report,
-        admission_no
-      ];
+    const [result] = await db.query(updateQuery, values);
 
-      db.query(updateQuery, values, (updateErr, result) => {
-        if (updateErr) {
-          return res.status(500).json({ message: "Update failed", error: updateErr });
-        }
+    res.status(200).json({ message: "Reunion Summary updated successfully!" });
 
-        return res.status(200).json({ message: "Reunion Summary updated successfully!" });
-      });
-    });
-  });
-}
+  } catch (error) {
+    console.error("Error updating reunion summary:", error);
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
 
-module.exports = {
+export {
   createRescueCondition,
   getConditionDetails,
   deleteConditionDetails,

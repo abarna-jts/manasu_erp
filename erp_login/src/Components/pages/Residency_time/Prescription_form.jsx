@@ -261,6 +261,7 @@ function Prescription_form() {
         try {
             const res = await apiRoute.post('/residency/createPrescription', data);
             console.log(res);
+            alert("Prescription and Medicine Summary Saved Successfully");
 
             if (res.data.message === "Prescription and Medicine Summary Saved Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
@@ -306,30 +307,36 @@ function Prescription_form() {
             const response = await apiRoute.get(`/residency/getPrescription/${id}`);
             const data = response.data;
 
-            const meds = data.prescription_medicines;
+            const meds = data.prescription?.prescription_medicines;
+
+            if (!meds || meds.length === 0) {
+                console.warn("No prescription medicines found.");
+                setViewData({ ...data.prescription, prescription_medicines: [] });
+                return;
+            }
 
             // Check if data is row-wise (array of objects)
-            if (Array.isArray(meds) && meds.length > 0 && typeof meds[0].medicine === "string" && !meds[0].medicine.startsWith("[")) {
+            if (typeof meds[0].medicine === "string" && !meds[0].medicine.startsWith("[")) {
                 // Plain strings like "CALCIUM"
                 setViewData({
-                    ...data,
+                    ...data.prescription,
                     prescription_medicines: meds,
                 });
             } else {
                 // Data is column-wise JSON stringified
                 const medData = meds[0];
 
-                const medicines = JSON.parse(medData.medicine);
-                const types = JSON.parse(medData.medicine_type);
-                const durations = JSON.parse(medData.duration);
-                const instructions = JSON.parse(medData.med_instruction);
-                const mornings = JSON.parse(medData.morning);
-                const afternoons = JSON.parse(medData.afternoon);
-                const nights = JSON.parse(medData.night);
-                const intakes = JSON.parse(medData.intake);
+                const medicines = JSON.parse(medData.medicine || "[]");
+                const types = JSON.parse(medData.medicine_type || "[]");
+                const durations = JSON.parse(medData.duration || "[]");
+                const instructions = JSON.parse(medData.med_instruction || "[]");
+                const mornings = JSON.parse(medData.morning || "[]");
+                const afternoons = JSON.parse(medData.afternoon || "[]");
+                const nights = JSON.parse(medData.night || "[]");
+                const intakes = JSON.parse(medData.intake || "[]");
 
                 setViewData({
-                    ...data,
+                    ...data.prescription,
                     prescription_medicines: medicines.map((_, i) => ({
                         medicine: medicines[i],
                         medicine_type: types[i],
@@ -348,6 +355,7 @@ function Prescription_form() {
             console.error("Fetch error:", err);
         }
     };
+
 
 
     useEffect(() => {
@@ -385,7 +393,7 @@ function Prescription_form() {
     const handleEditform = async (id) => {
         try {
             const response = await apiRoute.get(`/residency/getPrescription/${id}`);
-            const data = response.data;
+            const data = response.data.prescription;
             const meds = data.prescription_medicines;
 
             // Helper function to safely parse JSON strings
@@ -455,45 +463,45 @@ function Prescription_form() {
 
 
     const handleUpdate = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const admissionNumber = admission_no || formData.admission_no;
+        const admissionNumber = admission_no || formData.admission_no;
 
-    if (!admissionNumber || admissionNumber.trim() === '') {
-        setSubmissionMessage("Admission number is required.");
-        setMessageType("danger");
-        return;
-    }
+        if (!admissionNumber || admissionNumber.trim() === '') {
+            setSubmissionMessage("Admission number is required.");
+            setMessageType("danger");
+            return;
+        }
 
-    const todayDate = new Date().toISOString().split('T')[0];
+        const todayDate = new Date().toISOString().split('T')[0];
 
-    // Construct updated data
-    const updatedData = {
-        ...formData,
-        admission_no: admissionNumber.trim(),
-        current_date: todayDate,
-        prescription_medicines: rows,  // ← updated dynamic table data
-    };
+        // Construct updated data
+        const updatedData = {
+            ...formData,
+            admission_no: data.admission_no || '',
+            current_date: todayDate,
+            prescription_medicines: rows,  // ← updated dynamic table data
+        };
 
-    console.log("Updating data:", updatedData);
+        console.log("Updating data:", updatedData);
 
-    try {
-        const res = await apiRoute.put(`/residency/updatePrescription/${formData.id}`, updatedData); // Make sure formData.id holds the prescription ID
+        try {
+            const res = await apiRoute.put(`/residency/updatePrescription/${formData.id}`, updatedData); // Make sure formData.id holds the prescription ID
 
-        if (res.data.message === "Prescription and Medicine Summary Updated Successfully") {
-            setSubmissionMessage("Prescription updated successfully!");
-            setMessageType("success");
-            setTimeout(() => window.location.reload(), 3000);
-        } else {
-            setSubmissionMessage("Update failed.");
+            if (res.data.message === "Prescription and Medicine Summary Updated Successfully") {
+                setSubmissionMessage("Prescription updated successfully!");
+                setMessageType("success");
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Update failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error updating prescription", error);
+            setSubmissionMessage("Something went wrong.");
             setMessageType("danger");
         }
-    } catch (error) {
-        console.error("Error updating prescription", error);
-        setSubmissionMessage("Something went wrong.");
-        setMessageType("danger");
-    }
-};
+    };
 
 
 

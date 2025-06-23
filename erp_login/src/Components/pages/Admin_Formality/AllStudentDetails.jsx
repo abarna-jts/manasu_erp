@@ -170,6 +170,7 @@ function AllStudentDetails() {
 
             setFormData((formData) => ({
                 ...formData,
+                id: student.stud_id || '',
                 stud_name: student.stud_name || '',
                 stud_id: student.stud_id || '',
                 department: student.department || '',
@@ -197,6 +198,7 @@ function AllStudentDetails() {
     const handleUpdate = async (e) => {
         e.preventDefault();
         const id = formData.id; // ✅ Get it from form data
+        console.log("Updating form with ID:", id);
         if (!id) {
             alert("ID not found.");
             return;

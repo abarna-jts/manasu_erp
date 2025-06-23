@@ -50,11 +50,12 @@ function Medical_camp() {
         try {
             const response = await apiRoute.get('/residency/getAllMedicalCamp');
             console.log("API response:", response.data);
-            setCampDetail(response.data.data);
+            setCampDetail(response.data.data);  // ✅ This will now work correctly
         } catch (error) {
             console.error('Error fetching Medical Camp:', error);
         }
     };
+
 
     const filteredRescueDetails = campDetails.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
@@ -71,7 +72,7 @@ function Medical_camp() {
         try {
             const response = await apiRoute.post("/residency/createMedicalCamp", formData);
             // console.log(response.formData);
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 alert('Form submitted successfully!');
                 window.location.reload();
             } else {
@@ -261,9 +262,9 @@ function Medical_camp() {
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                     {userType === "3" && (
-                                    <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
-                                        <i className="fas fa-plus"></i>
-                                    </InputGroup.Text>
+                                        <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
+                                            <i className="fas fa-plus"></i>
+                                        </InputGroup.Text>
                                     )}
 
                                 </InputGroup>

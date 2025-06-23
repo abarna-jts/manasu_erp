@@ -1,7 +1,7 @@
 import db from "../db.js";
+import { formalityAsync } from "../util/formalityMulter.js";
 
-
-const createSelfDeclaration = async(req, res) => {
+const createSelfDeclaration = async (req, res) => {
     const {
         admission_no,
         rescue_name,
@@ -33,56 +33,57 @@ const createSelfDeclaration = async(req, res) => {
         travel_letter
     ];
 
-    try{
+    try {
         const [data] = await db.query(q, values);
         res.status(201).json({
-            message:"Document Handover Form submitted successfully",
-            data:data
+            message: "Document Handover Form submitted successfully",
+            data: data
         });
-    }catch(err){
+    } catch (err) {
         console.error("Error inserting into formality Declaration:", err);
         res.status(500).json({
-            message:"Database Error",
-            error:err.message
+            message: "Database Error",
+            error: err.message
         });
     }
 }
 
-const getFormalityForm = (req, res) => {
+const getFormalityForm = async (req, res) => {
     const admission_no = req.params.admission_no;
     const query = 'SELECT * FROM formality_declaration WHERE admission_no = ?';
 
-    db.query(query, [admission_no], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Database error' });
-        }
+    try {
+        const [results] = await db.query(query, [admission_no]);
 
         if (results.length === 0) {
             return res.status(404).json({ message: 'Self Declaration Form not found' });
         }
 
-        res.json(results[0]);
-    });
+        return res.status(200).json(results[0]);
+    } catch (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Database error', error: err });
+    }
 }
 
-const updateFormalityForm = (req, res) => {
-    const {
-        rescue_name,
-        age,
-        medicine_provided,
-        toiletries_provided,
-        dress_provided,
-        travel_expenses,
-        welfare_expenses,
-        medical_prescription,
-        discharge_summary,
-        travel_letter
-    } = req.body;
+const updateFormalityForm = async (req, res) => {
+    try {
+        const {
+            rescue_name,
+            age,
+            medicine_provided,
+            toiletries_provided,
+            dress_provided,
+            travel_expenses,
+            welfare_expenses,
+            medical_prescription,
+            discharge_summary,
+            travel_letter
+        } = req.body;
 
-    const admission_no = req.params.admission_no;
+        const admission_no = req.params.admission_no;
 
-    const updateQuery = `UPDATE formality_declaration SET
+        const updateQuery = `UPDATE formality_declaration SET
                             rescue_name = ?,
                             age = ?,
                             medicine_provided = ?,
@@ -95,27 +96,32 @@ const updateFormalityForm = (req, res) => {
                             travel_letter = ?
                         WHERE admission_no = ?`;
 
-    const values = [
-        rescue_name,
-        age,
-        medicine_provided,
-        toiletries_provided,
-        dress_provided,
-        travel_expenses,
-        welfare_expenses,
-        medical_prescription,
-        discharge_summary,
-        travel_letter,
-        admission_no
-    ];
+        const values = [
+            rescue_name,
+            age,
+            medicine_provided,
+            toiletries_provided,
+            dress_provided,
+            travel_expenses,
+            welfare_expenses,
+            medical_prescription,
+            discharge_summary,
+            travel_letter,
+            admission_no
+        ];
 
-    db.query(updateQuery, values, (updateErr, result) => {
-        if (updateErr) {
-            return res.status(500).json({ message: "Update failed", error: updateErr });
+        const [result] = await db.query(updateQuery, values);
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "No record updated. Check if admission_no exists." });
         }
 
         return res.status(200).json({ message: "Self Declaration updated successfully!" });
-    });
+
+    } catch (error) {
+        console.error("Update Error:", error);
+        return res.status(500).json({ message: "Update failed", error });
+    }
+
 }
 
 const deleteFormalityForm = (req, res) => {
@@ -136,11 +142,11 @@ const deleteFormalityForm = (req, res) => {
     });
 }
 
-const createRecords = (req, res) => {
-    upload(req, res, (err) => {
-        if (err) {
-            return res.status(400).json({ message: "File upload error", error: err });
-        }
+const createRecords = async (req, res) => {
+    try {
+        // Handle file upload
+        await formalityAsync(req, res);
+
         const {
             admission_no,
             rescue_name,
@@ -159,24 +165,22 @@ const createRecords = (req, res) => {
             any_other
         } = req.body;
 
-        // if (!req.file) {
-        //     return res.status(400).json({ message: "Bank passbook upload required" });
-        // }
-
-        const bank_passbookPath = req.files['bank_passbook']
+        // File paths if available
+        const bank_passbookPath = req.files?.['bank_passbook']
             ? `uploads/Rescue_Images/${req.files['bank_passbook'][0].filename}`
             : null;
 
-        const Form7Path = req.files['form7_attach']
+        const Form7Path = req.files?.['form7_attach']
             ? `uploads/Rescue_Images/${req.files['form7_attach'][0].filename}`
             : null;
 
-
-        const q = `INSERT INTO essential_records 
-        (admission_no, rescue_name, aadhar_card, udid_no, disability_no,voter_id, form_7,form7_attach,
-         bank_name, account_no, ifsc_code, bank_passbook,
-         insurance_provider, policy_no, validity_period, other_gvt_scheme, any_other)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const q = `
+            INSERT INTO essential_records (
+                admission_no, rescue_name, aadhar_card, udid_no, disability_no, voter_id,
+                form_7, form7_attach, bank_name, account_no, ifsc_code, bank_passbook,
+                insurance_provider, policy_no, validity_period, other_gvt_scheme, any_other
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
 
         const values = [
             admission_no,
@@ -198,40 +202,46 @@ const createRecords = (req, res) => {
             any_other
         ];
 
-        db.query(q, values, (dbErr, data) => {
-            if (dbErr) {
-                return res.status(500).json({ message: "Database Error", error: dbErr });
-            }
-            res.status(201).json({ message: "Essential Records Form Created Successfully", data: data });
+        const [result] = await db.query(q, values);
+
+        res.status(201).json({
+            message: "Essential Records Form Created Successfully",
+            data: result
         });
-    });
+
+    } catch (err) {
+        console.error("Error creating Essential Records:", err);
+        res.status(500).json({
+            message: "Server Error while creating essential records",
+            error: err
+        });
+    }
 };
 
 
-const getEssentialRecords = (req, res) => {
+const getEssentialRecords = async(req, res) => {
     const admission_no = req.params.admission_no;
     const query = 'SELECT * FROM essential_records WHERE admission_no = ?';
 
-    db.query(query, [admission_no], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Database error' });
-        }
+    try{
+        const [results] = await db.query(query, [admission_no]);
 
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Essentail Records Form not found' });
+            return res.status(404).json({ message: 'Essential Records Form not found' });
         }
 
-        res.json(results[0]);
-    });
+        return res.status(200).json(results[0]);
+    }
+    catch (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Database error', error: err });
+    }
 }
 
-const updateEssentialRecords = (req, res) => {
-    upload(req, res, (err) => {
-        if (err) {
-            return res.status(500).json({ message: "File upload failed", error: err });
-        }
 
+const updateEssentialRecords = async(req, res) => {
+    try{
+        await formalityAsync(req, res);
         const {
             rescue_name,
             aadhar_card,
@@ -259,21 +269,23 @@ const updateEssentialRecords = (req, res) => {
             ? `uploads/Rescue_Images/${req.files['form7_attach'][0].filename}`
             : null;
 
-        // Fetch the existing logo path
-        const selectQuery = "SELECT bank_passbook, form7_attach FROM essential_records WHERE admission_no = ?";
-        db.query(selectQuery, [admission_no], (selectErr, selectData) => {
-            if (selectErr) {
-                return res.status(500).json({ message: "Failed to retrieve Bank passbook", error: selectErr });
-            }
+            // Get existing file paths
+        const [selectRows] = await db.query(
+            "SELECT bank_passbook, form7_attach FROM essential_records WHERE admission_no = ?",
+            [admission_no]
+        );
 
-            const existingBankPassbook = selectData[0]?.bank_passbook;
-            const finalBankPassbook = newBankPassbook || existingBankPassbook;
+        if (selectRows.length === 0) {
+            return res.status(404).json({ message: `No record found for admission_no = ${admission_no}` });
+        }
 
-            const existingForm7Attach = selectData[0]?.form7_attach;
-            const finalForm7Attach = newForm7Attach || existingForm7Attach;
+        const existingBankPassbook = selectRows[0]?.bank_passbook;
+        const finalBankPassbook = newBankPassbook || existingBankPassbook;
 
-            // Update the catalogue
-            const updateQuery = `
+        const existingForm7Attach = selectRows[0]?.form7_attach;
+        const finalForm7Attach = newForm7Attach || existingForm7Attach;
+    
+        const updateQuery = `
           UPDATE essential_records SET 
             rescue_name = ?, 
             aadhar_card = ?, 
@@ -311,29 +323,35 @@ const updateEssentialRecords = (req, res) => {
                 admission_no
             ];
 
+            const [updateResult] = await db.query(updateQuery, values);
 
-            db.query(updateQuery, values, (updateErr, data) => {
-                if (updateErr) {
-                    return res.status(500).json({ message: "Update failed", error: updateErr });
-                }
+        if (updateResult.affectedRows === 0) {
+            return res.status(400).json({ message: `Update failed. No record updated for admission_no = ${admission_no}` });
+        }
 
-                if (newBankPassbook && existingBankPassbook) {
-                    fs.unlink(existingBankPassbook, (fsErr) => {
-                        if (fsErr) console.warn("Failed to delete Bank Passbook:", fsErr);
-                    });
-                }
+        // Delete old files if new ones were uploaded
+        if (newBankPassbook && existingBankPassbook && existingBankPassbook !== newBankPassbook) {
+            try {
+                await fs.unlink(existingBankPassbook);
+            } catch (fsErr) {
+                console.warn("Failed to delete old bank passbook:", fsErr.message);
+            }
+        }
 
-                if (newForm7Attach && existingForm7Attach) {
-                    fs.unlink(existingForm7Attach, (fsErr) => {
-                        if (fsErr) console.warn("Failed to delete Form 7 attachment:", fsErr);
-                    });
-                }
+        if (newForm7Attach && existingForm7Attach && existingForm7Attach !== newForm7Attach) {
+            try {
+                await fs.unlink(existingForm7Attach);
+            } catch (fsErr) {
+                console.warn("Failed to delete old form 7 attachment:", fsErr.message);
+            }
+        }
 
-                res.status(200).json({ message: "Essential Record updated successfully" });
-            });
+        res.status(200).json({ message: "Essential Record updated successfully" });
 
-        });
-    });
+    } catch (err) {
+        console.error("Update failed:", err);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
 };
 
 
@@ -355,11 +373,11 @@ const deleteEssentialRecord = (req, res) => {
     });
 }
 
-const createEventReport = (req, res) => {
-    upload(req, res, (err) => {
-        if (err) {
-            return res.status(500).json({ message: 'File upload failed', error: err });
-        }
+const createEventReport = async (req, res) => {
+    try {
+        // Await the file upload
+        await eventUploadAsync(req, res);
+
         const {
             event_name,
             event_date,
@@ -379,124 +397,180 @@ const createEventReport = (req, res) => {
             outing_rescue_count,
         } = req.body;
 
-        const event_photosPath = req.files['event_photos']
+        const event_photosPath = req.files?.['event_photos']
             ? `/uploads/Event_Photos/${req.files['event_photos'][0].filename}`
             : null;
 
-        const awarness_photosPath = req.files['awarness_photos']
+        const awarness_photosPath = req.files?.['awarness_photos']
             ? `/uploads/Event_Photos/${req.files['awarness_photos'][0].filename}`
             : null;
-        const outing_photosPath = req.files['outing_photos']
+
+        const outing_photosPath = req.files?.['outing_photos']
             ? `/uploads/Event_Photos/${req.files['outing_photos'][0].filename}`
             : null;
 
-        const q = `INSERT INTO event_report(event_name, event_date, event_place, event_report, event_rescue_count, event_type, event_photos,
-                awareness_name,awarness_date, awarness_place, awarness_report, awarness_rescue_count,awarness_photos,
-                outing_name, outing_date, outing_place, outing_report, outing_rescue_count, outing_photos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+        const q = `
+            INSERT INTO event_report (
+                event_name, event_date, event_place, event_report, event_rescue_count, event_type, event_photos,
+                awareness_name, awarness_date, awarness_place, awarness_report, awarness_rescue_count, awarness_photos,
+                outing_name, outing_date, outing_place, outing_report, outing_rescue_count, outing_photos
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
 
         const values = [
-            event_name || 'Null', event_date || 'Null', event_place || 'Null', event_report || 'Null', event_rescue_count || 'Null', event_type, event_photosPath || 'Null',
-            awareness_name || 'Null', awarness_date || 'Null', awarness_place || 'Null', awarness_report || 'Null', awarness_rescue_count || 'Null', awarness_photosPath || 'Null',
-            outing_name || 'Null', outing_date || 'Null', outing_place || 'Null', outing_report || 'Null', outing_rescue_count || 'Null', outing_photosPath || 'Null'
-        ]
+            event_name || 'Null',
+            event_date || 'Null',
+            event_place || 'Null',
+            event_report || 'Null',
+            event_rescue_count || 'Null',
+            event_type,
+            event_photosPath || 'Null',
 
-        db.query(q, values, (dbErr, data) => {
-            if (dbErr) {
-                return res.status(500).json({ message: "Database Error", error: dbErr });
-            }
-            res.status(201).json({ message: "Event Report Form Created Successfully", data: data });
+            awareness_name || 'Null',
+            awarness_date || 'Null',
+            awarness_place || 'Null',
+            awarness_report || 'Null',
+            awarness_rescue_count || 'Null',
+            awarness_photosPath || 'Null',
+
+            outing_name || 'Null',
+            outing_date || 'Null',
+            outing_place || 'Null',
+            outing_report || 'Null',
+            outing_rescue_count || 'Null',
+            outing_photosPath || 'Null'
+        ];
+
+        const [result] = await db.query(q, values);
+
+        res.status(201).json({
+            message: "Event Report Form Created Successfully",
+            data: result
         });
-    });
-}
 
-const createCelebrationReport = (req, res) => {
-    const {
-        celebration_name,
-        celebration_date,
-        celebration_place,
-        celebration_rescue_count,
-        celebration_report,
-        other_celebration
-    } = req.body;
+    } catch (err) {
+        console.error("Error creating event report:", err);
+        res.status(500).json({
+            message: "Server Error while creating event report",
+            error: err
+        });
+    }
+};
 
-    const q = `INSERT INTO celebration_report(celebration_name, other_celebration, celebration_date, celebration_place, celebration_rescue_count, celebration_report) 
+const createCelebrationReport = async (req, res) => {
+    try {
+        const {
+            celebration_name,
+            celebration_date,
+            celebration_place,
+            celebration_rescue_count,
+            celebration_report,
+            other_celebration
+        } = req.body;
+
+        const q = `INSERT INTO celebration_report(celebration_name, other_celebration, celebration_date, celebration_place, celebration_rescue_count, celebration_report) 
                 VALUES (?,?,?,?,?,?)`;
 
-    const values = [
-        celebration_name,
-        other_celebration,
-        celebration_date,
-        celebration_place,
-        celebration_rescue_count,
-        celebration_report,
-    ]
+        const values = [
+            celebration_name,
+            other_celebration,
+            celebration_date,
+            celebration_place,
+            celebration_rescue_count,
+            celebration_report,
+        ]
 
-    db.query(q, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
-        }
-        res.status(201).json({ message: "Celebration Report Form Created Successfully", data: data });
-    });
+        const [result] = await db.query(q, values);
+        res.status(201).json({
+            message: "Celebration Report Form Created Successfully",
+            data: result
+        });
+
+    } catch (err) {
+        console.error("Error creating celebration report:", err);
+        return res.status(500).json({
+            message: "Server Error while creating celebration report",
+            error: err
+        });
+    }
 }
 
-const createCommunityReport = (req, res) => {
-    const {
-        program_name,
-        clg_name,
-        clg_dept,
-        resource_person,
-        program_date,
-        program_place,
-        program_rescue_count,
-        program_report,
-    } = req.body;
+const createCommunityReport = async (req, res) => {
+    try {
+        const {
+            program_name,
+            clg_name,
+            clg_dept,
+            resource_person,
+            program_date,
+            program_place,
+            program_rescue_count,
+            program_report,
+        } = req.body;
 
-    const q = `INSERT INTO community_report(community_name, clg_name, clg_dept, resource_person, community_date, community_place, community_rescue_count, community_report)
+        const q = `INSERT INTO community_report(community_name, clg_name, clg_dept, resource_person, community_date, community_place, community_rescue_count, community_report)
                 VALUES (?,?,?,?,?,?,?,?)`;
-    const values = [
-        program_name,
-        clg_name,
-        clg_dept,
-        resource_person,
-        program_date,
-        program_place,
-        program_rescue_count,
-        program_report,
-    ]
-    db.query(q, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
-        }
-        res.status(201).json({ message: "Community Report Form Created Successfully", data: data });
-    });
+        const values = [
+            program_name,
+            clg_name,
+            clg_dept,
+            resource_person,
+            program_date,
+            program_place,
+            program_rescue_count,
+            program_report,
+        ]
+
+        const [result] = await db.query(q, values);
+        res.status(201).json({
+            message: "Community Report Form Created Successfully",
+            data: result
+        });
+    }
+    catch (err) {
+        console.error("Error creating community report:", err);
+        return res.status(500).json({
+            message: "Server Error while creating community report",
+            error: err
+        });
+    }
 }
 
-const createStaffReport = (req, res) => {
-    const {
-        staff_name,
-        staff_date,
-        staff_place,
-        staff_rescue_count,
-        staff_report,
-    } = req.body;
 
-    const q = `INSERT INTO staff_report(staff_name, staff_date, staff_place, staff_rescue_count, staff_report)
+const createStaffReport = async (req, res) => {
+    try {
+        const {
+            staff_name,
+            staff_date,
+            staff_place,
+            staff_rescue_count,
+            staff_report,
+        } = req.body;
+
+        const q = `INSERT INTO staff_report(staff_name, staff_date, staff_place, staff_rescue_count, staff_report)
                 VALUES (?,?,?,?,?)`;
-    const values = [
-        staff_name,
-        staff_date,
-        staff_place,
-        staff_rescue_count,
-        staff_report,
-    ]
-    db.query(q, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
-        }
-        res.status(201).json({ message: "Staff Report Form Created Successfully", data: data });
-    });
+        const values = [
+            staff_name,
+            staff_date,
+            staff_place,
+            staff_rescue_count,
+            staff_report,
+        ]
 
+        const [result] = await db.query(q, values);
+        res.status(201).json({
+            message: "Staff Report Form Created Successfully",
+            data: result
+        });
+    }catch (err) {
+        console.error("Error creating staff report:", err);
+        return res.status(500).json({
+            message: "Server Error while creating staff report",
+            error: err
+        });
+    }
 }
+
 
 const createAnnualReport = (req, res) => {
 
@@ -617,7 +691,7 @@ const createAnnualReport = (req, res) => {
     });
 }
 
-const getAnnualReport = (req, res) => {
+const getAnnualReport = async (req, res) => {
     const query = `
         SELECT 
             e.*, 
@@ -634,34 +708,36 @@ const getAnnualReport = (req, res) => {
             staff_report s ON e.id = s.id;
     `;
 
-    db.query(query, (err, results) => {
-        if (err) {
-            return res.status(500).json({ message: "Joined Report Error", error: err });
-        }
-
+    try {
+        const [results] = await db.query(query);
         return res.status(200).json({ data: results });
-    });
+    } catch (err) {
+        console.error("Joined Report Error:", err);
+        return res.status(500).json({ message: "Joined Report Error", error: err });
+    }
 };
 
-const getAnnualReportbyID = (req, res) => {
+
+const getAnnualReportbyID = async (req, res) => {
     const id = req.params.id;
     const query = 'SELECT * FROM annual_report WHERE id = ?';
 
-    db.query(query, [id], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Database error' });
-        }
+    try {
+        const [results] = await db.query(query, [id]);
 
         if (results.length === 0) {
             return res.status(404).json({ message: 'Annual Report not found' });
         }
 
-        res.json(results[0]);
-    });
-}
+        return res.status(200).json(results[0]);
+    } catch (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Database error', error: err });
+    }
+};
 
-const updateAnnualReport = (req, res) => {
+
+const updateAnnualReport = async (req, res) => {
     const {
         event_name,
         event_date,
@@ -687,7 +763,6 @@ const updateAnnualReport = (req, res) => {
 
     const reportId = req.params.id;
 
-    // Update the catalogue
     const updateQuery = `
         UPDATE annual_report SET 
             event_name = ?, 
@@ -711,8 +786,7 @@ const updateAnnualReport = (req, res) => {
             staff_place = ?,
             staff_rescue_count = ?
         WHERE id = ?
-        `;
-
+    `;
 
     const values = [
         event_name,
@@ -738,18 +812,20 @@ const updateAnnualReport = (req, res) => {
         reportId
     ];
 
-    db.query(updateQuery, values, (updateErr, result) => {
-        if (updateErr) {
-            return res.status(500).json({ message: "Update failed", error: updateErr });
-        }
+    try {
+        const [result] = await db.query(updateQuery, values);
 
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "No record updated. Check if ID exists." });
         }
 
         return res.status(200).json({ message: "Annual Report updated successfully!" });
-    });
-}
+    } catch (error) {
+        console.error("Update Error:", error);
+        return res.status(500).json({ message: "Update failed", error });
+    }
+};
+
 
 const deleteAnnualReport = (req, res) => {
     const rescueId = req.params.id;
@@ -769,21 +845,27 @@ const deleteAnnualReport = (req, res) => {
     });
 }
 
-const getRescueDetails = (req, res) => {
+const getRescueDetails = async (req, res) => {
     const admissionNo = req.params.admission_no;
 
     const query = `SELECT rescue_name, referred_by FROM first_information WHERE admission_no = ?`;
 
-    db.query(query, [admissionNo], (err, results) => {
-        if (err) return res.status(500).json({ error: 'Database error' });
+    try {
+        const [results] = await db.query(query, [admissionNo]);
 
-        if (results.length === 0) return res.status(404).json({ message: 'No data found' });
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No data found' });
+        }
 
-        res.status(200).json(results[0]);
-    });
-}
+        return res.status(200).json(results[0]);
+    } catch (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: 'Database error', details: err });
+    }
+};
 
-const createRescueDischargeInfo = (req, res) => {
+
+const createRescueDischargeInfo = async (req, res) => {
     const {
         admission_no,
         rescue_name,
@@ -797,88 +879,137 @@ const createRescueDischargeInfo = (req, res) => {
         state
     } = req.body;
 
-    const cquery = `INSERT INTO discharge_summary
-                    (admission_no,
-                    rescue_name,
-                    referred_by,
-                    escape,death,discharge,reunited, transfer, state_venue, state)VALUES(?,?,?,?,?,?,?,?,?,?)`;
+    const cquery = `
+        INSERT INTO discharge_summary (
+            admission_no,
+            rescue_name,
+            referred_by,
+            escape,
+            death,
+            discharge,
+            reunited,
+            transfer,
+            state_venue,
+            state
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     const values = [
-        admission_no, rescue_name, referred_by, escape, death, discharge, reunited, transfer, state_venue, state
+        admission_no,
+        rescue_name,
+        referred_by,
+        escape,
+        death,
+        discharge,
+        reunited,
+        transfer,
+        state_venue || "NULL",
+        state || "NULL"
     ];
 
-    db.query(cquery, values, (dbErr, data) => {
-        if (dbErr) {
-            return res.status(500).json({ message: "Database Error", error: dbErr });
-        }
-        res.status(201).json({ message: "Rescue Discharge Summary Created Successfully", data: data });
-    });
-}
+    try {
+        const [result] = await db.query(cquery, values);
 
-const getDischargeSummary = (req, res) => {
+        return res.status(201).json({
+            message: "Rescue Discharge Summary Created Successfully",
+            data: result
+        });
+    } catch (error) {
+        console.error("Database Error:", error);
+        return res.status(500).json({
+            message: "Database Error",
+            error: error
+        });
+    }
+};
+
+
+const getDischargeSummary = async (req, res) => {
     const query = "Select * from discharge_summary";
-
-    db.query(query, (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: "Database Error", error: err });
-        }
-        res.status(201).json({ message: "Resque Discharge Summary Get Successfully", data: data });
-    });
+    try {
+        const [data] = await db.query(query);
+        return res.status(200).json({ message: "Rescue Discharge Summary Get Successfully", data: data });
+    } catch (err) {
+        console.error("Database Error:", err);
+        return res.status(500).json({ message: "Database Error", error: err });
+    }
 }
 
-const getDischargeSummaryID = (req, res) => {
+
+const getDischargeSummaryID = async (req, res) => {
     const rescueID = req.params.id;
     const query = 'SELECT * FROM discharge_summary WHERE id = ?';
 
-    db.query(query, [rescueID], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Database error' });
-        }
+    try {
+        const [results] = await db.query(query, [rescueID]);
 
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Resque Discharge Summary Form not found' });
+            return res.status(404).json({ message: 'Rescue Discharge Summary Form not found' });
         }
 
-        res.json(results[0]);
-    });
+        return res.status(200).json(results[0]);
+    } catch (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Database error', error: err });
+    }
 }
 
-const updateDischargeSummary = (req, res) => {
+const updateDischargeSummary = async (req, res) => {
     const {
-        rescue_name, referred_by, escape, death, discharge, reunited, transfer, state_venue, state
+        rescue_name,
+        referred_by,
+        escape,
+        death,
+        discharge,
+        reunited,
+        transfer,
+        state_venue,
+        state
     } = req.body;
 
     const rescueID = req.params.id;
 
-    const uquery = `UPDATE discharge_summary SET 
-                    rescue_name = ?, 
-                    referred_by = ?, 
-                    escape = ?, 
-                    death = ?, 
-                    discharge = ?,
-                    reunited = ?,
-                    transfer = ?,
-                    state_venue = ?,
-                    state = ?
-                    WHERE id = ?`;
+    const uquery = `
+        UPDATE discharge_summary SET 
+            rescue_name = ?, 
+            referred_by = ?, 
+            escape = ?, 
+            death = ?, 
+            discharge = ?,
+            reunited = ?,
+            transfer = ?,
+            state_venue = ?,
+            state = ?
+        WHERE id = ?
+    `;
 
     const values = [
-        rescue_name, referred_by, escape, death, discharge, reunited, transfer, state_venue, state, rescueID,
+        rescue_name,
+        referred_by,
+        escape,
+        death,
+        discharge,
+        reunited,
+        transfer,
+        state_venue,
+        state,
+        rescueID
     ];
 
-    db.query(uquery, values, (updateErr, result) => {
-        if (updateErr) {
-            return res.status(500).json({ message: "Update failed", error: updateErr });
-        }
+    try {
+        const [result] = await db.query(uquery, values);
 
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "No record updated. Check if ID exists." });
         }
 
         return res.status(200).json({ message: "Rescue Discharge Summary updated successfully!" });
-    });
+    } catch (error) {
+        console.error("Update Error:", error);
+        return res.status(500).json({ message: "Update failed", error });
+    }
 };
+
 
 const deleteDischargeSummary = (req, res) => {
     const rescueId = req.params.id;
@@ -898,11 +1029,9 @@ const deleteDischargeSummary = (req, res) => {
     });
 }
 
-const createInternForm = (req, res) => {
-    upload(req, res, (err) => {
-        if (err) {
-            return res.status(400).json({ message: "File upload error", error: err });
-        }
+const createInternForm = async (req, res) => {
+    try {
+        await formalityAsync(req, res);
         const {
             stud_name,
             stud_id,
@@ -934,52 +1063,77 @@ const createInternForm = (req, res) => {
             stud_name, stud_id, studentPhotoPath, department, email, phone, secondary_phone, field, other_field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
         ];
 
-        db.query(insertQuery, values, (dbErr, data) => {
-            if (dbErr) {
-                return res.status(500).json({ message: "Database Error", error: dbErr });
-            }
-            res.status(201).json({ message: "Internship Form Created successfully", data: data });
-        });
-    });
+        const [result] = await db.query(insertQuery, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Failed to create Internship Form" });
+        }
+        res.status(201).json({ message: "Internship Form Created successfully", data: result });
+
+    } catch (err) {
+        console.error("Error creating Internship Form:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
 }
 
-const getStudentDetails = (req, res) => {
+
+const getStudentDetails = async (req, res) => {
     const query = "Select * from internship_form";
 
-    db.query(query, (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: "Database Error", error: err });
-        }
-        res.status(201).json({ message: "Internship Student Details Get Successfully", data: data });
-    });
+    try {
+        const [data] = await db.query(query);
+        return res.status(200).json({ message: "Internship Student Details Get Successfully", data: data });
+    } catch (err) {
+        console.error("Database Error:", err);
+        return res.status(500).json({ message: "Database Error", error: err });
+    }
 }
 
-const getStudendDetailsbyID = (req, res) => {
+
+const getStudendDetailsbyID = async (req, res) => {
     const id = req.params.id;
     const query = "SELECT * FROM internship_form WHERE id = ?";
 
-    db.query(query, [id], (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: "Database Error", error: err });
-        }
+    try {
+        const [data] = await db.query(query, [id]);
+
         if (data.length === 0) {
             return res.status(404).json({ message: "No data found for the given admission number" });
         }
-        res.status(200).json({ message: "Student Details form fetched successfully", data: data });
-    });
+        return res.status(200).json({ message: "Student Details form fetched successfully", data: data });
+    } catch (err) {
+        console.error("Database Error:", err);
+        return res.status(500).json({ message: "Database Error", error: err });
+    }
 }
 
-const updateStudentDetail = (req, res) => {
-    const {
-        stud_name, stud_id, department, email, phone, secondary_phone,
-        clg_name, duration, from_date, to_date
-    } = req.body;
+const updateStudentDetail = async (req, res) => {
+    try {
+        await formalityAsync(req, res);
 
-    const id = req.params.id;
+        const {
+            stud_name, stud_id, department, email, phone, secondary_phone,
+            field, other_field, supervisor_name, supervisor_email, supervisor_phone,
+            clg_name, duration, from_date, to_date
+        } = req.body;
 
-    const usquery = `UPDATE internship_form SET
+        const id = req.params.id;
+        const studentPhotoPath = req.files['stud_photo']
+            ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
+            : null;
+
+        const usquery = `UPDATE internship_form SET
                     stud_name = ?,
                     stud_id = ?,
+                    stud_photo = ?,
+                    email = ?,
+                    phone = ?,
+                    secondary_phone = ?,
+                    field = ?,
+                    other_field = ?,
+                    supervisor_name = ?,
+                    supervisor_email = ?,
+                    supervisor_phone = ?,   
                     department = ?,
                     clg_name = ?, 
                     duration = ?, 
@@ -987,49 +1141,53 @@ const updateStudentDetail = (req, res) => {
                     to_date = ?
                     WHERE id= ?`;
 
-    const values = [
-        stud_name, stud_id, department, clg_name, duration, from_date, to_date, id
-    ];
 
-    db.query(usquery, values, (updateErr, result) => {
-        if (updateErr) {
-            return res.status(500).json({ message: "Update failed", error: updateErr });
+        const values = [
+            stud_name, stud_id, studentPhotoPath, email, phone, secondary_phone, field, other_field, supervisor_name,
+            supervisor_email, supervisor_phone, department, clg_name, duration, from_date, to_date, id
+        ];
+
+        const [result] = await db.query(usquery, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Failed to update Internship Form" });
         }
+        res.status(201).json({ message: "Internship Form Updated successfully", data: result });
 
-        return res.status(200).json({ message: "Intership Form updated successfully!" });
-    });
+    } catch (err) {
+        console.error("Error updating Internship Form:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
 }
 
-const getAllDocument = (req, res) => {
+const getAllDocument = async (req, res) => {
     const query = "Select * from essential_records";
-
-    db.query(query, (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: "Database Error", error: err });
-        }
-        res.status(201).json({ message: "Essential Records Details Get Successfully", data: data });
-    });
+    try {
+        const [data] = await db.query(query);
+        return res.status(200).json({ message: "Essential Records Details Get Successfully", data: data });
+    } catch (err) {
+        console.error("Database Error:", err);
+        return res.status(500).json({ message: "Database Error", error: err });
+    }
 }
 
-const getEssentialRecordshow = (req, res) => {
+const getEssentialRecordshow = async (req, res) => {
     const id = req.params.id;
     const query = 'SELECT * FROM essential_records WHERE id = ?';
 
-    db.query(query, [id], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Database error' });
-        }
-
+    try {
+        const [results] = await db.query(query, [id]);
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Essentail Records Form not found' });
+            return res.status(404).json({ message: 'Essential Records Form not found' });
         }
-
-        res.json(results[0]);
-    });
+        return res.status(200).json(results[0]);
+    } catch (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Database error', error: err });
+    }
 }
 
-export{
+export {
     createSelfDeclaration,
     getFormalityForm,
     updateFormalityForm,

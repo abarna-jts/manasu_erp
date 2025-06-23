@@ -35,6 +35,7 @@ function MSE_form() {
   const [canConcentrate, setCanConcentrate] = useState('');
   const [selectedStates, setSelectedStates] = useState([]);
   const [shouldGeneratePDF, setShouldGeneratePDF] = useState(false);
+  const [date, setDate] = useState('');
   const [formData, setFormData] = useState({
     admission_no: '',
     date:'',
@@ -1492,7 +1493,7 @@ function MSE_form() {
         },
       });
 
-      alert('Judgement Form updated successfully!');
+      alert('Insight Form updated successfully!');
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -1607,7 +1608,7 @@ function MSE_form() {
                         <InputGroup className="input-group-merge search-bar">
                           <Form.Control
                             type="date"
-                            value={formData.date}
+                            value={date}
                             onChange={(e) => {
                               setFormData((prev) => ({
                                 ...prev,

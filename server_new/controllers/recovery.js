@@ -1,37 +1,24 @@
-const db = require('../db');
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
+import db from '../db.js';
+import { recoveryAsync } from '../util/recoveryMulter.js';  
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve("uploads/Articles_carried/"));
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
+const createMSEForm = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      date,
+      general_appearance,
+      attitude,
+      comprehension,
+      gait_posture,
+      motor_activity,
+      catatonic_sign,
+      conversion_dissociative,
+      social_manner,
+      rapport,
+      hallucinatory_behaviour
+    } = req.body;
 
-
-const upload = multer({ storage: storage }).single("attach_items");
-
-const createMSEForm = (req, res) => {
-  const {
-    admission_no,
-    date,
-    general_appearance,
-    attitude,
-    comprehension,
-    gait_posture,
-    motor_activity,
-    catatonic_sign,
-    conversion_dissociative,
-    social_manner,
-    rapport,
-    hallucinatory_behaviour
-  } = req.body;
-
-  const query = `
+    const query = `
     INSERT INTO appearance_behaviour (
         admission_no,
         date,
@@ -48,72 +35,83 @@ const createMSEForm = (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    date,
-    general_appearance.join(", "),
-    attitude.join(", "),
-    comprehension.join(", "),
-    gait_posture.join(", "),
-    motor_activity.join(", "),
-    catatonic_sign.join(", "),
-    conversion_dissociative.join(", "),
-    social_manner.join(", "),
-    rapport.join(", "),
-    hallucinatory_behaviour.join(", ")
-  ];
+    const values = [
+      admission_no,
+      date,
+      general_appearance.join(", "),
+      attitude.join(", "),
+      comprehension.join(", "),
+      gait_posture.join(", "),
+      motor_activity.join(", "),
+      catatonic_sign.join(", "),
+      conversion_dissociative.join(", "),
+      social_manner.join(", "),
+      rapport.join(", "),
+      hallucinatory_behaviour.join(", ")
+    ];
 
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "MSE Form created successfully" });
+
+  } catch (err) {
+    console.error("Error in createMSEForm:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createSpeech = (req, res) => {
-  const { admission_no, rate_quantity, volume_tone, flow_rhythm } = req.body;
 
-  const query = `
+const createSpeech = async (req, res) => {
+  try {
+    const { admission_no, date, rate_quantity, volume_tone, flow_rhythm } = req.body;
+
+    const query = `
     INSERT INTO speech (
       admission_no,
+      date,
       rate_quantity,
         volume_tone,
         flow_rhythm
     ) VALUES (?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    rate_quantity.join(", "),
-    volume_tone.join(", "),
-    flow_rhythm.join(", ")
-  ];
+    const values = [
+      admission_no,
+      date,
+      rate_quantity.join(", "),
+      volume_tone.join(", "),
+      flow_rhythm.join(", ")
+    ];
 
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "Speech Form created successfully" });
+  } catch (err) {
+    console.error("Error in createSpeech:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createMood = (req, res) => {
-  const {
-    mood_description,
-    appearance,
-    resident_feeling,
-    general_feeling,
-    mood_like,
-    resident_general_feeling,
-    resident_look,
-    admission_no,
-    date
-  } = req.body;
 
-  const query = `
+const createMood = async (req, res) => {
+  try {
+    const {
+      mood_description,
+      appearance,
+      resident_feeling,
+      general_feeling,
+      mood_like,
+      resident_general_feeling,
+      resident_look,
+      admission_no,
+      date
+    } = req.body;
+
+    const query = `
     INSERT INTO mood_affect (
       admission_no,
       date,
@@ -128,78 +126,86 @@ const createMood = (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    date,
-    mood_description.join(", "),
-    appearance,
-    resident_feeling,
-    general_feeling,
-    mood_like,
-    resident_general_feeling,
-    resident_look.join(", ")
-  ];
+    const values = [
+      admission_no,
+      date,
+      mood_description.join(", "),
+      appearance,
+      resident_feeling,
+      general_feeling,
+      mood_like,
+      resident_general_feeling,
+      resident_look.join(", ")
+    ];
 
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "Mood and Affect Form created successfully" });
+
+  } catch (err) {
+    console.error("Error in createMood:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createThough = (req, res) => {
-  const {
-    stream_form_though,
-    content_though,
-    admission_no,
-    date
-  } = req.body;
 
-  const query = `
+const createThough = async (req, res) => {
+  try {
+    const {
+      stream_form_though,
+      content_though,
+      admission_no,
+      date
+    } = req.body;
+
+    const query = `
     INSERT INTO though_form (
       admission_no,
       date,
       stream_form_though,
       content_though
-
     ) VALUES (?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    date,
-    stream_form_though.join(", "),
-    content_though.join(", ")
-  ];
+    const values = [
+      admission_no,
+      date,
+      stream_form_though.join(", "),
+      content_though.join(", ")
+    ];
 
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "Though Form created successfully" });
+
+  } catch (err) {
+    console.error("Error in createThough:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createPerception = (req, res) => {
-  const {
-    hallucination_type,
-    heard,
-    voices_heard,
-    part_of_day,
-    female_male_voices,
-    interpreted_person,
-    illusion,
-    perception_changes,
-    somatic,
-    others,
-    admission_no,
-    date
-  } = req.body;
+const createPerception = async (req, res) => {
+  try {
+    const {
+      hallucination_type,
+      heard,
+      voices_heard,
+      part_of_day,
+      female_male_voices,
+      interpreted_person,
+      illusion,
+      perception_changes,
+      somatic,
+      others,
+      admission_no,
+      date
+    } = req.body;
 
-  const query = `
+    const query = `
     INSERT INTO perception (
       admission_no,
       date,
@@ -216,41 +222,44 @@ const createPerception = (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    date,
-    hallucination_type.join(", "),
-    heard,
-    voices_heard,
-    part_of_day,
-    female_male_voices,
-    interpreted_person,
-    illusion.join(", "),
-    perception_changes.join(", "),
-    somatic.join(", "),
-    others.join(", "),
-  ];
-
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const values = [
+      admission_no,
+      date,
+      hallucination_type.join(", "),
+      heard,
+      voices_heard,
+      part_of_day,
+      female_male_voices,
+      interpreted_person,
+      illusion.join(", "),
+      perception_changes.join(", "),
+      somatic.join(", "),
+      others.join(", "),
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "Perception Form created successfully" });
+  } catch (err) {
+    console.error("Error in createPerception:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createJudgement = (req, res) => {
-  const {
-    personal_judgement,
-    social_judgement,
-    test_judgement,
-    judgement,
-    admission_no,
-    date
-  } = req.body;
 
-  const query = `
+const createJudgement = async (req, res) => {
+  try {
+    const {
+      personal_judgement,
+      social_judgement,
+      test_judgement,
+      judgement,
+      admission_no,
+      date
+    } = req.body;
+
+    const query = `
     INSERT INTO judgement (
       admission_no,
       date,
@@ -261,37 +270,40 @@ const createJudgement = (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    date,
-    personal_judgement,
-    social_judgement,
-    test_judgement,
-    judgement
-  ];
+    const values = [
+      admission_no,
+      date,
+      personal_judgement,
+      social_judgement,
+      test_judgement,
+      judgement
+    ];
 
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "Judgement Form created successfully" });
+  } catch (err) {
+    console.error("Error in createJudgement:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createInsight = (req, res) => {
-  const {
-    denail_illness,
-    slight_awareness,
-    awarness_sick,
-    awarness_illness,
-    intellectual_insight,
-    true_emotion,
-    admission_no,
-    date
-  } = req.body;
+const createInsight = async (req, res) => {
+  try {
+    const {
+      denail_illness,
+      slight_awareness,
+      awarness_sick,
+      awarness_illness,
+      intellectual_insight,
+      true_emotion,
+      admission_no,
+      date
+    } = req.body;
 
-  const query = `
+    const query = `
     INSERT INTO insight (
       admission_no,
       date,
@@ -304,60 +316,64 @@ const createInsight = (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    date,
-    denail_illness,
-    slight_awareness,
-    awarness_sick,
-    awarness_illness,
-    intellectual_insight,
-    true_emotion
-  ];
+    const values = [
+      admission_no,
+      date,
+      denail_illness,
+      slight_awareness,
+      awarness_sick,
+      awarness_illness,
+      intellectual_insight,
+      true_emotion
+    ];
 
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "Insight Form created successfully" });
+  } catch (err) {
+    console.error("Error in createInsight:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createCognition = (req, res) => {
-  const {
-    consciousness,
-    orientation_time,
-    orientation_place,
-    orientation_person,
-    consciousnessState,
-    canConcentrate,
-    distractibility,
-    asking_test,
-    names_months,
-    test_performance,
-    immediate_retention,
-    recall,
-    patient_place,
-    dinner_ate,
-    date_ofMrg,
-    birthdays_children,
-    person_past,
-    amnesia,
-    live_growing,
-    person_school,
-    breakfast_ques,
-    do_yesterday,
-    general_info,
-    test_red_wri,
-    calculation_test,
-    proverb_testing,
-    familiar_object,
-    admission_no,
-    date
-  } = req.body;
 
-  const query = `
+const createCognition = async (req, res) => {
+  try {
+    const {
+      consciousness,
+      orientation_time,
+      orientation_place,
+      orientation_person,
+      consciousnessState,
+      canConcentrate,
+      distractibility,
+      asking_test,
+      names_months,
+      test_performance,
+      immediate_retention,
+      recall,
+      patient_place,
+      dinner_ate,
+      date_ofMrg,
+      birthdays_children,
+      person_past,
+      amnesia,
+      live_growing,
+      person_school,
+      breakfast_ques,
+      do_yesterday,
+      general_info,
+      test_red_wri,
+      calculation_test,
+      proverb_testing,
+      familiar_object,
+      admission_no,
+      date
+    } = req.body;
+
+    const query = `
     INSERT INTO conginition (
         admission_no,
         date,
@@ -391,49 +407,53 @@ const createCognition = (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    admission_no,
-    date,
-    consciousness.join(", "),
-    orientation_time,
-    orientation_place,
-    orientation_person,
-    consciousnessState,
-    canConcentrate,
-    distractibility,
-    asking_test,
-    names_months,
-    test_performance,
-    immediate_retention,
-    recall,
-    patient_place,
-    dinner_ate,
-    date_ofMrg,
-    birthdays_children,
-    person_past,
-    amnesia,
-    live_growing,
-    person_school,
-    breakfast_ques,
-    do_yesterday,
-    general_info,
-    test_red_wri,
-    calculation_test,
-    proverb_testing,
-    familiar_object
-  ];
+    const values = [
+      admission_no,
+      date,
+      consciousness.join(", "),
+      orientation_time,
+      orientation_place,
+      orientation_person,
+      consciousnessState,
+      canConcentrate,
+      distractibility,
+      asking_test,
+      names_months,
+      test_performance,
+      immediate_retention,
+      recall,
+      patient_place,
+      dinner_ate,
+      date_ofMrg,
+      birthdays_children,
+      person_past,
+      amnesia,
+      live_growing,
+      person_school,
+      breakfast_ques,
+      do_yesterday,
+      general_info,
+      test_red_wri,
+      calculation_test,
+      proverb_testing,
+      familiar_object
+    ];
 
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "Database insert error" });
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(200).json({ message: "Data inserted successfully" });
-  });
+    res.status(201).json({ message: "Cognition Form created successfully" });
+  } catch (err) {
+    console.error("Error in createCognition:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const createArticles = (req, res) => {
-  upload(req, res, (err) => {
+const createArticles = async(req, res) => {
+  try{
+    await recoveryAsync(req, res);
+
     const {
       admission_no,
       rescue_name, date_time, collected_items
@@ -451,38 +471,39 @@ const createArticles = (req, res) => {
       admission_no,
       rescue_name, date_time, collected_items, attachItemsPath
     ]
-    db.query(createquery, values, (dbErr, data) => {
-      if (dbErr) {
-        return res.status(500).json({ message: "Database Error", error: dbErr });
-      }
-      res.status(201).json({ message: "Rescue Condition Created Successfully", data });
-    });
-  });
-};
 
-const getArticles = (req, res) => {
+    const [result] = await db.query(createquery, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
+    }
+    res.status(201).json({ message: "Rescue Condition Created Successfully" });
+
+  }catch (err) {
+    console.error("Error in createArticles:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+
+const getArticles = async(req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM articles_items WHERE admission_no = ?';
-
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try{
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Articles carried Form not found' });
     }
-
     res.json(results[0]);
-  });
+  }catch (err) {
+  console.error(err);
+  return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const updateArticles = (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: "File upload failed", error: err });
-    }
+
+const updateArticles = async(req, res) => {
+  try{
+    await recoveryAsync(req, res);
 
     const {
       rescue_name, date_time, collected_items
@@ -494,55 +515,51 @@ const updateArticles = (req, res) => {
       ? `uploads/Articles_carried/${req.file.filename}`
       : null;
 
+    const [selectRows] = await db.query("SELECT attach_items FROM articles_items WHERE admission_no = ?", [admission_no]);
+    if (selectRows.length === 0) {
+      return res.status(404).json({ message: "Admission number not found" });
+    } 
+    const existingAttachItems = selectRows[0].attach_items;
+    const finalAttachItems = attachItemsPath || existingAttachItems;
+    const updateQuery = `
+      UPDATE articles_items SET 
+        rescue_name = ?, 
+        date_time = ?, 
+        collected_items = ?, 
+        attach_items = ?
+      WHERE admission_no = ?
+    `;
+    const values = [
+      rescue_name,
+      date_time,
+      collected_items,
+      finalAttachItems,
+      admission_no
+    ];
+    const [result] = await db.query(updateQuery, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record updated. Check if ID exists." });
+    }
+    res.status(200).json({ message: "Rescue Condition updated successfully!" });
 
-    const selectQuery = "SELECT attach_items FROM articles_items WHERE admission_no = ?";
-    db.query(selectQuery, [admission_no], (selectErr, selectData) => {
-      if (selectErr) {
-        return res.status(500).json({ message: "Failed to retrieve existing files", error: selectErr });
-      }
-
-      const exsitingattachItems = selectData[0]?.attach_items;
-
-      const finalattachItems = attachItemsPath || exsitingattachItems;
-
-      const updateQuery = `
-                UPDATE articles_items SET 
-                    rescue_name = ?, 
-                    date_time = ?, 
-                    collected_items = ?, 
-                    attach_items = ?
-                WHERE admission_no = ?
-            `;
-
-      const values = [
-        rescue_name,
-        date_time,
-        collected_items,
-        finalattachItems,
-        admission_no
-      ];
-
-      db.query(updateQuery, values, (updateErr, result) => {
-        if (updateErr) {
-          return res.status(500).json({ message: "Update failed", error: updateErr });
-        }
-
-        return res.status(200).json({ message: "Self Declaration updated successfully!" });
-      });
-    });
-  });
+  }catch (err) {
+    console.error("Error in updateArticles:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const updateAppearance = (req, res) => {
-  const {
-    general_appearance, attitude, comprehension, gait_posture,
-    motor_activity, catatonic_sign, conversion_dissociative,
-    social_manner, rapport, hallucinatory_behaviour
-  } = req.body;
 
-  const admission_no = req.params.admission_no;
+const updateAppearance = async (req, res) => {
+  try {
+    const {
+      general_appearance, attitude, comprehension, gait_posture,
+      motor_activity, catatonic_sign, conversion_dissociative,
+      social_manner, rapport, hallucinatory_behaviour
+    } = req.body;
 
-  const uquery = `UPDATE appearance_behaviour SET 
+    const admission_no = req.params.admission_no;
+
+    const uquery = `UPDATE appearance_behaviour SET 
                     general_appearance = ?, 
                     attitude = ?, 
                     comprehension = ?, 
@@ -555,78 +572,72 @@ const updateAppearance = (req, res) => {
                     hallucinatory_behaviour = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    general_appearance.join(", "),
-    attitude.join(", "),
-    comprehension.join(", "),
-    gait_posture.join(", "),
-    motor_activity.join(", "),
-    catatonic_sign.join(", "),
-    conversion_dissociative.join(", "),
-    social_manner.join(", "),
-    rapport.join(", "),
-    hallucinatory_behaviour.join(", "),
-    admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      general_appearance.join(", "),
+      attitude.join(", "),
+      comprehension.join(", "),
+      gait_posture.join(", "),
+      motor_activity.join(", "),
+      catatonic_sign.join(", "),
+      conversion_dissociative.join(", "),
+      social_manner.join(", "),
+      rapport.join(", "),
+      hallucinatory_behaviour.join(", "),
+      admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
     }
-
     return res.status(200).json({ message: "General appearance Form updated successfully!" });
-  });
-
-
+  } catch (err) {
+    console.error("Error in updateAppearance:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const UpdateSpeech = (req, res) => {
-  const {
-    rate_quantity, volume_tone, flow_rhythm
-  } = req.body;
 
-  const admission_no = req.params.admission_no;
+const UpdateSpeech = async (req, res) => {
+  try {
+    const {
+      rate_quantity, volume_tone, flow_rhythm
+    } = req.body;
 
-  const uquery = `UPDATE speech SET 
+    const admission_no = req.params.admission_no;
+
+    const uquery = `UPDATE speech SET 
                     rate_quantity = ?, 
                     volume_tone = ?, 
                     flow_rhythm = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    rate_quantity.join(", "),
-    volume_tone.join(", "),
-    flow_rhythm.join(", "),
-    admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      rate_quantity.join(", "),
+      volume_tone.join(", "),
+      flow_rhythm.join(", "),
+      admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
     }
-
     return res.status(200).json({ message: "Speech Form updated successfully!" });
-  });
-
+  } catch (err) {
+    console.error("Error in UpdateSpeech:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const UpdateMood = (req, res) => {
-  const {
-    mood_description, appearance, resident_feeling, general_feeling,
-    mood_like, resident_general_feeling, resident_look
-  } = req.body;
+const UpdateMood = async (req, res) => {
+  try {
+    const {
+      mood_description, appearance, resident_feeling, general_feeling,
+      mood_like, resident_general_feeling, resident_look
+    } = req.body;
 
-  const admission_no = req.params.admission_no;
+    const admission_no = req.params.admission_no;
 
-  const uquery = `UPDATE mood_affect SET 
+    const uquery = `UPDATE mood_affect SET 
                     mood_description = ?, 
                     appearance = ?, 
                     resident_feeling = ?,
@@ -636,72 +647,67 @@ const UpdateMood = (req, res) => {
                     resident_look = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    mood_description.join(", "),
-    appearance,
-    resident_feeling,
-    general_feeling,
-    mood_like,
-    resident_general_feeling,
-    resident_look.join(", "),
-    admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      mood_description.join(", "),
+      appearance,
+      resident_feeling,
+      general_feeling,
+      mood_like,
+      resident_general_feeling,
+      resident_look.join(", "),
+      admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
     }
-
     return res.status(200).json({ message: "Mood and Affect Form updated successfully!" });
-  });
 
+  } catch (err) {
+    console.error("Error in UpdateMood:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const updateThough = (req, res) => {
-  const {
-    stream_form_though, content_though
-  } = req.body;
+const updateThough = async (req, res) => {
+  try {
+    const {
+      stream_form_though, content_though
+    } = req.body;
 
-  const admission_no = req.params.admission_no;
+    const admission_no = req.params.admission_no;
 
-  const uquery = `UPDATE though_form SET 
+    const uquery = `UPDATE though_form SET 
                     stream_form_though = ?, 
                     content_though = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    stream_form_though.join(", "),
-    content_though.join(", "),
-    admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      stream_form_though.join(", "),
+      content_though.join(", "),
+      admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
     }
-
-    return res.status(200).json({ message: "Though Form updated successfully!" });
-  });
-
+    return res.status(200).json({ message: "Though form updated successfully." });
+  } catch (err) {
+    console.error("Error in updateThough:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const updatePerception = (req, res) => {
-  const {
-    hallucination_type, heard, voices_heard, part_of_day, female_male_voices,
-    interpreted_person, illusion, perception_changes, somatic, others
-  } = req.body;
+const updatePerception = async (req, res) => {
+  try {
+    const {
+      hallucination_type, heard, voices_heard, part_of_day, female_male_voices,
+      interpreted_person, illusion, perception_changes, somatic, others
+    } = req.body;
 
-  const admission_no = req.params.admission_no;
+    const admission_no = req.params.admission_no;
 
-  const uquery = `UPDATE perception SET 
+    const uquery = `UPDATE perception SET 
                     hallucination_type = ?, 
                     heard = ?,
                     voices_heard = ?,
@@ -714,78 +720,72 @@ const updatePerception = (req, res) => {
                     others = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    hallucination_type.join(", "),
-    heard,
-    voices_heard,
-    part_of_day,
-    female_male_voices,
-    interpreted_person,
-    illusion.join(", "),
-    perception_changes.join(", "),
-    somatic.join(", "),
-    others.join(", "),
-    admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      hallucination_type.join(", "),
+      heard,
+      voices_heard,
+      part_of_day,
+      female_male_voices,
+      interpreted_person,
+      illusion.join(", "),
+      perception_changes.join(", "),
+      somatic.join(", "),
+      others.join(", "),
+      admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
     }
-
     return res.status(200).json({ message: "Perception Form updated successfully!" });
-  });
-
+  } catch (err) {
+    console.error("Error in updatePerception:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const updateJudgement = (req, res) => {
-  const {
-    personal_judgement, social_judgement, test_judgement, judgement
-  } = req.body;
+const updateJudgement = async (req, res) => {
+  try {
+    const {
+      personal_judgement, social_judgement, test_judgement, judgement
+    } = req.body;
 
-  const admission_no = req.params.admission_no;
+    const admission_no = req.params.admission_no;
 
-  const uquery = `UPDATE judgement SET 
+    const uquery = `UPDATE judgement SET 
                     personal_judgement = ?, 
                     social_judgement = ?,
                     test_judgement = ?,
                     judgement = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    personal_judgement,
-    social_judgement,
-    test_judgement,
-    judgement,
-    admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      personal_judgement,
+      social_judgement,
+      test_judgement,
+      judgement,
+      admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
     }
-
     return res.status(200).json({ message: "Judgement Form updated successfully!" });
-  });
-
+  } catch (err) {
+    console.error("Error in updateJudgement:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const updateInsight = (req, res) => {
-  const {
-    denail_illness, slight_awareness, awarness_sick, awarness_illness, intellectual_insight, true_emotion,
-  } = req.body;
+const updateInsight = async (req, res) => {
+  try {
+    const {
+      denail_illness, slight_awareness, awarness_sick, awarness_illness, intellectual_insight, true_emotion,
+    } = req.body;
 
-  const admission_no = req.params.admission_no;
+    const admission_no = req.params.admission_no;
 
-  const uquery = `UPDATE insight SET 
+    const uquery = `UPDATE insight SET 
                     denail_illness = ?, 
                     slight_awareness = ?,
                     awarness_sick = ?,
@@ -794,41 +794,39 @@ const updateInsight = (req, res) => {
                     true_emotion = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    denail_illness,
-    slight_awareness,
-    awarness_sick,
-    awarness_illness,
-    intellectual_insight,
-    true_emotion,
-    admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      denail_illness,
+      slight_awareness,
+      awarness_sick,
+      awarness_illness,
+      intellectual_insight,
+      true_emotion,
+      admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
     }
-
     return res.status(200).json({ message: "Insight Form updated successfully!" });
-  });
+  } catch (err) {
+    console.error("Error in updateInsight:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const updateCognition = (req, res) => {
-  const {
-    consciousness, orientation_time, orientation_place, orientation_person, consciousnessState,canConcentrate,
-    distractibility, asking_test, names_months, test_performance, immediate_retention,
-    recall, patient_place, dinner_ate, date_ofMrg, birthdays_children, person_past, amnesia,
-    live_growing, person_school, breakfast_ques, do_yesterday, general_info, test_red_wri, calculation_test, proverb_testing,
-    familiar_object
-  } = req.body;
+const updateCognition = async (req, res) => {
+  try {
+    const {
+      consciousness, orientation_time, orientation_place, orientation_person, consciousnessState, canConcentrate,
+      distractibility, asking_test, names_months, test_performance, immediate_retention,
+      recall, patient_place, dinner_ate, date_ofMrg, birthdays_children, person_past, amnesia,
+      live_growing, person_school, breakfast_ques, do_yesterday, general_info, test_red_wri, calculation_test, proverb_testing,
+      familiar_object
+    } = req.body;
 
-  const admission_no = req.params.admission_no;
+    const admission_no = req.params.admission_no;
 
-  const uquery = `UPDATE conginition SET 
+    const uquery = `UPDATE conginition SET 
                     consciousness = ?, 
                     orientation_time = ?,
                     orientation_place = ?,
@@ -848,230 +846,187 @@ const updateCognition = (req, res) => {
                     familiar_object = ?
                     WHERE admission_no = ?`;
 
-  const values = [
-    consciousness, orientation_time, orientation_place, orientation_person, consciousnessState, canConcentrate,
-    distractibility, asking_test, names_months, test_performance, immediate_retention,
-    recall, patient_place, dinner_ate, date_ofMrg, birthdays_children, person_past, amnesia,
-    live_growing, person_school, breakfast_ques, do_yesterday, general_info, test_red_wri, calculation_test, proverb_testing,
-    familiar_object, admission_no
-  ];
-
-  db.query(uquery, values, (updateErr, result) => {
-    if (updateErr) {
-      return res.status(500).json({ message: "Update failed", error: updateErr });
-    }
-
+    const values = [
+      consciousness, orientation_time, orientation_place, orientation_person, consciousnessState, canConcentrate,
+      distractibility, asking_test, names_months, test_performance, immediate_retention,
+      recall, patient_place, dinner_ate, date_ofMrg, birthdays_children, person_past, amnesia,
+      live_growing, person_school, breakfast_ques, do_yesterday, general_info, test_red_wri, calculation_test, proverb_testing,
+      familiar_object, admission_no
+    ];
+    const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
-    }
-
-    return res.status(200).json({ message: "Insight Form updated successfully!" });
-  });
+    } 
+    return res.status(200).json({ message: "Cognition Form updated successfully!" });
+  }catch (err) {
+    console.error("Error in updateCognition:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-const getallappearance = (req, res) => {
+
+const getallappearance = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM appearance_behaviour WHERE admission_no = ?';
-
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'General Appearance Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const getallmood = (req, res) => {
+
+const getallmood = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM mood_affect WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Mood and Affect Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const getallspeech = (req, res) => {
+const getallspeech = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM speech WHERE admission_no = ?';
-
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Speech Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const getallThough = (req, res) => {
+const getallThough = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM though_form WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Though Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const getallperception = (req, res) => {
+const getallperception = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM perception WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Perception Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const getalljudgement = (req, res) => {
+const getalljudgement = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM judgement WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Judgement Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const getallInsight = (req, res) => {
+const getallInsight = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM insight WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Insight Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
-const getallcognition = (req, res) => {
+const getallcognition = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM conginition WHERE admission_no = ?';
 
-  db.query(query, [admission_no], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
-      return res.status(404).json({ message: 'Conginition Form not found' });
+      return res.status(404).json({ message: 'Cognition Form not found' });
     }
-
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
 }
 
 const getMseAllForm = async (req, res) => {
+  try {
+    const admission_no = req.params.admission_no;
 
-  const admission_no = req.params.admission_no;
+    const query = (q) => db.query(q, [admission_no]);
 
-  const query1 = `SELECT * FROM appearance_behaviour WHERE admission_no = ?`;
-  const query2 = `SELECT * FROM speech WHERE admission_no = ?`;
-  const query3 = `SELECT * FROM mood_affect WHERE admission_no = ?`;
-  const query4 = `SELECT * FROM though_form WHERE admission_no = ?`;
-  const query5 = `SELECT * FROM perception WHERE admission_no = ?`;
-  const query6 = `SELECT * FROM conginition WHERE admission_no = ?`;
-  const query7 = `SELECT * FROM judgement WHERE admission_no = ?`;
-  const query8 = `SELECT * FROM insight WHERE admission_no = ?`;
+    const [appearance_behaviour] = await query(`SELECT * FROM appearance_behaviour WHERE admission_no = ?`);
+    const [speech] = await query(`SELECT * FROM speech WHERE admission_no = ?`);
+    const [mood_affect] = await query(`SELECT * FROM mood_affect WHERE admission_no = ?`);
+    const [though] = await query(`SELECT * FROM though_form WHERE admission_no = ?`);
+    const [perceiption] = await query(`SELECT * FROM perception WHERE admission_no = ?`);
+    const [conginition] = await query(`SELECT * FROM conginition WHERE admission_no = ?`);
+    const [judgement] = await query(`SELECT * FROM judgement WHERE admission_no = ?`);
+    const [insight] = await query(`SELECT * FROM insight WHERE admission_no = ?`);
 
-  db.query(query1, [admission_no], (err1, results1) => {
-    if (err1) return res.status(500).json({ error: err1 });
-
-    db.query(query2, [admission_no], (err2, results2) => {
-      if (err2) return res.status(500).json({ error: err2 });
-
-      db.query(query3, [admission_no], (err3, results3) => {
-        if (err3) return res.status(500).json({ error: err3 });
-
-        db.query(query4, [admission_no], (err4, results4) => {
-          if (err4) return res.status(500).json({ error: err4 });
-
-          db.query(query5, [admission_no], (err5, results5) => {
-            if (err5) return res.status(500).json({ error: err5 });
-
-            db.query(query6, [admission_no], (err6, results6) => {
-              if (err6) return res.status(500).json({ error: err6 });
-
-              db.query(query7, [admission_no], (err7, results7) => {
-                if (err7) return res.status(500).json({ error: err7 });
-
-                db.query(query8, [admission_no], (err8, results8) => {
-                  if (err8) return res.status(500).json({ error: err8 });
-
-                  res.json({
-                    appearance_behaviour: results1[0] || null,
-                    speech: results2[0] || null,
-                    mood_affect: results3[0] || null,
-                    though: results4[0] || null,
-                    perceiption: results5[0] || null,
-                    conginition: results6[0] || null,
-                    judgement: results7[0] || null,
-                    insight: results8[0] || null
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
+    return res.status(200).json({
+      appearance_behaviour: appearance_behaviour[0] || null,
+      speech: speech[0] || null,
+      mood_affect: mood_affect[0] || null,
+      though: though[0] || null,
+      perceiption: perceiption[0] || null,
+      conginition: conginition[0] || null,
+      judgement: judgement[0] || null,
+      insight: insight[0] || null
     });
-  });
+
+  } catch (error) {
+    console.error("Error fetching MSE form data:", error);
+    return res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
 
-module.exports = {
+
+export {
   createMSEForm,
   createSpeech,
   createMood,

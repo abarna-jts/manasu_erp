@@ -7,6 +7,9 @@ import dashboardRoutes from './routes/dashboard.js';
 import admissionRoutes from './routes/admission.js';
 import SCRBRoutes from './routes/scrb_form.js';
 import ReunionRoutes from './routes/reunion.js';
+import FormalityRoutes from './routes/formality.js';
+import recoveryRoutes from './routes/recovery.js';
+import residencyRoutes from './routes/residency.js';
 
 // Load environment variables
 dotenv.config();
@@ -69,7 +72,9 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/admision', admissionRoutes);
 app.use('/scrb_form', SCRBRoutes);
 app.use('/reunion', ReunionRoutes);
-// app.use('/formality', FormalityRoutes);
+app.use('/formality', FormalityRoutes);
+app.use('/recovery',recoveryRoutes);
+app.use('/residency',residencyRoutes);
 // app.use('/api/student', studentRoutes);
 // app.use('/api/auth', authRoute);
 

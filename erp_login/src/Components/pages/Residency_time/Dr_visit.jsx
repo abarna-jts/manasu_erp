@@ -1,18 +1,18 @@
 import React from 'react';
 import { Breadcrumb, Container, Row, Form, Button, InputGroup } from 'react-bootstrap';
 import { Col } from 'react-bootstrap';
-import { useState} from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 function Dr_visit() {
-    const[formData, setFormData] = useState({
-        dr_name:'',
-        hospital_name:'',
-        date_time:'',
-        resident_examinite:'',
-        report:''
+    const [formData, setFormData] = useState({
+        dr_name: '',
+        hospital_name: '',
+        date_time: '',
+        resident_examinite: '',
+        report: ''
     })
 
     const userType = Cookies.get('usertype');
@@ -26,29 +26,29 @@ function Dr_visit() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
-    const handleSubmit = async (e) =>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try{
+        try {
             const response = await apiRoute.post("/residency/createDrVisit", formData);
-            // console.log(response.formData);
-            if (response.status === 200) {
+
+            if (response.status === 200 || response.status === 201) {
                 alert('Form submitted successfully!');
                 window.location.reload();
             } else {
                 alert('Error submitting form.');
             }
-        }
-        catch(err){
-             console.error('There was an error submitting the form:', err);
+        } catch (err) {
+            console.error('There was an error submitting the form:', err);
             alert('There was an error submitting the form.');
         }
-    }
+    };
+
 
     const navigate = useNavigate();
 
-    const handleViewPage = () =>{
-        
+    const handleViewPage = () => {
+
         navigate("/dr_visitView");
     }
 
@@ -101,7 +101,7 @@ function Dr_visit() {
                                                 <Form.Control
                                                     type="text"
                                                     name="hospital_name"
-                                                     value={formData.hospital_name}
+                                                    value={formData.hospital_name}
                                                     onChange={handleChange}
                                                     required />
                                             </Col>
@@ -114,7 +114,7 @@ function Dr_visit() {
                                                 <Form.Control
                                                     type="datetime-local"
                                                     name="date_time"
-                                                     value={formData.date_time}
+                                                    value={formData.date_time}
                                                     onChange={handleChange}
                                                     required />
                                             </Col>
@@ -127,7 +127,7 @@ function Dr_visit() {
                                                 <Form.Control
                                                     type="text"
                                                     name="resident_examinite"
-                                                     value={formData.resident_examinite}
+                                                    value={formData.resident_examinite}
                                                     onChange={handleChange}
                                                     required />
                                             </Col>
@@ -148,9 +148,9 @@ function Dr_visit() {
                                     </Col>
 
                                     {userType === "3" && (
-                                    <div className="mt-3">
-                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
-                                    </div>
+                                        <div className="mt-3">
+                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                        </div>
                                     )}
 
                                 </Row>

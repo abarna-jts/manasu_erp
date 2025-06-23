@@ -31,45 +31,45 @@ createSelfDeclaration,
 
 const router = express.Router();
 
-router.post("/createDeclaration", createSelfDeclaration);
-router.get("/getFormalityForm/:admission_no",getFormalityForm);
-router.put("/updateFormalityForm/:admission_no",updateFormalityForm);
-router.delete("/deleteFormalityForm/:admission_no",deleteFormalityForm);
+router.post("/createDeclaration", createSelfDeclaration); //completed
+router.get("/getFormalityForm/:admission_no",getFormalityForm); //completed
+router.put("/updateFormalityForm/:admission_no",updateFormalityForm); //completed
+// router.delete("/deleteFormalityForm/:admission_no",deleteFormalityForm);
 
 //Essential Record
-router.post("/createEventReport",createEventReport);
-router.post("/createCelebrationReport",createCelebrationReport);
-router.post("/createCommunityReport", createCommunityReport);
-router.post("/createStaffReport", createStaffReport);
-router.post("/createRecords",createRecords);
-router.get("/getEssentialRecord/:admission_no",getEssentialRecords);
-router.get("/getEssentialRecordshow/:id",getEssentialRecordshow);
-router.put("/updateEssentialRecords/:admission_no",updateEssentialRecords);
-router.delete("/deleteEssentailRecord/:admission_no",deleteEssentialRecord);
+router.post("/createEventReport",createEventReport); //completed
+router.post("/createCelebrationReport",createCelebrationReport); //completed
+router.post("/createCommunityReport", createCommunityReport); //completed
+router.post("/createStaffReport", createStaffReport); //completed
+router.post("/createRecords",createRecords); //completed
+router.get("/getEssentialRecord/:admission_no",getEssentialRecords); //completed
+router.get("/getEssentialRecordshow/:id",getEssentialRecordshow); //completed
+router.put("/updateEssentialRecords/:admission_no",updateEssentialRecords); //completed
+// router.delete("/deleteEssentailRecord/:admission_no",deleteEssentialRecord);
 
 //annual Report
-router.post("/createAnnualReport", createAnnualReport);
-router.get("/getReport", getAnnualReport);
-router.get("/getAnnualReport/:id", getAnnualReportbyID);
-router.put("/updateAnnualReport/:id",updateAnnualReport);
-router.delete("/deleteAnnualReport/:id",deleteAnnualReport);
+router.post("/createAnnualReport", createAnnualReport); //completed
+router.get("/getReport", getAnnualReport); // not used
+router.get("/getAnnualReport/:id", getAnnualReportbyID); //completed
+router.put("/updateAnnualReport/:id",updateAnnualReport); //completed
+// router.delete("/deleteAnnualReport/:id",deleteAnnualReport);
 
 //rescue_details
-router.get("/getRescueDetails/:admission_no",getRescueDetails);
-router.post("/create_dischargeInfo",createRescueDischargeInfo);
-router.get("/getDischargeSummary",getDischargeSummary);
-router.get("/getDischargeSummaryID/:id",getDischargeSummaryID);
-router.put("/updateDischargeSummary/:id",updateDischargeSummary);
-router.delete("/deleteDischargeSummary/:id",deleteDischargeSummary);
+router.get("/getRescueDetails/:admission_no",getRescueDetails); //completed
+router.post("/create_dischargeInfo",createRescueDischargeInfo); //completed
+router.get("/getDischargeSummary",getDischargeSummary); //completed
+router.get("/getDischargeSummaryID/:id",getDischargeSummaryID); //completed
+router.put("/updateDischargeSummary/:id",updateDischargeSummary); //completed
+// router.delete("/deleteDischargeSummary/:id",deleteDischargeSummary);
 
 //internship form 
-router.post("/createInternForm", createInternForm);
-router.get("/getStudentDetails",getStudentDetails);
-router.get("/getStudentDet/:id",getStudendDetailsbyID);
-router.put("/updateStudentDetail/:id",updateStudentDetail);
+router.post("/createInternForm", createInternForm); //completed
+router.get("/getStudentDetails",getStudentDetails); //completed
+router.get("/getStudentDet/:id",getStudendDetailsbyID); //completed
+router.put("/updateStudentDetail/:id",updateStudentDetail); //completed
 
 //director routes
-router.get("/getAllDocument",getAllDocument);
+router.get("/getAllDocument",getAllDocument); //completed
 
 
 export default router;
