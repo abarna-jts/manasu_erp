@@ -279,7 +279,6 @@ function SCRB_Form2A() {
         setError(""); // clear any previous error
       } else {
         setRescueImage(null);
-
         setError("Image not found for this admission number");
       }
     } catch (error) {

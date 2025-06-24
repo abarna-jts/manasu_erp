@@ -51,6 +51,7 @@ function Prescription_form() {
     ]);
 
     const [viewData, setViewData] = useState({
+        id:'',
         admission_no: '',
         rescue_name: '',
         age: '',
@@ -63,7 +64,6 @@ function Prescription_form() {
         follow_up: '',
         prescription_medicines: [],
     });
-
 
 
     const generalMedicines = [
@@ -462,46 +462,31 @@ function Prescription_form() {
     };
 
 
-    const handleUpdate = async (e) => {
-        e.preventDefault();
+   const handleUpdate = async (e) => {
+    e.preventDefault();
 
-        const admissionNumber = admission_no || formData.admission_no;
+    try {
+        const response = await apiRoute.put(
+            `/residency/updatePrescription/${viewData.id}`, 
+            viewData
+        );
 
-        if (!admissionNumber || admissionNumber.trim() === '') {
-            setSubmissionMessage("Admission number is required.");
-            setMessageType("danger");
-            return;
+        if (response.status === 200) {
+            alert("Updated successfully!");
+            // Optional: refresh data or redirect
+        } else {
+            alert(`Update failed: ${response.data.message}`);
         }
-
-        const todayDate = new Date().toISOString().split('T')[0];
-
-        // Construct updated data
-        const updatedData = {
-            ...formData,
-            admission_no: data.admission_no || '',
-            current_date: todayDate,
-            prescription_medicines: rows,  // ← updated dynamic table data
-        };
-
-        console.log("Updating data:", updatedData);
-
-        try {
-            const res = await apiRoute.put(`/residency/updatePrescription/${formData.id}`, updatedData); // Make sure formData.id holds the prescription ID
-
-            if (res.data.message === "Prescription and Medicine Summary Updated Successfully") {
-                setSubmissionMessage("Prescription updated successfully!");
-                setMessageType("success");
-                setTimeout(() => window.location.reload(), 3000);
-            } else {
-                setSubmissionMessage("Update failed.");
-                setMessageType("danger");
-            }
-        } catch (error) {
-            console.error("Error updating prescription", error);
-            setSubmissionMessage("Something went wrong.");
-            setMessageType("danger");
+    } catch (error) {
+        console.error("Axios update error:", error);
+        if (error.response) {
+            alert(`Error: ${error.response.data.message}`);
+        } else {
+            alert("Network or server error occurred.");
         }
-    };
+    }
+};
+
 
 
 
@@ -542,7 +527,7 @@ function Prescription_form() {
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                     {userType === "3" && (
-                                        <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }}>
+                                        <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
                                             <i className="fas fa-plus"></i>
                                         </InputGroup.Text>
                                     )}

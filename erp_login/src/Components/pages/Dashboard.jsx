@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from '@themesberg/react-bootstrap';
+import { Button, Form } from '@themesberg/react-bootstrap';
 import { useNavigate } from "react-router-dom";
 import circle from "../img/icons/circle.png";
 import Sidebar from "./Sidebar";
@@ -18,6 +18,8 @@ function Dashboard() {
     const [totalResident, setTotalResident] = useState(0);
     const [totalReunion, setTotalReunion] = useState(0);
     const [nurseRecordData, setNurseRecordData] = useState([]);
+    const [admissionData, setAdmissionData] = useState([]);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
     useEffect(() => {
         const fetchTotalRescue = async () => {
@@ -84,22 +86,35 @@ function Dashboard() {
         fetchNurseRecord();
     }, []);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await apiRoute.get(`/dashboard/getMonthlyAdmissionsByYear/${selectedYear}`);
+                setAdmissionData(res.data.data);
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
+        };
+
+        fetchData();
+    }, [selectedYear]);
+
     const COLORS = ["#fe7096", "#90caf9", "#84d9d2", "#92a6f8", "#ffc7ad", "#ffbccc"];
 
-    const admissionData = [
-        { month: 'Jan', value: 4 },
-        { month: 'Feb', value: 3 },
-        { month: 'Mar', value: 0 },
-        { month: 'Apr', value: 0 },
-        { month: 'May', value: 4 },
-        { month: 'Jun', value: 0 },
-        { month: 'Jul', value: 5 },
-        { month: 'Aug', value: 4 },
-        { month: 'Sep', value: 0 },
-        { month: 'Oct', value: 3 },
-        { month: 'Nov', value: 4 },
-        { month: 'Dec', value: 1 },
-    ];
+    // const admissionData = [
+    //     { month: 'Jan', value: 4 },
+    //     { month: 'Feb', value: 3 },
+    //     { month: 'Mar', value: 0 },
+    //     { month: 'Apr', value: 0 },
+    //     { month: 'May', value: 4 },
+    //     { month: 'Jun', value: 0 },
+    //     { month: 'Jul', value: 5 },
+    //     { month: 'Aug', value: 4 },
+    //     { month: 'Sep', value: 0 },
+    //     { month: 'Oct', value: 3 },
+    //     { month: 'Nov', value: 4 },
+    //     { month: 'Dec', value: 1 },
+    // ];
 
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -202,10 +217,28 @@ function Dashboard() {
 
                     </Col>
                     <Col md={5} className="admission_report">
-                        <h5>Monthly Admission Report</h5>
+                        <h5>Year-wise Admission Report</h5>
+                        <Row className="d-flex align-items-center justify-content-center mt-3">
+                            <Col md={3}>
+                                <Form.Select onChange={(e) => setSelectedYear(e.target.value)} value={selectedYear}>
+                                    {Array.from({ length: new Date().getFullYear() - 2009 }, (_, i) => {
+                                        const year = new Date().getFullYear() - i;
+                                        return (
+                                            <option key={year} value={year}>
+                                                {year}
+                                            </option>
+                                        );
+                                    })}
+                                </Form.Select>
+
+                            </Col>
+                        </Row>
+
+
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
-                            {/* Pie Chart */}
                             <div style={{ width: 350, height: 350 }}>
+
+
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
@@ -214,7 +247,7 @@ function Dashboard() {
                                             nameKey="month"
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={40} // Makes it a donut
+                                            innerRadius={40}
                                             outerRadius={100}
                                             fill="#8884d8"
                                             label
@@ -228,32 +261,31 @@ function Dashboard() {
                                 </ResponsiveContainer>
                             </div>
 
-                            {/* Custom Legend with 2 columns of 6 months */}
                             <div style={{ display: "flex", flexWrap: "wrap", width: 200 }}>
-                                {admissionData.map((entry, index) => (
-                                    <div
-                                        key={`legend-${index}`}
-                                        style={{
-                                            width: "50%", // 2 columns
-                                            display: "flex",
-                                            alignItems: "center",
-                                            marginBottom: 8,
-                                        }}
-                                    >
+                                {admissionData.length > 0 ? (
+                                    admissionData.map((entry, index) => (
                                         <div
-                                            style={{
-                                                width: 16,
-                                                height: 16,
-                                                backgroundColor: COLORS[index % COLORS.length],
-                                                marginRight: 8,
-                                                borderRadius: 4,
-                                            }}
-                                        />
-                                        <span style={{ fontSize: "0.875rem" }}>
-                                            {entry.month} ({entry.value})
-                                        </span>
-                                    </div>
-                                ))}
+                                            key={`legend-${index}`}
+                                            style={{ width: "50%", display: "flex", alignItems: "center", marginBottom: 8 }}
+                                        >
+                                            <div
+                                                style={{
+                                                    width: 16,
+                                                    height: 16,
+                                                    backgroundColor: COLORS[index % COLORS.length],
+                                                    marginRight: 8,
+                                                    borderRadius: 4,
+                                                }}
+                                            />
+                                            <span style={{ fontSize: "0.875rem" }}>
+                                                {entry.month} ({entry.value})
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <span style={{ fontSize: "0.875rem", color: "#888" }}>No Data Available</span>
+                                )}
+
                             </div>
                         </div>
                     </Col>

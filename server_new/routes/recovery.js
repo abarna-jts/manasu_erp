@@ -2,7 +2,8 @@ import express from 'express';
 import  { createMSEForm, createSpeech, createMood, createThough, createJudgement, createInsight, createCognition, createArticles, getArticles,updateArticles, createPerception,
     getallappearance,getallspeech,
     getallmood,getallperception,getallcognition,getMseAllForm, getallThough, getalljudgement,getallInsight, 
-    updateAppearance,UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition
+    updateAppearance,UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition,
+    createBasicInformation,createChiefComplaint, createPresenting
 } from '../controllers/recovery.js';
 
 const router = express.Router();
@@ -66,5 +67,10 @@ router.get("/mseAllForm/:admission_no",getMseAllForm); //completed
 router.post("/create_articles", createArticles); //completed (not used in frontend)
 router.get("/getArticles/:admission_no",getArticles); //completed (not used in frontend)
 router.post("/updateArticles/:admission_no",updateArticles); //completed (not used in frontend)
+
+//psychiatric form
+router.post("/create_information", createBasicInformation);
+router.post("/create_chiefComplaint",createChiefComplaint);
+router.post("/create_presenting",createPresenting);
 
 export default router;

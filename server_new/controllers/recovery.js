@@ -1,5 +1,5 @@
 import db from '../db.js';
-import { recoveryAsync } from '../util/recoveryMulter.js';  
+import { recoveryAsync } from '../util/recoveryMulter.js';
 
 const createMSEForm = async (req, res) => {
   try {
@@ -450,8 +450,8 @@ const createCognition = async (req, res) => {
   }
 }
 
-const createArticles = async(req, res) => {
-  try{
+const createArticles = async (req, res) => {
+  try {
     await recoveryAsync(req, res);
 
     const {
@@ -478,31 +478,31 @@ const createArticles = async(req, res) => {
     }
     res.status(201).json({ message: "Rescue Condition Created Successfully" });
 
-  }catch (err) {
+  } catch (err) {
     console.error("Error in createArticles:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
 
 
-const getArticles = async(req, res) => {
+const getArticles = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM articles_items WHERE admission_no = ?';
-  try{
+  try {
     const [results] = await db.query(query, [admission_no]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Articles carried Form not found' });
     }
     res.json(results[0]);
-  }catch (err) {
-  console.error(err);
-  return res.status(500).json({ message: 'Database error' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
   }
 }
 
 
-const updateArticles = async(req, res) => {
-  try{
+const updateArticles = async (req, res) => {
+  try {
     await recoveryAsync(req, res);
 
     const {
@@ -518,7 +518,7 @@ const updateArticles = async(req, res) => {
     const [selectRows] = await db.query("SELECT attach_items FROM articles_items WHERE admission_no = ?", [admission_no]);
     if (selectRows.length === 0) {
       return res.status(404).json({ message: "Admission number not found" });
-    } 
+    }
     const existingAttachItems = selectRows[0].attach_items;
     const finalAttachItems = attachItemsPath || existingAttachItems;
     const updateQuery = `
@@ -542,7 +542,7 @@ const updateArticles = async(req, res) => {
     }
     res.status(200).json({ message: "Rescue Condition updated successfully!" });
 
-  }catch (err) {
+  } catch (err) {
     console.error("Error in updateArticles:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -856,9 +856,9 @@ const updateCognition = async (req, res) => {
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record updated. Check if ID exists." });
-    } 
+    }
     return res.status(200).json({ message: "Cognition Form updated successfully!" });
-  }catch (err) {
+  } catch (err) {
     console.error("Error in updateCognition:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -1024,7 +1024,137 @@ const getMseAllForm = async (req, res) => {
   }
 };
 
+const createBasicInformation = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      patient_name,
+      patient_age,
+      patient_gender,
+      sexual_orientation,
+      education_bg,
+      occupation,
+      marital_status,
+      economic_status,
+      religion,
+      informant,
+      residential_address,
+      living_arrangements,
+      family_structure,
+      cultural_identity,
+      language_preferences
 
+    } = req.body;
+
+    const query = `INSERT INTO basic_detail(
+    admission_no, patient_name, patient_age, patient_gender, sexual_orientation,
+    education_bg, occupation, marital_status,economic_status,
+    religion,informant, residential_address,living_arrangements,
+    family_structure,cultural_identity,language_preferences)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      admission_no, patient_name, patient_age, patient_gender, sexual_orientation,
+      education_bg, occupation, marital_status, economic_status, religion,
+      informant, residential_address, living_arrangements, family_structure, cultural_identity, language_preferences
+    ];
+
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(201).json({ message: "Demographic Information form created successfully" });
+  } catch (err) {
+    console.error("Error in create Demographic Information Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const createChiefComplaint = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      chief_complaint,
+      onset_duration,
+      nature_symptoms,
+      severity,
+      course_type,
+      nature_illness,
+      identify_trigger,
+      life_changes,
+      biological,
+      psychological,
+      social_environment
+    } = req.body;
+
+    const query = `INSERT INTO cheif_complaint(admission_no,chief_complaint, onset_duration, nature_symptoms,
+    severity, course_type, nature_illness, identify_trigger, life_changes, biological,
+    psychological, social_environment)VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      admission_no,
+      chief_complaint,
+      onset_duration,
+      nature_symptoms,
+      severity,
+      course_type,
+      nature_illness,
+      identify_trigger,
+      life_changes,
+      biological,
+      psychological,
+      social_environment
+    ];
+
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(201).json({ message: "Chief Complaint Form created successfully" });
+  } catch (err) {
+    console.error("Error in create Chief Complaint Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const createPresenting = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      history_presenting,
+      mood_affect,
+      though_content,
+      though_process,
+      perception,
+      behavioural_changes,
+      sleep_patterns,
+      energy_level,
+      appetite_weight,
+      occupation_academic,
+      interpersonal_relationship,
+      selfCare_activity,
+      recreation_activity,
+    } = req.body;
+
+    const query = `INSERT INTO presenting_problems(admission_no, history_presenting, mood_affect, though_content,
+    though_process, perception, behavioural_changes, sleep_patterns, energy_level, appetite_weight,
+    occupation_academic, interpersonal_relationship, selfCare_activity, recreation_activity,)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [admission_no, history_presenting, mood_affect, though_content, though_process, perception,
+      behavioural_changes, sleep_patterns, energy_level, appetite_weight, occupation_academic, interpersonal_relationship,
+      selfCare_activity, recreation_activity,
+    ];
+
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(201).json({ message: "Presenting Problems Form created successfully" });
+  } catch (err) {
+    console.error("Error in create Presenting Problems Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
 
 export {
   createMSEForm,
@@ -1040,5 +1170,6 @@ export {
   createCognition,
   getallappearance,
   getallmood, getallspeech, getallcognition, getallperception, getMseAllForm, getallThough, getalljudgement, getallInsight,
-  updateAppearance, UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition
+  updateAppearance, UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition,
+  createBasicInformation, createChiefComplaint, createPresenting
 };

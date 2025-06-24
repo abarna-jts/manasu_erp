@@ -797,7 +797,7 @@ const getPrescriptionbyID = async (req, res) => {
 
 
 const updatePrescription = async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.id; // prescription.id
   const {
     admission_no,
     rescue_name,
@@ -806,10 +806,18 @@ const updatePrescription = async (req, res) => {
     hospital_name,
     department,
     masterHealthCheckup,
+    medical_type,
     instruction,
     advice,
     follow_up,
-    prescription_medicines,
+    medicine,
+    medicine_type,
+    duration,
+    intake,
+    med_instruction,
+    morning,
+    afternoon,
+    night
   } = req.body;
 
   if (!admission_no) {
@@ -827,6 +835,7 @@ const updatePrescription = async (req, res) => {
         hospital_name = ?, 
         department = ?,
         masterHealthCheckup = ?, 
+        medical_type = ?,
         instruction = ?, 
         advice = ?, 
         follow_up = ?
@@ -840,77 +849,89 @@ const updatePrescription = async (req, res) => {
       hospital_name,
       department,
       masterHealthCheckup,
+      medical_type,
       instruction,
       advice,
       follow_up,
       id,
     ];
 
-    const [result] = await db.query(sql, values);
+    const [updateResult] = await db.query(sql, values);
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'No prescription found with this ID' });
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ message: 'No prescription found' });
     }
 
-    // 2. If no medicines, return success for prescription update only
-    if (!Array.isArray(prescription_medicines) || prescription_medicines.length === 0) {
-      return res.status(200).json({ message: 'Prescription updated (no medicines provided)' });
+    // 2. Get current medicine rows
+    const [existingMeds] = await db.query(
+      `SELECT id FROM prescription_medicines WHERE prescription_id = ? ORDER BY id ASC`,
+      [id]
+    );
+
+    const count = medicine.length;
+    const updateCount = Math.min(existingMeds.length, count);
+
+    // 3. Update existing medicines
+    for (let i = 0; i < updateCount; i++) {
+      await db.query(
+        `UPDATE prescription_medicines SET 
+          medicine = ?, 
+          medicine_type = ?, 
+          duration = ?, 
+          intake = ?, 
+          med_instruction = ?, 
+          morning = ?, 
+          afternoon = ?, 
+          night = ?
+        WHERE id = ?`,
+        [
+          medicine[i],
+          medicine_type[i],
+          duration[i],
+          intake[i],
+          med_instruction[i],
+          morning[i],
+          afternoon[i],
+          night[i],
+          existingMeds[i].id
+        ]
+      );
     }
 
-    // 3. Process medicines (update or insert)
-    for (const med of prescription_medicines) {
-      if (med.id) {
-        // 🔄 UPDATE existing medicine
-        const updateMedSql = `
-          UPDATE prescription_medicines SET
-            medicine = ?, 
-            medicine_type = ?, 
-            duration = ?, 
-            intake = ?, 
-            med_instruction = ?, 
-            morning = ?, 
-            afternoon = ?, 
-            night = ?
-          WHERE id = ? AND prescription_id = ?`;
-
-        const medValues = [
-          med.medicine,
-          med.medicine_type,
-          med.duration,
-          med.intake,
-          med.med_instruction,
-          med.morning,
-          med.afternoon,
-          med.night,
-          med.id,
-          id,
-        ];
-
-        await db.query(updateMedSql, medValues);
-      } else {
-        // ➕ INSERT new medicine
-        const insertMedSql = `
-          INSERT INTO prescription_medicines 
+    // 4. Insert remaining new medicines
+    for (let i = updateCount; i < count; i++) {
+      await db.query(
+        `INSERT INTO prescription_medicines 
           (prescription_id, medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-        const medValues = [
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
           id,
-          med.medicine,
-          med.medicine_type,
-          med.duration,
-          med.intake,
-          med.med_instruction,
-          med.morning,
-          med.afternoon,
-          med.night,
-        ];
+          medicine[i],
+          medicine_type[i],
+          duration[i],
+          intake[i],
+          med_instruction[i],
+          morning[i],
+          afternoon[i],
+          night[i],
+        ]
+      );
+    }
 
-        await db.query(insertMedSql, medValues);
+    // 5. Delete extra old medicines
+    if (existingMeds.length > count) {
+      const idsToDelete = existingMeds
+        .slice(count)
+        .map(med => med.id);
+
+      if (idsToDelete.length > 0) {
+        await db.query(
+          `DELETE FROM prescription_medicines WHERE id IN (${idsToDelete.map(() => '?').join(',')})`,
+          idsToDelete
+        );
       }
     }
 
-    // ✅ All updates done
     return res.status(200).json({ message: 'Prescription and medicines updated successfully' });
 
   } catch (err) {
@@ -918,6 +939,8 @@ const updatePrescription = async (req, res) => {
     return res.status(500).json({ message: 'Server Error', error: err });
   }
 };
+
+
 
 
 

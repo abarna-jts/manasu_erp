@@ -62,30 +62,33 @@ const getMonthlyResidentConditions = async (req, res) => {
     }
 };
 
-const getMonthlyObserReport = async (req, res) => {
-    try {
-        const sql = `
+const getMonthlyAdmissionsByYear = async (req, res) => {
+  const { year } = req.params;
+
+  const sql = `
     SELECT 
-        MONTHNAME(date) AS month,
-        COUNT(*) AS value
-        FROM 
-        observation_report
-        WHERE 
-        date IS NOT NULL
-        GROUP BY 
-        MONTH(date)
-        ORDER BY 
-        MONTH(date);
+      MONTHNAME(admission_date) AS month,
+      MONTH(admission_date) AS month_number,
+      COUNT(*) AS value
+    FROM 
+      first_information
+    WHERE 
+      YEAR(admission_date) = ?
+    GROUP BY 
+      MONTH(admission_date), MONTHNAME(admission_date)
+    ORDER BY 
+      MONTH(admission_date)
   `;
 
-        const [results] = await db.query(sql);
-        res.json(results[0]);
-    } catch (err) {
-        console.error("Error fetching data:", err);
-        res.status(500).json({ error: "Database error" });
-    }
-
+  try {
+    const [rows] = await db.query(sql, [year]);
+    res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error("Error fetching admissions:", err);
+    res.status(500).json({ success: false, message: "Server Error", error: err });
+  }
 };
+
 
 export {
     getRecentRescue,
@@ -93,5 +96,5 @@ export {
     totalResident,
     totalReunion,
     getMonthlyResidentConditions,
-    getMonthlyObserReport
+    getMonthlyAdmissionsByYear
 };

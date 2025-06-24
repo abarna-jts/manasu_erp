@@ -950,20 +950,6 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Disability Certificate No. & Issuing Authority :
-                                    </Form.Label>
-                                    <Col sm="6" className='d-flex align-items-center'>
-                                        <Form.Control
-                                            type="text"
-                                            name="disability_no"
-                                            value={formData.disability_no}
-                                            onChange={handleInputChange}
-                                            required />
-                                    </Col>
-                                </Form.Group>
-
-                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="6" className='text-start'>
                                         Voter ID :
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
