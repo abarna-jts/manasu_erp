@@ -1138,10 +1138,16 @@ const createPresenting = async (req, res) => {
 
     const query = `INSERT INTO presenting_problems(admission_no, history_presenting, mood_affect, though_content,
     though_process, perception, behavioural_changes, sleep_patterns, energy_level, appetite_weight,
-    occupation_academic, interpersonal_relationship, selfCare_activity, recreation_activity,)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    occupation_academic, interpersonal_relationship, selfCare_activity, recreation_activity)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
-    const values = [admission_no, history_presenting, mood_affect, though_content, though_process, perception,
-      behavioural_changes, sleep_patterns, energy_level, appetite_weight, occupation_academic, interpersonal_relationship,
+    const values = [admission_no, history_presenting,
+      mood_affect.join(", "),
+      though_content.join(", "),
+      though_process.join(", "),
+      perception.join(", "),
+      behavioural_changes.join(", "),
+      sleep_patterns.join(", "),
+      energy_level, appetite_weight, occupation_academic, interpersonal_relationship,
       selfCare_activity, recreation_activity,
     ];
 
@@ -1152,6 +1158,140 @@ const createPresenting = async (req, res) => {
     res.status(201).json({ message: "Presenting Problems Form created successfully" });
   } catch (err) {
     console.error("Error in create Presenting Problems Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const createPsyHistory = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      psychiatric_diagnoses,
+      treatment_history,
+      medications,
+      dosage,
+      adherence,
+      sideEffect,
+      experience_reaction,
+      hospitalisation_reason,
+      duration,
+      crisis_episodes,
+      fm_mentalHealth,
+      significant_life,
+      chronic_stressors,
+      trauma_exploration,
+      legal_environment
+    } = req.body;
+
+    const query = `INSERT INTO psy_history(admission_no, psychiatric_diagnoses,
+    treatment_history, medications, dosage, adherence, sideEffect, experience_reaction,
+    hospitalisation_reason, duration, crisis_episodes, fm_mentalHealth, significant_life,
+    chronic_stressors, trauma_exploration, legal_environment)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      admission_no, psychiatric_diagnoses,
+      treatment_history,
+      medications,
+      dosage,
+      adherence,
+      sideEffect,
+      experience_reaction,
+      hospitalisation_reason,
+      duration,
+      crisis_episodes,
+      fm_mentalHealth,
+      significant_life,
+      chronic_stressors,
+      trauma_exploration.join(", "),
+      legal_environment.join(", ")
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(201).json({ message: "Psychiatric History Form created successfully" });
+  } catch (err) {
+    console.error("Error in create Psychiatric History Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const createMedicalData = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      disability_status,
+      chronic_medical,
+      acute_health,
+      medication,
+      medication_allergies,
+      other_allergy,
+      significant_medical,
+      traumatic_injuries,
+      sexual_health
+    } = req.body;
+
+    const query = `INSERT INTO medical_history(admission_no,disability_status, chronic_medical,
+    acute_health,medication,medication_allergies,other_allergy,significant_medical,traumatic_injuries,sexual_health)
+    VALUES(?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      admission_no,
+      disability_status,
+      chronic_medical,
+      acute_health,
+      medication,
+      medication_allergies,
+      other_allergy.join(", "),
+      significant_medical.join(", "),
+      traumatic_injuries,
+      sexual_health.join(", ")
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(201).json({ message: "Medical History Form created successfully" });
+  } catch (err) {
+    console.error("Error in create Medical History Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const createFamilyHistoryData = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      family_composition,
+      family_dynamics,
+      marriage_type,
+      family_history,
+      genetic_predisposition,
+      family_changes,
+      family_substance
+    } = req.body;
+
+    const query = `INSERT INTO familyhis_data(admission_no,family_composition,family_dynamics,
+    marriage_type,family_history,genetic_predisposition,family_changes,family_substance)VALUES(?,?,?,?,?,?,?,?);`
+
+    const values = [
+      admission_no,
+      family_composition.join(", "),
+      family_dynamics.join(", "),
+      marriage_type,
+      family_history,
+      genetic_predisposition,
+      family_changes.join(", "),
+      family_substance
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(201).json({ message: "Family History Form created successfully" });
+  } catch (err) {
+    console.error("Error in create Family History Form:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
@@ -1171,5 +1311,5 @@ export {
   getallappearance,
   getallmood, getallspeech, getallcognition, getallperception, getMseAllForm, getallThough, getalljudgement, getallInsight,
   updateAppearance, UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition,
-  createBasicInformation, createChiefComplaint, createPresenting
+  createBasicInformation, createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData
 };

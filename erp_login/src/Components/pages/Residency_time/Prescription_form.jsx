@@ -60,6 +60,7 @@ function Prescription_form() {
         department: '',
         masterHealthCheckup: '',
         instruction: '',
+        medical_type:'',
         advice: '',
         follow_up: '',
         prescription_medicines: [],

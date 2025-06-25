@@ -56,6 +56,7 @@ const upload = multer({ storage: storage }).fields([
     { name: 'medicationsFile', maxCount: 1 },
     { name: 'ClothesFile', maxCount: 1 },
     { name: 'possessionsRecoveredFile', maxCount: 1 },
+    { name: 'dischargeAllowanceFile', maxCount: 1},
     { name: 'travelExpensesFile', maxCount: 1 },
     { name: 'copyOfdischargeSummaryFile', maxCount: 1 },
     { name: 'travelSafetyLetterFile', maxCount: 1 },

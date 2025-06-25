@@ -376,7 +376,7 @@ const deleteEssentialRecord = (req, res) => {
 const createEventReport = async (req, res) => {
     try {
         // Await the file upload
-        await eventUploadAsync(req, res);
+        await formalityAsync(req, res);
 
         const {
             event_name,

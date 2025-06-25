@@ -970,10 +970,47 @@ function Edit_ReunionChecklist() {
                                         </Col>
                                     </Form.Group>
 
-                                    {/* Discharge Allowance / Travel Expenses Provided */}
+                                    {/* Discharge Allowance*/}
                                     <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
                                         <Form.Label column sm="3">
-                                            Discharge Allowance / Travel Expenses Provided :
+                                            Discharge Allowance Provided :
+                                        </Form.Label>
+                                        <Col sm="9" className='d-flex align-items-center justify-content-start'>
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="Yes"
+                                                name="dischargeAllowance"
+                                                id="dischargeAllowanceYes"
+                                                value="Yes"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="No"
+                                                name="dischargeAllowance"
+                                                id="dischargeAllowanceNo"
+                                                value="No"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm="2">Attach:</Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="file"
+                                                        name='dischargeAllowanceFile'
+                                                        onChange={handleChange}
+                                                        required={formData.dischargeAllowance === "Yes"} />
+                                                </Col>
+                                            </Form.Group>
+
+                                        </Col>
+                                    </Form.Group>
+
+                                    {/*  Travel Expenses Provided */}
+                                    <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
+                                        <Form.Label column sm="3">
+                                            Travel Expenses Provided :
                                         </Form.Label>
                                         <Col sm="3" className='d-flex align-items-center justify-content-start'>
                                             <Form.Check

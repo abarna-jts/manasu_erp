@@ -87,17 +87,17 @@ function Family_Request_form() {
     };
 
     const handleInputChange1 = (e) => {
-        setStoreData({ ...storeData, [e.target.name]: e.target.value });
         const { name, value } = e.target;
-        if (name === "f_aadhar_card_no" || name=== "r_aadhar_card_no") {
-            // Allow only digits and format as xxxx xxxx xxxx
-            let formatted = value.replace(/\D/g, '').slice(0, 12); // Remove non-digits, limit to 12 digits
-            formatted = formatted.replace(/(.{4})/g, '$1 ').trim(); // Insert space every 4 digits
-            setStoreData({ ...storeData, [name]: formatted });
-        } else {
-            setStoreData({ ...storeData, [name]: value });
+        let updatedValue = value;
+
+        if (name === "f_aadhar_card_no" || name === "r_aadhar_card_no") {
+            updatedValue = value.replace(/\D/g, '').slice(0, 12);
+            updatedValue = updatedValue.replace(/(.{4})/g, '$1 ').trim();
         }
+
+        setStoreData(prev => ({ ...prev, [name]: updatedValue }));
     };
+
 
     const handleInputChange2 = (e) => {
         setRefData({ ...refData, [e.target.name]: e.target.value });
@@ -372,31 +372,31 @@ function Family_Request_form() {
     };
 
     const fetchRescueDetails = async (admission_no) => {
-    try {
-      const response = await apiRoute.get(`/scrb_form/get_scrbform2data/${admission_no}`);
-      const result = response.data;
-      console.log("API Result:", result);
+        try {
+            const response = await apiRoute.get(`/scrb_form/get_scrbform2data/${admission_no}`);
+            const result = response.data;
+            console.log("API Result:", result);
 
-      if (result && result.data) {
-        const imagePath = result.data.rescue_image.startsWith("http")
-          ? result.data.rescue_image
-          : `https://www.pahrultours.com/app2/${result.data.rescue_image}`;
+            if (result && result.data) {
+                const imagePath = result.data.rescue_image.startsWith("http")
+                    ? result.data.rescue_image
+                    : `https://www.pahrultours.com/app2/${result.data.rescue_image}`;
 
-        setRescueImage(imagePath);
-        setRescueName(result.data.rescue_name || "");
-        setError(""); // clear any previous error
-      } else {
-        setRescueImage(null);
+                setRescueImage(imagePath);
+                setRescueName(result.data.rescue_name || "");
+                setError(""); // clear any previous error
+            } else {
+                setRescueImage(null);
 
-        setError("Image not found for this admission number");
-      }
-    } catch (error) {
-      console.error("Error fetching data", error);
-      setRescueImage(null);
-      setRescueName("");
-      setError("Admission Number Not found");
-    }
-  };
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueImage(null);
+            setRescueName("");
+            setError("Admission Number Not found");
+        }
+    };
 
     // Trigger when admission number changes
     useEffect(() => {
@@ -664,7 +664,6 @@ function Family_Request_form() {
                                         type="text"
                                         name='f_aadhar_card_no'
                                         value={storeData.f_aadhar_card_no}
-
                                         onChange={handleInputChange1}
                                         required />
                                 </Col>

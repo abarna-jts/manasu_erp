@@ -283,7 +283,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return; // Stop form submission
     }
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -328,8 +328,13 @@ function MSE_form() {
       return;
     }
 
+    const completeFormData = {
+      ...formData,
+      date:date
+    };
+
     try {
-      const response = await apiRoute.post('/recovery/create_MSE', formData);
+      const response = await apiRoute.post('/recovery/create_MSE', completeFormData);
       console.log("Form submitted successfully:", response.data);
       alert("Form submitted successfully!");
       window.location.reload(); // Reload the page to reflect changes
@@ -1389,6 +1394,7 @@ function MSE_form() {
       });
 
       alert('General Appearance Form updated successfully!');
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1406,6 +1412,7 @@ function MSE_form() {
       });
 
       alert('Speech Form updated successfully!');
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1423,6 +1430,7 @@ function MSE_form() {
       });
 
       alert('Mood and Affect Form updated successfully!');
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1440,6 +1448,7 @@ function MSE_form() {
       });
 
       alert('Though Form updated successfully!');
+      
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -1609,12 +1618,7 @@ function MSE_form() {
                           <Form.Control
                             type="date"
                             value={date}
-                            onChange={(e) => {
-                              setFormData((prev) => ({
-                                ...prev,
-                                date: e.target.value
-                              }));
-                            }}
+                            onChange={(e) => setDate(e.target.value)}
                           />
                         </InputGroup>
                       </Col>

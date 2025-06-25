@@ -1016,6 +1016,22 @@ const UpdateDrVisit = async (req, res) => {
 
     const id = req.params.id;
 
+    const formatDateTimeForMySQL = (isoString) => {
+      const date = new Date(isoString);
+
+      const pad = (n) => (n < 10 ? '0' + n : n);
+
+      const yyyy = date.getFullYear();
+      const mm = pad(date.getMonth() + 1); // Months are zero-indexed
+      const dd = pad(date.getDate());
+
+      const hh = pad(date.getHours());
+      const mi = pad(date.getMinutes());
+      const ss = pad(date.getSeconds());
+
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`; // ✅ MySQL format
+    };
+
     const usquery = `UPDATE dr_visit SET
                     dr_name = ?,
                     hospital_name = ?,
@@ -1024,20 +1040,22 @@ const UpdateDrVisit = async (req, res) => {
                     report = ?
                     WHERE id= ?`;
 
+    const formattedDateTime = formatDateTimeForMySQL(date_time);
+
     const values = [
-      dr_name, hospital_name, date_time, resident_examinite, report, id
+      dr_name, hospital_name, formattedDateTime, resident_examinite, report, id
     ];
 
     const [result] = await db.query(usquery, values);
-    if(result.affectedRows === 0){
+    if (result.affectedRows === 0) {
       return res.status(404).json({ message: "No record found with this ID" });
     }
     return res.status(200).json({ message: "Dr Visit updated successfully!" });
-  }catch(err){
+  } catch (err) {
     console.error('Error updating Dr Visit:', err);
     return res.status(500).json({ message: "Database Error", error: err });
   }
-  
+
 }
 
 const createMedicalCamp = async (req, res) => {
@@ -1099,10 +1117,10 @@ const getMedicalCamp = async (req, res) => {
 };
 
 
-const getMedicalCampID = async(req, res) => {
+const getMedicalCampID = async (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM medical_camp WHERE id = ?';
-  try{
+  try {
     const [result] = await db.query(query, [id]);
     if (result.length === 0) {
       return res.status(404).json({ message: "No Medical Report found" });
@@ -1140,11 +1158,18 @@ const updateMedicalCamp = async (req, res) => {
       general_details = ?
     WHERE id = ?
   `;
+  const formatDateForMySQL = (isoString) => {
+    const date = new Date(isoString);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`; // ✅ format as YYYY-MM-DD
+  };
 
   const values = [
     camp_name,
     hospital_name,
-    date,
+    formatDateForMySQL(date),
     camp_type,
     organised_by,
     participants,
@@ -1214,16 +1239,16 @@ const createSummary = async (req, res) => {
   }
 };
 
-const getSummary = async(req, res) => {
+const getSummary = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM reunion_summary WHERE admission_no = ?';
-  try{
+  try {
     const [result] = await db.query(query, [admission_no]);
     if (result.length === 0) {
       return res.status(404).json({ message: "No Summary Details found" });
     }
     res.json(result[0]);
-  }catch (err) {
+  } catch (err) {
     console.error('Error fetching Summary Details:', err);
     res.status(500).json({ message: "Database Error", error: err });
   }

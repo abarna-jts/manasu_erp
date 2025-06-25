@@ -230,8 +230,12 @@ function Annual_Report() {
     });
 
     const handleFileChange = (e) => {
-        setFiles({ ...files, [e.target.name]: e.target.files[0] });
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
+
 
     const handleEventSubmit = async (e) => {
         e.preventDefault();
@@ -253,9 +257,24 @@ function Annual_Report() {
         data.append('outing_place', eventData.outing_place);
         data.append('outing_rescue_count', eventData.outing_rescue_count);
         data.append('outing_report', eventData.outing_report);
-        data.append('event_photos', files.event_photos);
-        data.append('awarness_photos', files.awarness_photos);
-        data.append('outing_photos', files.outing_photos);
+        // Append all images (e.g., from 'event_photos')
+        if (files.event_photos && files.event_photos.length > 0) {
+            files.event_photos.forEach(file => {
+                data.append('event_photos', file); // ✅ no []
+            });
+        }
+        // Append all images (e.g., from 'awarness_photos')
+        if (files.awarness_photos && files.awarness_photos.length > 0) {
+            files.awarness_photos.forEach(file => {
+                data.append('awarness_photos', file);
+            });
+        }
+        // Append all images (e.g., from 'outing_photos')
+        if (files.outing_photos && files.outing_photos.length > 0) {
+            files.outing_photos.forEach(file => {
+                data.append('outing_photos', file);
+            });
+        }
 
         try {
             const res = await apiRoute.post('/formality/createEventReport', data, {
@@ -368,7 +387,7 @@ function Annual_Report() {
         "Community Programs",
         "Staff Programs",
     ];
-    
+
 
     return (
         <>
@@ -527,6 +546,7 @@ function Annual_Report() {
                                                     type="file"
                                                     name="event_photos"
                                                     onChange={handleFileChange}
+                                                    multiple
                                                     required
                                                 />
                                             </Col>
@@ -608,6 +628,7 @@ function Annual_Report() {
                                                 <Form.Control
                                                     type="file"
                                                     name="awarness_photos"
+                                                    multiple
                                                     onChange={handleFileChange}
                                                     required
                                                 />
@@ -689,6 +710,7 @@ function Annual_Report() {
                                                     type="file"
                                                     name="outing_photos"
                                                     onChange={handleFileChange}
+                                                    multiple
                                                     required
                                                 />
                                             </Col>

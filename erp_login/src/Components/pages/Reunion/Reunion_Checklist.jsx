@@ -47,6 +47,8 @@ function Reunion_Checklist() {
         ClothesFile: null,
         possessionsRecovered: '',
         possessionsRecoveredFile: null,
+        dischargeAllowance:'',
+        dischargeAllowanceFile:null,
         travelExpenses: '',
         travelExpensesFile: null,
         copyOfdischargeSummary: '',
@@ -151,6 +153,7 @@ function Reunion_Checklist() {
                 medications: data.medications || '',
                 Clothes: data.Clothes || '',
                 possessionsRecovered: data.possessionsRecovered || '',
+                dischargeAllowance:data.dischargeAllowance || '',
                 travelExpenses: data.travelExpenses || '',
                 copyOfdischargeSummary: data.copyOfdischargeSummary || '',
                 travelSafetyLetter: data.travelSafetyLetter || '',
@@ -176,6 +179,7 @@ function Reunion_Checklist() {
                 medicationsFile: getFilePath(data.medicationsFile),
                 ClothesFile: getFilePath(data.ClothesFile),
                 possessionsRecoveredFile: getFilePath(data.possessionsRecoveredFile),
+                dischargeAllowanceFile:getFilePath(data.dischargeAllowanceFile),
                 travelExpensesFile: getFilePath(data.travelExpensesFile),
                 copyOfdischargeSummaryFile: getFilePath(data.copyOfdischargeSummaryFile),
                 travelSafetyLetterFile: getFilePath(data.travelSafetyLetterFile),
@@ -908,11 +912,47 @@ function Reunion_Checklist() {
 
                                         </Col>
                                     </Form.Group>
-
-                                    {/* Discharge Allowance / Travel Expenses Provided */}
+                                    {/* Discharge Allowance*/}
                                     <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
                                         <Form.Label column sm="3">
-                                            Discharge Allowance / Travel Expenses Provided :
+                                            Discharge Allowance Provided :
+                                        </Form.Label>
+                                        <Col sm="9" className='d-flex align-items-center justify-content-start'>
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="Yes"
+                                                name="dischargeAllowance"
+                                                id="dischargeAllowanceYes"
+                                                value="Yes"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Check
+                                                inline
+                                                type="radio"
+                                                label="No"
+                                                name="dischargeAllowance"
+                                                id="dischargeAllowanceNo"
+                                                value="No"
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm="2">Attach:</Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="file"
+                                                        name='dischargeAllowanceFile'
+                                                        onChange={handleChange}
+                                                        required={formData.dischargeAllowance === "Yes"} />
+                                                </Col>
+                                            </Form.Group>
+
+                                        </Col>
+                                    </Form.Group>
+
+                                    {/* Travel Expenses Provided */}
+                                    <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
+                                        <Form.Label column sm="3">
+                                            Travel Expenses Provided :
                                         </Form.Label>
                                         <Col sm="9" className='d-flex align-items-center justify-content-start'>
                                             <Form.Check
@@ -1319,7 +1359,18 @@ function Reunion_Checklist() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-2 mt-5 align-items-center">
-                                <Form.Label column sm="4">Discharge Allowance / Travel Expenses Provided:</Form.Label>
+                                <Form.Label column sm="4">Discharge Allowance :</Form.Label>
+                                <Col sm="3">
+                                    <Form.Control
+                                        type="text"
+                                        name="dischargeAllowance"
+                                        value={formData.dischargeAllowance}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-2 mt-5 align-items-center">
+                                <Form.Label column sm="4">Travel Expenses Provided:</Form.Label>
                                 <Col sm="3">
                                     <Form.Control
                                         type="text"

@@ -134,6 +134,7 @@ function Reunion_summary() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Reunion Summary Form submitted successfully!');
+            window.location.reload();
         } catch (err) {
             console.error(err);
             alert('Submission failed.');
