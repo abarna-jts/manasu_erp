@@ -37,6 +37,8 @@ function Edit_ReunionChecklist() {
         ClothesFile: null,
         possessionsRecovered: '',
         possessionsRecoveredFile: null,
+        dischargeAllowance:'',
+        dischargeAllowanceFile:null,
         travelExpenses: '',
         travelExpensesFile: null,
         copyOfdischargeSummary: '',
@@ -133,7 +135,8 @@ function Edit_ReunionChecklist() {
 
     const navigate = useNavigate();
 
-    const updateFormData = async () => {
+    const updateFormData = async (e) => {
+        e.preventDefault();
         const formPayload = new FormData();
 
         for (const key in formData) {
@@ -970,18 +973,19 @@ function Edit_ReunionChecklist() {
                                         </Col>
                                     </Form.Group>
 
-                                    {/* Discharge Allowance*/}
+                                    {/*  Discharge Allowance Provided */}
                                     <Form.Group as={Row} className="mb-1 align-items-center icon_checkList">
                                         <Form.Label column sm="3">
                                             Discharge Allowance Provided :
                                         </Form.Label>
-                                        <Col sm="9" className='d-flex align-items-center justify-content-start'>
+                                        <Col sm="3" className='d-flex align-items-center justify-content-start'>
                                             <Form.Check
                                                 inline
                                                 type="radio"
                                                 label="Yes"
                                                 name="dischargeAllowance"
                                                 id="dischargeAllowanceYes"
+                                                checked={formData.dischargeAllowance === "Yes"}
                                                 value="Yes"
                                                 onChange={handleChange}
                                             />
@@ -992,18 +996,30 @@ function Edit_ReunionChecklist() {
                                                 name="dischargeAllowance"
                                                 id="dischargeAllowanceNo"
                                                 value="No"
+                                                checked={formData.dischargeAllowance === "No"}
                                                 onChange={handleChange}
                                             />
-                                            <Form.Group as={Row}>
-                                                <Form.Label column sm="2">Attach:</Form.Label>
-                                                <Col sm="10">
-                                                    <Form.Control type="file"
-                                                        name='dischargeAllowanceFile'
-                                                        onChange={handleChange}
-                                                        required={formData.dischargeAllowance === "Yes"} />
-                                                </Col>
-                                            </Form.Group>
-
+                                        </Col>
+                                        <Col sm="6" className="d-flex align-items-center">
+                                            <Form.Label column sm="3">
+                                                Attach:
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="dischargeAllowanceFile"
+                                                onChange={handleChange}
+                                                required={formData.dischargeAllowanceFile === "Yes"}
+                                            />
+                                            {formData.dischargeAllowanceFile && (
+                                                <a
+                                                    href={`https://www.pahrultours.com/app2/${formData.dischargeAllowanceFile}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ms-2"
+                                                >
+                                                    View
+                                                </a>
+                                            ) || " Null"}
                                         </Col>
                                     </Form.Group>
 

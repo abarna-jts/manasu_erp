@@ -352,7 +352,7 @@ function MSE_form() {
       return;
     }
 
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -375,6 +375,7 @@ function MSE_form() {
     // Merge admission_no into speechFormData
     const payload = {
       ...speechFormData,
+      date:date,
       admission_no: formData.admission_no
     };
 
@@ -394,7 +395,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -429,7 +430,8 @@ function MSE_form() {
 
     const payload = {
       ...moodFormData,
-      admission_no: formData.admission_no
+      admission_no: formData.admission_no,
+      date:date,
     };
 
     try {
@@ -451,7 +453,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -467,6 +469,7 @@ function MSE_form() {
 
     const payload = {
       ...thoughFormData,
+      date:date,
       admission_no: formData.admission_no
     };
 
@@ -489,7 +492,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -513,6 +516,7 @@ function MSE_form() {
 
     const payload = {
       ...judgementData,
+      date:date,
       admission_no: formData.admission_no
     };
 
@@ -534,7 +538,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -566,6 +570,7 @@ function MSE_form() {
 
     const payload = {
       ...insightData,
+      date:date,
       admission_no: formData.admission_no
     };
 
@@ -587,7 +592,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -619,6 +624,7 @@ function MSE_form() {
 
     const payload = {
       ...perceptionData,
+      date:date,
       admission_no: formData.admission_no
     };
 
@@ -640,7 +646,7 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
-    if (!formData.date || formData.date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
     }
@@ -704,6 +710,7 @@ function MSE_form() {
 
     const payload = {
       ...cognitionData,
+      date:date,
       admission_no: formData.admission_no,
       consciousnessState: selectedStates.join(', '),  // ✔️ Store array as comma-separated string
       canConcentrate: canConcentrate,                 // ✔️ Radio button value

@@ -219,11 +219,11 @@ const createRecords = async (req, res) => {
 };
 
 
-const getEssentialRecords = async(req, res) => {
+const getEssentialRecords = async (req, res) => {
     const admission_no = req.params.admission_no;
     const query = 'SELECT * FROM essential_records WHERE admission_no = ?';
 
-    try{
+    try {
         const [results] = await db.query(query, [admission_no]);
 
         if (results.length === 0) {
@@ -239,8 +239,8 @@ const getEssentialRecords = async(req, res) => {
 }
 
 
-const updateEssentialRecords = async(req, res) => {
-    try{
+const updateEssentialRecords = async (req, res) => {
+    try {
         await formalityAsync(req, res);
         const {
             rescue_name,
@@ -269,7 +269,7 @@ const updateEssentialRecords = async(req, res) => {
             ? `uploads/Rescue_Images/${req.files['form7_attach'][0].filename}`
             : null;
 
-            // Get existing file paths
+        // Get existing file paths
         const [selectRows] = await db.query(
             "SELECT bank_passbook, form7_attach FROM essential_records WHERE admission_no = ?",
             [admission_no]
@@ -284,7 +284,7 @@ const updateEssentialRecords = async(req, res) => {
 
         const existingForm7Attach = selectRows[0]?.form7_attach;
         const finalForm7Attach = newForm7Attach || existingForm7Attach;
-    
+
         const updateQuery = `
           UPDATE essential_records SET 
             rescue_name = ?, 
@@ -304,26 +304,26 @@ const updateEssentialRecords = async(req, res) => {
             other_gvt_scheme = ?
           WHERE admission_no = ?`;
 
-            const values = [
-                rescue_name,
-                aadhar_card,
-                udid_no,
-                disability_no,
-                voter_id,
-                form_7,
-                finalForm7Attach,
-                bank_name,
-                account_no,
-                ifsc_code,
-                finalBankPassbook,
-                insurance_provider,
-                policy_no,
-                validity_period,
-                other_gvt_scheme,
-                admission_no
-            ];
+        const values = [
+            rescue_name,
+            aadhar_card,
+            udid_no,
+            disability_no,
+            voter_id,
+            form_7,
+            finalForm7Attach,
+            bank_name,
+            account_no,
+            ifsc_code,
+            finalBankPassbook,
+            insurance_provider,
+            policy_no,
+            validity_period,
+            other_gvt_scheme,
+            admission_no
+        ];
 
-            const [updateResult] = await db.query(updateQuery, values);
+        const [updateResult] = await db.query(updateQuery, values);
 
         if (updateResult.affectedRows === 0) {
             return res.status(400).json({ message: `Update failed. No record updated for admission_no = ${admission_no}` });
@@ -397,6 +397,12 @@ const createEventReport = async (req, res) => {
             outing_rescue_count,
         } = req.body;
 
+        const formatDate = (isoDate) => {
+            const d = new Date(isoDate);
+            if (isNaN(d)) return 'Invalid';
+            return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+        };
+
         const event_photosPath = req.files?.['event_photos']
             ? `/uploads/Event_Photos/${req.files['event_photos'][0].filename}`
             : null;
@@ -418,27 +424,27 @@ const createEventReport = async (req, res) => {
         `;
 
         const values = [
-            event_name || 'Null',
-            event_date || 'Null',
-            event_place || 'Null',
-            event_report || 'Null',
-            event_rescue_count || 'Null',
+            event_name || null,
+            formatDate(event_date) || null,
+            event_place || null,
+            event_report || null,
+            event_rescue_count || null,
             event_type,
-            event_photosPath || 'Null',
+            event_photosPath || null,
 
-            awareness_name || 'Null',
-            awarness_date || 'Null',
-            awarness_place || 'Null',
-            awarness_report || 'Null',
-            awarness_rescue_count || 'Null',
-            awarness_photosPath || 'Null',
+            awareness_name || null,
+            formatDate(awarness_date) || null,
+            awarness_place || null,
+            awarness_report || null,
+            awarness_rescue_count || null,
+            awarness_photosPath || null,
 
-            outing_name || 'Null',
-            outing_date || 'Null',
-            outing_place || 'Null',
-            outing_report || 'Null',
-            outing_rescue_count || 'Null',
-            outing_photosPath || 'Null'
+            outing_name || null,
+            formatDate(outing_date) || null,
+            outing_place || null,
+            outing_report || null,
+            outing_rescue_count || null,
+            outing_photosPath || null
         ];
 
         const [result] = await db.query(q, values);
@@ -562,7 +568,7 @@ const createStaffReport = async (req, res) => {
             message: "Staff Report Form Created Successfully",
             data: result
         });
-    }catch (err) {
+    } catch (err) {
         console.error("Error creating staff report:", err);
         return res.status(500).json({
             message: "Server Error while creating staff report",
@@ -1109,7 +1115,6 @@ const getStudendDetailsbyID = async (req, res) => {
 
 const updateStudentDetail = async (req, res) => {
     try {
-        await formalityAsync(req, res);
 
         const {
             stud_name, stud_id, department, email, phone, secondary_phone,
@@ -1118,14 +1123,22 @@ const updateStudentDetail = async (req, res) => {
         } = req.body;
 
         const id = req.params.id;
-        const studentPhotoPath = req.files['stud_photo']
-            ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
-            : null;
+
+        if (!id) {
+            return res.status(400).json({ message: "Missing ID" });
+        }
+
+        // get existing photo if not uploaded
+        // const [existing] = await db.query("SELECT stud_photo FROM internship_form WHERE id = ?", [id]);
+        // const currentPhoto = existing[0]?.stud_photo || null;
+
+        // const studentPhotoPath = req.files?.['stud_photo']
+        //     ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
+        //     : currentPhoto;
 
         const usquery = `UPDATE internship_form SET
                     stud_name = ?,
                     stud_id = ?,
-                    stud_photo = ?,
                     email = ?,
                     phone = ?,
                     secondary_phone = ?,
@@ -1143,7 +1156,7 @@ const updateStudentDetail = async (req, res) => {
 
 
         const values = [
-            stud_name, stud_id, studentPhotoPath, email, phone, secondary_phone, field, other_field, supervisor_name,
+            stud_name, stud_id, email, phone, secondary_phone, field, other_field, supervisor_name,
             supervisor_email, supervisor_phone, department, clg_name, duration, from_date, to_date, id
         ];
 

@@ -27,6 +27,9 @@ function Annual_Report() {
 
     const [eventData, setEventData] = useState({
         event_type: 'event',
+        event_date:'',
+        awarness_date:'',
+        outing_date:'',
         event_name: '',
         awareness_name: '',
         outing_name: '',
@@ -307,6 +310,7 @@ function Annual_Report() {
             if (response.data.message === "Celebration Report Form Created Successfully") {
                 setSubmissionMessage("Form Submitted Successfully!");
                 setMessageType("success");
+                window.location.reload();
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");

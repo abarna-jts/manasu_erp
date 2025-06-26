@@ -23,7 +23,7 @@ function Reunion_summary() {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
 
-     const userType = Cookies.get('usertype');
+    const userType = Cookies.get('usertype');
 
     const [formData, setFormData] = useState({
         rescue_name: '',
@@ -176,14 +176,15 @@ function Reunion_summary() {
         if (!isoDateStr) return "";
 
         const date = new Date(isoDateStr);
-        if (isNaN(date)) return "";
+        if (isNaN(date.getTime())) return "";
 
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
 
-        return `${year}-${month}-${day}`;
+        return `${year}-${month}-${day}`; // ✅ format for <input type="date">
     };
+
 
     useEffect(() => {
         if (previewRequested) {
@@ -453,7 +454,7 @@ function Reunion_summary() {
 
                                     <div className="mt-3">
                                         {userType === "4" && (
-                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
                                         )}
                                     </div>
 

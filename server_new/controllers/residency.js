@@ -618,122 +618,63 @@ const updateRescueCondition = async (req, res) => {
 }
 
 const createPrescription = async (req, res) => {
+  const {
+    admission_no,
+    rescue_name,
+    age,
+    op_no,
+    hospital_name,
+    department,
+    masterHealthCheckup,
+    instruction,
+    medical_type,
+    advice,
+    follow_up,
+    current_date,
+    medicine,
+    medicine_type,
+    duration,
+    intake,
+    med_instruction,
+    morning,
+    afternoon,
+    night
+  } = req.body;
+
   try {
-    const {
-      admission_no,
-      rescue_name,
-      age,
-      current_date,
-      op_no,
-      hospital_name,
-      department,
-      masterHealthCheckup,
-      medical_type,
-      instruction,
-      advice,
-      follow_up,
-      prescription_medicines, // <-- array of row data
-    } = req.body;
-
-    if (!admission_no) {
-      return res.status(400).json({ error: 'Missing admission_no' });
+    if (!admission_no || !rescue_name) {
+      return res.status(400).json({ error: "Admission number and Resident's name are required." });
     }
 
-    // Insert into prescription table
-    const sql = `
-    INSERT INTO prescription (
-      admission_no, rescue_name, age, created_date, op_no, hospital_name, department,
-      masterHealthCheckup, medical_type, instruction, advice, follow_up
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-    const values = [
-      admission_no,
-      rescue_name,
-      age,
-      current_date,
-      op_no,
-      hospital_name,
-      department,
-      masterHealthCheckup,
-      medical_type,
-      instruction,
-      advice,
-      follow_up,
-    ];
-    const [result] = await db.query(sql, values);
-    const prescription_id = result.insertId;
-
-    // If no medicine rows, just return
-    if (!Array.isArray(prescription_medicines) || prescription_medicines.length === 0) {
-      return res.status(201).json({
-        message: 'Prescription Created Successfully',
-        prescriptionId: prescription_id,
-      });
-    }
-
-    // Convert medicine rows into column-wise arrays
-    const medicineData = {
-      medicine: [],
-      medicine_type: [],
-      duration: [],
-      intake: [],
-      med_instruction: [],
-      morning: [],
-      afternoon: [],
-      night: [],
-    };
-
-    prescription_medicines.forEach((med) => {
-      medicineData.medicine.push(med.medicine);
-      medicineData.medicine_type.push(med.medicine_type);
-      medicineData.duration.push(med.duration);
-      medicineData.intake.push(med.intake);
-      medicineData.med_instruction.push(med.med_instruction || 'nill');
-      medicineData.morning.push(med.morning || '0');
-      medicineData.afternoon.push(med.afternoon || '0');
-      medicineData.night.push(med.night || '0');
-    });
-
-    // Insert into prescription_medicine_summary as JSON strings
-    const medSql = `
+    const insertQuery = `
       INSERT INTO prescription_medicines (
-        prescription_id, medicine, medicine_type, duration, intake,
-        med_instruction, morning, afternoon, night
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        admission_no, rescue_name, age, op_no, hospital_name, department, masterHealthCheckup,
+        instruction, medical_type, advice, follow_up, created_date,
+        medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const medValues = [
-      prescription_id,
-      JSON.stringify(medicineData.medicine),
-      JSON.stringify(medicineData.medicine_type),
-      JSON.stringify(medicineData.duration),
-      JSON.stringify(medicineData.intake),
-      JSON.stringify(medicineData.med_instruction),
-      JSON.stringify(medicineData.morning),
-      JSON.stringify(medicineData.afternoon),
-      JSON.stringify(medicineData.night),
+    const values = [
+      admission_no, rescue_name, age, op_no, hospital_name, department, masterHealthCheckup,
+      instruction, medical_type, advice, follow_up, current_date,
+      medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night
     ];
 
-    const [medResult] = await db.query(medSql, medValues);
-    if (medResult.affectedRows === 0) {
-      return res.status(500).json({ message: 'Error inserting medicine summary' });
-    }
-    res.status(201).json({
-      message: 'Prescription and Medicine Summary Saved Successfully',
-      prescriptionId: prescription_id,
-    });
-  } catch (err) {
-    console.error('Error creating prescription:', err);
-    res.status(500).json({ message: 'Database Error', error: err });
+    await db.query(insertQuery, values);
+
+    res.status(201).json({ message: "Prescription Saved Successfully" });
+  } catch (error) {
+    console.error("Error inserting prescription:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
+
+
 
 
 
 const getPrescription = async (req, res) => {
-  const query = `SELECT DISTINCT prescription.*,prescription_medicines.prescription_id
-FROM prescription
-JOIN prescription_medicines ON prescription.id = prescription_medicines.prescription_id;`;
+  const query = `SELECT * from prescription_medicines;`;
 
   try {
     const [data] = await db.query(query);
@@ -751,11 +692,9 @@ const getPrescriptionbyID = async (req, res) => {
   const id = req.params.id;
 
   const query = `
-    SELECT p.*, pm.*
-    FROM prescription p
-    LEFT JOIN prescription_medicines pm ON p.id = pm.prescription_id
-    WHERE p.id = ?;
+   SELECT * from prescription_medicines WHERE id=?;
   `;
+  
   try {
     const [results] = await db.query(query, [id]);
     if (results.length === 0) {
@@ -796,150 +735,43 @@ const getPrescriptionbyID = async (req, res) => {
 };
 
 
+// Update individual prescriptions
 const updatePrescription = async (req, res) => {
-  const id = req.params.id; // prescription.id
-  const {
-    admission_no,
-    rescue_name,
-    age,
-    op_no,
-    hospital_name,
-    department,
-    masterHealthCheckup,
-    medical_type,
-    instruction,
-    advice,
-    follow_up,
-    medicine,
-    medicine_type,
-    duration,
-    intake,
-    med_instruction,
-    morning,
-    afternoon,
-    night
-  } = req.body;
+  const { prescriptions = [] } = req.body;
 
-  if (!admission_no) {
-    return res.status(400).json({ error: 'Missing admission_no' });
+  if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
+    return res.status(400).json({ error: 'Missing or empty prescriptions array' });
   }
 
   try {
-    // 1. Update main prescription
-    const sql = `
-      UPDATE prescription SET
-        admission_no = ?, 
-        rescue_name = ?, 
-        age = ?, 
-        op_no = ?, 
-        hospital_name = ?, 
-        department = ?,
-        masterHealthCheckup = ?, 
-        medical_type = ?,
-        instruction = ?, 
-        advice = ?, 
-        follow_up = ?
-      WHERE id = ?`;
+    for (const p of prescriptions) {
+      if (!p.id) continue; // Skip if no ID provided
 
-    const values = [
-      admission_no,
-      rescue_name,
-      age,
-      op_no,
-      hospital_name,
-      department,
-      masterHealthCheckup,
-      medical_type,
-      instruction,
-      advice,
-      follow_up,
-      id,
-    ];
-
-    const [updateResult] = await db.query(sql, values);
-
-    if (updateResult.affectedRows === 0) {
-      return res.status(404).json({ message: 'No prescription found' });
-    }
-
-    // 2. Get current medicine rows
-    const [existingMeds] = await db.query(
-      `SELECT id FROM prescription_medicines WHERE prescription_id = ? ORDER BY id ASC`,
-      [id]
-    );
-
-    const count = medicine.length;
-    const updateCount = Math.min(existingMeds.length, count);
-
-    // 3. Update existing medicines
-    for (let i = 0; i < updateCount; i++) {
       await db.query(
-        `UPDATE prescription_medicines SET 
-          medicine = ?, 
-          medicine_type = ?, 
-          duration = ?, 
-          intake = ?, 
-          med_instruction = ?, 
-          morning = ?, 
-          afternoon = ?, 
-          night = ?
-        WHERE id = ?`,
+        `UPDATE prescription_medicines SET
+          medicine = ?, medicine_type = ?, duration = ?, intake = ?, med_instruction = ?,
+          morning = ?, afternoon = ?, night = ?
+         WHERE id = ?`,
         [
-          medicine[i],
-          medicine_type[i],
-          duration[i],
-          intake[i],
-          med_instruction[i],
-          morning[i],
-          afternoon[i],
-          night[i],
-          existingMeds[i].id
+          p.medicine ?? null,
+          p.medicine_type ?? null,
+          p.duration ?? null,
+          p.intake ?? null,
+          p.med_instruction ?? null,
+          p.morning ?? null,
+          p.afternoon ?? null,
+          p.night ?? null,
+          p.id
         ]
       );
     }
 
-    // 4. Insert remaining new medicines
-    for (let i = updateCount; i < count; i++) {
-      await db.query(
-        `INSERT INTO prescription_medicines 
-          (prescription_id, medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          id,
-          medicine[i],
-          medicine_type[i],
-          duration[i],
-          intake[i],
-          med_instruction[i],
-          morning[i],
-          afternoon[i],
-          night[i],
-        ]
-      );
-    }
-
-    // 5. Delete extra old medicines
-    if (existingMeds.length > count) {
-      const idsToDelete = existingMeds
-        .slice(count)
-        .map(med => med.id);
-
-      if (idsToDelete.length > 0) {
-        await db.query(
-          `DELETE FROM prescription_medicines WHERE id IN (${idsToDelete.map(() => '?').join(',')})`,
-          idsToDelete
-        );
-      }
-    }
-
-    return res.status(200).json({ message: 'Prescription and medicines updated successfully' });
-
-  } catch (err) {
-    console.error('Error in updatePrescription:', err);
-    return res.status(500).json({ message: 'Server Error', error: err });
+    res.status(200).json({ message: 'Prescriptions updated successfully' });
+  } catch (error) {
+    console.error('Error updating prescriptions:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
-
 
 
 
@@ -1256,7 +1088,6 @@ const getSummary = async (req, res) => {
 
 const updateSummary = async (req, res) => {
   try {
-    // Wait for file upload to complete
     await residencyAsync(req, res);
 
     const {
@@ -1265,13 +1096,25 @@ const updateSummary = async (req, res) => {
       report,
     } = req.body;
 
+    const formatDate = (isoDate) => {
+      if (!isoDate || typeof isoDate !== 'string') return null;
+
+      const d = new Date(isoDate);
+      if (isNaN(d.getTime())) return null;
+
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    };
+
+
     const admission_no = req.params.admission_no;
 
     const SummaryAttachPath = req.files?.['summary_attach']
       ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
       : null;
 
-    // Get existing file path from DB
     const selectQuery = "SELECT summary_attach FROM reunion_summary WHERE admission_no = ?";
     const [selectData] = await db.query(selectQuery, [admission_no]);
 
@@ -1289,13 +1132,13 @@ const updateSummary = async (req, res) => {
 
     const values = [
       rescue_name,
-      date,
+      formatDate(date),
       finalSummaryAttach,
       report,
       admission_no
     ];
 
-    const [result] = await db.query(updateQuery, values);
+    await db.query(updateQuery, values);
 
     res.status(200).json({ message: "Reunion Summary updated successfully!" });
 
@@ -1304,6 +1147,7 @@ const updateSummary = async (req, res) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
 
 export {
   createRescueCondition,

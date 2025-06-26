@@ -47,6 +47,7 @@ import Reunion_summary from './Components/pages/Residency_time/Reunion_summary';
 import Director_essentialRecord from './Components/pages/Admin_Formality/Director_essentialRecord';
 import Reunited_people from './Components/pages/Admission/Reunited_people';
 import Psychiatrics_form from './Components/pages/Recovery/Psychiatrics_form';
+import Prescription_demo from './Components/pages/Residency_time/Prescription_demo';
 
 function App() {
 
@@ -380,6 +381,17 @@ function App() {
                 <MainLayout><Prescription_form /></MainLayout>
               ) : (
                 <MainLayout><Prescription_form /></MainLayout>
+              )
+            }
+          />
+
+          <Route
+            path='/prescription_demo'
+            element={
+              userType === '1' || userType === '2' || userType === '3' ? (
+                <MainLayout><Prescription_demo /></MainLayout>
+              ) : (
+                <MainLayout><Prescription_demo /></MainLayout>
               )
             }
           />

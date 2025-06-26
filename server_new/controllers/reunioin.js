@@ -654,14 +654,15 @@ const getReunionChecklistAll = async(req, res) => {
     }
 }
 
-const updateChecklist = async(req, res) => {
-    try{
-        await ReunionAsync(req, res); // your custom middleware
+const updateChecklist = async (req, res) => {
+    try {
         const admission_no = req.params.admission_no;
-
         if (!admission_no) {
             return res.status(400).json({ message: "Admission number is required" });
         }
+
+        const getFilePath = (field) =>
+            req.files && req.files[field] ? `uploads/Reunion/Discharge_Checklist/${req.files[field][0].filename}` : '';
 
         const {
             familyRequestLetter,
@@ -679,6 +680,7 @@ const updateChecklist = async(req, res) => {
             medications,
             Clothes,
             possessionsRecovered,
+            dischargeAllowance,
             travelExpenses,
             copyOfdischargeSummary,
             travelSafetyLetter,
@@ -686,9 +688,6 @@ const updateChecklist = async(req, res) => {
             witnessSignature,
             any_other
         } = req.body;
-
-        const getFilePath = (fieldName) =>
-            req.files[fieldName] ? `uploads/Reunion/Discharge_Checklist/${req.files[fieldName][0].filename}` : null;
 
         const query = `
             UPDATE discharge_checklist SET
@@ -706,6 +705,7 @@ const updateChecklist = async(req, res) => {
                 medications = ?, medicationsFile = ?,
                 Clothes = ?, ClothesFile = ?,
                 possessionsRecovered = ?, possessionsRecoveredFile = ?,
+                dischargeAllowance = ?, dischargeAllowanceFile = ?,
                 travelExpenses = ?, travelExpensesFile = ?,
                 copyOfdischargeSummary = ?, copyOfdischargeSummaryFile = ?,
                 travelSafetyLetter = ?, travelSafetyLetterFile = ?,
@@ -746,6 +746,8 @@ const updateChecklist = async(req, res) => {
             getFilePath('ClothesFile'),
             possessionsRecovered,
             getFilePath('possessionsRecoveredFile'),
+            dischargeAllowance,
+            getFilePath('dischargeAllowanceFile'),
             travelExpenses,
             getFilePath('travelExpensesFile'),
             copyOfdischargeSummary,
@@ -757,16 +759,18 @@ const updateChecklist = async(req, res) => {
             witnessSignature,
             getFilePath('witnessSignatureFile'),
             any_other,
-            admission_no // important: last in values
+            admission_no
         ];
+
         await db.query(query, values);
         res.status(200).json({ message: "Discharge checklist updated successfully" });
 
-    }catch (error) {
+    } catch (error) {
         console.error("Error updating Discharge checklist:", error);
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
-}
+};
+
 
 export {
     createFamilyLetter,

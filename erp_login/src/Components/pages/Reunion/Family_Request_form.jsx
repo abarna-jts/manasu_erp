@@ -46,6 +46,10 @@ function Family_Request_form() {
         f_member_age: '',
         f_member_address: '',
         f_member_phone: '',
+        f_aadhar_card_no:'',
+        f_ration_card_no:'',
+        r_aadhar_card_no:'',
+        r_ration_card_no:'',
         description: '',
     })
 
@@ -60,6 +64,10 @@ function Family_Request_form() {
         f_member_age: '',
         f_member_address: '',
         f_member_phone: '',
+        f_aadhar_card_no:'',
+        f_ration_card_no:'',
+        r_aadhar_card_no:'',
+        r_ration_card_no:'',
         description: '',
     })
 
@@ -226,6 +234,10 @@ function Family_Request_form() {
                 f_member_age: data.age || '',
                 description: data.description || '',
                 family_relationship: data.family_relationship || '',
+                f_aadhar_card_no:data.f_aadhar_card_no || '',
+                f_ration_card_no:data.f_ration_card_no || '',
+                r_aadhar_card_no:data.r_aadhar_card_no || '',
+                r_ration_card_no:data.r_ration_card_no || '',
                 f_member_name: data.f_member_name || '',
                 f_member_phone: data.f_member_phone || 'NULL',
                 f_member_address: data.f_member_address || '',
@@ -279,6 +291,10 @@ function Family_Request_form() {
                 f_member_name: data.f_member_name || '',
                 f_member_phone: data.f_member_phone || '',
                 f_member_address: data.f_member_address || '',
+                f_aadhar_card_no:data.f_aadhar_card_no || '',
+                f_ration_card_no:data.f_ration_card_no || '',
+                r_aadhar_card_no:data.r_aadhar_card_no || '',
+                r_ration_card_no:data.r_ration_card_no || '',
             }));
 
             // Handle old and new photo paths correctly
@@ -325,6 +341,10 @@ function Family_Request_form() {
         data.append('f_member_name', formData.f_member_name);
         data.append('f_member_phone', formData.f_member_phone);
         data.append('f_member_address', formData.f_member_address);
+        data.append('f_aadhar_card_no', formData.f_aadhar_card_no);
+        data.append('f_ration_card_no', formData.f_ration_card_no);
+        data.append('r_aadhar_card_no', formData.r_aadhar_card_no);
+        data.append('r_ration_card_no', formData.r_ration_card_no);
         data.append('f_aadhar_card', files.f_aadhar_card);
         data.append('f_ration_card', files.f_ration_card);
         data.append('r_aadhar_card', files.r_aadhar_card);
@@ -964,9 +984,22 @@ function Family_Request_form() {
                                             required />
                                     </Col>
                                 </Form.Group>
+                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Aadhar Card Number (Relation):
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="text"
+                                            name='f_aadhar_card_no'
+                                            value={refData.f_aadhar_card_no}
+                                            onChange={handleInputChange2}
+                                            required />
+                                    </Col>
+                                </Form.Group>
                                 <Form.Group as={Row} className="mb-3 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
-                                        Aadhar Card No(Relation) :
+                                        Aadhar Card (Relation) :
                                     </Form.Label>
                                     <Col sm="8">
                                         {files.f_aadhar_card ? (
@@ -980,6 +1013,19 @@ function Family_Request_form() {
                                         ) : (
                                             <p>Unknown</p> // Display if no photo
                                         )}
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Ration Card Number (Relation):
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="text"
+                                            name="f_ration_card_no"
+                                            value={refData.f_ration_card_no}
+                                            onChange={handleInputChange2}
+                                            required />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3 text-start" controlId="formPoliceMemo">
@@ -1000,9 +1046,22 @@ function Family_Request_form() {
                                         )}
                                     </Col>
                                 </Form.Group>
+                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Aadhar Card Number (Resident):
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="text"
+                                            name='r_aadhar_card_no'
+                                            value={refData.r_aadhar_card_no}
+                                            onChange={handleInputChange2}
+                                            required />
+                                    </Col>
+                                </Form.Group>
                                 <Form.Group as={Row} className="mb-5 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
-                                        Aadhar Card No (Resident):
+                                        Aadhar Card (Resident):
                                     </Form.Label>
                                     <Col sm="8">
                                         {files.r_aadhar_card ? (
@@ -1016,6 +1075,19 @@ function Family_Request_form() {
                                         ) : (
                                             <p>Unknown</p> // Display if no photo
                                         )}
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Ration Card Number (Resident):
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="text"
+                                            name="r_ration_card_no"
+                                            value={refData.r_ration_card_no}
+                                            onChange={handleInputChange2} required />
                                     </Col>
                                 </Form.Group>
 
@@ -1035,6 +1107,18 @@ function Family_Request_form() {
                                         ) : (
                                             <p>Unknown</p> // Display if no photo
                                         )}
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                    <Form.Label column sm="4">
+                                        Any other :
+                                    </Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="text"
+                                            name="any_other"
+                                            value={refData.any_other}
+                                            onChange={handleInputChange2} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-5 mt-5 text-start" controlId="formPoliceMemo">
@@ -1109,7 +1193,7 @@ function Family_Request_form() {
                                                     type='number'
                                                     value={admissionNumber}
                                                     onChange={handleInputChange}
-                                                    required />
+                                                    readOnly />
                                             </Col>
                                         </Form.Group>
 
@@ -1191,7 +1275,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                             <Form.Label column sm="6">
-                                                Person Name :
+                                                Name :
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1205,7 +1289,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                                             <Form.Label column sm="6">
-                                                Person Age :
+                                                Age :
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1220,7 +1304,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
                                             <Form.Label column sm="6">
-                                                Person Phone No :
+                                                Phone No :
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1234,7 +1318,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Person Address :
+                                                Address :
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1247,7 +1331,20 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Aadhar Card No (Relation):
+                                                Aadhar Card Number (Relation):
+                                            </Form.Label>
+                                            <Col sm="6">
+                                                <Form.Control
+                                                    type="text"
+                                                    name='f_aadhar_card_no'
+                                                    value={formData.f_aadhar_card_no}
+                                                    onChange={handleInputChange}
+                                                    required />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
+                                                Aadhar Card (Relation):
                                             </Form.Label>
                                             <Col sm="6" className='d-flex align-items-center justify-content-center'>
                                                 {files.f_aadhar_card ? (
@@ -1267,6 +1364,19 @@ function Family_Request_form() {
                                                     onChange={handleFileChange}
                                                     name="f_aadhar_card"
                                                 />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
+                                                Ration Card Number (Relation):
+                                            </Form.Label>
+                                            <Col sm="6">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="f_ration_card_no"
+                                                    value={formData.f_ration_card_no}
+                                                    onChange={handleInputChange}
+                                                    required />
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -1291,6 +1401,19 @@ function Family_Request_form() {
                                                     onChange={handleFileChange}
                                                     name="f_ration_card"
                                                 />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
+                                                Aadhar Card No. (Resident):
+                                            </Form.Label>
+                                            <Col sm="6">
+                                                <Form.Control
+                                                    type="text"
+                                                    name='r_aadhar_card_no'
+                                                    value={formData.r_aadhar_card_no}
+                                                    onChange={handleInputChange}
+                                                    required />
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -1320,6 +1443,19 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
+                                                Ration Card Number (Resident):
+                                            </Form.Label>
+                                            <Col sm="6">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="r_ration_card_no"
+                                                    value={formData.r_ration_card_no}
+                                                    onChange={handleInputChange} required />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
                                                 Ration Card (Resident):
                                             </Form.Label>
                                             <Col sm="6" className='d-flex align-items-center justify-content-center'>
@@ -1340,6 +1476,18 @@ function Family_Request_form() {
                                                     onChange={handleFileChange}
                                                     name="r_ration_card"
                                                 />
+                                            </Col>
+                                        </Form.Group>
+                                        <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                            <Form.Label column sm="6">
+                                                Any other :
+                                            </Form.Label>
+                                            <Col sm="6">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="any_other"
+                                                    value={formData.any_other}
+                                                    onChange={handleInputChange} />
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
