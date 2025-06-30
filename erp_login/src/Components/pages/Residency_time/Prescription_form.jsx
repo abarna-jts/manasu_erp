@@ -462,7 +462,6 @@ function Prescription_form() {
         }
     };
 
-
     const handleUpdate = async (e) => {
         e.preventDefault();
 
@@ -486,8 +485,6 @@ function Prescription_form() {
             }
         }
     };
-
-
 
     const handleMedicalTypeChange = (e) => {
         const { name, value } = e.target;

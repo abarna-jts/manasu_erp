@@ -596,6 +596,356 @@ const updateAppearance = async (req, res) => {
   }
 }
 
+const updateInformation = async (req, res) => {
+  try {
+    const {
+      patient_name,
+      patient_age,
+      patient_gender,
+      sexual_orientation,
+      education_bg,
+      occupation,
+      marital_status,
+      economic_status,
+      religion,
+      informant,
+      residential_address,
+      living_arrangements,
+      family_structure,
+      cultural_identity,
+      language1,
+      language2
+
+    } = req.body;
+
+    const admission_no = req.params.admission_no;
+
+    const uquery = `UPDATE basic_detail SET
+                    patient_name = ?,
+                    patient_age = ?,
+                    patient_gender = ?,
+                    sexual_orientation = ?,
+                    education_bg = ?,
+                    occupation = ?,
+                    marital_status = ?,
+                    economic_status = ?,
+                    religion = ?,
+                    informant = ?,
+                    residential_address = ?,
+                    living_arrangements = ?,
+                    family_structure = ?,
+                    cultural_identity = ?,
+                    language1 = ?,
+                    language2 = ?
+                    WHERE admission_no = ?`;
+    const values = [
+      patient_name,
+      patient_age,
+      patient_gender,
+      sexual_orientation,
+      education_bg,
+      occupation,
+      marital_status,
+      economic_status,
+      religion,
+      informant,
+      residential_address,
+      living_arrangements,
+      family_structure,
+      cultural_identity,
+      language1,
+      language2, admission_no
+    ];
+    const [result] = await db.query(uquery, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record updated. Check if ID exists." });
+    }
+    return res.status(200).json({ message: "Demographic Information Form updated successfully!" });
+  } catch (err) {
+    console.error("Error in update Demographic Information:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const updateCheifComplaint = async (req, res) => {
+  try {
+    const {
+      chief_complaint,
+      onset_duration,
+      nature_symptoms,
+      severity,
+      course_type,
+      nature_illness,
+      identify_trigger,
+      life_changes,
+      biological,
+      psychological,
+      social_environment
+
+    } = req.body;
+
+    const admission_no = req.params.admission_no;
+
+    const uquery = `UPDATE cheif_complaint SET
+                    chief_complaint = ?,
+                    onset_duration = ?,
+                    nature_symptoms = ?,
+                    severity = ?,
+                    course_type = ?,
+                    nature_illness = ?,
+                    identify_trigger = ?,
+                    life_changes = ?,
+                    biological = ?,
+                    psychological = ?,
+                    social_environment = ?
+                    WHERE admission_no = ?`;
+    const values = [
+      chief_complaint,
+      onset_duration,
+      nature_symptoms,
+      severity,
+      course_type,
+      nature_illness,
+      identify_trigger,
+      life_changes,
+      biological,
+      psychological,
+      social_environment, admission_no
+    ];
+    const [result] = await db.query(uquery, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record updated. Check if ID exists." });
+    }
+    return res.status(200).json({ message: "Cheif Complaint Form updated successfully!" });
+  } catch (err) {
+    console.error("Error in update Cheif Complaint:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const updatePresentingData = async (req, res) => {
+  try {
+    const {
+      history_presenting,
+      mood_affect,
+      though_content,
+      though_process,
+      perception,
+      behavioural_changes,
+      sleep_patterns,
+      energy_level,
+      appetite_weight,
+      occupation_academic,
+      interpersonal_relationship,
+      selfCare_activity,
+      recreation_activity,
+    } = req.body;
+
+    const admission_no = req.params.admission_no;
+
+    const uquery = `UPDATE presenting_problems SET
+                    history_presenting = ?,
+                    mood_affect = ?,
+                    though_content = ?,
+                    though_process = ?,
+                    perception = ?,
+                    behavioural_changes = ?,
+                    sleep_patterns = ?,
+                    energy_level = ?,
+                    appetite_weight = ?,
+                    occupation_academic = ?,
+                    interpersonal_relationship = ?,
+                    selfCare_activity = ?,
+                    recreation_activity = ?
+                    WHERE admission_no = ?`;
+
+    const values = [
+      history_presenting,
+      mood_affect.join(", "),
+      though_content.join(", "),
+      though_process.join(", "),
+      perception.join(", "),
+      behavioural_changes.join(", "),
+      sleep_patterns.join(", "),
+      energy_level,
+      appetite_weight,
+      occupation_academic,
+      interpersonal_relationship,
+      selfCare_activity,
+      recreation_activity, admission_no
+    ];
+    const [result] = await db.query(uquery, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record updated. Check if ID exists." });
+    }
+    return res.status(200).json({ message: "Presenting Problems Form updated successfully!" });
+  } catch (err) {
+    console.error("Error in update Presenting Problems:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const updatePsychiatricData = async (req, res) => {
+  try {
+    const {
+      psychiatric_diagnoses,
+      treatment_history,
+      medications,
+      dosage,
+      adherence,
+      sideEffect,
+      experience_reaction,
+      hospitalisation_reason,
+      duration,
+      crisis_episodes,
+      fm_mentalHealth,
+      significant_life,
+      chronic_stressors,
+      trauma_exploration,
+      legal_environment
+    } = req.body;
+    const admission_no = req.params.admission_no;
+
+    const uquery = `UPDATE psy_history SET
+                    psychiatric_diagnoses = ?,
+                    treatment_history = ?,
+                    medications = ?,
+                    dosage = ?,
+                    adherence = ?,
+                    sideEffect = ?,
+                    experience_reaction = ?,
+                    hospitalisation_reason = ?,
+                    duration = ?,
+                    crisis_episodes = ?,
+                    fm_mentalHealth = ?,
+                    significant_life = ?,
+                    chronic_stressors = ?,
+                    trauma_exploration = ?,
+                    legal_environment = ?
+                    WHERE admission_no = ?`;
+    const values = [
+      psychiatric_diagnoses,
+      treatment_history,
+      medications,
+      dosage,
+      adherence,
+      sideEffect,
+      experience_reaction,
+      hospitalisation_reason,
+      duration,
+      crisis_episodes,
+      fm_mentalHealth,
+      significant_life,
+      chronic_stressors,
+      trauma_exploration,
+      legal_environment, admission_no
+    ];
+    const [result] = await db.query(uquery, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record updated. Check if ID exists." });
+    }
+    return res.status(200).json({ message: "Psychiatric History Form updated successfully!" });
+  } catch (err) {
+    console.error("Error in update Psychiatric History:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const updateMedicalHistoryData = async (req, res) => {
+  try {
+    const {
+      disability_status,
+      chronic_medical,
+      acute_health,
+      medication,
+      medication_allergies,
+      other_allergy,
+      significant_medical,
+      traumatic_injuries,
+      sexual_health
+    } = req.body;
+
+    const admission_no = req.params.admission_no;
+
+    const query = `UPDATE medical_history SET
+                  disability_status = ?,
+                  chronic_medical = ?,
+                  acute_health = ?,
+                  medication = ?,
+                  medication_allergies = ?,
+                  other_allergy = ?,
+                  significant_medical = ?,
+                  traumatic_injuries = ?,
+                  sexual_health = ?
+                  WHERE admission_no = ?`;
+
+    const values = [
+      disability_status,
+      chronic_medical,
+      acute_health,
+      medication,
+      medication_allergies,
+      other_allergy.join(", "),
+      significant_medical.join(", "),
+      traumatic_injuries,
+      sexual_health.join(", "),
+      admission_no
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record updated. Check if ID exists." });
+    }
+    return res.status(200).json({ message: "Medical History Form updated successfully!" });
+  } catch (err) {
+    console.error("Error in update Medical History:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const updateFamilyHistoryData = async (req, res) => {
+  try {
+    const {
+      family_composition,
+      family_dynamics,
+      marriage_type,
+      family_history,
+      genetic_predisposition,
+      family_changes,
+      family_substance
+    } = req.body;
+
+    const admission_no = req.params.admission_no;
+
+    const uquery = `UPDATE familyhis_data SET
+                    family_composition = ?,
+                    family_dynamics = ?,
+                    marriage_type = ?,
+                    family_history = ?,
+                    genetic_predisposition = ?,
+                    family_changes = ?,
+                    family_substance = ?
+                    WHERE admission_no = ?`;
+
+    const values = [
+      family_composition.join(", "),
+      family_dynamics.join(", "),
+      marriage_type,
+      family_history,
+      genetic_predisposition,
+      family_changes.join(", "),
+      family_substance, admission_no
+    ];
+
+    const [result] = await db.query(uquery, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record updated. Check if ID exists." });
+    }
+    return res.status(200).json({ message: "Family History Form updated successfully!" });
+  } catch (err) {
+    console.error("Error in update Family History:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
 
 const UpdateSpeech = async (req, res) => {
   try {
@@ -1042,7 +1392,8 @@ const createBasicInformation = async (req, res) => {
       living_arrangements,
       family_structure,
       cultural_identity,
-      language_preferences
+      language1,
+      language2
 
     } = req.body;
 
@@ -1050,13 +1401,13 @@ const createBasicInformation = async (req, res) => {
     admission_no, patient_name, patient_age, patient_gender, sexual_orientation,
     education_bg, occupation, marital_status,economic_status,
     religion,informant, residential_address,living_arrangements,
-    family_structure,cultural_identity,language_preferences)
-    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    family_structure,cultural_identity,language1,language2)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     const values = [
       admission_no, patient_name, patient_age, patient_gender, sexual_orientation,
       education_bg, occupation, marital_status, economic_status, religion,
-      informant, residential_address, living_arrangements, family_structure, cultural_identity, language_preferences
+      informant, residential_address, living_arrangements, family_structure, cultural_identity, language1, language2
     ];
 
     const [result] = await db.query(query, values);
@@ -1296,6 +1647,263 @@ const createFamilyHistoryData = async (req, res) => {
   }
 }
 
+const createSocialHistoryData = async (req, res) => {
+  try {
+    const {
+      family_relationship,
+      admission_no,
+      socialCircle_relationship,
+      relationship_significant,
+      living_arrangements,
+      education_bg,
+      currentEmp_status,
+      socialRecreation_activity,
+      social_outlets,
+      socialMed_engagement,
+      technology_related,
+    } = req.body;
+
+    const query = `INSERT INTO social_history (
+        admission_no, family_relationship, socialCircle_relationship, relationship_significant, living_arrangements, education_bg,
+        currentEmp_status, socialRecreation_activity, social_outlets, socialMed_engagement, technology_related
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
+
+
+    const values = [
+      admission_no, family_relationship, socialCircle_relationship, relationship_significant, living_arrangements, education_bg, currentEmp_status, socialRecreation_activity,
+      social_outlets, socialMed_engagement, technology_related
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(200).json({ message: "Social History Form created Successfully" });
+  } catch (err) {
+    console.error("Error in create Social History Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const createDevelopmentalData = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      prenatal_factors,
+      birth_details,
+      birth_order,
+      siblings_number,
+      bonding_attachment,
+      milestones_development,
+      childhood_illness,
+      siblings_relationship,
+      parenting_style,
+      learning_challenge,
+      pubertal_development,
+    } = req.body;
+
+    const query = `INSERT INTO development_history(admission_no, prenatal_factors, birth_details, birth_order, siblings_number, bonding_attachment,
+    milestones_development, childhood_illness, siblings_relationship, parenting_style, learning_challenge, pubertal_development)VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      admission_no,
+      prenatal_factors,
+      birth_details,
+      birth_order,
+      siblings_number,
+      bonding_attachment,
+      milestones_development,
+      childhood_illness,
+      siblings_relationship,
+      parenting_style,
+      learning_challenge,
+      pubertal_development,
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(200).json({ message: "Developmental History Form created Successfully" });
+  } catch (err) {
+    console.error("Error in create Developmental History Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const createSubstanceData = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      substance_use,
+      age_onset,
+      frequency,
+      quantity,
+      motivation_use,
+      environmental_trigger,
+      impact_occupation,
+      impact_interpersonal,
+      financial_consequences,
+      craving_intensity,
+      previous_treatment,
+      relapse_history,
+    } = req.body;
+
+    const query = `INSERT INTO substance_use(admission_no, substance_use, age_onset, frequency, quantity, motivation_use, environmental_trigger,
+    impact_occupation, impact_interpersonal, financial_consequences, craving_intensity, previous_treatment, relapse_history)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      admission_no,
+      substance_use,
+      age_onset,
+      frequency,
+      quantity,
+      motivation_use,
+      environmental_trigger,
+      impact_occupation,
+      impact_interpersonal,
+      financial_consequences,
+      craving_intensity,
+      previous_treatment,
+      relapse_history,
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(200).json({ message: "Developmental History Form created Successfully" });
+
+  } catch (err) {
+    console.error("Error in create Developmental History Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+
+}
+
+const createSuicidalData = async (req, res) => {
+  try {
+    const {
+      admission_no,
+      suicide_history,
+      triggers_stressors,
+      homicidal_ideation,
+      target_method,
+      immediate_threat,
+      emergency_response,
+      hospital_required
+    } = req.body;
+    const query = `INSERT INTO suicidal_data(admission_no, suicide_history, triggers_stressors, homicidal_ideation,
+    target_method, immediate_threat, emergency_response, hospital_required)VALUES(?,?,?,?,?,?,?,?)`;
+    const values = [
+      admission_no,
+      suicide_history,
+      triggers_stressors,
+      homicidal_ideation,
+      target_method,
+      immediate_threat,
+      emergency_response,
+      hospital_required
+    ];
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted" });
+    }
+    res.status(200).json({ message: "Suicidal and Homicidal Ideation Form created Successfully" });
+
+  } catch (err) {
+    console.error("Error in create Suicidal and Homicidal Ideation Form:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+const getInformation = async (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM basic_detail WHERE admission_no = ?';
+  try {
+    const [results] = await db.query(query, [admission_no]);
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Demographic Information Form not found' });
+    }
+    res.json(results[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+}
+
+const getCheifComplaint = async (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM cheif_complaint WHERE admission_no = ?';
+  try {
+    const [results] = await db.query(query, [admission_no]);
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Cheif Complaint Form not found' });
+    }
+    res.json(results[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+}
+
+const getPresentingData = async (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM presenting_problems WHERE admission_no = ?';
+  try {
+    const [results] = await db.query(query, [admission_no]);
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Presenting Problems Form not found' });
+    }
+    res.json(results[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+}
+
+const getPsychiatricData = async (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM psy_history WHERE admission_no = ?';
+  try {
+    const [results] = await db.query(query, [admission_no]);
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Psychiatric History Form not found' });
+    }
+    res.json(results[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+}
+
+const getMedicalHistory = async (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM medical_history WHERE admission_no = ?';
+  try {
+    const [results] = await db.query(query, [admission_no]);
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Medical History Form not found' });
+    }
+    res.json(results[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+}
+
+const getFamilyHistory = async (req, res) => {
+  const admission_no = req.params.admission_no;
+  const query = 'SELECT * FROM familyhis_data WHERE admission_no = ?';
+  try {
+    const [results] = await db.query(query, [admission_no]);
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Family History Form not found' });
+    }
+    res.json(results[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Database error' });
+  }
+}
+
 export {
   createMSEForm,
   createSpeech,
@@ -1311,5 +1919,9 @@ export {
   getallappearance,
   getallmood, getallspeech, getallcognition, getallperception, getMseAllForm, getallThough, getalljudgement, getallInsight,
   updateAppearance, UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition,
-  createBasicInformation, createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData
+  createBasicInformation, createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData,
+  createSocialHistoryData, createDevelopmentalData, createSubstanceData, createSuicidalData,
+  getInformation, getCheifComplaint, getPresentingData, getPsychiatricData, getMedicalHistory, getFamilyHistory,
+  updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData,
+  updateFamilyHistoryData
 };

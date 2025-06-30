@@ -3,7 +3,10 @@ import  { createMSEForm, createSpeech, createMood, createThough, createJudgement
     getallappearance,getallspeech,
     getallmood,getallperception,getallcognition,getMseAllForm, getallThough, getalljudgement,getallInsight, 
     updateAppearance,UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition,
-    createBasicInformation,createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData
+    createBasicInformation,createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData,
+    createSocialHistoryData, createDevelopmentalData, createSubstanceData, createSuicidalData,
+    getInformation, getCheifComplaint, getPresentingData, getPsychiatricData, getMedicalHistory, getFamilyHistory,
+    updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData, updateFamilyHistoryData
 } from '../controllers/recovery.js';
 
 const router = express.Router();
@@ -75,5 +78,23 @@ router.post("/create_presenting",createPresenting);
 router.post("/create_psyhistory", createPsyHistory);
 router.post("/create_medicalData", createMedicalData);
 router.post("/create_familyData", createFamilyHistoryData);
+router.post("/create_socialData", createSocialHistoryData);
+router.post("/create_developmentalData", createDevelopmentalData);
+router.post("/create_substanceData", createSubstanceData);
+router.post("/create_suicidalData", createSuicidalData);
+
+router.get("/get_information/:admission_no", getInformation);
+router.get("/get_chiefComplaint/:admission_no", getCheifComplaint);
+router.get("/get_presentingData/:admission_no",getPresentingData);
+router.get("/get_psychiatric/:admission_no", getPsychiatricData);
+router.get("/get_medicalHistory/:admission_no", getMedicalHistory);
+router.get("/get_familyHistory/:admission_no", getFamilyHistory);
+
+router.post("/updateInformation/:admission_no", updateInformation);
+router.post("/updateCheifComplaint/:admission_no", updateCheifComplaint);
+router.post("/updatePresentingData/:admission_no", updatePresentingData);
+router.post("/updatePsychiatricData/:admission_no", updatePsychiatricData);
+router.post("/updateMedicalHistory/:admission_no", updateMedicalHistoryData);
+router.post("/updateFamilyHistory/:admission_no", updateFamilyHistoryData);
 
 export default router;
