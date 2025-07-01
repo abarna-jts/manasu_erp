@@ -768,6 +768,10 @@ body {
 	}
 }
 
+.pdf_heading{
+	text-decoration: underline;
+}
+
 /* tabs styles start */
 
 .bg {
@@ -869,6 +873,7 @@ body {
 .pcss3t>.tab-content-7:checked~ul .tab-content-7,
 .pcss3t>.tab-content-8:checked~ul .tab-content-8,
 .pcss3t>.tab-content-9:checked~ul .tab-content-9,
+.pcss3t>.tab-content-10:checked~ul .tab-content-10,
 .pcss3t>.tab-content-last:checked~ul .tab-content-last {
 	z-index: 1;
 	top: 0;

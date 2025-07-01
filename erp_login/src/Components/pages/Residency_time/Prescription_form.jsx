@@ -303,60 +303,58 @@ function Prescription_form() {
         return `${day}-${month}-${year}`;
     };
 
-    const fetchPrescriptionData = async (id) => {
-        try {
-            const response = await apiRoute.get(`/residency/getPrescription/${id}`);
-            const data = response.data;
+   const fetchPrescriptionData = async (id) => {
+    try {
+        const response = await apiRoute.get(`/residency/getPrescription/${id}`);
+        const data = response.data;
 
-            const meds = data.prescription?.prescription_medicines;
+        const meds = data.prescription?.prescription_medicines;
 
-            if (!meds || meds.length === 0) {
-                console.warn("No prescription medicines found.");
-                setViewData({ ...data.prescription, prescription_medicines: [] });
-                return;
-            }
-
-            // Check if data is row-wise (array of objects)
-            if (typeof meds[0].medicine === "string" && !meds[0].medicine.startsWith("[")) {
-                // Plain strings like "CALCIUM"
-                setViewData({
-                    ...data.prescription,
-                    prescription_medicines: meds,
-                });
-            } else {
-                // Data is column-wise JSON stringified
-                const medData = meds[0];
-
-                const medicines = JSON.parse(medData.medicine || "[]");
-                const types = JSON.parse(medData.medicine_type || "[]");
-                const durations = JSON.parse(medData.duration || "[]");
-                const instructions = JSON.parse(medData.med_instruction || "[]");
-                const mornings = JSON.parse(medData.morning || "[]");
-                const afternoons = JSON.parse(medData.afternoon || "[]");
-                const nights = JSON.parse(medData.night || "[]");
-                const intakes = JSON.parse(medData.intake || "[]");
-
-                setViewData({
-                    ...data.prescription,
-                    prescription_medicines: medicines.map((_, i) => ({
-                        medicine: medicines[i],
-                        medicine_type: types[i],
-                        duration: durations[i],
-                        med_instruction: instructions[i],
-                        morning: mornings[i],
-                        afternoon: afternoons[i],
-                        night: nights[i],
-                        intake: intakes[i],
-                    })),
-                });
-            }
-
-            setPreviewRequested(true);
-        } catch (err) {
-            console.error("Fetch error:", err);
+        if (!meds || meds.length === 0) {
+            console.warn("No prescription medicines found.");
+            setViewData({ ...data.prescription, prescription_medicines: [] });
+            return;
         }
-    };
 
+        const medData = meds[0]; // Single object with comma-separated fields
+
+        const splitByComma = (val) => {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            if (typeof val === 'string') return val.split(',').map((item) => item.trim());
+            return [];
+        };
+
+        const medicines = splitByComma(medData.medicine);
+        const types = splitByComma(medData.medicine_type);
+        const durations = splitByComma(medData.duration);
+        const instructions = splitByComma(medData.med_instruction);
+        const mornings = splitByComma(medData.morning);
+        const afternoons = splitByComma(medData.afternoon);
+        const nights = splitByComma(medData.night);
+        const intakes = splitByComma(medData.intake);
+
+        const prescriptionRows = medicines.map((_, i) => ({
+            medicine: medicines[i] || '',
+            medicine_type: types[i] || '',
+            duration: durations[i] || '',
+            med_instruction: instructions[i] || '',
+            morning: mornings[i] || '',
+            afternoon: afternoons[i] || '',
+            night: nights[i] || '',
+            intake: intakes[i] || '',
+        }));
+
+        setViewData({
+            ...data.prescription,
+            prescription_medicines: prescriptionRows,
+        });
+
+        setPreviewRequested(true);
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+};
 
 
     useEffect(() => {
@@ -392,47 +390,59 @@ function Prescription_form() {
     };
 
     const handleEditform = async (id) => {
-        try {
-            const response = await apiRoute.get(`/residency/getPrescription/${id}`);
-            const data = response.data.prescription;
-            const meds = data.prescription_medicines;
+    try {
+        const response = await apiRoute.get(`/residency/getPrescription/${id}`);
+        const data = response.data.prescription;
+        const meds = data.prescription_medicines;
 
-            // Helper function to safely parse JSON strings
-            const safeParse = (value) => {
-                try {
-                    return JSON.parse(value);
-                } catch {
-                    return value;
-                }
-            };
+        console.log("Fetched meds:", meds);
 
+        // Split values safely into arrays
+        const splitByCommaOrJSON = (value) => {
+            if (!value) return [];
+            if (Array.isArray(value)) return value;
+
+            try {
+                const parsed = JSON.parse(value);
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e) {
+                // Not JSON — fallback to comma splitting
+            }
+
+            if (typeof value === 'string') {
+                return value.split(',').map(item => item.trim());
+            }
+
+            return [];
+        };
+
+        if (Array.isArray(meds) && meds.length > 0) {
+            const firstMed = meds[0];
+
+            // ✅ If it’s already row-wise (each row is one medicine object), just use it
             if (
-                Array.isArray(meds) &&
-                meds.length > 0 &&
-                typeof meds[0].medicine === "string" &&
-                !meds[0].medicine.trim().startsWith("[")
+                typeof firstMed.medicine === "string" &&
+                !firstMed.medicine.trim().startsWith("[") &&
+                meds.length > 1
             ) {
-                // ✅ Row-wise data format (already good for rendering)
                 console.log("Detected row-wise medicine format.");
                 setViewData({
                     ...data,
-                    prescription_medicines: meds || [],
+                    prescription_medicines: meds,
                 });
-            } else if (Array.isArray(meds) && meds.length > 0) {
-                // 🔄 Column-wise format — parse each field
+            } else {
+                // 🔄 Column-wise — split each field into arrays
                 console.log("Detected column-wise medicine format.");
-                const medData = meds[0]; // Only one row where all fields are arrays
+                const medicines = splitByCommaOrJSON(firstMed.medicine);
+                const types = splitByCommaOrJSON(firstMed.medicine_type);
+                const durations = splitByCommaOrJSON(firstMed.duration);
+                const instructions = splitByCommaOrJSON(firstMed.med_instruction);
+                const mornings = splitByCommaOrJSON(firstMed.morning);
+                const afternoons = splitByCommaOrJSON(firstMed.afternoon);
+                const nights = splitByCommaOrJSON(firstMed.night);
+                const intakes = splitByCommaOrJSON(firstMed.intake);
 
-                const medicines = safeParse(medData.medicine);
-                const types = safeParse(medData.medicine_type);
-                const durations = safeParse(medData.duration);
-                const instructions = safeParse(medData.med_instruction);
-                const mornings = safeParse(medData.morning);
-                const afternoons = safeParse(medData.afternoon);
-                const nights = safeParse(medData.night);
-                const intakes = safeParse(medData.intake);
-
-                const normalizedMeds = medicines.map((_, i) => ({
+                const formattedMeds = medicines.map((_, i) => ({
                     medicine: medicines[i] || '',
                     medicine_type: types[i] || '',
                     duration: durations[i] || '',
@@ -445,22 +455,23 @@ function Prescription_form() {
 
                 setViewData({
                     ...data,
-                    prescription_medicines: normalizedMeds,
-                });
-            } else {
-                // ❌ No prescription data
-                console.warn("No valid prescription_medicines data.");
-                setViewData({
-                    ...data,
-                    prescription_medicines: [],
+                    prescription_medicines: formattedMeds,
                 });
             }
-
-            setEditShow(true); // Show the modal or section
-        } catch (error) {
-            console.error('Error fetching prescription:', error);
+        } else {
+            console.warn("No valid prescription_medicines data.");
+            setViewData({
+                ...data,
+                prescription_medicines: [],
+            });
         }
-    };
+
+        setEditShow(true);
+    } catch (error) {
+        console.error('Error fetching prescription:', error);
+    }
+};
+
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -561,7 +572,6 @@ function Prescription_form() {
                             <thead className="thead-light">
                                 <tr>
                                     <th scope="col">S.No.</th>
-                                    <th scope="col">Prescription Id</th>
                                     <th scope="col">Resident's Name</th>
                                     <th scope="col">Admission No</th>
                                     <th scope="col">Out Patient No.</th>
@@ -576,7 +586,6 @@ function Prescription_form() {
                                         <>
                                             <tr key={item.id}>
                                                 <td>{index + 1}</td>
-                                                <td>{item.patient_id}</td>
                                                 <td>{item.rescue_name}</td>
                                                 <td>{item.admission_no}</td>
                                                 <td>{item.op_no}</td>
@@ -1008,14 +1017,6 @@ function Prescription_form() {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col md={6}>
-                                        <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Prescription ID:</Form.Label>
-                                            <Col sm="7">
-                                                <Form.Control readOnly value={viewData.prescription_medicines[0]?.patient_id || ''} />
-                                            </Col>
-                                        </Form.Group>
-                                    </Col>
 
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
@@ -1025,8 +1026,6 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
-                                </Row>
-                                <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Out Patient No.:</Form.Label>
@@ -1035,6 +1034,9 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
+                                </Row>
+                                <Row>
+                                    
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Hospital Name:</Form.Label>
@@ -1043,8 +1045,6 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
-                                </Row>
-                                <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Department:</Form.Label>
@@ -1053,6 +1053,9 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
+                                </Row>
+                                <Row>
+                                    
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Date:</Form.Label>
@@ -1061,8 +1064,6 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
-                                </Row>
-                                <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Instruction:</Form.Label>
@@ -1071,6 +1072,9 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
+                                </Row>
+                                <Row>
+                                    
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Advice:</Form.Label>
@@ -1119,6 +1123,7 @@ function Prescription_form() {
                                             </tr>
                                         ))}
                                     </tbody>
+
                                 </table>
                             </Form>
                         </Col>
