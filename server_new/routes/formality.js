@@ -26,7 +26,8 @@ createSelfDeclaration,
     createEventReport,
     createCelebrationReport,
     createCommunityReport,
-    createStaffReport,getAllDocument,getEssentialRecordshow
+    createStaffReport,getAllDocument,getEssentialRecordshow,
+    getEventReport
 }from "../controllers/formality.js";
 
 const router = express.Router();
@@ -70,6 +71,9 @@ router.put("/updateStudentDetail/:id",updateStudentDetail); //completed
 
 //director routes
 router.get("/getAllDocument",getAllDocument); //completed
+
+//Annual Report routes for getting pdf
+router.get("/getEventReport", getEventReport);
 
 
 export default router;

@@ -2,13 +2,17 @@ import React from 'react';
 import { Breadcrumb, Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Alert } from "react-bootstrap";
+import { useRef } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 function Annual_Report() {
     const [validated, setValidated] = useState(false);
+    const [previewRequested, setPreviewRequested] = useState(false);
     const [step, setStep] = useState(1);
     const [isStep1Invalid, setIsStep1Invalid] = useState(false);
     const [isStep2Invalid, setIsStep2Invalid] = useState(false);
@@ -27,9 +31,9 @@ function Annual_Report() {
 
     const [eventData, setEventData] = useState({
         event_type: 'event',
-        event_date:'',
-        awarness_date:'',
-        outing_date:'',
+        event_date: '',
+        awarness_date: '',
+        outing_date: '',
         event_name: '',
         awareness_name: '',
         outing_name: '',
@@ -392,6 +396,15 @@ function Annual_Report() {
         "Staff Programs",
     ];
 
+    const ViewEventReport = () => {
+        navigate("/view_annualReport", { state: { reportType: "event" } });
+    };
+
+    // (optional) ViewCelebrationReport
+    const ViewCelebrationReport = () => {
+        navigate("/view_annualReport", { state: { reportType: "celebration" } });
+    };
+
 
     return (
         <>
@@ -462,8 +475,11 @@ function Annual_Report() {
                     <Row className='d-flex align-items-center justify-content-center'>
                         <Col md={6}>
                             <Row className='d-flex align-items-center justify-content-between'>
-                                <Col md={8} className="text-start">
+                                <Col md={12} className="text-start d-flex align-items-center justify-content-between">
                                     <h3 className="annual_section_title mt-3">Event / Awareness / Outing Details</h3>
+                                    <button className='btn btn-success' onClick={() => {
+                                        ViewEventReport();
+                                    }}>View Event Report</button>
                                 </Col>
                                 {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
                                     <Button type='button' className='btn btn-success annual_view' onClick={handleViewAll}>View All</Button>

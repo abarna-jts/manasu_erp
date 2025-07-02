@@ -642,10 +642,6 @@ const createPrescription = async (req, res) => {
   } = req.body;
 
   try {
-    if (!admission_no || !rescue_name) {
-      return res.status(400).json({ error: "Admission number and Resident's name are required." });
-    }
-
     const insertQuery = `
       INSERT INTO prescription_medicines (
         admission_no, rescue_name, age, op_no, hospital_name, department, masterHealthCheckup,
@@ -662,7 +658,7 @@ const createPrescription = async (req, res) => {
 
     await db.query(insertQuery, values);
 
-    res.status(201).json({ message: "Prescription Saved Successfully" });
+    res.status(201).json({ message: "Prescription and Medicine Summary Saved Successfully" });
   } catch (error) {
     console.error("Error inserting prescription:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -707,6 +703,7 @@ const getPrescriptionbyID = async (req, res) => {
       age: results[0].age,
       created_date: results[0].created_date,
       op_no: results[0].op_no,
+      medical_type: results[0].medical_type,
       hospital_name: results[0].hospital_name,
       department: results[0].department,
       masterHealthCheckup: results[0].masterHealthCheckup,
@@ -737,42 +734,60 @@ const getPrescriptionbyID = async (req, res) => {
 
 // Update individual prescriptions
 const updatePrescription = async (req, res) => {
-  const { prescriptions = [] } = req.body;
-
-  if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
-    return res.status(400).json({ error: 'Missing or empty prescriptions array' });
-  }
-
   try {
-    for (const p of prescriptions) {
-      if (!p.id) continue; // Skip if no ID provided
+    const id = req.params.id;
 
-      await db.query(
-        `UPDATE prescription_medicines SET
-          medicine = ?, medicine_type = ?, duration = ?, intake = ?, med_instruction = ?,
-          morning = ?, afternoon = ?, night = ?
-         WHERE id = ?`,
-        [
-          p.medicine ?? null,
-          p.medicine_type ?? null,
-          p.duration ?? null,
-          p.intake ?? null,
-          p.med_instruction ?? null,
-          p.morning ?? null,
-          p.afternoon ?? null,
-          p.night ?? null,
-          p.id
-        ]
-      );
+    const {
+      admission_no,
+      rescue_name,
+      age,
+      op_no,
+      hospital_name,
+      department,
+      masterHealthCheckup,
+      instruction,
+      medical_type,
+      advice,
+      follow_up,
+      medicine,
+      medicine_type,
+      duration,
+      intake,
+      med_instruction,
+      morning,
+      afternoon,
+      night
+    } = req.body;
+
+    const updateQuery = `
+      UPDATE prescription_medicines SET
+        admission_no = ?, rescue_name = ?, age = ?, op_no = ?, hospital_name = ?, department = ?,
+        masterHealthCheckup = ?, instruction = ?, medical_type = ?, advice = ?, follow_up = ?,
+        medicine = ?, medicine_type = ?, duration = ?, intake = ?, med_instruction = ?,
+        morning = ?, afternoon = ?, night = ?
+      WHERE id = ?
+    `;
+
+    const values = [
+      admission_no, rescue_name, age, op_no, hospital_name, department,
+      masterHealthCheckup, instruction, medical_type, advice, follow_up,
+      medicine, medicine_type, duration, intake, med_instruction,
+      morning, afternoon, night,
+      id
+    ];
+
+    const [result] = await db.query(updateQuery, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Prescription not found or not updated' });
     }
 
-    res.status(200).json({ message: 'Prescriptions updated successfully' });
+    res.status(200).json({ message: 'Prescription updated successfully' });
   } catch (error) {
-    console.error('Error updating prescriptions:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("❌ Error updating prescription:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 
 

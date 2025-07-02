@@ -154,7 +154,7 @@ function Prescription_form() {
     const handleRowChange1 = (index, e) => {
         const { name, value } = e.target;
 
-        if (name === 'id') return; // prevent changing ID
+        if (name === 'id') return;
 
         const updatedMedicines = [...viewData.prescription_medicines];
         updatedMedicines[index] = {
@@ -167,9 +167,6 @@ function Prescription_form() {
             prescription_medicines: updatedMedicines,
         }));
     };
-
-
-
 
     const handleRemoveRow = (index) => {
         setRows(prevRows => prevRows.filter((_, i) => i !== index));
@@ -249,12 +246,23 @@ function Prescription_form() {
 
         const todayDate = new Date().toISOString().split('T')[0]; // e.g., "2025-05-23"
 
-        // Construct data object to send
+
+        // ✅ Helper to flatten row fields into comma-separated strings
+        const flattenField = (field) => rows.map(r => r[field] || '').join(',');
+
+        // ✅ Construct flattened data object
         const data = {
             ...formData,
             admission_no: admissionNumber.trim(),
             current_date: todayDate,
-            prescription_medicines: rows,  // ← include your dynamic table data
+            medicine: flattenField('medicine'),
+            medicine_type: flattenField('medicine_type'),
+            duration: flattenField('duration'),
+            intake: flattenField('intake'),
+            med_instruction: flattenField('med_instruction'),
+            morning: flattenField('morning'),
+            afternoon: flattenField('afternoon'),
+            night: flattenField('night'),
         };
 
         console.log("Submitting data:", data);
@@ -280,6 +288,7 @@ function Prescription_form() {
     };
 
 
+
     //fetching prescription details
     const getPrescriptionDetails = async () => {
         try {
@@ -303,58 +312,60 @@ function Prescription_form() {
         return `${day}-${month}-${year}`;
     };
 
-   const fetchPrescriptionData = async (id) => {
-    try {
-        const response = await apiRoute.get(`/residency/getPrescription/${id}`);
-        const data = response.data;
+    const fetchPrescriptionData = async (id) => {
+        try {
+            const response = await apiRoute.get(`/residency/getPrescription/${id}`);
+            const data = response.data;
 
-        const meds = data.prescription?.prescription_medicines;
+            const meds = data.prescription?.prescription_medicines;
 
-        if (!meds || meds.length === 0) {
-            console.warn("No prescription medicines found.");
-            setViewData({ ...data.prescription, prescription_medicines: [] });
-            return;
+            if (!meds || meds.length === 0) {
+                console.warn("No prescription medicines found.");
+                setViewData({ ...data.prescription, prescription_medicines: [] });
+                return;
+            }
+
+            const medData = meds[0]; // Single object with comma-separated fields
+
+            const splitByComma = (val) => {
+                if (!val) return [];
+                if (Array.isArray(val)) return val;
+                if (typeof val === 'string') return val.split(',').map((item) => item.trim());
+                return [];
+            };
+
+            const medicines = splitByComma(medData.medicine);
+            const types = splitByComma(medData.medicine_type);
+            const durations = splitByComma(medData.duration);
+            const instructions = splitByComma(medData.med_instruction);
+            const mornings = splitByComma(medData.morning);
+            const afternoons = splitByComma(medData.afternoon);
+            const nights = splitByComma(medData.night);
+            const intakes = splitByComma(medData.intake);
+            
+            console.log("Duration",durations);
+
+            const prescriptionRows = medicines.map((_, i) => ({
+                medicine: medicines[i] || '',
+                medicine_type: types[i] || '',
+                duration: durations[i] || '',
+                med_instruction: instructions[i] || '',
+                morning: mornings[i] || '',
+                afternoon: afternoons[i] || '',
+                night: nights[i] || '',
+                intake: intakes[i] || '',
+            }));
+
+            setViewData({
+                ...data.prescription,
+                prescription_medicines: prescriptionRows,
+            });
+
+            setPreviewRequested(true);
+        } catch (err) {
+            console.error("Fetch error:", err);
         }
-
-        const medData = meds[0]; // Single object with comma-separated fields
-
-        const splitByComma = (val) => {
-            if (!val) return [];
-            if (Array.isArray(val)) return val;
-            if (typeof val === 'string') return val.split(',').map((item) => item.trim());
-            return [];
-        };
-
-        const medicines = splitByComma(medData.medicine);
-        const types = splitByComma(medData.medicine_type);
-        const durations = splitByComma(medData.duration);
-        const instructions = splitByComma(medData.med_instruction);
-        const mornings = splitByComma(medData.morning);
-        const afternoons = splitByComma(medData.afternoon);
-        const nights = splitByComma(medData.night);
-        const intakes = splitByComma(medData.intake);
-
-        const prescriptionRows = medicines.map((_, i) => ({
-            medicine: medicines[i] || '',
-            medicine_type: types[i] || '',
-            duration: durations[i] || '',
-            med_instruction: instructions[i] || '',
-            morning: mornings[i] || '',
-            afternoon: afternoons[i] || '',
-            night: nights[i] || '',
-            intake: intakes[i] || '',
-        }));
-
-        setViewData({
-            ...data.prescription,
-            prescription_medicines: prescriptionRows,
-        });
-
-        setPreviewRequested(true);
-    } catch (err) {
-        console.error("Fetch error:", err);
-    }
-};
+    };
 
 
     useEffect(() => {
@@ -390,96 +401,122 @@ function Prescription_form() {
     };
 
     const handleEditform = async (id) => {
-    try {
-        const response = await apiRoute.get(`/residency/getPrescription/${id}`);
-        const data = response.data.prescription;
-        const meds = data.prescription_medicines;
+        try {
+            const response = await apiRoute.get(`/residency/getPrescription/${id}`);
+            const data = response.data.prescription;
+            const meds = data.prescription_medicines;
 
-        console.log("Fetched meds:", meds);
+            // console.log("Fetched meds:", meds);
+            // console.log("Fetched data:", data);
 
-        // Split values safely into arrays
-        const splitByCommaOrJSON = (value) => {
-            if (!value) return [];
-            if (Array.isArray(value)) return value;
+            // Split values safely into arrays
+            const splitByCommaOrJSON = (value) => {
+                if (!value) return [];
+                if (Array.isArray(value)) return value;
 
-            try {
-                const parsed = JSON.parse(value);
-                if (Array.isArray(parsed)) return parsed;
-            } catch (e) {
-                // Not JSON — fallback to comma splitting
-            }
+                try {
+                    const parsed = JSON.parse(value);
+                    if (Array.isArray(parsed)) return parsed;
+                } catch (e) {
+                    // Not JSON — fallback to comma splitting
+                }
 
-            if (typeof value === 'string') {
-                return value.split(',').map(item => item.trim());
-            }
+                if (typeof value === 'string') {
+                    return value.split(',').map(item => item.trim());
+                }
 
-            return [];
-        };
+                return [];
+            };
 
-        if (Array.isArray(meds) && meds.length > 0) {
-            const firstMed = meds[0];
+            if (Array.isArray(meds) && meds.length > 0) {
+                const firstMed = meds[0];
 
-            // ✅ If it’s already row-wise (each row is one medicine object), just use it
-            if (
-                typeof firstMed.medicine === "string" &&
-                !firstMed.medicine.trim().startsWith("[") &&
-                meds.length > 1
-            ) {
-                console.log("Detected row-wise medicine format.");
-                setViewData({
-                    ...data,
-                    prescription_medicines: meds,
-                });
+                // ✅ If it’s already row-wise (each row is one medicine object), just use it
+                if (
+                    typeof firstMed.medicine === "string" &&
+                    !firstMed.medicine.trim().startsWith("[") &&
+                    meds.length > 1
+                ) {
+                    console.log("Detected row-wise medicine format.");
+                    setViewData({
+                        ...data,
+                        prescription_medicines: meds,
+                    });
+                } else {
+                    // 🔄 Column-wise — split each field into arrays
+                    console.log("Detected column-wise medicine format.");
+                    const id = splitByCommaOrJSON(firstMed.id);
+                    const medicines = splitByCommaOrJSON(firstMed.medicine);
+                    const types = splitByCommaOrJSON(firstMed.medicine_type);
+                    const durations = splitByCommaOrJSON(firstMed.duration);
+                    const instructions = splitByCommaOrJSON(firstMed.med_instruction);
+                    const mornings = splitByCommaOrJSON(firstMed.morning);
+                    const afternoons = splitByCommaOrJSON(firstMed.afternoon);
+                    const nights = splitByCommaOrJSON(firstMed.night);
+                    const intakes = splitByCommaOrJSON(firstMed.intake);
+
+                    console.log("Duration of edit", durations);
+
+                    const formattedMeds = medicines.map((_, i) => ({
+                        id: id[i],
+                        medicine: medicines[i] || '',
+                        medicine_type: types[i] || '',
+                        duration: durations[i] || '',
+                        med_instruction: instructions[i] || '',
+                        morning: mornings[i] || '',
+                        afternoon: afternoons[i] || '',
+                        night: nights[i] || '',
+                        intake: intakes[i] || '',
+                    }));
+
+                    console.log("Parsed intake values:", intakes);
+
+                    setViewData({
+                        ...data,
+                        prescription_medicines: formattedMeds,
+                    });
+                }
             } else {
-                // 🔄 Column-wise — split each field into arrays
-                console.log("Detected column-wise medicine format.");
-                const medicines = splitByCommaOrJSON(firstMed.medicine);
-                const types = splitByCommaOrJSON(firstMed.medicine_type);
-                const durations = splitByCommaOrJSON(firstMed.duration);
-                const instructions = splitByCommaOrJSON(firstMed.med_instruction);
-                const mornings = splitByCommaOrJSON(firstMed.morning);
-                const afternoons = splitByCommaOrJSON(firstMed.afternoon);
-                const nights = splitByCommaOrJSON(firstMed.night);
-                const intakes = splitByCommaOrJSON(firstMed.intake);
-
-                const formattedMeds = medicines.map((_, i) => ({
-                    medicine: medicines[i] || '',
-                    medicine_type: types[i] || '',
-                    duration: durations[i] || '',
-                    med_instruction: instructions[i] || '',
-                    morning: mornings[i] || '',
-                    afternoon: afternoons[i] || '',
-                    night: nights[i] || '',
-                    intake: intakes[i] || '',
-                }));
-
+                console.warn("No valid prescription_medicines data.");
                 setViewData({
                     ...data,
-                    prescription_medicines: formattedMeds,
+                    prescription_medicines: [],
                 });
             }
-        } else {
-            console.warn("No valid prescription_medicines data.");
-            setViewData({
-                ...data,
-                prescription_medicines: [],
-            });
-        }
 
-        setEditShow(true);
-    } catch (error) {
-        console.error('Error fetching prescription:', error);
-    }
-};
+            setEditShow(true);
+        } catch (error) {
+            console.error('Error fetching prescription:', error);
+        }
+    };
 
 
     const handleUpdate = async (e) => {
         e.preventDefault();
 
         try {
+            // Helper to flatten all rows into comma-separated strings
+            const flattenField = (field) =>
+                viewData.prescription_medicines.map(row => row[field] || '').join(',');
+
+            const data = {
+                ...viewData,
+                medicine: flattenField('medicine'),
+                medicine_type: flattenField('medicine_type'),
+                duration: flattenField('duration'),
+                intake: flattenField('intake'),
+                med_instruction: flattenField('med_instruction'),
+                morning: flattenField('morning'),
+                afternoon: flattenField('afternoon'),
+                night: flattenField('night'),
+            };
+
+            console.log("Sending update data:", data);
+            console.log("Medical_type:", viewData.medical_type);
+
             const response = await apiRoute.put(
                 `/residency/updatePrescription/${viewData.id}`,
-                viewData
+                data
             );
 
             if (response.status === 200) {
@@ -497,14 +534,15 @@ function Prescription_form() {
         }
     };
 
+
     const handleMedicalTypeChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
+        setViewData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: value
         }));
-        setMedicalType(e.target.value);
     };
+
 
 
     return (
@@ -887,13 +925,12 @@ function Prescription_form() {
 
                                         <td>
                                             <input
-                                                type="number"
                                                 min={1}
                                                 name="duration"
                                                 value={rows[i].duration}
                                                 onChange={(e) => handleRowChange(i, e)}
                                                 required
-                                                placeholder="duration"
+                                                placeholder="Duration"
                                                 autoComplete="off"
                                                 className="form-control"
 
@@ -1036,7 +1073,7 @@ function Prescription_form() {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    
+
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Hospital Name:</Form.Label>
@@ -1055,7 +1092,7 @@ function Prescription_form() {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    
+
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Date:</Form.Label>
@@ -1074,7 +1111,7 @@ function Prescription_form() {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    
+
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Advice:</Form.Label>
@@ -1354,118 +1391,125 @@ function Prescription_form() {
                                 </tr>
                             </thead>
                             <tbody id="medicine">
-                                {viewData.prescription_medicines.map((med, index) => (
-                                    <tr key={med.id}>
+                                {viewData.prescription_medicines.map((med, index) => {
+                                    const allOptions = new Set([
+                                        ...medicineOptions,
+                                        med.medicine // ensure current value is included
+                                    ]);
 
-                                        <td>
-                                            <button type="button" className="btn btn-sm btn-primary add" onClick={handleAddRow1}>+</button>{' '}
-                                            <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow1(index)}>-</button>
-                                        </td>
+                                    return (
+                                        <tr key={med.id}>
+                                            <td>
+                                                <button type="button" className="btn btn-sm btn-primary add" onClick={handleAddRow1}>+</button>{' '}
+                                                <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow1(index)}>-</button>
+                                            </td>
 
-                                        <td>
-                                            <div className="input-group mb-2" style={{ width: 'auto', margin: 'auto' }}>
-                                                <select
-                                                    className="form-select"
-                                                    name="medicine"
-                                                    value={med.medicine}
+                                            <td>
+                                                <div className="input-group mb-2" style={{ width: 'auto', margin: 'auto' }}>
+                                                    <select
+                                                        className="form-select"
+                                                        name="medicine"
+                                                        value={med.medicine}
+                                                        onChange={(e) => handleRowChange1(index, e)}
+                                                        required
+                                                        style={{ width: '45%' }}
+                                                    >
+                                                        <option value="" disabled hidden>Select Medicine</option>
+                                                        {[...allOptions].map((option, idx) => (
+                                                            <option key={idx} value={option}>{option}</option>
+                                                        ))}
+                                                    </select>
+                                                    <select
+                                                        className="form-select"
+                                                        name="medicine_type"
+                                                        value={med.medicine_type}
+                                                        onChange={(e) => handleRowChange1(index, e)}
+                                                        required
+                                                        style={{ width: '20%' }}
+                                                    >
+                                                        <option value="" disabled hidden>Select Type</option>
+                                                        <option value="mg">mg</option>
+                                                        <option value="dl">dl</option>
+                                                        <option value="ml">ml</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    name="duration"
+                                                    value={med.duration}
                                                     onChange={(e) => handleRowChange1(index, e)}
                                                     required
-                                                    style={{ width: '45%' }}
-                                                >
-                                                    <option value="" disabled hidden>Select Medicine</option>
-                                                    {medicineOptions.map((med, idx) => (
-                                                        <option key={idx} value={med}>{med}</option>
-                                                    ))}
-                                                </select>
+                                                    placeholder="Duration"
+                                                    className="form-control"
+                                                />
+                                            </td>
+
+                                            <td>
                                                 <select
                                                     className="form-select"
-                                                    name="medicine_type"
-                                                    value={med.medicine_type}
+                                                    name="intake"
+                                                    value={med.intake}
                                                     onChange={(e) => handleRowChange1(index, e)}
                                                     required
-                                                    style={{ width: '20%' }}
+                                                    style={{ width: '140px', margin: 'auto' }}
                                                 >
-                                                    <option value="" disabled hidden>Select Type</option>
-                                                    <option value="mg">mg</option>
-                                                    <option value="dl">dl</option>
-                                                    <option value="ml">ml</option>
+                                                    <option value="" disabled hidden>Select Intake</option>
+                                                    <option value="before_food">Before Food</option>
+                                                    <option value="after_food">After Food</option>
                                                 </select>
-                                            </div>
-                                        </td>
+                                            </td>
 
-                                        <td>
-                                            <input
-                                                type="number"
-                                                min={1}
-                                                name="duration"
-                                                value={med.duration}
-                                                onChange={(e) => handleRowChange1(index, e)}
-                                                required
-                                                placeholder="Duration"
-                                                className="form-control"
-                                            />
-                                        </td>
+                                            <td>
+                                                <textarea
+                                                    name="med_instruction"
+                                                    placeholder="Instruction"
+                                                    value={med.med_instruction}
+                                                    onChange={(e) => handleRowChange1(index, e)}
+                                                    rows="1"
+                                                    className="form-control"
+                                                ></textarea>
+                                            </td>
 
-                                        <td>
-                                            <select
-                                                className="form-select"
-                                                name="intake"
-                                                value={med.intake}
-                                                onChange={(e) => handleRowChange1(index, e)}
-                                                required
-                                                style={{ width: '140px', margin: 'auto' }}
-                                            >
-                                                <option value="" disabled hidden>Select Intake</option>
-                                                <option value="Before Food">Before Food</option>
-                                                <option value="After Food">After Food</option>
-                                            </select>
-                                        </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    name="morning"
+                                                    value={med.morning}
+                                                    onChange={(e) => handleRowChange1(index, e)}
+                                                    placeholder="Morning"
+                                                    className="form-control"
+                                                />
+                                            </td>
 
-                                        <td>
-                                            <textarea
-                                                name="med_instruction"
-                                                placeholder="Instruction"
-                                                value={med.med_instruction}
-                                                onChange={(e) => handleRowChange1(index, e)}
-                                                rows="1"
-                                                className="form-control"
-                                            ></textarea>
-                                        </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    name="afternoon"
+                                                    value={med.afternoon}
+                                                    onChange={(e) => handleRowChange1(index, e)}
+                                                    placeholder="Afternoon"
+                                                    className="form-control"
+                                                />
+                                            </td>
 
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="morning"
-                                                value={med.morning}
-                                                onChange={(e) => handleRowChange1(index, e)}
-                                                placeholder="Morning"
-                                                className="form-control"
-                                            />
-                                        </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    name="night"
+                                                    value={med.night}
+                                                    onChange={(e) => handleRowChange1(index, e)}
+                                                    placeholder="Night"
+                                                    className="form-control"
+                                                />
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
 
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="afternoon"
-                                                value={med.afternoon}
-                                                onChange={(e) => handleRowChange1(index, e)}
-                                                placeholder="Afternoon"
-                                                className="form-control"
-                                            />
-                                        </td>
-
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="night"
-                                                value={med.night}
-                                                onChange={(e) => handleRowChange1(index, e)}
-                                                placeholder="Night"
-                                                className="form-control"
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
                             </tbody>
                         </table>
 

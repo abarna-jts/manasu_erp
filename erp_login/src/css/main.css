@@ -1866,3 +1866,7 @@ body {
 		font-size: 0.9rem !important;
 	}
 }
+
+#root {
+	width: 100% !important;
+}

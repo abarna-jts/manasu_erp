@@ -698,28 +698,13 @@ const createAnnualReport = (req, res) => {
 }
 
 const getAnnualReport = async (req, res) => {
-    const query = `
-        SELECT 
-            e.*, 
-            c.*, 
-            cm.*, 
-            s.* 
-        FROM 
-            event_report e
-        INNER JOIN 
-            celebration_report c ON e.id = c.id
-        INNER JOIN 
-            community_report cm ON e.id = cm.id
-        INNER JOIN 
-            staff_report s ON e.id = s.id;
-    `;
-
+    const query = "Select * from event_report";
     try {
-        const [results] = await db.query(query);
-        return res.status(200).json({ data: results });
+        const [data] = await db.query(query);
+        return res.status(200).json({ message: "Event Report Get Successfully", data: data });
     } catch (err) {
-        console.error("Joined Report Error:", err);
-        return res.status(500).json({ message: "Joined Report Error", error: err });
+        console.error("Database Error:", err);
+        return res.status(500).json({ message: "Database Error", error: err });
     }
 };
 
@@ -1200,6 +1185,20 @@ const getEssentialRecordshow = async (req, res) => {
     }
 }
 
+const getEventReport = async (req, res) => {
+    const query = "Select * from event_report";
+    try {
+        const [result] = await db.query(query);
+        if (result.length === 0) {
+            res.status(404).json({ message: "Event Report is not found" });
+        }
+        return res.status(200).json({ message: "Doctor Visit form Get Successfully", data: result });
+    } catch (err) {
+        console.log("Error fetching Dr visit:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
 export {
     createSelfDeclaration,
     getFormalityForm,
@@ -1228,5 +1227,6 @@ export {
     createCelebrationReport,
     createCommunityReport,
     createStaffReport,
-    getAllDocument, getEssentialRecordshow
+    getAllDocument, getEssentialRecordshow,
+    getEventReport
 };
