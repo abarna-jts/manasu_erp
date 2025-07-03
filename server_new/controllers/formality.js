@@ -399,8 +399,11 @@ const createEventReport = async (req, res) => {
 
         const formatDate = (isoDate) => {
             const d = new Date(isoDate);
-            if (isNaN(d)) return 'Invalid';
-            return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+            if (isNaN(d)) return null;
+            const year = d.getFullYear();
+            const month = (`0${d.getMonth() + 1}`).slice(-2);
+            const day = (`0${d.getDate()}`).slice(-2);
+            return `${year}-${month}-${day}`;
         };
 
         const event_photosPath = req.files?.['event_photos']
@@ -698,15 +701,17 @@ const createAnnualReport = (req, res) => {
 }
 
 const getAnnualReport = async (req, res) => {
-    const query = "Select * from event_report";
+
+    const query = "SELECT * FROM event_report";
     try {
         const [data] = await db.query(query);
         return res.status(200).json({ message: "Event Report Get Successfully", data: data });
     } catch (err) {
-        console.error("Database Error:", err);
+        console.error("❌ Database Error:", err);
         return res.status(500).json({ message: "Database Error", error: err });
     }
 };
+
 
 
 const getAnnualReportbyID = async (req, res) => {
@@ -1100,12 +1105,13 @@ const getStudendDetailsbyID = async (req, res) => {
 
 const updateStudentDetail = async (req, res) => {
     try {
-
+        await formalityAsync(req, res);
         const {
             stud_name, stud_id, department, email, phone, secondary_phone,
             field, other_field, supervisor_name, supervisor_email, supervisor_phone,
             clg_name, duration, from_date, to_date
         } = req.body;
+
 
         const id = req.params.id;
 
@@ -1114,16 +1120,17 @@ const updateStudentDetail = async (req, res) => {
         }
 
         // get existing photo if not uploaded
-        // const [existing] = await db.query("SELECT stud_photo FROM internship_form WHERE id = ?", [id]);
-        // const currentPhoto = existing[0]?.stud_photo || null;
+        const [existing] = await db.query("SELECT stud_photo FROM internship_form WHERE id = ?", [id]);
+        const currentPhoto = existing[0]?.stud_photo || null;
 
-        // const studentPhotoPath = req.files?.['stud_photo']
-        //     ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
-        //     : currentPhoto;
+        const studentPhotoPath = req.files?.['stud_photo']
+            ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
+            : currentPhoto;
 
         const usquery = `UPDATE internship_form SET
                     stud_name = ?,
                     stud_id = ?,
+                    stud_photo = ?,
                     email = ?,
                     phone = ?,
                     secondary_phone = ?,
@@ -1141,7 +1148,7 @@ const updateStudentDetail = async (req, res) => {
 
 
         const values = [
-            stud_name, stud_id, email, phone, secondary_phone, field, other_field, supervisor_name,
+            stud_name, stud_id, studentPhotoPath, email, phone, secondary_phone, field, other_field, supervisor_name,
             supervisor_email, supervisor_phone, department, clg_name, duration, from_date, to_date, id
         ];
 
@@ -1199,6 +1206,296 @@ const getEventReport = async (req, res) => {
     }
 }
 
+const getCelebrationReport = async (req, res) => {
+    const query = "Select * from celebration_report";
+    try {
+        const [result] = await db.query(query);
+        if (result.length === 0) {
+            res.status(404).json({ message: "Celebration Report is not found" });
+        }
+        return res.status(200).json({ message: "Celebration Report Get Successfully", data: result });
+    } catch (err) {
+        console.log("Error fetching Celebration Report:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
+const getProgramsReport = async (req, res) => {
+    const query = "Select * from community_report";
+    try {
+        const [result] = await db.query(query);
+        if (result.length === 0) {
+            res.status(404).json({ message: "Community Programs Report is not found" });
+        }
+        return res.status(200).json({ message: "Community Programs Get Successfully", data: result });
+    } catch (err) {
+        console.log("Error fetching Community Programs:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
+const getStaffProgramsReport = async (req, res) => {
+    const query = "Select * from staff_report";
+    try {
+        const [result] = await db.query(query);
+        if (result.length === 0) {
+            res.status(404).json({ message: "Staff Programs Report is not found" });
+        }
+        return res.status(200).json({ message: "Staff Programs Get Successfully", data: result });
+    } catch (err) {
+        console.log("Error fetching Staff Programs:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
+const getEventReportbyID = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = "SELECT * FROM event_report WHERE id=?";
+        const [result] = await db.query(query, [id]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Event Report not found" }); // ✅ Added return
+        }
+
+        return res.status(200).json({
+            message: "Event Report fetched successfully",
+            data: result[0] // Optional: return just the object, not array
+        });
+    } catch (err) {
+        console.error("Error fetching Event Report:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+};
+
+const getCelebrationbyID = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = "SELECT * FROM celebration_report WHERE id=?";
+        const [result] = await db.query(query, [id]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Celebration Report not found" }); // ✅ Added return
+        }
+
+        return res.status(200).json({
+            message: "Celebration Report fetched successfully",
+            data: result[0] // Optional: return just the object, not array
+        });
+    } catch (err) {
+        console.error("Error fetching Celebration Report:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+};
+
+const getProgramsbyID = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = "SELECT * FROM community_report WHERE id=?";
+        const [result] = await db.query(query, [id]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Community Programs Report not found" }); // ✅ Added return
+        }
+
+        return res.status(200).json({
+            message: "Community Programs fetched successfully",
+            data: result[0] // Optional: return just the object, not array
+        });
+    } catch (err) {
+        console.error("Error fetching Community Programs:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+};
+
+const getStaffProgramsbyID = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = "SELECT * FROM staff_report WHERE id=?";
+        const [result] = await db.query(query, [id]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Staff Programs Report not found" }); // ✅ Added return
+        }
+
+        return res.status(200).json({
+            message: "Staff Programs fetched successfully",
+            data: result[0] // Optional: return just the object, not array
+        });
+    } catch (err) {
+        console.error("Error fetching Staff Programs:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+};
+
+const updateEventDetail = async (req, res) => {
+    try {
+        const {
+            event_type, event_name, event_date, event_place, event_report, event_rescue_count,
+            awareness_name, awarness_date, awarness_place, awarness_report, awarness_rescue_count,
+            outing_name, outing_date, outing_place, outing_report
+        } = req.body;
+
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({ message: "Missing ID" });
+        }
+
+        const usquery = `UPDATE event_report SET
+                    event_type = ?,
+                    event_name = ?,
+                    event_date = ?,
+                    event_place = ?,
+                    event_report = ?,
+                    event_rescue_count = ?,
+                    awareness_name = ?,
+                    awarness_date = ?,
+                    awarness_place = ?,
+                    awarness_report = ?,   
+                    awarness_rescue_count = ?,
+                    outing_name = ?, 
+                    outing_date = ?, 
+                    outing_place = ?, 
+                    outing_report = ?
+                    WHERE id= ?`;
+
+        const values = [
+            event_type, event_name, event_date, event_place, event_report, event_rescue_count,
+            awareness_name, awarness_date, awarness_place, awarness_report, awarness_rescue_count,
+            outing_name, outing_date, outing_place, outing_report, id
+        ];
+
+        const [result] = await db.query(usquery, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Failed to update Event Report" });
+        }
+        res.status(201).json({ message: "Event Report Form Updated successfully", data: result });
+
+    } catch (err) {
+        console.error("Error updating Event Report Form:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
+const updateCelebrationDetail = async (req, res) => {
+    try {
+        const {
+            celebration_name, other_celebration, celebration_date, celebration_place, celebration_report, celebration_rescue_count
+        } = req.body;
+
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({ message: "Missing ID" });
+        }
+
+        const usquery = `UPDATE celebration_report SET
+                    celebration_name = ?,
+                    other_celebration = ?,
+                    celebration_date = ?,
+                    celebration_place = ?,
+                    celebration_report = ?,
+                    celebration_rescue_count = ?
+                    WHERE id= ?`;
+
+        const values = [
+            celebration_name, other_celebration, celebration_date, celebration_place, celebration_report, celebration_rescue_count, id
+        ];
+
+        const [result] = await db.query(usquery, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Failed to update Celebration Report" });
+        }
+        res.status(201).json({ message: "Celebration Report Form Updated successfully", data: result });
+
+    } catch (err) {
+        console.error("Error updating Celebration Report Form:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
+const updateProgrambyID = async (req, res) => {
+    try {
+        const {
+            community_name, clg_name, clg_dept, resource_person, community_date,
+            community_place, community_rescue_count, community_report
+        } = req.body;
+
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({ message: "Missing ID" });
+        }
+
+        const usquery = `UPDATE community_report SET
+                    community_name = ?,
+                    clg_name = ?,
+                    clg_dept = ?,
+                    resource_person = ?,
+                    community_date = ?,
+                    community_place = ?,
+                    community_rescue_count = ?,
+                    community_report = ?
+                    WHERE id= ?`;
+
+        const values = [
+            community_name, clg_name, clg_dept, resource_person, community_date,
+            community_place, community_rescue_count, community_report, id
+        ];
+
+        const [result] = await db.query(usquery, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Failed to update Community Programms Report" });
+        }
+        res.status(201).json({ message: "Community Programms Report Form Updated successfully", data: result });
+
+    } catch (err) {
+        console.error("Error updating Community Programms Report Form:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
+const updateStaffProgrambyID = async (req, res) => {
+    try {
+        const {
+            staff_name, staff_date, staff_place, staff_rescue_count, staff_report
+        } = req.body;
+
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({ message: "Missing ID" });
+        }
+
+        const usquery = `UPDATE staff_report SET
+                    staff_name = ?,
+                    staff_date = ?,
+                    staff_place = ?,
+                    staff_rescue_count = ?,
+                    staff_report = ?
+                    WHERE id= ?`;
+
+        const values = [
+            staff_name, staff_date, staff_place, staff_rescue_count, staff_report, id
+        ];
+
+        const [result] = await db.query(usquery, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Failed to update Staff Programms Report" });
+        }
+        res.status(201).json({ message: "Staff Programms Report Form Updated successfully", data: result });
+
+    } catch (err) {
+        console.error("Error updating Staff Programms Report Form:", err);
+        res.status(500).json({ message: "Database Error", error: err });
+    }
+}
+
 export {
     createSelfDeclaration,
     getFormalityForm,
@@ -1228,5 +1525,7 @@ export {
     createCommunityReport,
     createStaffReport,
     getAllDocument, getEssentialRecordshow,
-    getEventReport
+    getEventReport, getEventReportbyID, getCelebrationReport, getCelebrationbyID,
+    getProgramsReport, getProgramsbyID, getStaffProgramsReport, getStaffProgramsbyID,
+    updateEventDetail, updateCelebrationDetail, updateProgrambyID, updateStaffProgrambyID
 };

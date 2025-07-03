@@ -48,6 +48,9 @@ import Director_essentialRecord from './Components/pages/Admin_Formality/Directo
 import Reunited_people from './Components/pages/Admission/Reunited_people';
 import Psychiatrics_form from './Components/pages/Recovery/Psychiatrics_form';
 import Prescription_demo from './Components/pages/Residency_time/Prescription_demo';
+import Celebration_report from './Components/pages/Admin_Formality/Celebration_report';
+import Programms_report from './Components/pages/Admin_Formality/Programms_report';
+import StaffPrograms_report from './Components/pages/Admin_Formality/StaffPrograms_report';
 
 function App() {
 
@@ -523,6 +526,21 @@ function App() {
               <Route
                 path='/view_annualReport'
                 element={<MainLayout><View_annualReport /></MainLayout>}
+              />
+
+              <Route
+                path='/celebration_report'
+                element={<MainLayout><Celebration_report /></MainLayout>}
+              />
+
+              <Route
+                path='/programs_report'
+                element={<MainLayout><Programms_report /></MainLayout>}
+              />
+
+              <Route
+                path='/staffPrograms_report'
+                element={<MainLayout><StaffPrograms_report /></MainLayout>}
               />
 
               <Route

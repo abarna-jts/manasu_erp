@@ -336,6 +336,7 @@ function Annual_Report() {
             if (reponse.data.message === "Community Report Form Created Successfully") {
                 setSubmissionMessage("Form Submitted Successfully!");
                 setMessageType("success");
+                window.location.reload();
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -375,6 +376,7 @@ function Annual_Report() {
             if (response.data.message === "Staff Report Form Created Successfully") {
                 setSubmissionMessage("Form Submitted Successfully!");
                 setMessageType("success");
+                window.location.reload();
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -402,9 +404,16 @@ function Annual_Report() {
 
     // (optional) ViewCelebrationReport
     const ViewCelebrationReport = () => {
-        navigate("/view_annualReport", { state: { reportType: "celebration" } });
+        navigate("/celebration_report");
     };
 
+    const ViewCommunityReport = () =>{
+        navigate("/programs_report");
+    }
+
+    const ViewStaffReport = () =>{
+        navigate("/staffPrograms_report");
+    }
 
     return (
         <>
@@ -771,8 +780,11 @@ function Annual_Report() {
                     <Row className='d-flex align-items-center justify-content-center'>
                         <Col md={6}>
                             <Row className='d-flex align-items-center justify-content-between'>
-                                <Col md={8} className="text-start">
+                                <Col md={12} className="text-start d-flex align-items-center justify-content-between">
                                     <h3 className="annual_section_title mt-3">General Celebration Details</h3>
+                                    <button className='btn btn-success' onClick={() => {
+                                        ViewCelebrationReport();
+                                    }}>View Celebration Report</button>
                                 </Col>
                                 {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
                                     <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
@@ -889,8 +901,11 @@ function Annual_Report() {
                     <Row className='d-flex align-items-center justify-content-center'>
                         <Col md={6}>
                             <Row className='d-flex align-items-center justify-content-center'>
-                                <Col md={8} className="text-start">
+                                <Col md={12} className="text-start d-flex align-items-center justify-content-between">
                                     <h3 className="annual_section_title mt-3">Community Programs</h3>
+                                    <button className='btn btn-success' onClick={() => {
+                                        ViewCommunityReport();
+                                    }}>View Programs Report</button>
                                 </Col>
                                 {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
                                     <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>
@@ -1019,8 +1034,11 @@ function Annual_Report() {
                     <Row className='d-flex align-items-center justify-content-center'>
                         <Col md={6}>
                             <Row className='d-flex align-items-center justify-content-center'>
-                                <Col md={8} className="text-start">
+                                <Col md={12} className="text-start d-flex align-items-center justify-content-between">
                                     <h3 className="annual_section_title mt-3">Staff Programs</h3>
+                                    <button className='btn btn-success' onClick={() => {
+                                        ViewStaffReport();
+                                    }}>View Staff Program</button>
                                 </Col>
                                 {/* <Col md={4} className="text-start d-flex align-items-center justify-content-end">
                                     <Button type='button' className='btn btn-success' onClick={handleViewAll}>View All</Button>

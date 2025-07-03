@@ -342,8 +342,8 @@ function Prescription_form() {
             const afternoons = splitByComma(medData.afternoon);
             const nights = splitByComma(medData.night);
             const intakes = splitByComma(medData.intake);
-            
-            console.log("Duration",durations);
+
+            console.log("Duration", durations);
 
             const prescriptionRows = medicines.map((_, i) => ({
                 medicine: medicines[i] || '',
@@ -537,12 +537,11 @@ function Prescription_form() {
 
     const handleMedicalTypeChange = (e) => {
         const { name, value } = e.target;
-        setViewData((prev) => ({
+        setFormData((prev) => ({
             ...prev,
             [name]: value
         }));
     };
-
 
 
     return (
@@ -808,7 +807,7 @@ function Prescription_form() {
                                         <Form.Select
                                             name="medical_type"
                                             value={formData.medical_type ?? ''}
-                                            onChange={handleMedicalTypeChange}
+                                            onChange={handleInputChange}
                                             required
                                         >
                                             <option value="" disabled hidden>Select Type</option>

@@ -185,7 +185,6 @@ function Rescue_details() {
 
     const fetchFormData = async (id) => {
         try {
-
             const response = await apiRoute.get(`/admision/get_rescue_details/${id}`);
             const data = response.data;
 

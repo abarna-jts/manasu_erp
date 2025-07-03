@@ -170,7 +170,7 @@ function AllStudentDetails() {
 
             setFormData((formData) => ({
                 ...formData,
-                id: student.stud_id || '',
+                id: student.id || '',
                 stud_name: student.stud_name || '',
                 stud_id: student.stud_id || '',
                 department: student.department || '',
@@ -187,6 +187,10 @@ function AllStudentDetails() {
                 supervisor_phone: student.supervisor_phone || '',
                 choose_intern: student.choose_intern || ''
             }));
+            setFiles((files) => ({
+                ...files,
+                stud_photo: student.stud_photo ? `/uploads/Student_Photos/${student.stud_photo}` : null
+            }));
 
             setShow(true);
 
@@ -197,19 +201,39 @@ function AllStudentDetails() {
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-        const id = formData.id; // ✅ Get it from form data
-        console.log("Updating form with ID:", id);
+        const id = formData.id;
+
         if (!id) {
             alert("ID not found.");
             return;
         }
+
         try {
-            const response = await apiRoute.put(`/formality/updateStudentDetail/${id}`, formData);
+            const formDataToSend = new FormData();
+
+            // Append all form fields
+            for (const key in formData) {
+                formDataToSend.append(key, formData[key]);
+            }
+
+            // Append the file (if selected)
+            if (files.stud_photo instanceof File) {
+                formDataToSend.append('stud_photo', files.stud_photo); // assuming files.stud_photo is File object
+            }
+
+            const response = await apiRoute.put(
+                `/formality/updateStudentDetail/${id}`,
+                formDataToSend,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                }
+            );
 
             console.log(response.data);
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 alert('Form Updated successfully!');
-                handleClose(true);
                 window.location.reload();
             } else {
                 alert('Error Updating form.');
@@ -219,6 +243,23 @@ function AllStudentDetails() {
             alert('There was an error Updating the form.');
         }
     };
+
+
+    const handleFileChange = (e) => {
+        const { name, files: selectedFiles } = e.target;
+        if (selectedFiles.length > 0) {
+            setFiles(prev => ({
+                ...prev,
+                [name]: selectedFiles[0], // store File object
+            }));
+        }
+    };
+
+
+    const [files, setFiles] = useState({
+        stud_photo: null
+    });
+
 
     return (
         <>
@@ -369,6 +410,20 @@ function AllStudentDetails() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
+                                    Attach Student Photo :
+                                </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control
+                                        name="stud_photo"
+                                        type="file"
+                                        value={formData.stud_photo}
+                                        onChange={handleFileChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                <Form.Label column sm="4">
                                     Name of the College :
                                 </Form.Label>
                                 <Col sm="8">
@@ -411,21 +466,29 @@ function AllStudentDetails() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
                                 <Form.Label column sm="4">
-                                    Contact Numbers:
+                                    Contact Number:
                                 </Form.Label>
-                                <Col sm="4">
+                                <Col sm="8">
                                     <Form.Control
                                         name="phone"
-                                        type="number"
+                                        type="text"
                                         value={formData.phone}
                                         onChange={handleInputChange}
                                         required
                                     />
                                 </Col>
-                                <Col sm="4">
+
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
+                                <Form.Label column sm="4">
+                                    Emergency Contact Number:
+                                </Form.Label>
+                                <Col sm="8">
+
                                     <Form.Control
                                         name="secondary_phone"
-                                        type="number"
+                                        type="text"
                                         value={formData.secondary_phone}
                                         onChange={handleInputChange}
                                     />
@@ -479,7 +542,7 @@ function AllStudentDetails() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Interested Field :
+                                    Preferred Field :
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -490,12 +553,36 @@ function AllStudentDetails() {
                                         required
                                     >
                                         <option value="">-- Select --</option>
-                                        <option value="Social Worker">Social Worker</option>
+
+                                        <optgroup label="Social Worker">
+                                            <option value="Medical and Psychiatry">Medical and Psychiatry</option>
+                                            <option value="Community Development">Community Development</option>
+                                            <option value="Human Resource Management">Human Resource Management</option>
+                                            <option value="Human Rights">Human Rights</option>
+                                            <option value="Any other">Any other</option>
+                                        </optgroup>
+
                                         <option value="Social Services">Social Services</option>
                                         <option value="Psychology">Psychology</option>
+
                                     </Form.Control>
                                 </Col>
                             </Form.Group>
+
+                            {formData.field === 'Any other' && (
+                                <Form.Group as={Row} className="mb-1">
+                                    <Form.Label column sm="4" className='text-start'>Any Other Field:</Form.Label>
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="text"
+                                            name="other_field"
+                                            value={formData.other_field}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </Col>
+                                </Form.Group>
+                            )}
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
@@ -515,7 +602,7 @@ function AllStudentDetails() {
                             {/* From and To Date in the same row */}
                             <Form.Group as={Row} className="mb-3 text-start">
                                 <Form.Label column sm="4">
-                                    Intern Date :
+                                    Internship Date :
                                 </Form.Label>
                                 <Col sm="4">
                                     <Form.Control
@@ -559,7 +646,7 @@ function AllStudentDetails() {
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Intern Information Form</Modal.Title>
+                    <Modal.Title>Edit InternShip Information Form</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
@@ -568,10 +655,10 @@ function AllStudentDetails() {
                                 <Row>
 
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
+                                        <Form.Label column sm="6">
                                             Student Name :
                                         </Form.Label>
-                                        <Col sm="8">
+                                        <Col sm="6">
                                             <Form.Control
                                                 name="stud_name"
                                                 type="text"
@@ -582,10 +669,10 @@ function AllStudentDetails() {
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
+                                        <Form.Label column sm="6">
                                             Student ID :
                                         </Form.Label>
-                                        <Col sm="8">
+                                        <Col sm="6">
                                             <Form.Control
                                                 name="stud_id"
                                                 type="number"
@@ -596,72 +683,33 @@ function AllStudentDetails() {
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
-                                            Department :
+                                        <Form.Label column sm="6">
+                                            Attach Student Photo :
                                         </Form.Label>
-                                        <Col sm="8">
+                                        <Col sm="6">
+                                            {files.stud_photo ? (
+                                                <img
+                                                    src={files.stud_photo}
+                                                    alt="Rescue"
+                                                    style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
+                                                />
+                                            ) : (
+                                                <div>No Image Available</div>
+                                            )}
                                             <Form.Control
-                                                name="department"
-                                                type="text"
-                                                value={formData.department}
-                                                onChange={handleInputChange}
+                                                name="stud_photo"
+                                                type="file"
+                                                value={formData.stud_photo}
+                                                onChange={handleFileChange}
                                                 required
                                             />
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
-                                            Email ID :
+                                        <Form.Label column sm="6">
+                                            Name of the College :
                                         </Form.Label>
-                                        <Col sm="8">
-                                            <Form.Control
-                                                name="email"
-                                                type="text"
-                                                value={formData.email}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
-                                            Contact Number :
-                                        </Form.Label>
-                                        <Col sm="8">
-                                            <Form.Control
-                                                name="phone"
-                                                type="number"
-                                                value={formData.phone}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </Col>
-                                    </Form.Group>
-
-                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
-                                            Interested Field :
-                                        </Form.Label>
-                                        <Col sm="8">
-                                            <Form.Control
-                                                as="select"
-                                                name="field"
-                                                value={formData.field}
-                                                onChange={handleInputChange}
-                                                required
-                                            >
-                                                <option value="">-- Select --</option>
-                                                <option value="Social Worker">Social Worker</option>
-                                                <option value="Social Services">Social Services</option>
-                                                <option value="Psychology">Psychology</option>
-                                            </Form.Control>
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
-                                            College Name :
-                                        </Form.Label>
-                                        <Col sm="8">
+                                        <Col sm="6">
                                             <Form.Control
                                                 name="clg_name"
                                                 type="text"
@@ -672,10 +720,155 @@ function AllStudentDetails() {
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
+                                        <Form.Label column sm="6">
+                                            Name of the Department :
+                                        </Form.Label>
+                                        <Col sm="6">
+                                            <Form.Control
+                                                name="department"
+                                                type="text"
+                                                value={formData.department}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="6">
+                                            Email ID :
+                                        </Form.Label>
+                                        <Col sm="6">
+                                            <Form.Control
+                                                name="email"
+                                                type="text"
+                                                value={formData.email}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="6">
+                                            Contact Number :
+                                        </Form.Label>
+                                        <Col sm="6">
+                                            <Form.Control
+                                                name="phone"
+                                                type="number"
+                                                value={formData.phone}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
+                                        <Form.Label column sm="6">
+                                            Emergency Contact Number:
+                                        </Form.Label>
+                                        <Col sm="6">
+
+                                            <Form.Control
+                                                name="secondary_phone"
+                                                type="text"
+                                                value={formData.secondary_phone}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-1 text-start d-flex align-items-center" controlId="formEmailID">
+                                        <Form.Label column sm="6">
+                                            Supervisor's Name from College/Institution :
+                                        </Form.Label>
+                                        <Col sm="6">
+                                            <Form.Control
+                                                name="supervisor_name"
+                                                type="text"
+                                                value={formData.supervisor_name}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="6">
+                                            Supervisor's Email :
+                                        </Form.Label>
+                                        <Col sm="6">
+                                            <Form.Control
+                                                name="supervisor_email"
+                                                type="text"
+                                                value={formData.supervisor_email}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="6">
+                                            Supervisor's Contact Number :
+                                        </Form.Label>
+                                        <Col sm="6">
+                                            <Form.Control
+                                                name="supervisor_phone"
+                                                type="text"
+                                                value={formData.supervisor_phone}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="6">
+                                            Preferred Field :
+                                        </Form.Label>
+                                        <Col sm="6">
+                                            <Form.Control
+                                                as="select"
+                                                name="field"
+                                                value={formData.field}
+                                                onChange={handleInputChange}
+                                                required
+                                            >
+                                                <option value="">-- Select --</option>
+
+                                                <optgroup label="Social Worker">
+                                                    <option value="Medical and Psychiatry">Medical and Psychiatry</option>
+                                                    <option value="Community Development">Community Development</option>
+                                                    <option value="Human Resource Management">Human Resource Management</option>
+                                                    <option value="Human Rights">Human Rights</option>
+                                                    <option value="Any other">Any other</option>
+                                                </optgroup>
+
+                                                <option value="Social Services">Social Services</option>
+                                                <option value="Psychology">Psychology</option>
+
+                                            </Form.Control>
+                                        </Col>
+                                    </Form.Group>
+                                    {formData.field === 'Any other' && (
+                                        <Form.Group as={Row} className="mb-1">
+                                            <Form.Label column sm="6" className='text-start'>Any Other Field:</Form.Label>
+                                            <Col sm="6">
+                                                <Form.Control
+                                                    type="text"
+                                                    name="other_field"
+                                                    value={formData.other_field}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                    )}
+
+                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                                        <Form.Label column sm="6">
                                             Duration :
                                         </Form.Label>
-                                        <Col sm="8">
+                                        <Col sm="6">
                                             <Form.Control
                                                 name="duration"
                                                 type="text"
@@ -689,9 +882,9 @@ function AllStudentDetails() {
                                     {/* From and To Date in the same row */}
                                     <Form.Group as={Row} className="mb-3 text-start">
                                         <Form.Label column sm="4">
-                                            Intern Date :
+                                            Internship Date :
                                         </Form.Label>
-                                        <Col sm="4">
+                                        <Col sm="4" className='intern_class'>
                                             <Form.Control
                                                 name="from_date"
                                                 type="date"
@@ -700,7 +893,7 @@ function AllStudentDetails() {
                                                 required
                                             />
                                         </Col>
-                                        <Col sm="4">
+                                        <Col sm="4" className='intern_class'>
                                             <Form.Control
                                                 name="to_date"
                                                 type="date"
@@ -711,10 +904,10 @@ function AllStudentDetails() {
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="4">
+                                        <Form.Label column sm="6">
                                             Why did you choose MANASU for your internship?
                                         </Form.Label>
-                                        <Col sm="8">
+                                        <Col sm="6">
                                             <Form.Control
                                                 as="textarea" rows={3}
                                                 name="choose_intern"

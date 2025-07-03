@@ -207,7 +207,7 @@ function SCRB_form() {
                 parent_name: data.parent_name || '',
                 found_date: data.found_date || '',
                 marital_status: data.marital_status || '',
-                language1: data.language1 || '',
+                language: data.language || '',
                 district: data.district || '',
                 police_station: data.police_station || '',
                 addition_info: data.addition_info || '',
@@ -303,12 +303,8 @@ function SCRB_form() {
     const navigate = useNavigate();
 
     const handleNextpage = () => {
-
         navigate("/scrb_form2A");
-
-
     }
-
 
     return (
         <>

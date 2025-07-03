@@ -27,7 +27,9 @@ createSelfDeclaration,
     createCelebrationReport,
     createCommunityReport,
     createStaffReport,getAllDocument,getEssentialRecordshow,
-    getEventReport
+    getEventReport, getEventReportbyID, getCelebrationReport, 
+    getCelebrationbyID, getProgramsReport, getProgramsbyID, getStaffProgramsReport, getStaffProgramsbyID,
+    updateEventDetail, updateCelebrationDetail, updateProgrambyID, updateStaffProgrambyID
 }from "../controllers/formality.js";
 
 const router = express.Router();
@@ -74,6 +76,18 @@ router.get("/getAllDocument",getAllDocument); //completed
 
 //Annual Report routes for getting pdf
 router.get("/getEventReport", getEventReport);
+router.get("/getEventReportbyID/:id", getEventReportbyID);
+router.get("/getCelebrationReport", getCelebrationReport);
+router.get("/getCelebrationbyID/:id", getCelebrationbyID);
+router.get("/getProgramsReport", getProgramsReport);
+router.get("/getProgramsbyID/:id", getProgramsbyID);
+router.get("/getStaffProgramsReport",getStaffProgramsReport);
+router.get("/getStaffProgramsbyID/:id", getStaffProgramsbyID);
+
+router.put("/updateEventDetail/:id", updateEventDetail);
+router.put("/updateCelebrationDetail/:id", updateCelebrationDetail);
+router.put("/updateProgrambyID/:id", updateProgrambyID);
+router.put("/updateStaffProgrambyID/:id", updateStaffProgrambyID);
 
 
 export default router;
