@@ -116,12 +116,10 @@ function InternshipForm() {
                     <Col md={7} className="text-start">
                         <h3 className="section_title">Internship Information Form</h3>
                     </Col>
-
                 </Row>
             </Container>
 
             <div>
-                {/* Show success or error message box */}
                 {submissionMessage && (
                     <Alert variant={messageType} className="mt-3">
                         {submissionMessage}
@@ -143,7 +141,6 @@ function InternshipForm() {
                 <Form onSubmit={handleSubmit} className="navbar-search col-md-12 d-flex align-items-center justify-content-center">
                     <Col md={8} className="consultant_box my-2 p-3">
                         <Row>
-
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
                                     Student Name :
@@ -258,7 +255,6 @@ function InternshipForm() {
                                         required
                                     />
                                 </Col>
-
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
@@ -266,7 +262,6 @@ function InternshipForm() {
                                     Emergency Contact Number:
                                 </Form.Label>
                                 <Col sm="8">
-
                                     <Form.Control
                                         name="secondary_phone"
                                         type="text"

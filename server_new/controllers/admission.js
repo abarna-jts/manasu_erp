@@ -110,7 +110,21 @@ const createFirstForm = async (req, res) => {
 
   } catch (err) {
     console.error("Create First Form Error:", err);
-    return res.status(500).json({ message: "Server error while creating first form", error: err });
+
+    // Check for specific SQL syntax error
+    if (err.code === 'ER_TRUNCATED_WRONG_VALUE' || err.code === 'ER_BAD_FIELD_ERROR') {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input format.",
+        error: err.sqlMessage || err.message
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error while creating first form",
+      error: err.sqlMessage || err.message
+    });
   }
 };
 
@@ -148,7 +162,7 @@ const getForm2Data = async (req, res) => {
   }
 };
 
-const getFirst2AForm = async(req, res) => {
+const getFirst2AForm = async (req, res) => {
   const admission_no = req.params.admission_no;
 
   if (!admission_no) {
@@ -170,7 +184,6 @@ const getFirst2AForm = async(req, res) => {
     return res.status(500).json({ error: 'Internal server error in getting SCRB Form2', details: err });
   }
 };
-
 
 
 const UpdateFirstForm = async (req, res) => {
@@ -223,9 +236,15 @@ const UpdateFirstForm = async (req, res) => {
     const newRescueImage = req.files['rescue_image']
       ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}`
       : null;
+    const newAttachPoliceMemo = req.files['attach_policeMemo']
+      ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}`
+      : null;
+    const newgovIdFile = req.files['govIdFile']
+      ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}`
+      : null;
     // const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
-    const newAttachPoliceMemo = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
-    const newgovIdFile = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
+    // const newAttachPoliceMemo = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
+    // const newgovIdFile = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
 
     // Fetch the existing logo path
     const [selectData] = await db.query("SELECT rescue_image, attach_policeMemo, govIdFile FROM first_information WHERE id = ?", [rescueId]);
@@ -330,7 +349,7 @@ const UpdateFirstForm = async (req, res) => {
 
     console.log("Final Rescue Image Path:", finalRescuePath);
 
-     const [result] = await db.query(updateQuery, values);
+    const [result] = await db.query(updateQuery, values);
 
     return res.status(201).json({ message: "First Form Updated Successfully", data: result });
 
@@ -341,48 +360,48 @@ const UpdateFirstForm = async (req, res) => {
 
 }
 
-
-const getRescueDetailsPDF = async(req, res) => {
+const getRescueDetailsPDF = async (req, res) => {
   const id = req.params.id;
   const query = 'SELECT * FROM first_information WHERE id = ?';
 
-  try{
-      const [results] = await db.query(query, [id]);
+  try {
+    const [results] = await db.query(query, [id]);
 
-      if(results.length === 0){
-        return res.status(404).json({message:"First Form not found"});
-      }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "First Form not found" });
+    }
 
-      res.status(200).json(results[0]);
-  }catch(err){
+    res.status(200).json(results[0]);
+  } catch (err) {
     console.error("Error fetching First Form:", err);
-    res.status(500).json({message:"Database Error", error:err.message});
+    res.status(500).json({ message: "Database Error", error: err.message });
   }
 }
 
-const UpdateStatus = async(req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
+const UpdateStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
 
-    if (!status) {
-      return res.status(400).json({ message: "Status is required" });
-    }
-
-    const query = 'UPDATE first_information SET resident_status = ? WHERE id = ?';
-
-    try{
-      const [results] = await db.query(query, [status, id]);
-
-      if(results.length === 0){
-        return res.status(404).json({message:"update of status is not found"});
-      }
-      res.status(200).json(results[0]);
-
-    }catch(err){
-      console.error("Error in updating status:", err);
-      res.status(500).json({message:"Database Error", error:err.message});
-    }
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
   }
+
+  const query = 'UPDATE first_information SET resident_status = ? WHERE id = ?';
+
+  try {
+    const [results] = await db.query(query, [status, id]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "update of status is not found" });
+    }
+    res.status(200).json(results[0]);
+
+  } catch (err) {
+    console.error("Error in updating status:", err);
+    res.status(500).json({ message: "Database Error", error: err.message });
+  }
+}
+
 
 const getReunionData = async (req, res) => {
   const query = `SELECT * FROM first_information WHERE resident_status = 'Reunion'`;
@@ -402,16 +421,14 @@ const getReunionData = async (req, res) => {
   }
 };
 
-
-
-export{
+export {
   checkAdmissionNo,
   createFirstForm,
   getFirstForm,
   UpdateFirstForm,
   getRescueDetailsPDF,
   UpdateStatus,
-  getReunionData, 
+  getReunionData,
   getForm2Data,
   getFirst2AForm
 };

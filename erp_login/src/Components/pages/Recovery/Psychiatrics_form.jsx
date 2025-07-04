@@ -76,7 +76,7 @@ function Psychiatrics_form() {
         psychological: '',
         social_environment: '',
         date: '',
-        admission_no:'',
+        admission_no: '',
     });
 
     const [presentingData, setPresentingData] = useState({
@@ -215,9 +215,11 @@ function Psychiatrics_form() {
 
     const handleInputChange2 = (e) => {
         const { name, value } = e.target;
-        setPresentingData((prev) => ({ ...prev, [name]: value }));
+        setPresentingData(prev => ({
+            ...prev,
+            [name]: value,
+        }));
     };
-
     const handleInputChange3 = (e) => {
         const { name, value } = e.target;
         setPsyHistoryData((prev) => ({ ...prev, [name]: value }));
@@ -225,7 +227,10 @@ function Psychiatrics_form() {
 
     const handleInputChange4 = (e) => {
         const { name, value } = e.target;
-        setMedicalData((prev) => ({ ...prev, [name]: value }));
+        setMedicalData(prev => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleInputChange5 = (e) => {
@@ -820,6 +825,7 @@ function Psychiatrics_form() {
                 behavioural_changes: data.behavioural_changes?.split(',').map(i => i.trim()) || [],
                 sleep_patterns: data.sleep_patterns?.split(',').map(i => i.trim()) || [],
                 energy_level: data.energy_level || '',
+                appetite_weight: data.appetite_weight || '',
                 occupation_academic: data.occupation_academic || '',
                 interpersonal_relationship: data.interpersonal_relationship || '',
                 selfCare_activity: data.selfCare_activity || '',
@@ -888,6 +894,7 @@ function Psychiatrics_form() {
                 acute_health: data.acute_health || '',
                 medication: data.medication || '',
                 medication_allergies: data.medication_allergies || '',
+                traumatic_injuries: data.traumatic_injuries || '',
                 other_allergy: data.other_allergy?.split(',').map(i => i.trim()) || [],
                 significant_medical: data.significant_medical?.split(',').map(i => i.trim()) || [],
                 sexual_health: data.sexual_health?.split(',').map(i => i.trim()) || [],
@@ -1553,9 +1560,9 @@ function Psychiatrics_form() {
                     <Form.Group className="mt-3 d-flex align-items-center justify-content-center">
                         <Form.Label className='mx-3'>Date:</Form.Label>
                         <Form.Control name='date'
-                        type='date'
-                        value={date}
-                        onChange={handleDateChange}/>
+                            type='date'
+                            value={date}
+                            onChange={handleDateChange} />
                     </Form.Group>
                 </Form>
             </Container>
@@ -1606,8 +1613,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-first typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>DEMOGRAPHIC INFORMATION</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -1829,8 +1838,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-2 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>THE CHIEF COMPLAINT</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleCheifComplaintShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -1995,8 +2006,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-3 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>PRESENTING PROBLEMS</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handlePresentingShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2099,11 +2112,15 @@ function Psychiatrics_form() {
 
                                                     <Form.Group className="mb-3" >
                                                         <Form.Label>Appetite and Weight Changes: </Form.Label>
-                                                        <Form.Control as="textarea" rows={2}
+                                                        <Form.Control
+                                                            as="textarea"
+                                                            rows={2}
                                                             name='appetite_weight'
                                                             value={presentingData.appetite_weight}
                                                             onChange={handleInputChange2}
-                                                            required />
+                                                            required
+                                                        />
+
                                                     </Form.Group>
 
                                                     <Form.Group className="mb-3" >
@@ -2170,8 +2187,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-4 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>PSYCHIATRIC HISTORY</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handlePsychiatricShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2371,8 +2390,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-5 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>MEDICAL HISTORY</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleMedicalShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2499,8 +2520,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-6 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>FAMILY HISTORY</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleFamilyShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2605,8 +2628,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-7 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>SOCIAL HISTORY </h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleSocialShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2744,8 +2769,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-8 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>DEVELOPMENTAL HISTORY </h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleDevelopmentalShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2896,8 +2923,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-9 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>SUBSTANCE USE HISTORY</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleSubstanceShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -3060,8 +3089,10 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-10 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>SUICIDAL AND HOMICIDAL IDEATION</h1>
+                                            {userType === "4" && (
                                             <button type="button" className="btn btn-success mx-3" onClick={handleSuicidalShow}>
                                                 <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                            )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -3656,11 +3687,15 @@ function Psychiatrics_form() {
 
                         <Form.Group className="mb-3" >
                             <Form.Label>Appetite and Weight Changes: </Form.Label>
-                            <Form.Control as="textarea" rows={2}
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
                                 name='appetite_weight'
                                 value={presentingData.appetite_weight}
                                 onChange={handleInputChange2}
-                                required />
+                                required
+                            />
+
                         </Form.Group>
 
                         <Form.Group className="mb-3" >
@@ -4043,7 +4078,7 @@ function Psychiatrics_form() {
                 <Modal.Body>
                     <Form>
                         <li className='icon-li'>
-                            <h4>Family Composition:</h4>
+                            <h5>Family Composition:</h5>
                         </li>
                         <Form.Group as={Row} className="mb-3">
                             <div className="d-flex flex-wrap gap-3 mt-2">
@@ -4055,7 +4090,7 @@ function Psychiatrics_form() {
                             </div>
                         </Form.Group>
                         <li className='icon-li'>
-                            <h4>Family Dynamics:</h4>
+                            <h5>Family Dynamics:</h5>
                         </li>
                         <Form.Group as={Row} className="mb-3">
                             <div className="d-flex flex-wrap gap-3 mt-2">
@@ -4067,7 +4102,7 @@ function Psychiatrics_form() {
                             </div>
                         </Form.Group>
                         <li className='icon-li'>
-                            <h4>Type of Marriage: </h4>
+                            <h5>Type of Marriage: </h5>
                         </li>
                         <Form.Group>
                             <Form.Control
@@ -4079,7 +4114,7 @@ function Psychiatrics_form() {
                         </Form.Group>
 
                         <li className='icon-li'>
-                            <h4>Family History of Psychiatric Disorders: <span>(any hereditary conditions)</span></h4>
+                            <h5>Family History of Psychiatric Disorders: <span>(any hereditary conditions)</span></h5>
                         </li>
                         <Form.Group>
                             <Form.Control
@@ -4091,7 +4126,7 @@ function Psychiatrics_form() {
                         </Form.Group>
 
                         <li className='icon-li'>
-                            <h4>Genetic Predispositions: <span>(genetic conditions or predispositions)</span></h4>
+                            <h5>Genetic Predispositions: <span>(genetic conditions or predispositions)</span></h5>
                         </li>
                         <Form.Group>
                             <Form.Control
@@ -4103,7 +4138,7 @@ function Psychiatrics_form() {
                         </Form.Group>
 
                         <li className='icon-li'>
-                            <h4>Family Changes or Transitions: </h4>
+                            <h5>Family Changes or Transitions: </h5>
                         </li>
                         <Form.Group as={Row} className="mb-3">
                             <div className="d-flex flex-wrap gap-3 mt-2">
@@ -4118,7 +4153,7 @@ function Psychiatrics_form() {
                         </Form.Group>
 
                         <li className='icon-li'>
-                            <h4>Substance Use within the Family</h4>
+                            <h5>Substance Use within the Family</h5>
                         </li>
                         <Form.Group>
                             <Form.Control
@@ -5177,7 +5212,7 @@ function Psychiatrics_form() {
                                 <strong>Learning Challenges : </strong>
                                 <p className='mx-3'>{developmentalData.learning_challenge}</p>
                             </li>
-                             <li className='d-flex'>
+                            <li className='d-flex'>
                                 <strong>Pubertal Development : </strong>
                                 <p className='mx-3'>{developmentalData.pubertal_development}</p>
                             </li>

@@ -104,8 +104,9 @@ function Nurse_Record_sheet() {
     const filteredRescueDetails = nurse_record.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
+            String(item.month).toLowerCase().includes(searchTerm) ||
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
-            String(item.resident_name).toLowerCase().includes(searchTerm) ||
+            String(item.rescue_name).toLowerCase().includes(searchTerm) ||
             String(item.follow_up).toLowerCase().includes(searchTerm)
         );
     });

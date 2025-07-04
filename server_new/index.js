@@ -78,6 +78,8 @@ app.use('/residency',residencyRoutes);
 // app.use('/api/student', studentRoutes);
 // app.use('/api/auth', authRoute);
 
+app.use('/uploads', express.static('uploads'));
+
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,

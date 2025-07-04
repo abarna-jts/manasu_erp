@@ -74,7 +74,7 @@ const createSpeech = async (req, res) => {
       rate_quantity,
         volume_tone,
         flow_rhythm
-    ) VALUES (?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?)
   `;
 
     const values = [
@@ -837,8 +837,8 @@ const updatePsychiatricData = async (req, res) => {
       fm_mentalHealth,
       significant_life,
       chronic_stressors,
-      trauma_exploration,
-      legal_environment, admission_no
+      trauma_exploration.join(", "),
+      legal_environment.join(", "), admission_no
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1425,9 +1425,9 @@ const updateCognition = async (req, res) => {
     }
     return res.status(200).json({ message: "Cognition Form updated successfully!" });
   } catch (err) {
-    console.error("Error in updateCognition:", err);
-    return res.status(500).json({ error: "Internal server error" });
-  }
+  console.error("Error in updateCognition:", err.message);  // log the error message
+  return res.status(500).json({ error: err.message });       // send detailed error for debugging
+}
 }
 
 

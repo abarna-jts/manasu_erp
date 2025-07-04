@@ -347,6 +347,7 @@ function Rescue_details() {
                 status,
             });
             alert("Status updated successfully");
+            window.location.reload();
         } catch (err) {
             console.error("Failed to update status:", err);
         }

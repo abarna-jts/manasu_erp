@@ -63,6 +63,8 @@ function Medical_camp() {
             String(item.camp_name).toLowerCase().includes(searchTerm) ||
             String(item.hospital_name).toLowerCase().includes(searchTerm) ||
             String(item.organised_by).toLowerCase().includes(searchTerm) ||
+            String(item.camp_type).toLowerCase().includes(searchTerm) ||
+            String(item.participants).toLowerCase().includes(searchTerm) ||
             String(item.date).toLowerCase().includes(searchTerm)
         );
     });

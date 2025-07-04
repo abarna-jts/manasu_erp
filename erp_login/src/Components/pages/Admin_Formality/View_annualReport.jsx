@@ -59,12 +59,14 @@ function View_annualReport() {
     const filteredRescueDetails = report_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
+            String(item.event_place).toLowerCase().includes(searchTerm) ||
             String(item.event_name).toLowerCase().includes(searchTerm) ||
             String(item.celebration_name).toLowerCase().includes(searchTerm) ||
             String(item.program_name).toLowerCase().includes(searchTerm) ||
             String(item.internship_duration).toLowerCase().includes(searchTerm) ||
             String(item.police_memo).toLowerCase().includes(searchTerm) ||
-            String(item.staff_name).toLowerCase().includes(searchTerm)
+            String(item.staff_name).toLowerCase().includes(searchTerm) ||
+            String(item.outing_name).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -84,7 +86,6 @@ function View_annualReport() {
         const day = (`0${date.getDate()}`).slice(-2);
         return `${year}-${month}-${day}`;
     };
-
 
 
     const navigate = useNavigate();

@@ -209,8 +209,9 @@ function Prescription_form() {
             const searchTerm = searchQuery.toLowerCase();
             return (
                 String(item.admission_no).toLowerCase().includes(searchTerm) ||
-                String(item.resident_name).toLowerCase().includes(searchTerm) ||
-                String(item.follow_up).toLowerCase().includes(searchTerm)
+                String(item.rescue_name).toLowerCase().includes(searchTerm) ||
+                String(item.follow_up).toLowerCase().includes(searchTerm) || 
+                String(item.op_no).toLowerCase().includes(searchTerm)
             );
         })
         : [];
@@ -521,6 +522,7 @@ function Prescription_form() {
 
             if (response.status === 200) {
                 alert("Updated successfully!");
+                window.location.reload();
             } else {
                 alert(`Update failed: ${response.data.message}`);
             }

@@ -38,7 +38,7 @@ function MSE_form() {
   const [date, setDate] = useState('');
   const [formData, setFormData] = useState({
     admission_no: '',
-    date:'',
+    date: '',
     general_appearance: [],
     attitude: [],
     comprehension: [],
@@ -56,7 +56,7 @@ function MSE_form() {
     volume_tone: [],
     flow_rhythm: [],
     admission_no: "",
-    date:'',
+    date: '',
   });
 
   const [moodFormData, setMoodFormData] = useState({
@@ -68,14 +68,14 @@ function MSE_form() {
     resident_general_feeling: "",
     resident_look: [],
     admission_no: "",
-    date:'',
+    date: '',
   });
 
   const [thoughFormData, setThoughFormData] = useState({
     stream_form_though: [],
     content_though: [],
     admission_no: '',
-    date:'',
+    date: '',
   })
 
   const [judgementData, setJudgementFormData] = useState({
@@ -84,7 +84,7 @@ function MSE_form() {
     test_judgement: '',
     judgement: '',
     admission_no: '',
-    date:'',
+    date: '',
   })
 
   const [insightData, setInsightData] = useState({
@@ -95,7 +95,7 @@ function MSE_form() {
     intellectual_insight: '',
     true_emotion: '',
     admission_no: '',
-    date:'',
+    date: '',
   })
 
   const [perceptionData, setPerceptionData] = useState({
@@ -110,7 +110,7 @@ function MSE_form() {
     somatic: [],
     others: [],
     admission_no: '',
-    date:'',
+    date: '',
   })
 
   const [cognitionData, setCognitionData] = useState({
@@ -141,8 +141,8 @@ function MSE_form() {
     calculation_test: '',
     proverb_testing: '',
     familiar_object: '',
-    admission_no:'',
-    date:'',
+    admission_no: '',
+    date: '',
 
   })
 
@@ -330,7 +330,7 @@ function MSE_form() {
 
     const completeFormData = {
       ...formData,
-      date:date
+      date: date
     };
 
     try {
@@ -375,7 +375,7 @@ function MSE_form() {
     // Merge admission_no into speechFormData
     const payload = {
       ...speechFormData,
-      date:date,
+      date: date,
       admission_no: formData.admission_no
     };
 
@@ -431,7 +431,7 @@ function MSE_form() {
     const payload = {
       ...moodFormData,
       admission_no: formData.admission_no,
-      date:date,
+      date: date,
     };
 
     try {
@@ -469,7 +469,7 @@ function MSE_form() {
 
     const payload = {
       ...thoughFormData,
-      date:date,
+      date: date,
       admission_no: formData.admission_no
     };
 
@@ -516,7 +516,7 @@ function MSE_form() {
 
     const payload = {
       ...judgementData,
-      date:date,
+      date: date,
       admission_no: formData.admission_no
     };
 
@@ -570,7 +570,7 @@ function MSE_form() {
 
     const payload = {
       ...insightData,
-      date:date,
+      date: date,
       admission_no: formData.admission_no
     };
 
@@ -624,7 +624,7 @@ function MSE_form() {
 
     const payload = {
       ...perceptionData,
-      date:date,
+      date: date,
       admission_no: formData.admission_no
     };
 
@@ -710,7 +710,7 @@ function MSE_form() {
 
     const payload = {
       ...cognitionData,
-      date:date,
+      date: date,
       admission_no: formData.admission_no,
       consciousnessState: selectedStates.join(', '),  // ✔️ Store array as comma-separated string
       canConcentrate: canConcentrate,                 // ✔️ Radio button value
@@ -1127,7 +1127,7 @@ function MSE_form() {
 
       setFormData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         general_appearance: data.general_appearance?.split(',').map(i => i.trim()) || [],
         attitude: data.attitude?.split(',').map(i => i.trim()) || [],
@@ -1164,7 +1164,7 @@ function MSE_form() {
 
       setSpeechFormData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         rate_quantity: data.rate_quantity?.split(',').map(i => i.trim()) || [],
         volume_tone: data.volume_tone?.split(',').map(i => i.trim()) || [],
@@ -1193,7 +1193,7 @@ function MSE_form() {
 
       setMoodFormData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         mood_description: data.mood_description?.split(',').map(i => i.trim()) || [],
         appearance: data.appearance,
@@ -1226,7 +1226,7 @@ function MSE_form() {
 
       setThoughFormData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         stream_form_though: data.stream_form_though?.split(',').map(i => i.trim()) || [],
         content_though: data.content_though?.split(',').map(i => i.trim()) || []
@@ -1254,7 +1254,7 @@ function MSE_form() {
 
       setPerceptionData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         hallucination_type: data.hallucination_type?.split(',').map(i => i.trim()) || [],
         heard: data.heard || '',
@@ -1280,23 +1280,22 @@ function MSE_form() {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
-
     try {
       const response = await apiRoute.get(`/recovery/getCognition/${formData.admission_no}`);
       const data = response.data;
 
-      console.log(response.data);
+      // Split and trim fetched checkbox values
+      const consciousnessStateArray = data.consciousnessState?.split(',').map(i => i.trim()) || [];
 
       setCognitionData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         consciousness: data.consciousness?.split(',').map(i => i.trim()) || [],
         orientation_time: data.orientation_time || '',
         orientation_place: data.orientation_place || '',
         orientation_person: data.orientation_person || '',
-        consciousnessState: data.consciousnessState || '',
+        consciousnessState: consciousnessStateArray,
         canConcentrate: data.canConcentrate || '',
         distractibility: data.distractibility || '',
         asking_test: data.asking_test || '',
@@ -1320,13 +1319,18 @@ function MSE_form() {
         proverb_testing: data.proverb_testing || '',
         familiar_object: data.familiar_object || ''
       }));
+      setCanConcentrate(data.canConcentrate || '');
+
+      // ✅ Update selectedStates so checkboxes reflect the fetched data
+      setSelectedStates(consciousnessStateArray);
 
       setCognitionShow(true);
     } catch (error) {
       console.error("Error fetching form data:", error);
       alert("Admission Number not found");
     }
-  }
+  };
+
 
   const handleJudgementShow = async () => {
     if (!formData.admission_no.trim()) {
@@ -1343,7 +1347,7 @@ function MSE_form() {
 
       setJudgementFormData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         personal_judgement: data.personal_judgement || '',
         social_judgement: data.social_judgement || '',
@@ -1373,7 +1377,7 @@ function MSE_form() {
 
       setInsightData(prev => ({
         ...prev,
-        admission_no: data.admission_no || '',
+        admission_no: String(data.admission_no || ''),
         date: data.date || '',
         denail_illness: data.denail_illness || '',
         slight_awareness: data.slight_awareness || '',
@@ -1455,7 +1459,7 @@ function MSE_form() {
       });
 
       alert('Though Form updated successfully!');
-      
+
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -1519,14 +1523,16 @@ function MSE_form() {
 
   const handleCognitionUpdate = async (e, admission_no) => {
     e.preventDefault();
-
+    const completeCognition ={
+      ...cognitionData,
+      canConcentrate
+    };
     try {
-      const res = await apiRoute.post(`/recovery/updateCognition/${cognitionData.admission_no}`, cognitionData, {
+      const res = await apiRoute.post(`/recovery/updateCognition/${cognitionData.admission_no}`, completeCognition, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
       alert('Cognition Form updated successfully!');
       window.location.reload();
     } catch (err) {
@@ -1590,7 +1596,7 @@ function MSE_form() {
                         <InputGroup className="input-group-merge search-bar">
                           <Form.Control
                             type="text"
-                            value={formData.admission_no}
+                            value={formData.admission_no || ""}
                             onChange={(e) => {
                               setFormData((prev) => ({
                                 ...prev,
@@ -1598,6 +1604,7 @@ function MSE_form() {
                               }));
                             }}
                           />
+
                         </InputGroup>
                       </Col>
 
@@ -1677,8 +1684,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>1. GENERAL APPEARANCE AND BEHAVIOUR:</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
 
@@ -1851,8 +1858,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>2. SPEECH</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handleSpeechShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handleSpeechShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
 
@@ -1919,8 +1926,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>3. MOOD AND AFFECT</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handleMoodShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handleMoodShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
 
@@ -2027,8 +2034,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>4. THOUGHT</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handleThoughShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handleThoughShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
 
@@ -2097,8 +2104,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>5. PERCEPTION</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handlePerceptionShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handlePerceptionShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
                     <Form onSubmit={handlePerceptionSubmit}>
@@ -2229,8 +2236,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handleCognitionShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handleCognitionShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
 
@@ -2317,11 +2324,23 @@ function MSE_form() {
                           <h4 style={{ display: "inline" }}>Concentration</h4>
                           <Form.Group className="mb-3">
                             <Form.Label>1. Can the patient concentrate?</Form.Label>
-                            <Form.Check type="radio" label="Yes" name="canConcentrate" value="Yes" checked={canConcentrate === 'Yes'}
-                              onChange={handleRadioChange} />
-                            <Form.Check type="radio" label="No" name="canConcentrate" value="No"
-                              checked={canConcentrate === 'No'}
-                              onChange={handleRadioChange} />
+                            <Form.Check
+                              type="radio"
+                              label="Yes"
+                              name="canConcentrate"
+                              value="Yes"
+                              checked={canConcentrate.toLowerCase() === 'yes'}
+                              onChange={handleRadioChange}
+                            />
+                            <Form.Check
+                              type="radio"
+                              label="No"
+                              name="canConcentrate"
+                              value="No"
+                              checked={canConcentrate.toLowerCase() === 'no'}
+                              onChange={handleRadioChange}
+                            />
+
                           </Form.Group>
 
                           <Form.Group className="mb-3">
@@ -2586,8 +2605,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>7. JUDGEMENT</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handleJudgementShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handleJudgementShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
                     <ul>
@@ -2661,8 +2680,8 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>8. INSIGHT</h1>
                       {userType === "4" && (
-                      <button type="button" className="btn btn-success mx-3" onClick={handleInsightShow}>
-                        <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-success mx-3" onClick={handleInsightShow}>
+                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                     </div>
                     <p>The patient's level of awareness and insight into their illness. </p>
@@ -4217,11 +4236,23 @@ function MSE_form() {
                   <h4 style={{ display: "inline" }}>Concentration</h4>
                   <Form.Group className="mb-3">
                     <Form.Label>1. Can the patient concentrate?</Form.Label>
-                    <Form.Check type="radio" label="Yes" name="canConcentrate" value="yes" checked={canConcentrate === 'Yes'}
-                      onChange={handleRadioChange} />
-                    <Form.Check type="radio" label="No" name="canConcentrate" value="no"
-                      checked={canConcentrate === 'No'}
-                      onChange={handleRadioChange} />
+                    <Form.Check
+                      type="radio"
+                      label="Yes"
+                      name="canConcentrate"
+                      value="Yes"
+                      checked={canConcentrate.toLowerCase() === 'yes'}
+                      onChange={handleRadioChange}
+                    />
+                    <Form.Check
+                      type="radio"
+                      label="No"
+                      name="canConcentrate"
+                      value="No"
+                      checked={canConcentrate.toLowerCase() === 'no'}
+                      onChange={handleRadioChange}
+                    />
+
                   </Form.Group>
 
                   <Form.Group className="mb-3">

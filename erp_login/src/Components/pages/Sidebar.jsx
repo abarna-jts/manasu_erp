@@ -255,8 +255,8 @@ const Sidebar = () => {
 
                 {/* Admission Form Menu */}
                 <CollapsableNavItem title="Admission" icon={faBook} activeKey={activeKey} onToggle={handleAccordionClick}>
-                  {/* <NavItem title="1. Resident Intake Form" to="/first_info_form" icon={faFileAlt} /> */}
-                  <NavItem title="Resident Report" to="/rescue_details" icon={faUsers} />
+                 <NavItem title="1. Resident Intake Form" to="/first_info_form" icon={faFileAlt} />
+                  <NavItem title="2. Resident Report" to="/rescue_details" icon={faUsers} />
                 </CollapsableNavItem>
 
                 {/* SCRB Form Menu */}
@@ -270,10 +270,10 @@ const Sidebar = () => {
                 </CollapsableNavItem> */}
 
                 {/* Recovery menus */}
-                <CollapsableNavItem title="Recovery" icon={faHome} activeKey={activeKey} onToggle={handleAccordionClick}>
+                <CollapsableNavItem title="Recovery" icon={faHome} activeKey={mainActiveKey} onToggle={handleMainToggle}>
                   {/* <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
                   <NavItem title="Articles carried Form" to="/articles_form" icon={faSuitcase} /> */}
-                  <CollapsableNavItem title="1. Nurse User" icon={faMapPin} activeKey={activeKey} onToggle={handleAccordionClick}>
+                  <CollapsableNavItem title="1. Nurse User" icon={faMapPin} activeKey={nurseActiveKey} onToggle={handleNurseToggle}>
                     <NavItem title="1. Consultation Report" to="/rescue_record_sheet" icon={faUserMd} />
                     <NavItem title="2. Doctor Visit" to="/dr_visitView" icon={faStethoscope} />
                     <NavItem title="3. Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
@@ -281,7 +281,7 @@ const Sidebar = () => {
                     <NavItem title="5. Medical Camp" to="/medical_camp" icon={faNotesMedical} />
                   </CollapsableNavItem>
 
-                  <CollapsableNavItem title="2. Social Worker User" icon={faMapPin} activeKey={activeKey} onToggle={handleAccordionClick}>
+                  <CollapsableNavItem title="2. Social Worker User" icon={faMapPin} activeKey={socialActiveKey} onToggle={handleSocialToggle}>
                     <NavItem title="1. Observation Report" to="/observation_report" icon={faUserNurse} />
                     <NavItem title="2. Psychiatric Case History" to="/psychatrics_form" icon={faBrain} />
                     <NavItem title="3. MSE Form" to="/mseform" icon={faNotesMedical} />

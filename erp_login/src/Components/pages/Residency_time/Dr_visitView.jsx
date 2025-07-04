@@ -38,6 +38,7 @@ function Dr_visitView() {
     const filteredRescueDetails = visitDetails.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
+            String(item.resident_examinite).toLowerCase().includes(searchTerm) ||
             String(item.dr_name).toLowerCase().includes(searchTerm) ||
             String(item.hospital_name).toLowerCase().includes(searchTerm)
         );

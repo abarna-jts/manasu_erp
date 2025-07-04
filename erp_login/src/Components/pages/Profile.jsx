@@ -2,9 +2,20 @@ import React from 'react';
 import { Card, Row, Col, Button, Container, Image, ListGroup } from 'react-bootstrap';
 import profileImg from '../img/logo/avatar.jpg'; 
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
     const userType = Cookies.get('usertype');
+
+    const navigate = useNavigate();
+       const handleLogout = () => {
+        const confirmLogout = window.confirm("Are you sure you want to log out?");
+        if (confirmLogout) {
+          localStorage.removeItem('jwt'); 
+          navigate('/'); // Redirect to login page
+        }
+      };
+
   return (
     <>
     <Container className="mt-5">
@@ -19,7 +30,7 @@ function Profile() {
                         <h4 className="mt-3">
                             {userType === "1" ? "Admin" : userType === "2" ? "Director" : userType === "3" ? "Nurse" : userType === "4" ? "Social Worker" : "User"}
                         </h4>
-                        <Button variant="primary" className="mt-2">Edit Profile</Button>
+                        {/* <Button variant="primary" className="mt-2">Edit Profile</Button> */}
                         </Col>
                         <Col md={8}>
                         <h3 className="section_title">User Information</h3>
@@ -36,9 +47,9 @@ function Profile() {
       
     </Container>
 
-    <Button className="btn btn-danger" onClick={handleLogout}>
+    {/* <Button className="btn btn-danger" onClick={handleLogout}>
                 LogOut
-            </Button>
+            </Button> */}
     </>
     
 
