@@ -93,6 +93,18 @@ function SCRB_Form2C() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!admission_no || admission_no.trim() === '') {
+      alert("Admission Number is required.");
+      return;
+    }
+
+    const trimmedAdNo = admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+      return;
+    }
+
     const payload = {
       ...formData,
       admission_no,
@@ -295,17 +307,17 @@ function SCRB_Form2C() {
   // Mock API call or fetch
   const fetchRescueDetails = async (admission_no) => {
     try {
-      const response = await apiRoute.get(`/scrb_form/get_scrbform2data/${admission_no}`);
-      const result = response.data;
+      const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+      const result = response.data.data[0];
       console.log("API Result:", result);
 
-      if (result && result.data) {
-        const imagePath = result.data.rescue_image.startsWith("http")
-          ? result.data.rescue_image
-          : `https://www.pahrultours.com/app2/${result.data.rescue_image}`;
+      if (result && result.rescue_image) {
+        const imagePath = result.rescue_image.startsWith("http")
+          ? result.rescue_image
+          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
         setRescueImage(imagePath);
-        setRescueName(result.data.rescue_name || "");
+        setRescueName(result.rescue_name || "");
         setError(""); // clear any previous error
       } else {
         setRescueImage(null);
@@ -422,7 +434,7 @@ function SCRB_Form2C() {
                   <FontAwesomeIcon icon={faArrowLeft} className="me-2" />Back
                 </Button>
                 <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
-                  Import Excel Sheet
+                  Export Excel Sheet
                 </button>
               </Col>
             </Row>

@@ -410,20 +410,6 @@ function AllStudentDetails() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Attach Student Photo :
-                                </Form.Label>
-                                <Col sm="8">
-                                    <Form.Control
-                                        name="stud_photo"
-                                        type="file"
-                                        value={formData.stud_photo}
-                                        onChange={handleFileChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
                                     Name of the College :
                                 </Form.Label>
                                 <Col sm="8">
@@ -699,6 +685,7 @@ function AllStudentDetails() {
                                             <Form.Control
                                                 name="stud_photo"
                                                 type="file"
+                                                accept=".jpg,.jpeg,.png"
                                                 value={formData.stud_photo}
                                                 onChange={handleFileChange}
                                                 required

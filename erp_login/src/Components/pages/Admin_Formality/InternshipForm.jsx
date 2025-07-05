@@ -178,6 +178,7 @@ function InternshipForm() {
                                     <Form.Control
                                         name="stud_photo"
                                         type="file"
+                                        accept=".jpg,.jpeg,.png"
                                         value={formData.stud_photo}
                                         onChange={handleFileChange}
                                         required

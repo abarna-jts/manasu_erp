@@ -357,6 +357,7 @@ function Rescue_Record_Sheet() {
                                 <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
                                 <Form.Control
                                     type="file"
+                                    accept=".jpg,.jpeg,.png"
                                     onChange={handleFileChange}
                                     name="rescue_recovery_photo"
                                     required
@@ -447,6 +448,7 @@ function Rescue_Record_Sheet() {
 
                                     <Form.Control
                                         type="file"
+                                        accept=".jpg,.jpeg,.png"
                                         onChange={handleFileChange}
                                         name="rescue_recovery_photo"
                                         required={!formData.rescue_recovery_photo}

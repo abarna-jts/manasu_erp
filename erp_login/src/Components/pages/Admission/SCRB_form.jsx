@@ -55,38 +55,48 @@ function SCRB_form() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handlePhoneChange = (e) => {
+        let value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters
+
+        if (value.length > 10) {
+            value = value.slice(0, 10); // Limit to 10 digits
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            phone_no: value
+        }));
+    };
+
+
     const handleFileChange = (e) => {
         setFiles({ ...files, [e.target.name]: e.target.files[0] });
     };
 
     const handleSearch = async () => {
         try {
-            const response = await apiRoute.get(`/scrb_form/get_scrbform2data/${admission_no}`);
-            const result = response.data;
-
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
             console.log("API Result:", result);
 
-            if (result && result.data) {
-                setFormData(result.data);
-                
-                const rescueName = result.data.rescue_name;
-                setRescueName(rescueName);
-                console.log("Rescue Name", rescueName);
-
-                const imagePath = result.data.rescue_image.startsWith("http")
-                    ? result.data.rescue_image
-                    : `https://www.pahrultours.com/app2${result.data.rescue_image}`;
+            if (result && result.rescue_image) {
+                const imagePath = result.rescue_image.startsWith("http")
+                    ? result.rescue_image
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
-                console.log("Image Path:", imagePath);
-                
+                setRescueName(result.rescue_name || "");
+                setError(""); // clear any previous error
             } else {
                 setRescueImage(null);
+                setRescueName("");
                 setError("Image not found for this admission number");
             }
         } catch (error) {
             console.error("Error fetching data", error);
-            alert("Admission Number Not found");
+            setRescueImage(null);
+            setRescueName("");
+            setError("Admission Number Not found");
         }
     };
 
@@ -104,6 +114,18 @@ function SCRB_form() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
+
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
 
         const updatedFormData = { ...formData, admission_no };
 
@@ -480,6 +502,7 @@ function SCRB_form() {
                                                     <input
                                                         type="file"
                                                         name="old_photo"
+                                                        accept=".jpg,.jpeg,.png"
                                                         className="form-control"
                                                         style={{ width: '300px', height: '100px' }}
                                                         onChange={handleFileChange}
@@ -495,6 +518,7 @@ function SCRB_form() {
                                                     <input
                                                         type="file"
                                                         name="new_photo"
+                                                        accept=".jpg,.jpeg,.png"
                                                         className="form-control"
                                                         onChange={handleFileChange}
                                                         style={{ width: '300px', height: '100px' }}
@@ -819,6 +843,7 @@ function SCRB_form() {
                                             <input
                                                 type="file"
                                                 name="signature"
+                                                accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 className="form-control"
                                                 required
@@ -854,12 +879,15 @@ function SCRB_form() {
                                         </td>
                                         <td>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="phone_no"
-                                                onChange={handleInputChange}
-                                                className="form-control"
                                                 value={formData.phone_no}
+                                                onChange={handlePhoneChange}
+                                                className="form-control"
+                                                pattern="^\d{10}$"
+                                                maxLength="10"
                                                 required
+                                                title="Please enter exactly 10 digits"
                                             />
                                         </td>
                                     </tr>
@@ -877,6 +905,7 @@ function SCRB_form() {
                                                 type="file"
                                                 name="seal"
                                                 onChange={handleFileChange}
+                                                accept=".jpg,.jpeg,.png"
                                                 className="form-control"
                                                 required
                                             />
@@ -888,7 +917,7 @@ function SCRB_form() {
 
                             <div className="mb-3">
 
-                                <button type="submit" className="btn btn-success">
+                                <button type="submit" className="btn btn-success mb-5">
                                     Submit Form
                                 </button>
 

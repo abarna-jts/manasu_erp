@@ -386,6 +386,7 @@ function Observation_report() {
                                 <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
                                 <Form.Control
                                     type="file"
+                                    accept=".jpg,.jpeg,.png"
                                     onChange={handleFileChange}
                                     name="recovery_photo"
                                     required
@@ -476,6 +477,7 @@ function Observation_report() {
                                     <Form.Control
                                         type="file"
                                         onChange={handleFileChange}
+                                        accept=".jpg,.jpeg,.png"
                                         name="recovery_photo"
                                         required={!formData.recovery_photo} // required only if there's no existing image
                                     />

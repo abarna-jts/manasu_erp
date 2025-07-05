@@ -110,6 +110,23 @@ function First_info_form() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
+    const handlePhoneChange = (e) => {
+        // Remove all non-digit characters
+        let value = e.target.value.replace(/\D/g, '');
+
+        // Limit to 10 digits only
+        if (value.length > 10) {
+            value = value.slice(0, 10);
+        }
+
+        setPhoneNumber(value);
+
+        // Validate length
+        setPhoneNoError(value.length !== 10);
+    };
+
+
+
 
     const AdmissionNumber = async () => {
         const now = new Date();
@@ -514,268 +531,268 @@ function First_info_form() {
         }
 
 
-            const formData = new FormData();
+        const formData = new FormData();
 
-            formData.append('referred_by', referred_by);
-            formData.append('from_place', from_place);
-            formData.append('date_time', date_time);
-            formData.append('police_memo', police_memo);
-            formData.append('police_station', police_station);
-            formData.append('information_public', information_public);
-            formData.append('admission_date', admission_date);
-            formData.append('admission_no', admission_no);
-            formData.append('rescue_name', rescue_name);
-            formData.append('age', age);
-            formData.append('rescue_status', rescue_status);
-            formData.append('religion', religion);
-            formData.append('language1', language1);
-            formData.append('language2', language2);
-            formData.append('language3', language3);
-            formData.append('education', education);
-            formData.append('father', father);
-            formData.append('mother', mother);
-            formData.append('other_relation', other_relation);
-            formData.append('place', place);
-            formData.append('phone_no', phone_no);
-            formData.append('phone_no_two', phone_no_two);
-            formData.append('clothing', clothing);
-            formData.append('dress_code', dress_code);
-            formData.append('complexion', complexion);
-            formData.append('indentification_mark', indentification_mark);
-            formData.append('tattoo', tattoo);
-            formData.append('wound_infection', wound_infection);
-            formData.append('height', height);
-            formData.append('weight', weight);
-            formData.append('things_carried', things_carried);
-            formData.append('remark', remark);
-            formData.append('mental_status', mental_status);
-            formData.append('behaviour', behaviour);
-            formData.append('community_ability', community_ability);
-            formData.append('self_careCapacity', self_careCapacity);
-            formData.append('diagnosis', diagnosis);
-            // formData.append('rescued_by', rescued_by);
-            // formData.append('information', information);
-            formData.append('govIdType', govIdType);
-            formData.append('govIdNumber', govIdNumber);
+        formData.append('referred_by', referred_by);
+        formData.append('from_place', from_place);
+        formData.append('date_time', date_time);
+        formData.append('police_memo', police_memo);
+        formData.append('police_station', police_station);
+        formData.append('information_public', information_public);
+        formData.append('admission_date', admission_date);
+        formData.append('admission_no', admission_no);
+        formData.append('rescue_name', rescue_name);
+        formData.append('age', age);
+        formData.append('rescue_status', rescue_status);
+        formData.append('religion', religion);
+        formData.append('language1', language1);
+        formData.append('language2', language2);
+        formData.append('language3', language3);
+        formData.append('education', education);
+        formData.append('father', father);
+        formData.append('mother', mother);
+        formData.append('other_relation', other_relation);
+        formData.append('place', place);
+        formData.append('phone_no', phone_no);
+        formData.append('phone_no_two', phone_no_two);
+        formData.append('clothing', clothing);
+        formData.append('dress_code', dress_code);
+        formData.append('complexion', complexion);
+        formData.append('indentification_mark', indentification_mark);
+        formData.append('tattoo', tattoo);
+        formData.append('wound_infection', wound_infection);
+        formData.append('height', height);
+        formData.append('weight', weight);
+        formData.append('things_carried', things_carried);
+        formData.append('remark', remark);
+        formData.append('mental_status', mental_status);
+        formData.append('behaviour', behaviour);
+        formData.append('community_ability', community_ability);
+        formData.append('self_careCapacity', self_careCapacity);
+        formData.append('diagnosis', diagnosis);
+        // formData.append('rescued_by', rescued_by);
+        // formData.append('information', information);
+        formData.append('govIdType', govIdType);
+        formData.append('govIdNumber', govIdNumber);
 
-            // formData.append('articles_carried', articles_carried);
-            // formData.append('rescue_relationship', rescue_relationship);
-            // formData.append('f_member_name', f_member_name);
-            // formData.append('f_member_phone', f_member_phone);
-            // formData.append('f_member_address', f_member_address);
+        // formData.append('articles_carried', articles_carried);
+        // formData.append('rescue_relationship', rescue_relationship);
+        // formData.append('f_member_name', f_member_name);
+        // formData.append('f_member_phone', f_member_phone);
+        // formData.append('f_member_address', f_member_address);
 
 
 
-            formData.append('rescue_image', rescue_image);
-            formData.append('attach_policeMemo', attach_policeMemo);
-            formData.append('govIdFile', govIdFile);
+        formData.append('rescue_image', rescue_image);
+        formData.append('attach_policeMemo', attach_policeMemo);
+        formData.append('govIdFile', govIdFile);
 
-            console.log("Rescue Image File", rescue_image);
-            console.log("Police Memo:", attach_policeMemo);
-            // formData.append('f_aadhar_card', f_aadhar_card);
-            // formData.append('f_ration_card', f_ration_card);
-            // formData.append('res_aadhar_card', res_aadhar_card);
-            // console.log("mentalstatus", mental_status);
-            // console.log("behaviour", behaviour);
-            // console.log("community_ability", community_ability);
-            // console.log("self_careCapacity", self_careCapacity);
-            // console.log("diagnosis", diagnosis);
+        console.log("Rescue Image File", rescue_image);
+        console.log("Police Memo:", attach_policeMemo);
+        // formData.append('f_aadhar_card', f_aadhar_card);
+        // formData.append('f_ration_card', f_ration_card);
+        // formData.append('res_aadhar_card', res_aadhar_card);
+        // console.log("mentalstatus", mental_status);
+        // console.log("behaviour", behaviour);
+        // console.log("community_ability", community_ability);
+        // console.log("self_careCapacity", self_careCapacity);
+        // console.log("diagnosis", diagnosis);
 
-            console.log("Submitting values:", admission_no, admission_date);
-            try {
-                const response = await apiRoute.post("/admision/create_first_form", formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data', // Important for file uploads
-                    }
-                });
-                console.log("Full Response:", response.data);
-                if (response.data.message === "First Form Created Successfully") {
-                    setSubmissionMessage("Form submitted successfully!");
-                    setMessageType("success");
-
-                    // Optionally reload after 3 seconds
-                    setTimeout(() => window.location.reload(), 3000);
-                } else {
-                    setSubmissionMessage("Submission failed.");
-                    setMessageType("danger");
+        console.log("Submitting values:", admission_no, admission_date);
+        try {
+            const response = await apiRoute.post("/admision/create_first_form", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data', // Important for file uploads
                 }
-            } catch (error) {
-                console.error("Error submitting form", error);
-                setSubmissionMessage("Something went wrong.");
+            });
+            console.log("Full Response:", response.data);
+            if (response.data.message === "First Form Created Successfully") {
+                setSubmissionMessage("Form submitted successfully!");
+                setMessageType("success");
+
+                // Optionally reload after 3 seconds
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
             }
+        } catch (error) {
+            console.error("Error submitting form", error);
+            setSubmissionMessage("Something went wrong.");
+            setMessageType("danger");
         }
+    }
 
 
 
-        const handleBack = () => {
-            setStep(1);
-        };
+    const handleBack = () => {
+        setStep(1);
+    };
 
-        const handleBack1 = () => {
-            setStep(2);
-        };
+    const handleBack1 = () => {
+        setStep(2);
+    };
 
-        const handleBack2 = () => {
-            setStep(3);
-        };
+    const handleBack2 = () => {
+        setStep(3);
+    };
 
-        const handleBack3 = () => {
-            setStep(4);
-        };
+    const handleBack3 = () => {
+        setStep(4);
+    };
 
-        // const handleBack4 = () => {
-        //     setStep(5);
-        // };
+    // const handleBack4 = () => {
+    //     setStep(5);
+    // };
 
-        // const handleBack5 = () => {
-        //     setStep(6);
-        // };
+    // const handleBack5 = () => {
+    //     setStep(6);
+    // };
 
-        useEffect(() => {
-            currentDate();
-            AdmissionNumber();
-        }, [])
+    useEffect(() => {
+        currentDate();
+        AdmissionNumber();
+    }, [])
 
-        const totalSteps = 5;
+    const totalSteps = 5;
 
-        const steps = [
-            "Rescue Details",
-            "Resident's Details",
-            "Family Details",
-            "Physical Appearance",
-            "Mental Status"
-        ];
+    const steps = [
+        "Rescue Details",
+        "Resident's Details",
+        "Family Details",
+        "Physical Appearance",
+        "Mental Status"
+    ];
 
-        return (
-            <>
-                <div className="d-xl-flex justify-content-between align-items-center flex-wrap flex-md-nowrap text-start py-2">
-                    <div className="d-block mb-4 mb-xl-0 px-4 ">
-                        <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
-                            <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
-                            <Breadcrumb.Item active>Admission</Breadcrumb.Item>
-                        </Breadcrumb>
-                        <h6 className="breadcrumb_title">Resident Intake Form</h6>
-
-                    </div>
-                    <Col md={7} className="text-center mb-4">
-                        <h3 className="section_title">Resident Intake Form</h3>
-                    </Col>
-                    <Col md={2}></Col>
-
+    return (
+        <>
+            <div className="d-xl-flex justify-content-between align-items-center flex-wrap flex-md-nowrap text-start py-2">
+                <div className="d-block mb-4 mb-xl-0 px-4 ">
+                    <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
+                        <Breadcrumb.Item></Breadcrumb.Item>
+                        <Breadcrumb.Item>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item active>Admission</Breadcrumb.Item>
+                    </Breadcrumb>
+                    <h6 className="breadcrumb_title">Resident Intake Form</h6>
 
                 </div>
+                <Col md={7} className="text-center mb-4">
+                    <h3 className="section_title">Resident Intake Form</h3>
+                </Col>
+                <Col md={2}></Col>
 
-                {/* Step Progress UI */}
-                <div className="step-progressbar mb-4">
-                    {steps.map((label, index) => {
-                        const stepNumber = index + 1;
-                        const isActive = stepNumber === step;
-                        const isCompleted = stepNumber < step;
 
-                        const isInvalid =
-                            (stepNumber === 1 && isStep1Invalid) ||
-                            (stepNumber === 2 && isStep2Invalid) ||
-                            (stepNumber === 3 && isStep3Invalid) ||
-                            (stepNumber === 4 && isStep4Invalid) ||
-                            (stepNumber === 5 && isStep5Invalid);
+            </div>
 
-                        return (
+            {/* Step Progress UI */}
+            <div className="step-progressbar mb-4">
+                {steps.map((label, index) => {
+                    const stepNumber = index + 1;
+                    const isActive = stepNumber === step;
+                    const isCompleted = stepNumber < step;
+
+                    const isInvalid =
+                        (stepNumber === 1 && isStep1Invalid) ||
+                        (stepNumber === 2 && isStep2Invalid) ||
+                        (stepNumber === 3 && isStep3Invalid) ||
+                        (stepNumber === 4 && isStep4Invalid) ||
+                        (stepNumber === 5 && isStep5Invalid);
+
+                    return (
+                        <div
+                            key={index}
+                            className={`step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}
+                        >
                             <div
-                                key={index}
-                                className={`step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}
+                                className="step-number"
+                                style={{
+                                    color: isInvalid ? 'white' : 'inherit',
+                                    fontWeight: isInvalid ? 'bold' : 'normal',
+                                    background: isInvalid ? 'red' : '#84c342',
+                                }}
                             >
-                                <div
-                                    className="step-number"
-                                    style={{
-                                        color: isInvalid ? 'white' : 'inherit',
-                                        fontWeight: isInvalid ? 'bold' : 'normal',
-                                        background: isInvalid ? 'red' : '#84c342',
-                                    }}
-                                >
-                                    {stepNumber}
-                                </div>
-                                <div className="step-label">{label}</div>
+                                {stepNumber}
                             </div>
-                        );
-                    })}
-                </div>
+                            <div className="step-label">{label}</div>
+                        </div>
+                    );
+                })}
+            </div>
 
 
 
 
 
-                <div>
-                    {/* Show success or error message box */}
-                    {submissionMessage && (
-                        <Alert variant={messageType} className="mt-3">
-                            {submissionMessage}
-                        </Alert>
-                    )}
-                </div>
+            <div>
+                {/* Show success or error message box */}
+                {submissionMessage && (
+                    <Alert variant={messageType} className="mt-3">
+                        {submissionMessage}
+                    </Alert>
+                )}
+            </div>
 
 
 
-                {step === 1 && (
-                    <Container>
-                        <Row>
-                            <Col md={12} className="text-start">
-                                <h3 className="section_title">Rescue Details</h3>
-                            </Col>
-                            <Form noValidate validated={validated} onSubmit={handleNext} className="first_infoForm">
-                                <Row className="d-flex justify-content-between first_infoFormRow">
-                                    <Col md={6}>
-                                        <Form.Group className="mb-3 text-start" controlId="formReferredby">
-                                            <Form.Label>Rescued / Referred by: </Form.Label>
-                                            <Form.Control type="text"
-                                                name="referred_by"
-                                                value={referred_by}
-                                                onChange={(e) => setReferredBy(e.target.value)}
-                                                required />
-                                            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-                                        </Form.Group>
-                                        <Form.Group className="mb-3 text-start" controlId="formtakePlace">
-                                            <Form.Label>Taken from (Rescue Place) : </Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name="from_place"
-                                                value={from_place}
-                                                onChange={(e) => setFromPlace(e.target.value)}
-                                                required />
-                                        </Form.Group>
-                                        <Form.Group className="mb-3 text-start" controlId="formdatetime">
-                                            <Form.Label>Date & Time : </Form.Label>
-                                            <Form.Control
-                                                type="datetime-local"
-                                                name="date_time"
-                                                value={date_time}
-                                                onChange={(e) => setDateTime(e.target.value)}
-                                                required />
-                                        </Form.Group>
-                                        <Row>
-                                            <Col md={6}>
-                                                <Form.Group className="mb-3 text-start" controlId="formPoliceMemo">
-                                                    <Form.Label>Police Memo : </Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="police_memo"
-                                                        value={police_memo}
-                                                        onChange={(e) => setPoliceMemo(e.target.value)}
-                                                        required />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={6} className="text-start">
-                                                <Form.Group>
-                                                    <Form.Label>Attach Police Memo : </Form.Label>
-                                                    <Form.Control
-                                                        type="file"
-                                                        name="attach_policeMemo"
-                                                        accept="image/*"
-                                                        onChange={handleMemoChange}
-                                                        required={!attach_policeMemo}
-                                                    />
-                                                    {/* {attach_policeMemo && (
+            {step === 1 && (
+                <Container>
+                    <Row>
+                        <Col md={12} className="text-start">
+                            <h3 className="section_title">Rescue Details</h3>
+                        </Col>
+                        <Form noValidate validated={validated} onSubmit={handleNext} className="first_infoForm">
+                            <Row className="d-flex justify-content-between first_infoFormRow">
+                                <Col md={6}>
+                                    <Form.Group className="mb-3 text-start" controlId="formReferredby">
+                                        <Form.Label>Rescued / Referred by: </Form.Label>
+                                        <Form.Control type="text"
+                                            name="referred_by"
+                                            value={referred_by}
+                                            onChange={(e) => setReferredBy(e.target.value)}
+                                            required />
+                                        <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3 text-start" controlId="formtakePlace">
+                                        <Form.Label>Taken from (Rescue Place) : </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="from_place"
+                                            value={from_place}
+                                            onChange={(e) => setFromPlace(e.target.value)}
+                                            required />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3 text-start" controlId="formdatetime">
+                                        <Form.Label>Date & Time : </Form.Label>
+                                        <Form.Control
+                                            type="datetime-local"
+                                            name="date_time"
+                                            value={date_time}
+                                            onChange={(e) => setDateTime(e.target.value)}
+                                            required />
+                                    </Form.Group>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3 text-start" controlId="formPoliceMemo">
+                                                <Form.Label>Police Memo : </Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="police_memo"
+                                                    value={police_memo}
+                                                    onChange={(e) => setPoliceMemo(e.target.value)}
+                                                    required />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={6} className="text-start">
+                                            <Form.Group>
+                                                <Form.Label>Attach Police Memo : </Form.Label>
+                                                <Form.Control
+                                                    type="file"
+                                                    name="attach_policeMemo"
+                                                    accept=".jpg,.jpeg,.png"
+                                                    onChange={handleMemoChange}
+                                                    required={!attach_policeMemo}
+                                                />
+                                                {/* {attach_policeMemo && (
                                                     <>
                                                         <div className="mt-1 text-success">
                                                             Selected file: {attach_policeMemo.name}
@@ -788,27 +805,195 @@ function First_info_form() {
                                                         />
                                                     </>
                                                 )} */}
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
 
 
-                                        <Form.Group className="mb-3 text-start" controlId="formPoliceStation">
-                                            <Form.Label>Police Station : </Form.Label>
+                                    <Form.Group className="mb-3 text-start" controlId="formPoliceStation">
+                                        <Form.Label>Police Station : </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="police_station"
+                                            value={police_station}
+                                            onChange={(e) => setPoliceStation(e.target.value)}
+                                            required />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3 text-start" controlId="formPublicInfo">
+                                        <Form.Label>Information from Public / Spot : </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="information_public"
+                                            value={information_public}
+                                            onChange={(e) => setInformationPulic(e.target.value)}
+                                            required />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
+                                        <Form.Label column sm={6}>Date :</Form.Label>
+                                        <Col sm={6}>
+                                            <Form.Control
+                                                type="date"
+                                                name="admission_date"
+                                                value={admission_date}
+                                                onChange={(e) => setAdmissionDate(e.target.value)}
+                                                readOnly
+                                            />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
+                                        <Form.Label column sm={6}>Admission No. :</Form.Label>
+                                        <Col sm={6}>
+                                            <Form.Control
+                                                type="number"
+                                                placeholder={admissionNumber}
+                                                name="admission_no"
+                                                value={admission_no}
+                                                onChange={(e) => setAdmisisonNo(e.target.value)}
+                                                readOnly required />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group controlId="formFile" className="mb-3 text-start">
+                                        <Form.Label>Attach Rescue Image</Form.Label>
+                                        <Form.Control
+                                            type="file"
+                                            name="rescue_image"
+                                            accept=".jpg,.jpeg,.png"
+                                            onChange={handleImageChange}
+                                            required={!rescue_image}
+                                        />
+                                        {rescue_image && (
+                                            <>
+                                                <div className="mt-1 text-success">
+                                                    Selected file: {rescue_image.name}
+                                                </div>
+                                                <img
+                                                    src={imagePreview}
+                                                    alt="Preview"
+                                                    className="mt-2"
+                                                    style={{ maxWidth: "200px", maxHeight: "200px", border: "1px solid #ccc" }}
+                                                />
+                                            </>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <Col md={11}>
+                                <Button variant="outline-success" className="m-1 mb-5" type="submit">
+                                    <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
+                                </Button>
+                            </Col>
+                        </Form>
+                    </Row >
+                </Container >
+            )
+            }
+
+            {
+                step === 2 && (
+                    <Container>
+                        <Row>
+
+
+                            <Form noValidate validated={validated} onSubmit={handleInmateForm}>
+                                <Row className="d-flex justify-content-between first_infoFormRow">
+                                    <Col md={6}>
+                                        <Col md={12} className="text-start">
+                                            <h3 className="section_title">Resident's Details</h3>
+                                        </Col>
+                                        <Form.Group className="mb-3 text-start" controlId="formName">
+                                            <Form.Label>Name at the time of Rescue : </Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                name="police_station"
-                                                value={police_station}
-                                                onChange={(e) => setPoliceStation(e.target.value)}
+                                                name="rescue_name"
+                                                value={rescue_name}
+                                                onChange={(e) => setRescueName(e.target.value)}
                                                 required />
                                         </Form.Group>
-                                        <Form.Group className="mb-3 text-start" controlId="formPublicInfo">
-                                            <Form.Label>Information from Public / Spot : </Form.Label>
+                                        <Form.Group className="mb-3 text-start" controlId="formAge">
+                                            <Form.Label>Approximate age :</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                name="information_public"
-                                                value={information_public}
-                                                onChange={(e) => setInformationPulic(e.target.value)}
+                                                name="age"
+                                                value={age}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    if (value === '' || /^[0-9\b]+$/.test(value)) {
+                                                        setAge(value); // Only numbers allowed
+                                                    } else {
+                                                        setAge('Unknown'); // Anything else sets to Unknown
+                                                    }
+                                                }}
+                                            />
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formstatus">
+                                            <Form.Label>Status :</Form.Label>
+                                            <Form.Select
+                                                name="rescue_status"
+                                                value={rescue_status}
+                                                onChange={(e) => setRescueStatus(e.target.value)}
+                                                required
+                                            >
+                                                <option value="">-- Select Status --</option>
+                                                <option value="Single">Single</option>
+                                                <option value="Married">Married</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formReligion">
+                                            <Form.Label>Religion : </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="religion"
+                                                value={religion}
+                                                onChange={(e) => setReligion(e.target.value)} />
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formLanguage">
+                                            <Form.Label>Known Languages:</Form.Label>
+                                            <Row>
+                                                <Col md={4}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Language 1"
+                                                        value={language1}
+                                                        onChange={(e) => setLanguage1(e.target.value)}
+                                                        className="mb-2"
+                                                        required
+                                                    />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Language 2"
+                                                        value={language2}
+                                                        onChange={(e) => setLanguage2(e.target.value)}
+                                                        className="mb-2"
+                                                    />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Language 3"
+                                                        value={language3}
+                                                        onChange={(e) => setLanguage3(e.target.value)}
+                                                    />
+                                                </Col>
+                                            </Row>
+
+
+
+                                        </Form.Group>
+
+                                        <Form.Group className="mb-3 text-start" controlId="formEducation">
+                                            <Form.Label>Education : </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="education"
+                                                value={education}
+                                                onChange={(e) => setEducation(e.target.value)}
                                                 required />
                                         </Form.Group>
                                     </Col>
@@ -831,700 +1016,535 @@ function First_info_form() {
                                             <Col sm={6}>
                                                 <Form.Control
                                                     type="number"
-                                                    placeholder={admissionNumber}
                                                     name="admission_no"
                                                     value={admission_no}
                                                     onChange={(e) => setAdmisisonNo(e.target.value)}
-                                                    readOnly required />
+                                                    placeholder={admissionNumber}
+                                                    readOnly />
                                             </Col>
                                         </Form.Group>
 
-                                        <Form.Group controlId="formFile" className="mb-3 text-start">
-                                            <Form.Label>Attach Rescue Image</Form.Label>
+                                        <Form.Group className="mb-3 text-start">
+                                            <Form.Label column sm={12}>Government ID Type:</Form.Label>
+                                            <Col sm={12}>
+                                                <Form.Select
+                                                    value={govIdType}
+                                                    name="govIdType"
+                                                    onChange={(e) => setGovIdType(e.target.value)}
+                                                    required
+                                                >
+                                                    <option value="">Select ID Type</option>
+                                                    <option value="NA">Not Available</option>
+                                                    <option value="Aadhar">Aadhar Card</option>
+                                                    <option value="PAN">PAN Card</option>
+                                                    <option value="Voter">Voter ID</option>
+                                                    <option value="Driving">Driving License</option>
+                                                    <option value="Passport">Passport</option>
+                                                </Form.Select>
+                                            </Col>
+                                        </Form.Group>
+
+                                        {/* Show only if govIdType is not NA or empty */}
+                                        {govIdType !== 'NA' && govIdType !== '' && (
+                                            <>
+                                                <Form.Group className="mb-3 text-start">
+                                                    <Form.Label column sm={12}>{govIdType} Number:</Form.Label>
+                                                    <Col sm={12}>
+                                                        <Form.Control
+                                                            type="text"
+                                                            placeholder={`Enter ${govIdType} number`}
+                                                            value={govIdNumber}
+                                                            name="govIdNumber"
+                                                            onChange={(e) => setGovIdNumber(e.target.value)}
+                                                        />
+                                                    </Col>
+                                                </Form.Group>
+
+                                                <Form.Group className="mb-3 text-start">
+                                                    <Form.Label column sm={12}>Upload {govIdType} File:</Form.Label>
+                                                    <Col sm={12}>
+                                                        <Form.Control
+                                                            type="file"
+                                                            name="govIdFile"
+                                                            accept=".pdf,image/*"
+                                                            onChange={(e) => setGovIdFile(e.target.files[0])}
+                                                        />
+                                                        {govIdFile && (
+                                                            <div className="mt-1 text-success">
+                                                                Selected file: {govIdFile.name}
+                                                            </div>
+                                                        )}
+                                                    </Col>
+                                                </Form.Group>
+                                            </>
+                                        )}
+
+
+
+                                    </Col>
+                                </Row>
+                                <Col md={11}>
+                                    <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack}>
+                                        <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
+                                    </Button>
+                                    <Button variant="outline-success" className="m-1 mb-5" type="submit">
+                                        <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
+                                    </Button>
+                                </Col>
+
+                            </Form>
+
+
+
+                        </Row>
+                    </Container>
+
+                )
+            }
+
+            {
+                step === 3 && (
+                    <Container>
+                        <Row>
+
+                            <Col md={12} className="text-start">
+                                <h3 className="section_title">Family Details</h3>
+                            </Col>
+                            <Form noValidate validated={validated} onSubmit={handleFamilyForm}>
+                                <Row className="d-flex justify-content-between first_infoFormRow">
+                                    <Col md={6}>
+                                        <Form.Group className="mb-3 text-start" controlId="formFather">
+                                            <Form.Label>Father:</Form.Label>
                                             <Form.Control
-                                                type="file"
-                                                name="rescue_image"
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                                required={!rescue_image}
+                                                type="text"
+                                                name="father"
+                                                value={father}
+                                                onChange={(e) => setFather(e.target.value)}
+                                                isInvalid={fatherError}
                                             />
-                                            {rescue_image && (
-                                                <>
-                                                    <div className="mt-1 text-success">
-                                                        Selected file: {rescue_image.name}
-                                                    </div>
-                                                    <img
-                                                        src={imagePreview}
-                                                        alt="Preview"
-                                                        className="mt-2"
-                                                        style={{ maxWidth: "200px", maxHeight: "200px", border: "1px solid #ccc" }}
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+
+                                        <Form.Group className="mb-3 text-start" controlId="formMother">
+                                            <Form.Label>Mother : </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="mother"
+                                                value={mother}
+                                                onChange={(e) => setMother(e.target.value)}
+                                                isInvalid={motherError} />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formOther">
+                                            <Form.Label>Any Other Relationship: </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="other_relation"
+                                                value={other_relation}
+                                                placeholder="Eg.Smith John (Brother)"
+                                                onChange={(e) => setOtherRelation(e.target.value)}
+                                                isInvalid={other_relationError}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter in the format: "Name (Relation)", or enter "Unknown" or "NA" if not applicable.
+                                            </Form.Control.Feedback>
+
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formPlace">
+                                            <Form.Label>Address : </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="place"
+                                                value={place}
+                                                onChange={(e) => setPlace(e.target.value)}
+                                                isInvalid={placeError}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formContactNo">
+                                            <Form.Label>Contact Number : </Form.Label>
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="phone_no"
+                                                        value={phone_no}
+                                                        onChange={handlePhoneChange}
+                                                        isInvalid={phone_noError}
                                                     />
-                                                </>
-                                            )}
+                                                    <Form.Control.Feedback type="invalid">
+                                                        Please enter a valid 10-digit phone number.
+                                                    </Form.Control.Feedback>
+                                                </Col>
+                                                <Form.Control.Feedback type="invalid">
+                                                    Please enter "Unknown" or "NA" if not available.
+                                                </Form.Control.Feedback>
+                                                <Col md={6}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="phone_no_two"
+                                                        value={phone_no_two}
+                                                        onChange={(e) => setPhoneNumberTwo(e.target.value)}
+                                                    />
+                                                </Col>
+                                            </Row>
+
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={4}>
+                                        <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
+                                            <Form.Label column sm={6}>Date :</Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control
+                                                    type="date"
+                                                    name="admission_date"
+                                                    value={admission_date}
+                                                    onChange={(e) => setAdmissionDate(e.target.value)}
+                                                    readOnly
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
+                                            <Form.Label column sm={6}>Admission No. :</Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control
+                                                    type="number"
+                                                    name="admission_no"
+                                                    value={admission_no}
+                                                    onChange={(e) => setAdmisisonNo(e.target.value)}
+                                                    placeholder={admissionNumber}
+                                                    readOnly />
+                                            </Col>
                                         </Form.Group>
                                     </Col>
                                 </Row>
 
                                 <Col md={11}>
+                                    <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack1}>
+                                        <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
+                                    </Button>
                                     <Button variant="outline-success" className="m-1 mb-5" type="submit">
                                         <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
                                     </Button>
                                 </Col>
                             </Form>
-                        </Row >
-                    </Container >
+
+
+                        </Row>
+                    </Container>
+
                 )
-                }
+            }
 
-                {
-                    step === 2 && (
-                        <Container>
-                            <Row>
+            {
+                step === 4 && (
+                    <Container>
+                        <Row>
 
-
-                                <Form noValidate validated={validated} onSubmit={handleInmateForm}>
-                                    <Row className="d-flex justify-content-between first_infoFormRow">
-                                        <Col md={6}>
-                                            <Col md={12} className="text-start">
-                                                <h3 className="section_title">Resident's Details</h3>
-                                            </Col>
-                                            <Form.Group className="mb-3 text-start" controlId="formName">
-                                                <Form.Label>Name at the time of Rescue : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="rescue_name"
-                                                    value={rescue_name}
-                                                    onChange={(e) => setRescueName(e.target.value)}
-                                                    required />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formAge">
-                                                <Form.Label>Approximate age :</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="age"
-                                                    value={age}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value;
-                                                        if (value === '' || /^[0-9\b]+$/.test(value)) {
-                                                            setAge(value); // Only numbers allowed
-                                                        } else {
-                                                            setAge('Unknown'); // Anything else sets to Unknown
-                                                        }
-                                                    }}
-                                                />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formstatus">
-                                                <Form.Label>Status :</Form.Label>
-                                                <Form.Select
-                                                    name="rescue_status"
-                                                    value={rescue_status}
-                                                    onChange={(e) => setRescueStatus(e.target.value)}
-                                                    required
-                                                >
-                                                    <option value="">-- Select Status --</option>
-                                                    <option value="Single">Single</option>
-                                                    <option value="Married">Married</option>
-                                                </Form.Select>
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formReligion">
-                                                <Form.Label>Religion : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="religion"
-                                                    value={religion}
-                                                    onChange={(e) => setReligion(e.target.value)} />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formLanguage">
-                                                <Form.Label>Known Languages:</Form.Label>
-                                                <Row>
-                                                    <Col md={4}>
-                                                        <Form.Control
-                                                            type="text"
-                                                            placeholder="Language 1"
-                                                            value={language1}
-                                                            onChange={(e) => setLanguage1(e.target.value)}
-                                                            className="mb-2"
-                                                            required
-                                                        />
-                                                    </Col>
-                                                    <Col md={4}>
-                                                        <Form.Control
-                                                            type="text"
-                                                            placeholder="Language 2"
-                                                            value={language2}
-                                                            onChange={(e) => setLanguage2(e.target.value)}
-                                                            className="mb-2"
-                                                        />
-                                                    </Col>
-                                                    <Col md={4}>
-                                                        <Form.Control
-                                                            type="text"
-                                                            placeholder="Language 3"
-                                                            value={language3}
-                                                            onChange={(e) => setLanguage3(e.target.value)}
-                                                        />
-                                                    </Col>
-                                                </Row>
-
-
-
-                                            </Form.Group>
-
-                                            <Form.Group className="mb-3 text-start" controlId="formEducation">
-                                                <Form.Label>Education : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="education"
-                                                    value={education}
-                                                    onChange={(e) => setEducation(e.target.value)}
-                                                    required />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={4}>
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
-                                                <Form.Label column sm={6}>Date :</Form.Label>
-                                                <Col sm={6}>
+                            <Col md={12} className="text-start">
+                                <h3 className="section_title">Physical Appearance</h3>
+                            </Col>
+                            <Form noValidate validated={validated} onSubmit={handlePhysicalForm}>
+                                <Row className="d-flex justify-content-between first_infoFormRow">
+                                    <Col md={6}>
+                                        <Row>
+                                            <Col>
+                                                <Form.Group className="mb-3 text-start" controlId="formClothing">
+                                                    <Form.Label>Clothing : </Form.Label>
                                                     <Form.Control
-                                                        type="date"
-                                                        name="admission_date"
-                                                        value={admission_date}
-                                                        onChange={(e) => setAdmissionDate(e.target.value)}
-                                                        readOnly
-                                                    />
-                                                </Col>
-                                            </Form.Group>
-
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
-                                                <Form.Label column sm={6}>Admission No. :</Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control
-                                                        type="number"
-                                                        name="admission_no"
-                                                        value={admission_no}
-                                                        onChange={(e) => setAdmisisonNo(e.target.value)}
-                                                        placeholder={admissionNumber}
-                                                        readOnly />
-                                                </Col>
-                                            </Form.Group>
-
-                                            <Form.Group className="mb-3 text-start">
-                                                <Form.Label column sm={12}>Government ID Type:</Form.Label>
-                                                <Col sm={12}>
-                                                    <Form.Select
-                                                        value={govIdType}
-                                                        name="govIdType"
-                                                        onChange={(e) => setGovIdType(e.target.value)}
-                                                        required
-                                                    >
-                                                        <option value="">Select ID Type</option>
-                                                        <option value="NA">Not Available</option>
-                                                        <option value="Aadhar">Aadhar Card</option>
-                                                        <option value="PAN">PAN Card</option>
-                                                        <option value="Voter">Voter ID</option>
-                                                        <option value="Driving">Driving License</option>
-                                                        <option value="Passport">Passport</option>
-                                                    </Form.Select>
-                                                </Col>
-                                            </Form.Group>
-
-                                            {/* Show only if govIdType is not NA or empty */}
-                                            {govIdType !== 'NA' && govIdType !== '' && (
-                                                <>
-                                                    <Form.Group className="mb-3 text-start">
-                                                        <Form.Label column sm={12}>{govIdType} Number:</Form.Label>
-                                                        <Col sm={12}>
-                                                            <Form.Control
-                                                                type="text"
-                                                                placeholder={`Enter ${govIdType} number`}
-                                                                value={govIdNumber}
-                                                                name="govIdNumber"
-                                                                onChange={(e) => setGovIdNumber(e.target.value)}
-                                                            />
-                                                        </Col>
-                                                    </Form.Group>
-
-                                                    <Form.Group className="mb-3 text-start">
-                                                        <Form.Label column sm={12}>Upload {govIdType} File:</Form.Label>
-                                                        <Col sm={12}>
-                                                            <Form.Control
-                                                                type="file"
-                                                                name="govIdFile"
-                                                                accept=".pdf,image/*"
-                                                                onChange={(e) => setGovIdFile(e.target.files[0])}
-                                                            />
-                                                            {govIdFile && (
-                                                                <div className="mt-1 text-success">
-                                                                    Selected file: {govIdFile.name}
-                                                                </div>
-                                                            )}
-                                                        </Col>
-                                                    </Form.Group>
-                                                </>
-                                            )}
-
-
-
-                                        </Col>
-                                    </Row>
-                                    <Col md={11}>
-                                        <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack}>
-                                            <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
-                                        </Button>
-                                        <Button variant="outline-success" className="m-1 mb-5" type="submit">
-                                            <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
-                                        </Button>
-                                    </Col>
-
-                                </Form>
-
-
-
-                            </Row>
-                        </Container>
-
-                    )
-                }
-
-                {
-                    step === 3 && (
-                        <Container>
-                            <Row>
-
-                                <Col md={12} className="text-start">
-                                    <h3 className="section_title">Family Details</h3>
-                                </Col>
-                                <Form noValidate validated={validated} onSubmit={handleFamilyForm}>
-                                    <Row className="d-flex justify-content-between first_infoFormRow">
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3 text-start" controlId="formFather">
-                                                <Form.Label>Father:</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="father"
-                                                    value={father}
-                                                    onChange={(e) => setFather(e.target.value)}
-                                                    isInvalid={fatherError}
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter "Unknown" or "NA" if not available.
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-
-                                            <Form.Group className="mb-3 text-start" controlId="formMother">
-                                                <Form.Label>Mother : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="mother"
-                                                    value={mother}
-                                                    onChange={(e) => setMother(e.target.value)}
-                                                    isInvalid={motherError} />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter "Unknown" or "NA" if not available.
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formOther">
-                                                <Form.Label>Any Other Relationship: </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="other_relation"
-                                                    value={other_relation}
-                                                    placeholder="Eg.Smith John (Brother)"
-                                                    onChange={(e) => setOtherRelation(e.target.value)}
-                                                    isInvalid={other_relationError}
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter in the format: "Name (Relation)", or enter "Unknown" or "NA" if not applicable.
-                                                </Form.Control.Feedback>
-
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formPlace">
-                                                <Form.Label>Address : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="place"
-                                                    value={place}
-                                                    onChange={(e) => setPlace(e.target.value)}
-                                                    isInvalid={placeError}
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter "Unknown" or "NA" if not available.
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formContactNo">
-                                                <Form.Label>Contact Number : </Form.Label>
-                                                <Row>
-                                                    <Col md={6}>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="phone_no"
-                                                            value={phone_no}
-                                                            onChange={(e) => setPhoneNumber(e.target.value)}
-                                                            isInvalid={phone_noError}
-                                                        />
-                                                    </Col>
+                                                        type="text"
+                                                        name="clothing"
+                                                        value={clothing}
+                                                        onChange={(e) => setClothing(e.target.value)}
+                                                        isInvalid={clothingError} />
                                                     <Form.Control.Feedback type="invalid">
                                                         Please enter "Unknown" or "NA" if not available.
                                                     </Form.Control.Feedback>
-                                                    <Col md={6}>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="phone_no_two"
-                                                            value={phone_no_two}
-                                                            onChange={(e) => setPhoneNumberTwo(e.target.value)}
-                                                        />
-                                                    </Col>
-                                                </Row>
-
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={4}>
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
-                                                <Form.Label column sm={6}>Date :</Form.Label>
-                                                <Col sm={6}>
+                                                </Form.Group>
+                                            </Col>
+                                            <Col>
+                                                <Form.Group className="mb-3 text-start" controlId="formDressColor">
+                                                    <Form.Label>Dress Color : </Form.Label>
                                                     <Form.Control
-                                                        type="date"
-                                                        name="admission_date"
-                                                        value={admission_date}
-                                                        onChange={(e) => setAdmissionDate(e.target.value)}
-                                                        readOnly
-                                                    />
-                                                </Col>
-                                            </Form.Group>
+                                                        type="text"
+                                                        name="dress_code"
+                                                        value={dress_code}
+                                                        onChange={(e) => setDressCode(e.target.value)}
+                                                        isInvalid={dress_codeError} />
+                                                    <Form.Control.Feedback type="invalid">
+                                                        Please enter "Unknown" or "NA" if not available.
+                                                    </Form.Control.Feedback>
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
 
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
-                                                <Form.Label column sm={6}>Admission No. :</Form.Label>
-                                                <Col sm={6}>
+                                        <Form.Group className="mb-3 text-start" controlId="formComplexion">
+                                            <Form.Label>Complexion : </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="complexion"
+                                                value={complexion}
+                                                onChange={(e) => setComplexion(e.target.value)}
+                                                isInvalid={complexionError} />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formIdentificationMark">
+                                            <Form.Label>Indentification Mark : </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="indentification_mark"
+                                                value={indentification_mark}
+                                                onChange={(e) => setIdentification(e.target.value)}
+                                                isInvalid={identificationMarkError} />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                        <Row>
+                                            <Col>
+                                                <Form.Group className="mb-3 text-start" controlId="formTatoo">
+                                                    <Form.Label>Tattoo : </Form.Label>
                                                     <Form.Control
-                                                        type="number"
-                                                        name="admission_no"
-                                                        value={admission_no}
-                                                        onChange={(e) => setAdmisisonNo(e.target.value)}
-                                                        placeholder={admissionNumber}
-                                                        readOnly />
-                                                </Col>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
+                                                        type="text"
+                                                        name="tattoo"
+                                                        value={tattoo}
+                                                        onChange={(e) => setTattoo(e.target.value)}
+                                                        isInvalid={tattooError} />
+                                                    <Form.Control.Feedback type="invalid">
+                                                        Please enter "Unknown" or "NA" if not available.
+                                                    </Form.Control.Feedback>
+                                                </Form.Group>
+                                            </Col>
+                                            <Col>
+                                                <Form.Group className="mb-3 text-start" controlId="formWound">
+                                                    <Form.Label>Any Wound / Infection : </Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="wound_infection"
+                                                        value={wound_infection}
+                                                        onChange={(e) => setWoundInfection(e.target.value)}
+                                                        isInvalid={woundInfectionError} />
+                                                    <Form.Control.Feedback type="invalid">
+                                                        Please enter "Unknown" or "NA" if not available.
+                                                    </Form.Control.Feedback>
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
 
-                                    <Col md={11}>
-                                        <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack1}>
-                                            <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
-                                        </Button>
-                                        <Button variant="outline-success" className="m-1 mb-5" type="submit">
-                                            <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
-                                        </Button>
+                                        <Row>
+                                            <Col>
+                                                <Form.Group className="mb-3 text-start" controlId="formHeight">
+                                                    <Form.Label>Height : </Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="height"
+                                                        value={height}
+                                                        onChange={(e) => setHeight(e.target.value)}
+                                                        isInvalid={heightError}
+                                                        required />
+                                                </Form.Group>
+                                            </Col>
+                                            <Col>
+                                                <Form.Group className="mb-3 text-start" controlId="formWeight">
+                                                    <Form.Label>Weight : </Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="weight"
+                                                        value={weight}
+                                                        onChange={(e) => setWeight(e.target.value)}
+                                                        isInvalid={weightError}
+                                                        required />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                        <Form.Group className="mb-3 text-start" controlId="formThingsCarried">
+                                            <Form.Label>Possessions & Items Carried at the Time of Rescue  : </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="things_carried"
+                                                value={things_carried}
+                                                onChange={(e) => setThingsCarried(e.target.value)}
+                                                isInvalid={thingsCarrierError} />
+                                            <Form.Control.Feedback type="invalid">
+                                                Please enter "Unknown" or "NA" if not available.
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start" controlId="formRemark">
+                                            <Form.Label>Notes : </Form.Label>
+                                            <Form.Control
+                                                as="textarea"
+                                                name="remark"
+                                                value={remark}
+                                                onChange={(e) => setRemark(e.target.value)}
+                                                rows={3} />
+                                        </Form.Group>
                                     </Col>
-                                </Form>
+                                    <Col md={4}>
+                                        <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
+                                            <Form.Label column sm={6}>Date :</Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control
+                                                    type="date"
+                                                    name="admission_date"
+                                                    value={admission_date}
+                                                    onChange={(e) => setAdmissionDate(e.target.value)}
+                                                    readOnly
+                                                />
+                                            </Col>
+                                        </Form.Group>
 
-
-                            </Row>
-                        </Container>
-
-                    )
-                }
-
-                {
-                    step === 4 && (
-                        <Container>
-                            <Row>
-
-                                <Col md={12} className="text-start">
-                                    <h3 className="section_title">Physical Appearance</h3>
+                                        <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
+                                            <Form.Label column sm={6}>Admission No. :</Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control
+                                                    type="number"
+                                                    name="admission_no"
+                                                    value={admission_no}
+                                                    onChange={(e) => setAdmissionNo(e.target.value)}
+                                                    placeholder={admissionNumber}
+                                                    readOnly />
+                                            </Col>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Col md={11} className="mb-4">
+                                    <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack2}>
+                                        <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
+                                    </Button>
+                                    <Button variant="outline-success" className="m-1 mb-5" type="submit">
+                                        <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
+                                    </Button>
                                 </Col>
-                                <Form noValidate validated={validated} onSubmit={handlePhysicalForm}>
-                                    <Row className="d-flex justify-content-between first_infoFormRow">
-                                        <Col md={6}>
-                                            <Row>
-                                                <Col>
-                                                    <Form.Group className="mb-3 text-start" controlId="formClothing">
-                                                        <Form.Label>Clothing : </Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="clothing"
-                                                            value={clothing}
-                                                            onChange={(e) => setClothing(e.target.value)}
-                                                            isInvalid={clothingError} />
-                                                        <Form.Control.Feedback type="invalid">
-                                                            Please enter "Unknown" or "NA" if not available.
-                                                        </Form.Control.Feedback>
-                                                    </Form.Group>
-                                                </Col>
-                                                <Col>
-                                                    <Form.Group className="mb-3 text-start" controlId="formDressColor">
-                                                        <Form.Label>Dress Color : </Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="dress_code"
-                                                            value={dress_code}
-                                                            onChange={(e) => setDressCode(e.target.value)}
-                                                            isInvalid={dress_codeError} />
-                                                        <Form.Control.Feedback type="invalid">
-                                                            Please enter "Unknown" or "NA" if not available.
-                                                        </Form.Control.Feedback>
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
+                            </Form>
 
-                                            <Form.Group className="mb-3 text-start" controlId="formComplexion">
-                                                <Form.Label>Complexion : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="complexion"
-                                                    value={complexion}
-                                                    onChange={(e) => setComplexion(e.target.value)}
-                                                    isInvalid={complexionError} />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter "Unknown" or "NA" if not available.
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formIdentificationMark">
-                                                <Form.Label>Indentification Mark : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="indentification_mark"
-                                                    value={indentification_mark}
-                                                    onChange={(e) => setIdentification(e.target.value)}
-                                                    isInvalid={identificationMarkError} />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter "Unknown" or "NA" if not available.
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                            <Row>
-                                                <Col>
-                                                    <Form.Group className="mb-3 text-start" controlId="formTatoo">
-                                                        <Form.Label>Tattoo : </Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="tattoo"
-                                                            value={tattoo}
-                                                            onChange={(e) => setTattoo(e.target.value)}
-                                                            isInvalid={tattooError} />
-                                                        <Form.Control.Feedback type="invalid">
-                                                            Please enter "Unknown" or "NA" if not available.
-                                                        </Form.Control.Feedback>
-                                                    </Form.Group>
-                                                </Col>
-                                                <Col>
-                                                    <Form.Group className="mb-3 text-start" controlId="formWound">
-                                                        <Form.Label>Any Wound / Infection : </Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="wound_infection"
-                                                            value={wound_infection}
-                                                            onChange={(e) => setWoundInfection(e.target.value)}
-                                                            isInvalid={woundInfectionError} />
-                                                        <Form.Control.Feedback type="invalid">
-                                                            Please enter "Unknown" or "NA" if not available.
-                                                        </Form.Control.Feedback>
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
 
-                                            <Row>
-                                                <Col>
-                                                    <Form.Group className="mb-3 text-start" controlId="formHeight">
-                                                        <Form.Label>Height : </Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="height"
-                                                            value={height}
-                                                            onChange={(e) => setHeight(e.target.value)}
-                                                            isInvalid={heightError}
-                                                            required />
-                                                    </Form.Group>
-                                                </Col>
-                                                <Col>
-                                                    <Form.Group className="mb-3 text-start" controlId="formWeight">
-                                                        <Form.Label>Weight : </Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="weight"
-                                                            value={weight}
-                                                            onChange={(e) => setWeight(e.target.value)}
-                                                            isInvalid={weightError}
-                                                            required />
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                            <Form.Group className="mb-3 text-start" controlId="formThingsCarried">
-                                                <Form.Label>Possessions & Items Carried at the Time of Rescue  : </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="things_carried"
-                                                    value={things_carried}
-                                                    onChange={(e) => setThingsCarried(e.target.value)}
-                                                    isInvalid={thingsCarrierError} />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter "Unknown" or "NA" if not available.
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start" controlId="formRemark">
-                                                <Form.Label>Notes : </Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    name="remark"
-                                                    value={remark}
-                                                    onChange={(e) => setRemark(e.target.value)}
-                                                    rows={3} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={4}>
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
-                                                <Form.Label column sm={6}>Date :</Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control
-                                                        type="date"
-                                                        name="admission_date"
-                                                        value={admission_date}
-                                                        onChange={(e) => setAdmissionDate(e.target.value)}
-                                                        readOnly
-                                                    />
-                                                </Col>
-                                            </Form.Group>
 
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
-                                                <Form.Label column sm={6}>Admission No. :</Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control
-                                                        type="number"
-                                                        name="admission_no"
-                                                        value={admission_no}
-                                                        onChange={(e) => setAdmissionNo(e.target.value)}
-                                                        placeholder={admissionNumber}
-                                                        readOnly />
-                                                </Col>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Col md={11} className="mb-4">
-                                        <Button variant="outline-secondary" className="m-1 mb-5" onClick={handleBack2}>
-                                            <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
-                                        </Button>
-                                        <Button variant="outline-success" className="m-1 mb-5" type="submit">
-                                            <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Next
-                                        </Button>
+                        </Row>
+                    </Container>
+
+                )
+            }
+
+            {
+                step === 5 && (
+                    <Container>
+                        <Row>
+                            <Col md={12} className="text-start">
+                                <h3 className="section_title"> Initial Psychological Assessment.</h3>
+                            </Col>
+                            <Form noValidate validated={validated}>
+                                <Row className="d-flex justify-content-between first_infoFormRow">
+                                    <Col md={6}>
+                                        <Form.Group className="mb-3 text-start">
+                                            <Form.Label>Mental status : </Form.Label>
+                                            <Form.Control
+                                                as="textarea"
+                                                name="mental_status"
+                                                value={mental_status}
+                                                onChange={(e) => setMentalStatus(e.target.value)}
+                                                rows={3}
+                                                required />
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start">
+                                            <Form.Label>Cognitive Behavior : </Form.Label>
+                                            <Form.Control
+                                                as="textarea"
+                                                name="behaviour"
+                                                value={behaviour}
+                                                onChange={(e) => setBehaviour(e.target.value)}
+                                                rows={3}
+                                                required />
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start">
+                                            <Form.Label>Communication Ability : </Form.Label>
+                                            <Form.Control
+                                                as="textarea"
+                                                name="community_ability"
+                                                value={community_ability}
+                                                onChange={(e) => setCommunityAbility(e.target.value)}
+                                                rows={3}
+                                                required />
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start">
+                                            <Form.Label>Self-Care Capacity : </Form.Label>
+                                            <Form.Control
+                                                as="textarea"
+                                                name="self_careCapacity"
+                                                value={self_careCapacity}
+                                                onChange={(e) => setSelfCareCapacity(e.target.value)}
+                                                rows={3}
+                                                required />
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 text-start">
+                                            <Form.Label>Diagnosis : </Form.Label>
+                                            <Form.Control
+                                                as="textarea"
+                                                name="diagnosis"
+                                                value={diagnosis}
+                                                onChange={(e) => setDiagnosis(e.target.value)}
+                                                rows={3}
+                                                required />
+                                        </Form.Group>
+
                                     </Col>
-                                </Form>
+                                    <Col md={4}>
+                                        <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
+                                            <Form.Label column sm={6}>Date :</Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control
+                                                    type="date"
+                                                    name="admission_date"
+                                                    value={admission_date}
+                                                    onChange={(e) => setAdmissionDate(e.target.value)}
+                                                    readOnly
+                                                />
+                                            </Col>
+                                        </Form.Group>
 
+                                        <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
+                                            <Form.Label column sm={6}>Admission No. :</Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control
+                                                    type="number"
+                                                    name="admission_no"
+                                                    value={admission_no}
+                                                    onChange={(e) => setAdmisisonNo(e.target.value)}
+                                                    placeholder={admissionNumber}
+                                                    readOnly />
+                                            </Col>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
 
-
-                            </Row>
-                        </Container>
-
-                    )
-                }
-
-                {
-                    step === 5 && (
-                        <Container>
-                            <Row>
-                                <Col md={12} className="text-start">
-                                    <h3 className="section_title"> Initial Psychological Assessment.</h3>
+                                <Col md={11} className="mb-4">
+                                    <Button variant="outline-secondary" className="m-1" onClick={handleBack3}>
+                                        <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
+                                    </Button>
+                                    <Button variant="outline-success" className="m-1" type="submit" onClick={handleSubmitFinallForm}>
+                                        <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Submit
+                                    </Button>
                                 </Col>
-                                <Form noValidate validated={validated}>
-                                    <Row className="d-flex justify-content-between first_infoFormRow">
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3 text-start">
-                                                <Form.Label>Mental status : </Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    name="mental_status"
-                                                    value={mental_status}
-                                                    onChange={(e) => setMentalStatus(e.target.value)}
-                                                    rows={3}
-                                                    required />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start">
-                                                <Form.Label>Cognitive Behavior : </Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    name="behaviour"
-                                                    value={behaviour}
-                                                    onChange={(e) => setBehaviour(e.target.value)}
-                                                    rows={3}
-                                                    required />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start">
-                                                <Form.Label>Communication Ability : </Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    name="community_ability"
-                                                    value={community_ability}
-                                                    onChange={(e) => setCommunityAbility(e.target.value)}
-                                                    rows={3}
-                                                    required />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start">
-                                                <Form.Label>Self-Care Capacity : </Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    name="self_careCapacity"
-                                                    value={self_careCapacity}
-                                                    onChange={(e) => setSelfCareCapacity(e.target.value)}
-                                                    rows={3}
-                                                    required />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3 text-start">
-                                                <Form.Label>Diagnosis : </Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    name="diagnosis"
-                                                    value={diagnosis}
-                                                    onChange={(e) => setDiagnosis(e.target.value)}
-                                                    rows={3}
-                                                    required />
-                                            </Form.Group>
 
-                                        </Col>
-                                        <Col md={4}>
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formDate">
-                                                <Form.Label column sm={6}>Date :</Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control
-                                                        type="date"
-                                                        name="admission_date"
-                                                        value={admission_date}
-                                                        onChange={(e) => setAdmissionDate(e.target.value)}
-                                                        readOnly
-                                                    />
-                                                </Col>
-                                            </Form.Group>
-
-                                            <Form.Group as={Row} className="mb-3 text-start" controlId="formAdmissionType">
-                                                <Form.Label column sm={6}>Admission No. :</Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control
-                                                        type="number"
-                                                        name="admission_no"
-                                                        value={admission_no}
-                                                        onChange={(e) => setAdmisisonNo(e.target.value)}
-                                                        placeholder={admissionNumber}
-                                                        readOnly />
-                                                </Col>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-
-                                    <Col md={11} className="mb-4">
-                                        <Button variant="outline-secondary" className="m-1" onClick={handleBack3}>
-                                            <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Back
-                                        </Button>
-                                        <Button variant="outline-success" className="m-1" type="submit" onClick={handleSubmitFinallForm}>
-                                            <FontAwesomeIcon icon={faArrowRight} className="me-2" /> Submit
-                                        </Button>
-                                    </Col>
-
-                                </Form>
+                            </Form>
 
 
 
-                            </Row>
-                        </Container>
+                        </Row>
+                    </Container>
 
-                    )
-                }
+                )
+            }
 
-                {/* {step === 6 && (
+            {/* {step === 6 && (
                 <Container>
                     <Row>
                         <Col md={12} className="text-start">
@@ -1700,8 +1720,8 @@ function First_info_form() {
                     </Row>
                 </Container>
             )} */}
-            </>
-        )
-    }
+        </>
+    )
+}
 
-    export default First_info_form;
+export default First_info_form;

@@ -351,7 +351,7 @@ function Edit_Rescue_details() {
                       <Form.Control
                         type="file"
                         name="attach_policeMemo"
-                        accept="image/*"
+                        accept=".jpg,.jpeg,.png"
                         onChange={handleFileChange}
                       />
                     </Col>
@@ -430,7 +430,7 @@ function Edit_Rescue_details() {
                       <Form.Control
                         type="file"
                         name="rescue_image"
-                        accept="image/*"
+                        accept=".jpg,.jpeg,.png"
                         onChange={handleFileChange}
                       />
                     </Col>
@@ -886,7 +886,7 @@ function Edit_Rescue_details() {
                 </Col>
 
               </Row>
-              <Button type="submit">Update</Button>
+              <Button type="submit" className='btn btn-success mb-5 mt-3'>Update</Button>
             </Form>
           </Col>
         </Row>

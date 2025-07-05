@@ -74,6 +74,52 @@ function Formality_declaration() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+         if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
+
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
+
+        if (!formData.medicine_provided || formData.medicine_provided.trim() === '') {
+            alert("Please select Medicine Provided field Yes or No.");
+            return;
+        }
+
+         if (!formData.toiletries_provided || formData.toiletries_provided.trim() === '') {
+            alert("Please select Toiletries provided field Yes or No.");
+            return;
+        }
+         if (!formData.dress_provided || formData.dress_provided.trim() === '') {
+            alert("Please select Dress Provided field Yes or No.");
+            return;
+        }
+         if (!formData.travel_expenses || formData.travel_expenses.trim() === '') {
+            alert("Please select Travel Expenses Provided field Yes or No.");
+            return;
+        }
+         if (!formData.welfare_expenses || formData.welfare_expenses.trim() === '') {
+            alert("Please select Welfare Expenses field Yes or No.");
+            return;
+        }
+         if (!formData.medical_prescription || formData.medical_prescription.trim() === '') {
+            alert("Please select Medical Prescription field Yes or No.");
+            return;
+        }
+         if (!formData.discharge_summary || formData.discharge_summary.trim() === '') {
+            alert("Please select Copy of Discharge Summary field Yes or No.");
+            return;
+        }
+         if (!formData.travel_letter || formData.travel_letter.trim() === '') {
+            alert("Please select Travel Safety Letter field Yes or No.");
+            return;
+        }
+
         try {
             const res = await apiRoute.post('/formality/createDeclaration', formData, {
                 headers: { 'Content-Type': 'application/json' },

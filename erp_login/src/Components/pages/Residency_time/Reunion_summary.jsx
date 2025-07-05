@@ -432,6 +432,7 @@ function Reunion_summary() {
                                             <Col sm="7">
                                                 <Form.Control
                                                     type="File"
+                                                    accept=".jpg,.jpeg,.png"
                                                     name="summary_attach"
                                                     onChange={handleFileChange}
                                                     required />
@@ -603,6 +604,7 @@ function Reunion_summary() {
 
                                             <Form.Control
                                                 type="file"
+                                                accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 name="summary_attach"
                                             />

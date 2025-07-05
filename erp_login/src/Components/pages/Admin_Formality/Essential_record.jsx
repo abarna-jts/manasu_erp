@@ -19,6 +19,7 @@ function Essential_record() {
     const [rescueImage, setRescueImage] = useState(null);
     const [rescueName, setRescueName] = useState("");
     const [error, setError] = useState("");
+    const [formErrors, setFormErrors] = useState({});
 
     //alert box values
     const [submissionMessage, setSubmissionMessage] = useState("");
@@ -63,13 +64,79 @@ function Essential_record() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
+    const validateField = (name, value) => {
+        let error = "";
+
+        if (name === "aadhar_card") {
+            const aadhaarPattern = /^([0-9]{4} [0-9]{4} [0-9]{4}|UNKNOWN)$/;
+            if (!aadhaarPattern.test(value)) {
+                error = "Enter a valid Aadhaar (XXXX XXXX XXXX) or type 0000 0000 0000";
+            }
+        }
+
+        if (name === "udid_no") {
+            const udidPattern = /^([A-Z0-9]{20}|UNKNOWN)$/;
+            if (!udidPattern.test(value)) {
+                error = "Enter a valid 20-character UDID or type UNKNOWN";
+            }
+        }
+
+        if (name === "voter_id") {
+            const voterPattern = /^([A-Z]{3}[0-9]{7}|UNKNOWN)$/;
+            if (!voterPattern.test(value)) {
+                error = "Enter 3 letters and 7 digits (e.g., ABC1234567) or type UNKNOWN";
+            }
+        }
+
+        if (name === "ifsc_code") {
+            const ifscPattern = /^([A-Z]{4}0[A-Z0-9]{6}|UNKNOWN)$/;
+            if (!ifscPattern.test(value)) {
+                error = "Enter valid IFSC code (e.g., SBIN0001234) or type UNKNOWN";
+            }
+        }
+
+        return error;
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: value
+        let updatedValue = value.toUpperCase();
+
+        // Custom formatting logic
+        if (name === "aadhar_card" && updatedValue !== "UNKNOWN") {
+            updatedValue = value.replace(/\D/g, '').slice(0, 12);
+            updatedValue = updatedValue.replace(/(.{4})/g, '$1 ').trim();
+        }
+
+        if (name === "udid_no" && updatedValue !== "UNKNOWN") {
+            updatedValue = updatedValue.replace(/[^A-Z0-9]/gi, '').slice(0, 20).toUpperCase();
+        }
+
+        if (name === "voter_id" && updatedValue !== "UNKNOWN") {
+            updatedValue = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+            if (updatedValue.length > 10) return;
+        }
+
+        if (name === "ifsc_code" && updatedValue !== "UNKNOWN") {
+            updatedValue = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+            if (updatedValue.length > 11) return;
+        }
+
+        // Set form data
+        setFormData(prev => ({
+            ...prev,
+            [name]: updatedValue
+        }));
+
+        // Validate and set error
+        const errorMsg = validateField(name, updatedValue);
+        setFormErrors(prev => ({
+            ...prev,
+            [name]: errorMsg
         }));
     };
+
+
 
     const handleCheckChange = (e) => {
         const { name, value } = e.target;
@@ -103,10 +170,56 @@ function Essential_record() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        let errors = {};
+
         if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
-            return; // Stop form submission
+            return;
         }
+
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
+
+        // Aadhaar Validation
+        if (formData.aadhar_card && formData.aadhar_card !== "UNKNOWN") {
+            const digitsOnly = formData.aadhar_card.replace(/\D/g, '');
+            if (digitsOnly.length !== 12) {
+                alert("Aadhaar number must be 12 digits or type UNKNOWN");
+                return;
+            }
+        }
+
+        // UDID Validation
+        if (formData.udid_no && formData.udid_no !== "UNKNOWN") {
+            const cleaned = formData.udid_no.replace(/[^A-Z0-9]/gi, '');
+            if (cleaned.length !== 20) {
+                alert("UDID must be exactly 20 alphanumeric characters or type UNKNOWN");
+                return;
+            }
+        }
+
+        // Voter ID Validation
+        if (formData.voter_id && formData.voter_id !== "UNKNOWN") {
+            const cleaned = formData.voter_id.replace(/[^A-Za-z0-9]/g, '');
+            if (!/^[A-Z]{3}[0-9]{7}$/.test(cleaned)) {
+                alert("Voter ID must be 3 letters followed by 7 digits or type UNKNOWN");
+                return;
+            }
+        }
+
+        // IFSC Code Validation
+        if (formData.ifsc_code && formData.ifsc_code !== "UNKNOWN") {
+            const cleaned = formData.ifsc_code.replace(/[^A-Za-z0-9]/g, '');
+            if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(cleaned)) {
+                alert("IFSC Code must follow format like SBIN0001234 or type UNKNOWN");
+                return;
+            }
+        }
+
 
         const data = new FormData();
         data.append('admission_no', admission_no);
@@ -516,8 +629,13 @@ function Essential_record() {
                                                 name="aadhar_card"
                                                 value={formData.aadhar_card}
                                                 onChange={handleInputChange}
-                                                className="mb-2"
+                                                className={`mb-2 ${formErrors.aadhar_card ? 'is-invalid' : ''}`}
+                                                required
                                             />
+                                            {formErrors.aadhar_card && (
+                                                <div className="text-danger small">{formErrors.aadhar_card}</div>
+                                            )}
+
 
                                             {/* UDID */}
                                             <Form.Label className="mb-1">UDID Card Number (Unique Disability ID)</Form.Label>
@@ -526,8 +644,11 @@ function Essential_record() {
                                                 name="udid_no"
                                                 value={formData.udid_no}
                                                 onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
+                                                className={`mb-2 ${formErrors.udid_no ? 'is-invalid' : ''}`}
+                                                required />
+                                            {formErrors.udid_no && (
+                                                <div className="text-danger small">{formErrors.udid_no}</div>
+                                            )}
 
                                             {/* Disability Passport */}
                                             <Form.Label className="mb-1">Disability Certificate No. & Issuing Authority</Form.Label>
@@ -537,6 +658,7 @@ function Essential_record() {
                                                 value={formData.disability_no}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+                                                required
                                             />
 
                                             {/* Voter ID */}
@@ -546,8 +668,11 @@ function Essential_record() {
                                                 name="voter_id"
                                                 value={formData.voter_id}
                                                 onChange={handleInputChange}
-                                                className="mb-2"
-                                            />
+                                                className={`mb-2 ${formErrors.voter_id ? 'is-invalid' : ''}`}
+                                                required />
+                                            {formErrors.voter_id && (
+                                                <div className="text-danger small">{formErrors.voter_id}</div>
+                                            )}
 
                                             {/* Form 7 */}
                                             <Form.Label className="mb-1">Form 7</Form.Label>
@@ -557,6 +682,7 @@ function Essential_record() {
                                                 value={formData.form_7}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+                                                required
                                             />
 
                                             {/* Form 7  attachment*/}
@@ -564,7 +690,9 @@ function Essential_record() {
                                             <Form.Control
                                                 type="file"
                                                 name="form7_attach"
+                                                accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
+                                                required
                                             />
                                         </Col>
                                     </Form.Group>
@@ -582,16 +710,18 @@ function Essential_record() {
                                                 value={formData.bank_name}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+                                                required
                                             />
 
                                             {/* UDID */}
                                             <Form.Label className="mb-1">Account Number</Form.Label>
                                             <Form.Control
-                                                type="text"
+                                                type="number"
                                                 name="account_no"
                                                 value={formData.account_no}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+                                                required
                                             />
 
                                             {/* Disability Passport */}
@@ -601,12 +731,17 @@ function Essential_record() {
                                                 name="ifsc_code"
                                                 value={formData.ifsc_code}
                                                 onChange={handleInputChange}
-                                                className="mb-2"
+                                                className={`mb-2 ${formErrors.ifsc_code ? 'is-invalid' : ''}`}
+                                                required
                                             />
+                                            {formErrors.ifsc_code && (
+                                                <div className="text-danger small">{formErrors.ifsc_code}</div>
+                                            )}
 
                                             <Form.Label className="mb-1">Copy of Bank Passbook (attach)</Form.Label>
                                             <Form.Control
                                                 type="file"
+                                                accept=".jpg,.jpeg,.png"
                                                 name="bank_passbook"
                                                 onChange={handleFileChange}
                                             />
@@ -626,6 +761,7 @@ function Essential_record() {
                                                 value={formData.insurance_provider}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+                                                required
                                             />
 
                                             {/* UDID */}
@@ -636,6 +772,7 @@ function Essential_record() {
                                                 value={formData.policy_no}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+                                                required
                                             />
 
                                             {/* Disability Passport */}
@@ -646,6 +783,7 @@ function Essential_record() {
                                                 value={formData.validity_period}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+                                                required
                                             />
 
                                             <Form.Label className="mb-1">Other Govt. Scheme </Form.Label>
@@ -655,6 +793,7 @@ function Essential_record() {
                                                 value={formData.other_gvt_scheme}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+
                                             />
 
                                             <Form.Label className="mb-1">Any Other </Form.Label>
@@ -670,7 +809,7 @@ function Essential_record() {
 
                                     <div>
                                         {userType === "1" && (
-                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
                                         )}
                                     </div>
 
@@ -724,7 +863,9 @@ function Essential_record() {
                                     value={formData.aadhar_card}
                                     onChange={handleInputChange}
                                     className="mb-2"
+                                    required
                                 />
+
 
                                 {/* UDID */}
                                 <Form.Label className="mb-1">UDID Card Number (Unique Disability ID)</Form.Label>
@@ -793,7 +934,7 @@ function Essential_record() {
                                 {/* UDID */}
                                 <Form.Label className="mb-1">Account Number</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    type="number"
                                     name="account_no"
                                     value={formData.account_no}
                                     onChange={handleInputChange}
@@ -916,8 +1057,14 @@ function Essential_record() {
                                             name="aadhar_card"
                                             value={formData.aadhar_card}
                                             onChange={handleInputChange}
-                                            required />
+                                            className={`mb-2 ${formErrors.aadhar_card ? 'is-invalid' : ''}`}
+                                            required
+                                        />
+
                                     </Col>
+                                    {formErrors.aadhar_card && (
+                                        <div className="text-danger small">{formErrors.aadhar_card}</div>
+                                    )}
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
@@ -930,8 +1077,13 @@ function Essential_record() {
                                             name="udid_no"
                                             value={formData.udid_no}
                                             onChange={handleInputChange}
-                                            required />
+                                            className={`mb-2 ${formErrors.udid_no ? 'is-invalid' : ''}`}
+                                            required /><br />
+
                                     </Col>
+                                    {formErrors.udid_no && (
+                                        <div className="text-danger small">{formErrors.udid_no}</div>
+                                    )}
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
@@ -958,8 +1110,13 @@ function Essential_record() {
                                             name="voter_id"
                                             value={formData.voter_id}
                                             onChange={handleInputChange}
+                                            className={`mb-2 ${formErrors.voter_id ? 'is-invalid' : ''}`}
                                             required />
+
                                     </Col>
+                                    {formErrors.voter_id && (
+                                        <div className="text-danger small">{formErrors.voter_id}</div>
+                                    )}
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
@@ -984,6 +1141,7 @@ function Essential_record() {
                                         <Form.Control
                                             type="file"
                                             name="form7_attach"
+                                            accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             required
                                         />
@@ -1021,7 +1179,7 @@ function Essential_record() {
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
-                                            type="text"
+                                            type="number"
                                             name="account_no"
                                             value={formData.account_no}
                                             onChange={handleInputChange}
@@ -1039,8 +1197,14 @@ function Essential_record() {
                                             name="ifsc_code"
                                             value={formData.ifsc_code}
                                             onChange={handleInputChange}
-                                            required />
+                                            className={`mb-2 ${formErrors.ifsc_code ? 'is-invalid' : ''}`}
+                                            required
+                                        />
+
                                     </Col>
+                                    {formErrors.ifsc_code && (
+                                        <div className="text-danger small">{formErrors.ifsc_code}</div>
+                                    )}
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
@@ -1051,8 +1215,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="file"
                                             name="bank_passbook"
+                                            accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
-                                            required
                                         />
 
                                         {/* Preview Image Below File Input */}

@@ -157,6 +157,19 @@ function Self_Declaration_form() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
+
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
+
+
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('rescue_name', formData.rescue_name);
@@ -420,6 +433,7 @@ function Self_Declaration_form() {
                                         <Col sm="8">
                                             <Form.Control
                                                 type="file"
+                                                accept=".jpg,.jpeg,.png"
                                                 name='handwritten_document'
                                                 onChange={handleFileChange}
                                                 required />
@@ -435,6 +449,7 @@ function Self_Declaration_form() {
                                             <Form.Control
                                                 type="file"
                                                 name='signature'
+                                                accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 required />
                                         </Col>
@@ -448,15 +463,16 @@ function Self_Declaration_form() {
                                             <Form.Control
                                                 type="file"
                                                 name='photo'
+                                                accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 required />
                                         </Col>
                                     </Form.Group>
 
                                     {userType === "1" && (
-                                    <div className="mt-3">
-                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
-                                    </div>
+                                        <div className="mt-3">
+                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                        </div>
                                     )}
 
                                 </Row>
@@ -659,6 +675,7 @@ function Self_Declaration_form() {
 
                                         <Form.Control
                                             type="file"
+                                            accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             name="handwritten_document"
                                         />
@@ -685,6 +702,7 @@ function Self_Declaration_form() {
 
                                         <Form.Control
                                             type="file"
+                                            accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             name="signature"
                                         />
@@ -710,6 +728,7 @@ function Self_Declaration_form() {
 
                                         <Form.Control
                                             type="file"
+                                            accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             name="photo"
                                         />

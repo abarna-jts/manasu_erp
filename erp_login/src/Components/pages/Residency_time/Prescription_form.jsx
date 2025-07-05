@@ -210,7 +210,7 @@ function Prescription_form() {
             return (
                 String(item.admission_no).toLowerCase().includes(searchTerm) ||
                 String(item.rescue_name).toLowerCase().includes(searchTerm) ||
-                String(item.follow_up).toLowerCase().includes(searchTerm) || 
+                String(item.follow_up).toLowerCase().includes(searchTerm) ||
                 String(item.op_no).toLowerCase().includes(searchTerm)
             );
         })
@@ -232,7 +232,10 @@ function Prescription_form() {
         setRows(updatedRows);
     };
 
-    const medicineOptions = medicalType === 'General' ? generalMedicines : psychiatristMedicines;
+    const medicineOptions = formData.medical_type === 'General'
+        ? generalMedicines
+        : psychiatristMedicines;
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -546,6 +549,7 @@ function Prescription_form() {
     };
 
 
+
     return (
         <div>
             <Container fluid>
@@ -809,7 +813,7 @@ function Prescription_form() {
                                         <Form.Select
                                             name="medical_type"
                                             value={formData.medical_type ?? ''}
-                                            onChange={handleInputChange}
+                                            onChange={handleMedicalTypeChange}
                                             required
                                         >
                                             <option value="" disabled hidden>Select Type</option>
@@ -907,6 +911,7 @@ function Prescription_form() {
                                                         <option key={idx} value={med}>{med}</option>
                                                     ))}
                                                 </select>
+
                                                 <select
                                                     className="form-select"
                                                     name="medicine_type"

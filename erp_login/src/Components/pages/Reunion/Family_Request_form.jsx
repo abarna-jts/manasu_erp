@@ -21,6 +21,8 @@ function Family_Request_form() {
     const [rescueImage, setRescueImage] = useState(null);
     const [rescueName, setRescueName] = useState("");
     const [error, setError] = useState("");
+    const [formErrors, setFormErrors] = useState({});
+    const [admissionNumberError, setAdmissionNumberError] = useState("");
 
     //alert box values
     const [submissionMessage, setSubmissionMessage] = useState("");
@@ -46,10 +48,10 @@ function Family_Request_form() {
         f_member_age: '',
         f_member_address: '',
         f_member_phone: '',
-        f_aadhar_card_no:'',
-        f_ration_card_no:'',
-        r_aadhar_card_no:'',
-        r_ration_card_no:'',
+        f_aadhar_card_no: '',
+        f_ration_card_no: '',
+        r_aadhar_card_no: '',
+        r_ration_card_no: '',
         description: '',
     })
 
@@ -64,10 +66,10 @@ function Family_Request_form() {
         f_member_age: '',
         f_member_address: '',
         f_member_phone: '',
-        f_aadhar_card_no:'',
-        f_ration_card_no:'',
-        r_aadhar_card_no:'',
-        r_ration_card_no:'',
+        f_aadhar_card_no: '',
+        f_ration_card_no: '',
+        r_aadhar_card_no: '',
+        r_ration_card_no: '',
         description: '',
     })
 
@@ -98,13 +100,48 @@ function Family_Request_form() {
         const { name, value } = e.target;
         let updatedValue = value;
 
+        // Aadhaar card formatting
         if (name === "f_aadhar_card_no" || name === "r_aadhar_card_no") {
-            updatedValue = value.replace(/\D/g, '').slice(0, 12);
-            updatedValue = updatedValue.replace(/(.{4})/g, '$1 ').trim();
+            const digitsOnly = value.replace(/\D/g, '').slice(0, 12); // Get only digits, max 12
+            updatedValue = digitsOnly.replace(/(.{4})/g, '$1 ').trim(); // Format with space
+
+            // Aadhaar error check: must be exactly 12 digits
+            setFormErrors((prevErrors) => ({
+                ...prevErrors,
+                [name]: digitsOnly.length === 12 ? "" : "Aadhaar number must be exactly 12 digits"
+            }));
         }
 
-        setStoreData(prev => ({ ...prev, [name]: updatedValue }));
+        // Allow only digits (and max 10 digits)
+        const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+        setAdmissionNumber(digitsOnly);
+
+        // Clear error while typing
+        if (digitsOnly.length === 8 || digitsOnly.length === 10) {
+            setAdmissionNumberError("");
+        } else {
+            setAdmissionNumberError("Admission number must be 8 or 10 digits");
+        }
+
+
+
+        // Phone number validation
+        if (name === "f_member_phone" || name === "phone_no") {
+            updatedValue = value.replace(/\D/g, '').slice(0, 10);
+
+            // Phone error check: must be exactly 10 digits
+            setFormErrors((prevErrors) => ({
+                ...prevErrors,
+                [name]: updatedValue.length === 10 ? "" : "Please enter exactly 10 digits"
+            }));
+        }
+
+        setStoreData(prev => ({
+            ...prev,
+            [name]: updatedValue
+        }));
     };
+
 
 
     const handleInputChange2 = (e) => {
@@ -138,6 +175,18 @@ function Family_Request_form() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!admissionNumber || admissionNumber.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
+
+        const trimmedAdNo = admissionNumber.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
 
         const data = new FormData();
         data.append('admissionNumber', admissionNumber);
@@ -234,10 +283,10 @@ function Family_Request_form() {
                 f_member_age: data.age || '',
                 description: data.description || '',
                 family_relationship: data.family_relationship || '',
-                f_aadhar_card_no:data.f_aadhar_card_no || '',
-                f_ration_card_no:data.f_ration_card_no || '',
-                r_aadhar_card_no:data.r_aadhar_card_no || '',
-                r_ration_card_no:data.r_ration_card_no || '',
+                f_aadhar_card_no: data.f_aadhar_card_no || '',
+                f_ration_card_no: data.f_ration_card_no || '',
+                r_aadhar_card_no: data.r_aadhar_card_no || '',
+                r_ration_card_no: data.r_ration_card_no || '',
                 f_member_name: data.f_member_name || '',
                 f_member_phone: data.f_member_phone || 'NULL',
                 f_member_address: data.f_member_address || '',
@@ -291,10 +340,10 @@ function Family_Request_form() {
                 f_member_name: data.f_member_name || '',
                 f_member_phone: data.f_member_phone || '',
                 f_member_address: data.f_member_address || '',
-                f_aadhar_card_no:data.f_aadhar_card_no || '',
-                f_ration_card_no:data.f_ration_card_no || '',
-                r_aadhar_card_no:data.r_aadhar_card_no || '',
-                r_ration_card_no:data.r_ration_card_no || '',
+                f_aadhar_card_no: data.f_aadhar_card_no || '',
+                f_ration_card_no: data.f_ration_card_no || '',
+                r_aadhar_card_no: data.r_aadhar_card_no || '',
+                r_ration_card_no: data.r_ration_card_no || '',
             }));
 
             // Handle old and new photo paths correctly
@@ -537,9 +586,10 @@ function Family_Request_form() {
                                 <Col sm="8">
                                     <Form.Control
                                         name="admission_no"
-                                        type='number'
+                                        type='text'
                                         value={admissionNumber}
                                         onChange={handleInputChange1}
+                                        isInvalid={!!admissionNumberError}
                                         required />
                                 </Col>
                             </Form.Group>
@@ -596,7 +646,13 @@ function Family_Request_form() {
                                         type='number'
                                         value={storeData.phone_no}
                                         onChange={handleInputChange1}
+                                        isInvalid={!!formErrors.phone_no}
                                         required />
+                                    {formErrors.phone_no && (
+                                        <div className="text-danger small mt-1">
+                                            {formErrors.phone_no}
+                                        </div>
+                                    )}
                                 </Col>
                             </Form.Group>
 
@@ -659,6 +715,11 @@ function Family_Request_form() {
                                         value={storeData.f_member_phone}
                                         onChange={handleInputChange1}
                                         required />
+                                    {formErrors.f_member_phone && (
+                                        <div className="text-danger small mt-1">
+                                            {formErrors.f_member_phone}
+                                        </div>
+                                    )}
                                 </Col>
                             </Form.Group>
 
@@ -686,6 +747,11 @@ function Family_Request_form() {
                                         value={storeData.f_aadhar_card_no}
                                         onChange={handleInputChange1}
                                         required />
+                                    {formErrors.f_aadhar_card_no && (
+                                        <div className="text-danger small mt-1">
+                                            {formErrors.f_aadhar_card_no}
+                                        </div>
+                                    )}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -695,6 +761,7 @@ function Family_Request_form() {
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
+                                        accept=".jpg,.jpeg,.png"
                                         name='f_aadhar_card'
                                         onChange={handleFileChange} />
                                 </Col>
@@ -710,6 +777,11 @@ function Family_Request_form() {
                                         value={storeData.f_ration_card_no}
                                         onChange={handleInputChange1}
                                         required />
+                                    {/* {formErrors.f_ration_card_no && (
+                                        <div className="text-danger small mt-1">
+                                            {formErrors.f_ration_card_no}
+                                        </div>
+                                    )} */}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -719,6 +791,7 @@ function Family_Request_form() {
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
+                                        accept=".jpg,.jpeg,.png"
                                         name="f_ration_card"
                                         onChange={handleFileChange} />
                                 </Col>
@@ -734,7 +807,13 @@ function Family_Request_form() {
                                         name='r_aadhar_card_no'
                                         value={storeData.r_aadhar_card_no}
                                         onChange={handleInputChange1}
+                                        isInvalid={!!formErrors.r_aadhar_card_no}
                                         required />
+                                    {formErrors.r_aadhar_card_no && (
+                                        <div className="text-danger small mt-1">
+                                            {formErrors.r_aadhar_card_no}
+                                        </div>
+                                    )}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -744,6 +823,7 @@ function Family_Request_form() {
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
+                                        accept=".jpg,.jpeg,.png"
                                         name='r_aadhar_card'
                                         onChange={handleFileChange} />
                                 </Col>
@@ -757,7 +837,13 @@ function Family_Request_form() {
                                         type="text"
                                         name="r_ration_card_no"
                                         value={storeData.r_ration_card_no}
+                                        // isInvalid={!!formErrors.r_aadhar_card_no}
                                         onChange={handleInputChange1} required />
+                                    {/* {formErrors.r_ration_card_no && (
+                                        <div className="text-danger small mt-1">
+                                            {formErrors.r_ration_card_no}
+                                        </div>
+                                    )} */}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -767,6 +853,7 @@ function Family_Request_form() {
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
+                                        accept=".jpg,.jpeg,.png"
                                         name="r_ration_card"
                                         onChange={handleFileChange} />
                                 </Col>
@@ -791,6 +878,7 @@ function Family_Request_form() {
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
+                                        accept=".jpg,.jpeg,.png"
                                         name="govt_id"
                                         onChange={handleFileChange} />
                                 </Col>
@@ -815,7 +903,7 @@ function Family_Request_form() {
                         </Col>
                         {userType === "1" && (
                             <div className="mt-3 d-flex align-tems-cente justify-content-between">
-                                <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                <Button variant="success" className="m-1 mb-5" type="submit">Submit</Button>
                             </div>
                         )}
 
@@ -930,7 +1018,7 @@ function Family_Request_form() {
 
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                     <Form.Label column sm="4">
-                                        Person Name :
+                                        Name :
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
@@ -944,7 +1032,7 @@ function Family_Request_form() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                                     <Form.Label column sm="4">
-                                        Person Age :
+                                        Age :
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
@@ -959,7 +1047,7 @@ function Family_Request_form() {
 
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
                                     <Form.Label column sm="4">
-                                        Person Phone No :
+                                        Phone No :
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
@@ -973,7 +1061,7 @@ function Family_Request_form() {
 
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
-                                        Person Address :
+                                        Address :
                                     </Form.Label>
                                     <Col sm="8">
                                         <Form.Control
@@ -1361,6 +1449,7 @@ function Family_Request_form() {
 
                                                 <Form.Control
                                                     type="file"
+                                                    accept=".jpg,.jpeg,.png"
                                                     onChange={handleFileChange}
                                                     name="f_aadhar_card"
                                                 />
@@ -1398,6 +1487,7 @@ function Family_Request_form() {
 
                                                 <Form.Control
                                                     type="file"
+                                                    accept=".jpg,.jpeg,.png"
                                                     onChange={handleFileChange}
                                                     name="f_ration_card"
                                                 />
@@ -1435,6 +1525,7 @@ function Family_Request_form() {
 
                                                 <Form.Control
                                                     type="file"
+                                                    accept=".jpg,.jpeg,.png"
                                                     onChange={handleFileChange}
                                                     name="r_aadhar_card"
                                                 />
@@ -1473,6 +1564,7 @@ function Family_Request_form() {
 
                                                 <Form.Control
                                                     type="file"
+                                                    accept=".jpg,.jpeg,.png"
                                                     onChange={handleFileChange}
                                                     name="r_ration_card"
                                                 />
@@ -1510,6 +1602,7 @@ function Family_Request_form() {
                                                 <Form.Control
                                                     type="file"
                                                     onChange={handleFileChange}
+                                                    accept=".jpg,.jpeg,.png"
                                                     name="govt_id"
                                                 />
                                             </Col>

@@ -573,6 +573,7 @@ function Annual_Report() {
                                             <Col sm="7">
                                                 <Form.Control
                                                     type="file"
+                                                    accept=".jpg,.jpeg,.png"
                                                     name="event_photos"
                                                     onChange={handleFileChange}
                                                     multiple
@@ -657,6 +658,7 @@ function Annual_Report() {
                                                 <Form.Control
                                                     type="file"
                                                     name="awarness_photos"
+                                                    accept=".jpg,.jpeg,.png"
                                                     multiple
                                                     onChange={handleFileChange}
                                                     required
@@ -738,6 +740,7 @@ function Annual_Report() {
                                                 <Form.Control
                                                     type="file"
                                                     name="outing_photos"
+                                                    accept=".jpg,.jpeg,.png"
                                                     onChange={handleFileChange}
                                                     multiple
                                                     required

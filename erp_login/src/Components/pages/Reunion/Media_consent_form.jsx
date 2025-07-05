@@ -158,6 +158,23 @@ function Media_consent_form() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
+
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
+
+        if (!formData.social_media_consent || formData.social_media_consent.trim() === '') {
+            alert("Please select Yes or No.");
+            return;
+        }
+
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('rescue_name', formData.rescue_name);
@@ -498,7 +515,7 @@ function Media_consent_form() {
                                         <Col sm="8">
                                             <Form.Control
                                                 type="file"
-                                                accept="image/*"
+                                                accept=".jpg,.jpeg,.png"
                                                 name="scan_report"
                                                 onChange={handleImageUpload}
                                                 required
@@ -696,7 +713,7 @@ function Media_consent_form() {
 
                                         <Form.Control
                                             type="file"
-                                            accept="image/*"
+                                            accept=".jpg,.jpeg,.png"
                                             name="scan_report"
                                             onChange={handleImageUpload}
                                             required

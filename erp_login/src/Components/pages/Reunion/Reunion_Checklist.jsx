@@ -372,6 +372,7 @@ function Reunion_Checklist() {
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
+                                                        accept=".jpg,.jpeg,.png"
                                                         name='familyRequestLetterFile'
                                                         onChange={handleChange}
                                                         required={formData.familyRequestLetter === "Yes"} />
@@ -410,6 +411,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='selfDeclarationFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.selfDeclarationLetter === "Yes"} />
                                                 </Col>
@@ -447,6 +449,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='mediaConsentFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.mediaConsentLetter === "Yes"} />
                                                 </Col>
@@ -489,6 +492,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='familyIDproofFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.familyIDproof === "Yes"} />
                                                 </Col>
@@ -526,6 +530,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='residentIDproofFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.residentIDproof === "Yes"} />
                                                 </Col>
@@ -563,6 +568,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='aadharCardFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.aadharCard === "Yes"} />
                                                 </Col>
@@ -600,6 +606,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='udidCardFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.udidCard === "Yes"} />
                                                 </Col>
@@ -637,6 +644,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='disabilityCertificateFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.disabilityCertificate === "Yes"} />
                                                 </Col>
@@ -674,6 +682,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='bankPassbookFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.bankPassbook === "Yes"} />
                                                 </Col>
@@ -711,6 +720,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='healthInsuranceFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.healthInsurance === "Yes"} />
                                                 </Col>
@@ -753,6 +763,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='medicalReportFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.medicalReport === "Yes"} />
                                                 </Col>
@@ -790,6 +801,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='dischargeSummaryFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.dischargeSummary === "Yes"} />
                                                 </Col>
@@ -827,6 +839,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='medicationsFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.medications === "Yes"} />
                                                 </Col>
@@ -869,6 +882,7 @@ function Reunion_Checklist() {
                                                     <Form.Control type="file"
                                                         name='ClothesFile'
                                                         onChange={handleChange}
+                                                        accept=".jpg,.jpeg,.png"
                                                         required={formData.Clothes === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -904,6 +918,7 @@ function Reunion_Checklist() {
                                                 <Form.Label column sm="2">Attach:</Form.Label>
                                                 <Col sm="10">
                                                     <Form.Control type="file"
+                                                    accept=".jpg,.jpeg,.png"
                                                         name='possessionsRecoveredFile'
                                                         onChange={handleChange}
                                                         required={formData.possessionsRecovered === "Yes"} />
@@ -941,6 +956,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='dischargeAllowanceFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.dischargeAllowance === "Yes"} />
                                                 </Col>
@@ -978,6 +994,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='travelExpensesFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.travelExpenses === "Yes"} />
                                                 </Col>
@@ -1016,6 +1033,7 @@ function Reunion_Checklist() {
                                                     <Form.Control type="file"
                                                         name='copyOfdischargeSummaryFile'
                                                         onChange={handleChange}
+                                                        accept=".jpg,.jpeg,.png"
                                                         required={formData.copyOfdischargeSummary === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1058,6 +1076,7 @@ function Reunion_Checklist() {
                                                     <Form.Control type="file"
                                                         name='travelSafetyLetterFile'
                                                         onChange={handleChange}
+                                                        accept=".jpg,.jpeg,.png"
                                                         required={formData.travelSafetyLetter === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1094,6 +1113,7 @@ function Reunion_Checklist() {
                                                 <Col sm="10">
                                                     <Form.Control type="file"
                                                         name='reunionPhotoFile'
+                                                        accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         required={formData.reunionPhoto === "Yes"} />
                                                 </Col>
@@ -1137,6 +1157,7 @@ function Reunion_Checklist() {
                                                     <Form.Control type="file"
                                                         name='witnessSignatureFile'
                                                         onChange={handleChange}
+                                                        accept=".jpg,.jpeg,.png"
                                                         required={formData.witnessSignature === "Yes"} />
                                                 </Col>
                                             </Form.Group>
