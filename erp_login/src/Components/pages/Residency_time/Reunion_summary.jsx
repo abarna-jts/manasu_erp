@@ -122,6 +122,17 @@ function Reunion_summary() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return; // Stop form submission
+        }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
+
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('rescue_name', formData.rescue_name);
@@ -401,7 +412,7 @@ function Reunion_summary() {
                                     <Col md={12}>
                                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                Resident's Name :
+                                                Resident's Name : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
@@ -414,7 +425,7 @@ function Reunion_summary() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                Date :
+                                                Date : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
@@ -422,12 +433,13 @@ function Reunion_summary() {
                                                     name="date"
                                                     value={formData.date}
                                                     onChange={handleChange}
+                                                    max="9999-12-31"
                                                     required />
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                Summary Attach :
+                                                Summary Attach : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
@@ -448,7 +460,7 @@ function Reunion_summary() {
                                                     name="report"
                                                     value={formData.report}
                                                     onChange={handleChange}
-                                                    required />
+                                                     />
                                             </Col>
                                         </Form.Group>
                                     </Col>

@@ -82,7 +82,7 @@ function Dr_visit() {
                                     <Col md={12}>
                                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                Doctor Name :
+                                                Doctor Name : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
@@ -95,7 +95,7 @@ function Dr_visit() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                Hospital Name :
+                                                Hospital Name : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
@@ -108,7 +108,7 @@ function Dr_visit() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                Date & Time :
+                                                Date & Time : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
@@ -116,12 +116,13 @@ function Dr_visit() {
                                                     name="date_time"
                                                     value={formData.date_time}
                                                     onChange={handleChange}
+                                                    max={new Date().toISOString().slice(0, 16)}
                                                     required />
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                No. of Resident Checked :
+                                                No. of Resident Checked : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
@@ -134,7 +135,7 @@ function Dr_visit() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3 mt-3" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
-                                                Report :
+                                                Report : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="7">
                                                 <Form.Control

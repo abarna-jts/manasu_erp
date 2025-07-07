@@ -145,15 +145,14 @@ function Edit_Rescue_details() {
 
 
   const formatDateTimeLocal = (dateString) => {
-    if (!dateString) return ''; // Return empty string if input is invalid or undefined
-
+    if (!dateString) return '';
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return ''; // Invalid date
-
+    if (isNaN(date.getTime())) return '';
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - offset * 60 * 1000);
-    return localDate.toISOString().slice(0, 16); // "yyyy-MM-ddThh:mm"
+    return localDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
   };
+
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -315,6 +314,7 @@ function Edit_Rescue_details() {
                       <Form.Control
                         name="date_time"
                         type='datetime-local'
+                        max={new Date().toISOString().slice(0, 16)}
                         value={formatDateTimeLocal(formData.date_time)}// Make sure `rescueDate` is a valid date string
                         onChange={handleInputChange}
                         required />

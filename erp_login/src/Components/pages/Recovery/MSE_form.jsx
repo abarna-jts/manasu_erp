@@ -283,6 +283,12 @@ function MSE_form() {
       alert("Admission Number is required.");
       return; // Stop form submission
     }
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+      return;
+    }
     if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
@@ -340,8 +346,13 @@ function MSE_form() {
       window.location.reload(); // Reload the page to reflect changes
     } catch (error) {
       console.error(error);
-      alert("Error submitting form.");
+      if (error.response && error.response.status === 409) {
+        alert(error.response.data.error); // Shows: "A record already exists for this admission number."
+      } else {
+        alert("Error submitting form.");
+      }
     }
+
   };
 
   const handleSpeechSubmit = async (e) => {
@@ -349,6 +360,13 @@ function MSE_form() {
 
     if (!formData.admission_no || formData.admission_no.trim() === '') {
       alert("Admission Number is required.");
+      return;
+    }
+
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
       return;
     }
 
@@ -393,6 +411,12 @@ function MSE_form() {
     e.preventDefault();
     if (!formData.admission_no || formData.admission_no.trim() === '') {
       alert("Admission Number is required.");
+      return;
+    }
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
       return;
     }
     if (!date || date.trim() === '') {
@@ -453,6 +477,12 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+      return;
+    }
     if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
@@ -490,6 +520,12 @@ function MSE_form() {
     e.preventDefault();
     if (!formData.admission_no || formData.admission_no.trim() === '') {
       alert("Admission Number is required.");
+      return;
+    }
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
       return;
     }
     if (!date || date.trim() === '') {
@@ -536,6 +572,12 @@ function MSE_form() {
     e.preventDefault();
     if (!formData.admission_no || formData.admission_no.trim() === '') {
       alert("Admission Number is required.");
+      return;
+    }
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
       return;
     }
     if (!date || date.trim() === '') {
@@ -592,6 +634,12 @@ function MSE_form() {
       alert("Admission Number is required.");
       return;
     }
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+      return;
+    }
     if (!date || date.trim() === '') {
       alert("Date is required.");
       return; // Stop form submission
@@ -644,6 +692,12 @@ function MSE_form() {
     e.preventDefault();
     if (!formData.admission_no || formData.admission_no.trim() === '') {
       alert("Admission Number is required.");
+      return;
+    }
+    const trimmedAdNo = formData.admission_no.trim();
+
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
       return;
     }
     if (!date || date.trim() === '') {
@@ -1523,7 +1577,7 @@ function MSE_form() {
 
   const handleCognitionUpdate = async (e, admission_no) => {
     e.preventDefault();
-    const completeCognition ={
+    const completeCognition = {
       ...cognitionData,
       canConcentrate
     };
@@ -1632,6 +1686,7 @@ function MSE_form() {
                           <Form.Control
                             type="date"
                             value={date}
+                            max="9999-12-31"
                             onChange={(e) => setDate(e.target.value)}
                           />
                         </InputGroup>
@@ -1653,7 +1708,7 @@ function MSE_form() {
             <div className="page">
 
               {/* tabs */}
-              <div className="pcss3t pcss3t-effect-scale pcss3t-theme-1">
+              <div className="pcss3t pcss3t-effect-scale pcss3t-theme-1 MSE_form_tab">
                 <input type="radio" name="pcss3t" defaultChecked id="tab1" className="tab-content-first" />
                 <label htmlFor="tab1"><i className="icon-bolt"></i>General appearance and behaviour</label>
 
@@ -1693,7 +1748,7 @@ function MSE_form() {
                       <Form onSubmit={handleSubmit}>
                         {/* General Appearance */}
                         <Form.Group controlId="general_appearance" className="icon-li" required>
-                          <h4>General Appearance:</h4>
+                          <h4>General Appearance: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["Approximate height", "Approximate height"],
@@ -1713,7 +1768,7 @@ function MSE_form() {
 
                         {/* Attitude */}
                         <Form.Group controlId="attitude" className="icon-li" required>
-                          <h4>Attitude towards the examiner:</h4>
+                          <h4>Attitude towards the examiner: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["cooperation", "Cooperation"],
@@ -1729,7 +1784,7 @@ function MSE_form() {
 
                         {/* Comprehension */}
                         <Form.Group controlId="comprehension" className="icon-li" required>
-                          <h4>Comprehension:</h4>
+                          <h4>Comprehension: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["intact", "Intact"],
@@ -1741,7 +1796,7 @@ function MSE_form() {
 
                         {/* Gait and Posture */}
                         <Form.Group controlId="gait_posture" className="icon-li" required>
-                          <h4>Gait and posture:</h4>
+                          <h4>Gait and posture: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["sitting-normal", "Normal Sitting"],
@@ -1758,7 +1813,7 @@ function MSE_form() {
 
                         {/* Motor Activity */}
                         <Form.Group controlId="motor_activity" className="icon-li" required>
-                          <h4>Motor activity:</h4>
+                          <h4>Motor activity: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["increased", "Increased"],
@@ -1777,7 +1832,7 @@ function MSE_form() {
 
                         {/* Catatonic Signs */}
                         <Form.Group controlId="catatonic_sign" className="icon-li" required>
-                          <h4>Catatonic signs:</h4>
+                          <h4>Catatonic signs: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["mannerisms", "Mannerisms"],
@@ -1795,7 +1850,7 @@ function MSE_form() {
 
                         {/* Conversion and Dissociative Signs */}
                         <Form.Group controlId="conversion_dissociative" className="icon-li" required>
-                          <h4>Conversion and dissociative signs:</h4>
+                          <h4>Conversion and dissociative signs: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["pseudo seizures", "Pseudo Seizures"],
@@ -1806,7 +1861,7 @@ function MSE_form() {
 
                         {/* Social Manner */}
                         <Form.Group controlId="social_manner" className="icon-li" required>
-                          <h4>Social manner:</h4>
+                          <h4>Social manner: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["social-increased", "Increased"],
@@ -1818,7 +1873,7 @@ function MSE_form() {
 
                         {/* Rapport */}
                         <Form.Group controlId="rapport" className="icon-li" required>
-                          <h4>Rapport:</h4>
+                          <h4>Rapport: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               [
@@ -1831,7 +1886,7 @@ function MSE_form() {
 
                         {/* Hallucinatory Behaviour */}
                         <Form.Group controlId="hallucinatory_behaviour" className="icon-li" required>
-                          <h4>Hallucinatory behaviour:</h4>
+                          <h4>Hallucinatory behaviour: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["Smiling without reason", "Smiling without reason"],
@@ -1866,7 +1921,7 @@ function MSE_form() {
                     <ul>
                       <Form onSubmit={handleSpeechSubmit}>
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Rate and quantity of speech:</h4>
+                          <h4 style={{ display: "inline" }}>Rate and quantity of speech: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["present", "Speech is present"],
@@ -1883,7 +1938,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Volume and tone of speech:</h4>
+                          <h4 style={{ display: "inline" }}>Volume and tone of speech: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["volume_increase", "Increased"],
@@ -1893,7 +1948,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Flow and rhythm of speech:</h4>
+                          <h4 style={{ display: "inline" }}>Flow and rhythm of speech: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["smooth", "Smooth"],
@@ -1934,7 +1989,7 @@ function MSE_form() {
                     <ul>
                       <Form onSubmit={handleMoodAffectSubmit}>
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Mood Described as:</h4>
+                          <h4 style={{ display: "inline" }}>Mood Described as: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["Relaxed", "Relaxed"],
@@ -1956,7 +2011,7 @@ function MSE_form() {
                         </li>
                         <li className="icon-li">
                           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>How do they appear to you?</Form.Label>
+                            <Form.Label>How do they appear to you? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='appearance'
                               value={moodFormData.appearance}
@@ -1966,7 +2021,7 @@ function MSE_form() {
 
                         <li className="icon-li">
                           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>Ask the Resident directly how he/she feels</Form.Label>
+                            <Form.Label>Ask the Resident directly how he/she feels <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='resident_feeling'
                               value={moodFormData.resident_feeling}
@@ -1974,7 +2029,7 @@ function MSE_form() {
                           </Form.Group>
                         </li>
 
-                        <h4 style={{ display: "inline" }}>Question to ask about Mood:</h4>
+                        <h4 style={{ display: "inline" }}>Question to ask about Mood: <span style={{ color: 'red' }}>*</span></h4>
                         <li className="icon-li">
                           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                             <Form.Label>How do you generally feel most of the time?</Form.Label>
@@ -1987,7 +2042,7 @@ function MSE_form() {
 
                         <li className="icon-li">
                           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>What's your mood like?</Form.Label>
+                            <Form.Label>What's your mood like? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='mood_like'
                               value={moodFormData.mood_like}
@@ -1997,7 +2052,7 @@ function MSE_form() {
 
                         <li className="icon-li">
                           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>How would you say you feel generally - happy, sad, frightened, angry ?</Form.Label>
+                            <Form.Label>How would you say you feel generally - happy, sad, frightened, angry ? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='resident_general_feeling'
                               value={moodFormData.resident_general_feeling}
@@ -2006,7 +2061,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Resident's Looks like:</h4>
+                          <h4 style={{ display: "inline" }}>Resident's Looks like: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["depressed mood", "Depressed Mood"],
@@ -2042,7 +2097,7 @@ function MSE_form() {
                     <Form onSubmit={handlethoughSubmit}>
                       <ul>
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Stream and form of thought:</h4>
+                          <h4 style={{ display: "inline" }}>Stream and form of thought: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["Spontaneity", "Spontaneity"],
@@ -2064,7 +2119,7 @@ function MSE_form() {
                         </li>
 
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Content of thought:</h4>
+                          <h4 style={{ display: "inline" }}>Content of thought: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["obession", "Obsessions and contents of phobias"],
@@ -2111,7 +2166,7 @@ function MSE_form() {
                     <Form onSubmit={handlePerceptionSubmit}>
                       <ul>
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Hallucinations:</h4>
+                          <h4 style={{ display: "inline" }}>Hallucinations: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["auditory", "Auditory"],
@@ -2125,14 +2180,14 @@ function MSE_form() {
                           <div className='d-flex flex-wrap gap-3 mt-2'>
                             <Col md={4}>
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                <Form.Label>What was heard?</Form.Label>
+                                <Form.Label>What was heard? <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control as="textarea" rows={2}
                                   name='heard'
                                   value={perceptionData.heard}
                                   onChange={handleInputChange3} />
                               </Form.Group>
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                <Form.Label>How many voices were heard?</Form.Label>
+                                <Form.Label>How many voices were heard? <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control as="textarea" rows={2}
                                   name='voices_heard'
                                   value={perceptionData.voices_heard}
@@ -2142,14 +2197,14 @@ function MSE_form() {
                             <Col md={4}>
 
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                <Form.Label>in which part of the day?</Form.Label>
+                                <Form.Label>in which part of the day? <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control as="textarea" rows={2}
                                   name='part_of_day'
                                   value={perceptionData.part_of_day}
                                   onChange={handleInputChange3} />
                               </Form.Group>
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                <Form.Label>Male or Female voices?</Form.Label>
+                                <Form.Label>Male or Female voices? <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control as="textarea" rows={2}
                                   name='female_male_voices'
                                   value={perceptionData.female_male_voices}
@@ -2160,7 +2215,7 @@ function MSE_form() {
                             <Col md={4}>
 
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                <Form.Label>How interpreted and whether second person or third person hallucinations? (i.e., whether the voices are addressing the patient or are discussing him in third person)</Form.Label>
+                                <Form.Label>How interpreted and whether second person or third person hallucinations? (i.e., whether the voices are addressing the patient or are discussing him in third person) <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control as="textarea" rows={2}
                                   name='interpreted_person'
                                   value={perceptionData.interpreted_person}
@@ -2173,7 +2228,7 @@ function MSE_form() {
                         </li>
 
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Illusions and misinterpretations:</h4>
+                          <h4 style={{ display: "inline" }}>Illusions and misinterpretations: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["Illusions_visual", "Visual"],
@@ -2189,7 +2244,7 @@ function MSE_form() {
                         </li>
 
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Perception Changes :</h4>
+                          <h4 style={{ display: "inline" }}>Perception Changes : <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["Depersonalization", "Depersonalization"],
@@ -2199,7 +2254,7 @@ function MSE_form() {
                         </li>
 
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Somatic passivity phenomenon :</h4>
+                          <h4 style={{ display: "inline" }}>Somatic passivity phenomenon : <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["strangeSensations", "Strange sensations imposed by 'somebody'"]
@@ -2244,7 +2299,7 @@ function MSE_form() {
                     <Form onSubmit={handleCognitionSubmit}>
                       <ul>
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Consciousness:</h4>
+                          <h4 style={{ display: "inline" }}>Consciousness: <span style={{ color: 'red' }}>*</span></h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {[
                               ["Conscious", "Conscious"],
@@ -2259,9 +2314,9 @@ function MSE_form() {
                         </li>
 
                         <li className='icon-li'>
-                          <h4 style={{ display: "inline" }}>Orientation:</h4>
+                          <h4 style={{ display: "inline" }}>Orientation: </h4>
                           <div className="d-flex flex-wrap gap-3 mt-2">
-                            <label>Oriented to Time:</label>
+                            <label>Oriented to Time: <span style={{ color: 'red' }}>*</span></label>
                             <select id="orientation_time" name="orientation_time" className="form-control" required
                               value={cognitionData.orientation_time}
                               onChange={handleChange1}>
@@ -2270,7 +2325,7 @@ function MSE_form() {
                               <option value="no">No</option>
                             </select>
 
-                            <label>Oriented to Place:</label>
+                            <label>Oriented to Place: <span style={{ color: 'red' }}>*</span></label>
                             <select id="orientation_place" name="orientation_place" className="form-control" required
                               value={cognitionData.orientation_place}
                               onChange={handleChange1}>
@@ -2279,7 +2334,7 @@ function MSE_form() {
                               <option value="no">No</option>
                             </select>
 
-                            <label>Oriented to Person:</label>
+                            <label>Oriented to Person: <span style={{ color: 'red' }}>*</span></label>
                             <select id="orientation_person" name="orientation_person" className="form-control" required
                               value={cognitionData.orientation_person}
                               onChange={handleChange1}>
@@ -2293,7 +2348,7 @@ function MSE_form() {
 
                         <li className='icon-li'>
                           <h4 style={{ display: "inline" }}>Attention:</h4>
-                          <p>Is the attention easily aroused and sustained. Ask the patient to repeat digits forwards backwards.</p>
+                          <p>Is the attention easily aroused and sustained. Ask the patient to repeat digits forwards backwards. <span style={{ color: 'red' }}>*</span></p>
                           <div className="d-flex flex-wrap gap-3 mt-2">
                             {consciousnessStates.map((state) => (
                               <div key={state.id} style={{ width: "30%", minWidth: "200px" }}>
@@ -2323,7 +2378,7 @@ function MSE_form() {
                         <li className='icon-li'>
                           <h4 style={{ display: "inline" }}>Concentration</h4>
                           <Form.Group className="mb-3">
-                            <Form.Label>1. Can the patient concentrate?</Form.Label>
+                            <Form.Label>1. Can the patient concentrate? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Check
                               type="radio"
                               label="Yes"
@@ -2344,7 +2399,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>2. Ease of distractibility</Form.Label>
+                            <Form.Label>2. Ease of distractibility <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               placeholder="Describe how easily the Resident's is distracted"
                               name='distractibility'
@@ -2353,7 +2408,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>3. Ask to subtract serial sevens from hundred (100-7 test), or serial threes from forty (40-3 test), or to count backwards from 20</Form.Label>
+                            <Form.Label>3. Ask to subtract serial sevens from hundred (100-7 test), or serial threes from forty (40-3 test), or to count backwards from 20 <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               placeholder="Describe the resident's response."
                               name='asking_test'
@@ -2362,7 +2417,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>4. Enumerate the names of the months (or days of the week) in the reverse order.</Form.Label>
+                            <Form.Label>4. Enumerate the names of the months (or days of the week) in the reverse order. <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               placeholder="Describe or write the resident's response here"
                               name="names_months"
@@ -2371,7 +2426,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>5. Note down the answers and the time take perform the tests.</Form.Label>
+                            <Form.Label>5. Note down the answers and the time take perform the tests. <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               placeholder="Describe here..."
                               value={cognitionData.test_performance}
@@ -2383,7 +2438,7 @@ function MSE_form() {
                         <li className='icon-li'>
                           <h4 style={{ display: "inline" }}>Memory:</h4>
                           <Form.Group className="mb-3">
-                            <Form.Label>Immediate Retention (IR)</Form.Label>
+                            <Form.Label>Immediate Retention (IR) <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2394,7 +2449,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Recall (R) after a delay</Form.Label>
+                            <Form.Label>Recall (R) after a delay <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2405,7 +2460,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>How did the patient come to the room/hospital ?</Form.Label>
+                            <Form.Label>How did the patient come to the room/hospital ? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2416,7 +2471,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>What he ate for dinner the day before or for breakfast the same morning ?</Form.Label>
+                            <Form.Label>What he ate for dinner the day before or for breakfast the same morning ? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2427,7 +2482,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Ask for the date of marriage</Form.Label>
+                            <Form.Label>Ask for the date of marriage <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2438,7 +2493,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Name and birthdays of children</Form.Label>
+                            <Form.Label>Name and birthdays of children <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               name="birthdays_children"
@@ -2460,7 +2515,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Note any amnesia (anterograde/retrograde)</Form.Label>
+                            <Form.Label>Note any amnesia (anterograde/retrograde) <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2475,7 +2530,7 @@ function MSE_form() {
                           <h4 style={{ display: "inline" }}>Question to ask for the Memory</h4>
                           <h5>Long-term Memory</h5>
                           <Form.Group className="mb-3">
-                            <Form.Label>Where did you live when you were growing up?</Form.Label>
+                            <Form.Label>Where did you live when you were growing up? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               name="live_growing"
@@ -2486,7 +2541,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>What was the name of the school you went to?</Form.Label>
+                            <Form.Label>What was the name of the school you went to? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2499,7 +2554,7 @@ function MSE_form() {
                           <h5>Short-term Memory</h5>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>What did you have for breakfast?</Form.Label>
+                            <Form.Label>What did you have for breakfast? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2510,7 +2565,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>What did you do Yesterday?</Form.Label>
+                            <Form.Label>What did you do Yesterday? <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2526,7 +2581,7 @@ function MSE_form() {
                         <li className='icon-li'>
                           <h4 style={{ display: "inline" }}>Intelligence:</h4>
                           <Form.Group className="mb-3">
-                            <Form.Label>Ask questions about general information, keeping in mind the patient's educational and social background, his experiences and interests</Form.Label>
+                            <Form.Label>Ask questions about general information, keeping in mind the patient's educational and social background, his experiences and interests <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2538,7 +2593,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Test for reading and writing</Form.Label>
+                            <Form.Label>Test for reading and writing <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2550,7 +2605,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Give simple tests of calculation</Form.Label>
+                            <Form.Label>Give simple tests of calculation <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2567,7 +2622,7 @@ function MSE_form() {
                           <p>Abstract thinking testing assesses patient's concept formation. The methods used are:</p>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Proverb testing: Asking the meaning of simple proverbs.</Form.Label>
+                            <Form.Label>Proverb testing: Asking the meaning of simple proverbs. <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2579,7 +2634,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Ask the resident to identify the similarities and differences between familiar objects such as a table and a chair, a banana and an orange, a dog and a lion, and an eye and an ear.</Form.Label>
+                            <Form.Label>Ask the resident to identify the similarities and differences between familiar objects such as a table and a chair, a banana and an orange, a dog and a lion, and an eye and an ear. <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
@@ -2612,7 +2667,7 @@ function MSE_form() {
                     <ul>
                       <Form onSubmit={handleJudgementSubmit}>
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Personal judgement:</h4>
+                          <h4 style={{ display: "inline" }}>Personal judgement: <span style={{ color: 'red' }}>*</span></h4>
                           <Form.Group className="mb-3">
                             <Form.Control as="textarea" rows={2}
                               name='personal_judgement'
@@ -2622,7 +2677,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Social judgement:</h4>
+                          <h4 style={{ display: "inline" }}>Social judgement: <span style={{ color: 'red' }}>*</span></h4>
                           <Form.Group className="mb-3">
                             <Form.Control as="textarea" rows={2}
                               name='social_judgement'
@@ -2633,7 +2688,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Test judgement:</h4>
+                          <h4 style={{ display: "inline" }}>Test judgement: <span style={{ color: 'red' }}>*</span></h4>
                           <Form.Group className="mb-3">
                             <Form.Label>Please explain what actions you would take in the following situations: a house on fire, a man lying on the road, and a sealed, stamped envelope on the street.</Form.Label>
                             <Form.Control as="textarea" rows={2}
@@ -2644,7 +2699,7 @@ function MSE_form() {
                         </li>
 
                         <li className="icon-li">
-                          <h4 style={{ display: "inline" }}>Judgement:</h4>
+                          <h4 style={{ display: "inline" }}>Judgement: <span style={{ color: 'red' }}>*</span></h4>
                           <Form.Group>
                             <div>
                               {["Good", "Intact", "Normal", "Poor", "Impaired", "Abnormal"].map((value) => (
@@ -2689,9 +2744,9 @@ function MSE_form() {
                       <Form onSubmit={handleInsightSubmit}>
                         <li className="icon-li">
                           <h4 style={{ display: "inline" }}>LEVELS OF INSIGHT:</h4>
-                          <p>Insight is assessed using a six-point scale ranging from one to six.</p>
+                          <p>Insight is assessed using a six-point scale ranging from one to six. </p>
                           <Form.Group className="mb-3">
-                            <Form.Label>1. Complete denial of illness</Form.Label>
+                            <Form.Label>1. Complete denial of illness <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='denail_illness'
                               value={insightData.denail_illness}
@@ -2699,7 +2754,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>2. Slight awareness of being sick & needing help but denying it at the same time</Form.Label>
+                            <Form.Label>2. Slight awareness of being sick & needing help but denying it at the same time <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='slight_awareness'
                               value={insightData.slight_awareness}
@@ -2708,7 +2763,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>3. Awareness of being sick but blaming it on others, on external factors, or on organic factors.</Form.Label>
+                            <Form.Label>3. Awareness of being sick but blaming it on others, on external factors, or on organic factors. <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='awarness_sick'
                               value={insightData.awarness_sick}
@@ -2716,7 +2771,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>4. Awareness that illness is due to something unknown in the patient</Form.Label>
+                            <Form.Label>4. Awareness that illness is due to something unknown in the patient <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='awarness_illness'
                               value={insightData.awarness_illness}
@@ -2724,7 +2779,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>5. Intellectual insight</Form.Label>
+                            <Form.Label>5. Intellectual insight <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='intellectual_insight'
                               value={insightData.intellectual_insight}
@@ -2732,7 +2787,7 @@ function MSE_form() {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>6. True emotional insight</Form.Label>
+                            <Form.Label>6. True emotional insight <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Form.Control as="textarea" rows={2}
                               name='true_emotion'
                               value={insightData.true_emotion}

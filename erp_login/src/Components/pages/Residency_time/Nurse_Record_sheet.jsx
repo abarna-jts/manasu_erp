@@ -37,53 +37,66 @@ function Nurse_Record_sheet() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    
+
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
     //alert box values
-        const [submissionMessage, setSubmissionMessage] = useState("");
-        const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
+    const [submissionMessage, setSubmissionMessage] = useState("");
+    const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
 
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    try {
-        const response = await apiRoute.post("/residency/nurse_record", formData);
-        console.log(response);
+        if (!formData.admission_no || formData.admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
 
-        if (response.data.message === "Nurse Record Sheet Created Successfully") {
-            setSubmissionMessage("Form submitted successfully!");
-            setMessageType("success");
+        const trimmedAdNo = formData.admission_no.trim();
 
-            // Reset the form
-            setFormData({
-                id: '',
-                admission_no: '',
-                month: '',
-                temperature: '',
-                bp: '',
-                pulse: '',
-                weight: '',
-                date:''
-            });
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
 
-            handleClose(); // Close modal
 
-            // Reload after 3 seconds
-            setTimeout(() => window.location.reload(), 3000);
-        } else {
-            setSubmissionMessage("Submission failed.");
+        try {
+            const response = await apiRoute.post("/residency/nurse_record", formData);
+            console.log(response);
+
+            if (response.data.message === "Nurse Record Sheet Created Successfully") {
+                setSubmissionMessage("Form submitted successfully!");
+                setMessageType("success");
+
+                // Reset the form
+                setFormData({
+                    id: '',
+                    admission_no: '',
+                    month: '',
+                    temperature: '',
+                    bp: '',
+                    pulse: '',
+                    weight: '',
+                    date: ''
+                });
+
+                handleClose(); // Close modal
+
+                // Reload after 3 seconds
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                setSubmissionMessage("Submission failed.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("Error submitting form", error);
+            setSubmissionMessage("Something went wrong.");
             setMessageType("danger");
         }
-    } catch (error) {
-        console.error("Error submitting form", error);
-        setSubmissionMessage("Something went wrong.");
-        setMessageType("danger");
-    }
-};
+    };
 
 
 
@@ -157,31 +170,31 @@ function Nurse_Record_sheet() {
 
 
 
-   const handleUpdate = async (e, id) => {
-    e.preventDefault();
+    const handleUpdate = async (e, id) => {
+        e.preventDefault();
 
-    try {
-        const response = await apiRoute.put(`/residency/updateRecords/${id}`, formData);
-        console.log(response.data);
+        try {
+            const response = await apiRoute.put(`/residency/updateRecords/${id}`, formData);
+            console.log(response.data);
 
-        if (response.data.message === "Nurse Record updated successfully!") {
-            setSubmissionMessage("Form updated successfully!");
-            setMessageType("success");
+            if (response.data.message === "Nurse Record updated successfully!") {
+                setSubmissionMessage("Form updated successfully!");
+                setMessageType("success");
 
-            handleClose1(true);
+                handleClose1(true);
 
-            // Reload after 3 seconds
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            setSubmissionMessage("Error updating the form.");
+                // Reload after 3 seconds
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                setSubmissionMessage("Error updating the form.");
+                setMessageType("danger");
+            }
+        } catch (error) {
+            console.error("There was an error updating the form:", error);
+            setSubmissionMessage("Something went wrong.");
             setMessageType("danger");
         }
-    } catch (error) {
-        console.error("There was an error updating the form:", error);
-        setSubmissionMessage("Something went wrong.");
-        setMessageType("danger");
-    }
-};
+    };
 
 
 
@@ -211,9 +224,9 @@ function Nurse_Record_sheet() {
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                     {userType === "3" && (
-                                    <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
-                                        <i className="fas fa-plus"></i>
-                                    </InputGroup.Text>
+                                        <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
+                                            <i className="fas fa-plus"></i>
+                                        </InputGroup.Text>
                                     )}
 
                                 </InputGroup>
@@ -224,23 +237,23 @@ function Nurse_Record_sheet() {
             </Container>
 
             <div>
-                    {/* Show success or error message box */}
-                    {submissionMessage && (
-                        <Alert variant={messageType} className="mt-3">
-                            {submissionMessage}
-                        </Alert>
-                    )}
-                </div>
+                {/* Show success or error message box */}
+                {submissionMessage && (
+                    <Alert variant={messageType} className="mt-3">
+                        {submissionMessage}
+                    </Alert>
+                )}
+            </div>
 
             <Container>
                 <Row>
                     <Col md={4}>
-                    {userType === "3" && (
-                        <Button variant="success"
-                            className="m-1 d-flex justify-content-start align-items-center"
-                            type="submit"
-                            onClick={handleShow}>Enter Condition</Button>
-                    )}
+                        {userType === "3" && (
+                            <Button variant="success"
+                                className="m-1 d-flex justify-content-start align-items-center"
+                                type="submit"
+                                onClick={handleShow}>Enter Condition</Button>
+                        )}
                     </Col>
                     <Col md={12} className="mt-3 my-3">
 
@@ -298,7 +311,7 @@ function Nurse_Record_sheet() {
                 </Row>
             </Container>
 
-            
+
 
 
             <Modal show={show} onHide={handleClose}>
@@ -311,7 +324,7 @@ function Nurse_Record_sheet() {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAdmissionNo">
-                                        <Form.Label>Admission Number</Form.Label>
+                                        <Form.Label>Admission Number <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="admission_no"
@@ -323,7 +336,7 @@ function Nurse_Record_sheet() {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAdmissionNo">
-                                        <Form.Label>Month</Form.Label>
+                                        <Form.Label>Month <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Select
                                             name="month"
                                             value={formData.month}
@@ -351,12 +364,14 @@ function Nurse_Record_sheet() {
                             <Row>
                                 <Col md={9}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Date</Form.Label>
+                                        <Form.Label>Date <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="date"
                                             name="date"
+                                            max="9999-12-31"
                                             value={formData.date}
                                             onChange={handleInputChange}
+                                            required
                                         />
                                     </Form.Group>
                                 </Col>
@@ -366,7 +381,7 @@ function Nurse_Record_sheet() {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>Temperature</Form.Label>
+                                        <Form.Label>Temperature <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="temperature"
@@ -378,7 +393,7 @@ function Nurse_Record_sheet() {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>BP</Form.Label>
+                                        <Form.Label>BP <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="bp"
@@ -394,7 +409,7 @@ function Nurse_Record_sheet() {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>Pulse</Form.Label>
+                                        <Form.Label>Pulse <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="pulse"
@@ -406,7 +421,7 @@ function Nurse_Record_sheet() {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>Weight</Form.Label>
+                                        <Form.Label>Weight <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="weight"
@@ -445,7 +460,7 @@ function Nurse_Record_sheet() {
 
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAdmissionNo">
-                                        <Form.Label>Month</Form.Label>
+                                        <Form.Label>Month <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Select
                                             name="currentMonth"
                                             value={formData.currentMonth}
@@ -472,10 +487,11 @@ function Nurse_Record_sheet() {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Date</Form.Label>
+                                        <Form.Label>Date <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="date"
                                             name="date"
+                                            max="9999-12-31"
                                             value={formData.date}
                                             onChange={handleInputChange}
                                             required
@@ -486,7 +502,7 @@ function Nurse_Record_sheet() {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>Temperature</Form.Label>
+                                        <Form.Label>Temperature <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="temperature"
@@ -498,7 +514,7 @@ function Nurse_Record_sheet() {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>BP</Form.Label>
+                                        <Form.Label>BP <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="bp"
@@ -514,7 +530,7 @@ function Nurse_Record_sheet() {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>Pulse</Form.Label>
+                                        <Form.Label>Pulse <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="pulse"
@@ -526,7 +542,7 @@ function Nurse_Record_sheet() {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formResidentName">
-                                        <Form.Label>Weight</Form.Label>
+                                        <Form.Label>Weight <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="weight"

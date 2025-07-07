@@ -75,30 +75,51 @@ function SCRB_form() {
 
     const handleSearch = async () => {
         try {
-            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const response = await apiRoute.get(
+                `admision/get_scrbform2data/${admission_no}`
+            );
             const result = response.data.data[0];
             console.log("API Result:", result);
 
             if (result && result.rescue_image) {
+                console.log("Raw image path:", result.rescue_image);
+
+                const cleanPath = result.rescue_image.startsWith("/")
+                    ? result.rescue_image.slice(1)
+                    : result.rescue_image;
+
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${cleanPath}`;
+
+                console.log("Final image path:", imagePath);
 
                 setRescueImage(imagePath);
-                setRescueName(result.rescue_name || "");
-                setError(""); // clear any previous error
+                setError('');
             } else {
                 setRescueImage(null);
-                setRescueName("");
-                setError("Image not found for this admission number");
+                setError('Image not found for this admission number');
             }
+
+            // Set other form fields
+            setFormData(prev => ({
+                ...prev,
+                rescue_name: result.rescue_name || '',
+                father: result.father || '',
+                date_time: result.date_time || '',
+                rescue_status: result.rescue_status || '',
+                language1: result.language1 || '',
+                place: result.place || '',
+                police_station: result.police_station || '',
+                phone_no: result.phone_no || '',
+            }));
         } catch (error) {
             console.error("Error fetching data", error);
             setRescueImage(null);
-            setRescueName("");
             setError("Admission Number Not found");
         }
     };
+
 
 
     const formatDateOnly = (dateStr) => {
@@ -355,7 +376,7 @@ function SCRB_form() {
                                 className="img-fluid rounded"
                                 style={{ width: "100px", height: "100px" }}
                             />
-                            <p className="mt-2 text-start">{rescueName || "Not available"}</p>  {/* display name below */}
+                            <p className="mt-2 text-start">{formData.rescue_name || "Not available"}</p>  {/* display name below */}
                         </>
                     ) : (
                         <p>{error || "No image to display"}</p>
@@ -461,7 +482,7 @@ function SCRB_form() {
                                         <td style={{ width: '35%' }}>
                                             <div className="row">
                                                 <div className="col-md-12">
-                                                    <label>கோப்புஎண் :</label>
+                                                    <label>கோப்புஎண் : <span style={{ color: 'red' }}>*</span></label>
                                                 </div>
                                             </div>
                                         </td>
@@ -488,7 +509,7 @@ function SCRB_form() {
                                         <td style={{ width: '35%' }}>
                                             <div className="row">
                                                 <div className="col-md-12">
-                                                    <label>FOUND PERSON PHOTO</label>
+                                                    <label>FOUND PERSON PHOTO <span style={{ color: 'red' }}>*</span></label>
                                                     <h5 className="label_tamil">மீட்கப்பட்ட நபரின் புகைப்படம்</h5>
                                                 </div>
                                             </div>
@@ -521,7 +542,7 @@ function SCRB_form() {
                                                         accept=".jpg,.jpeg,.png"
                                                         className="form-control"
                                                         onChange={handleFileChange}
-                                                        style={{ width: '300px', height: '100px' }}
+                                                        style={{ width: '331px', height: '100px' }}
                                                         required
                                                     />
                                                 </div>
@@ -572,7 +593,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Name of the Person / பெயர் :</label>
+                                                        <label>Name of the Person / பெயர் : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -603,7 +624,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Name of the Spouse/Parent :</label>
+                                                        <label>Name of the Spouse/Parent : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -634,7 +655,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Gendar / பாலினம் :</label>
+                                                        <label>Gendar / பாலினம் : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -665,7 +686,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Found Date :</label>
+                                                        <label>Found Date : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -675,6 +696,7 @@ function SCRB_form() {
                                                         <input
                                                             type="date"
                                                             name="date_time"
+                                                            max="9999-12-31"
                                                             className="form-control text-center"
                                                             value={formatDateOnly(formData.date_time || '')}
                                                             onChange={handleInputChange}
@@ -695,7 +717,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Marital Status :</label>
+                                                        <label>Marital Status : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -726,7 +748,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Language Known :</label>
+                                                        <label>Language Known : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -757,7 +779,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>District :</label>
+                                                        <label>District : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -788,7 +810,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Police Station (காவல் நிலையம்) :</label>
+                                                        <label>Police Station (காவல் நிலையம்) :  <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -800,6 +822,7 @@ function SCRB_form() {
                                                             name="police_station"
                                                             className="form-control text-center"
                                                             onChange={handleInputChange}
+                                                            required
                                                             value={formData.police_station || ''}
                                                         />
                                                     </div>
@@ -821,7 +844,7 @@ function SCRB_form() {
                                                         name="addition_info"
                                                         id="exampleFormControlTextarea1"
                                                         onChange={handleInputChange}
-                                                        required
+                                                        
                                                         rows="3"></textarea>
                                                 </div>
                                             </div>
@@ -835,7 +858,7 @@ function SCRB_form() {
                                         <td>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
-                                                    <label>SIGNATURE / கையொப்பம் : </label>
+                                                    <label>SIGNATURE / கையொப்பம் :  <span style={{ color: 'red' }}>*</span></label>
                                                 </div>
                                             </div>
                                         </td>
@@ -854,7 +877,7 @@ function SCRB_form() {
                                         <td>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
-                                                    <label>NAME / பெயர் :</label>
+                                                    <label>NAME / பெயர் : <span style={{ color: 'red' }}>*</span></label>
                                                 </div>
                                             </div>
                                         </td>
@@ -873,7 +896,7 @@ function SCRB_form() {
                                         <td>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
-                                                    <label>PHONE NUMBER / தொலைபேசி எண் :</label>
+                                                    <label>PHONE NUMBER / தொலைபேசி எண் : <span style={{ color: 'red' }}>*</span></label>
                                                 </div>
                                             </div>
                                         </td>
@@ -896,7 +919,7 @@ function SCRB_form() {
                                         <td>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
-                                                    <label>SEAL / முத்திரை : </label>
+                                                    <label>SEAL / முத்திரை :  <span style={{ color: 'red' }}>*</span></label>
                                                 </div>
                                             </div>
                                         </td>

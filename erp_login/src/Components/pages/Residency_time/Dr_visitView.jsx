@@ -365,6 +365,7 @@ function Dr_visitView() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="date_time"
+                                        max={new Date().toISOString().slice(0, 16)}
                                         value={formatForInput(formData.date_time)}
                                         onChange={handleChange}
                                         required />
@@ -414,7 +415,7 @@ function Dr_visitView() {
                                 <Col md={12}>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Doctor Name :
+                                            Doctor Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -427,7 +428,7 @@ function Dr_visitView() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Hospital Name :
+                                            Hospital Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -440,12 +441,13 @@ function Dr_visitView() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Date & Time :
+                                            Date & Time : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
                                                 type="datetime-local"
                                                 name="date_time"
+                                                max={new Date().toISOString().slice(0, 16)}
                                                 value={formatForInput(formData.date_time)}
                                                 onChange={handleChange}
                                                 required />
@@ -453,7 +455,7 @@ function Dr_visitView() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            No. of Resident examinite :
+                                            No. of Resident examinite : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -474,7 +476,7 @@ function Dr_visitView() {
                                                 name="report"
                                                 value={formData.report}
                                                 onChange={handleChange}
-                                                required />
+                                                 />
                                         </Col>
                                     </Form.Group>
                                 </Col>

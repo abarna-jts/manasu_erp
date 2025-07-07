@@ -535,6 +535,7 @@ function Annual_Report() {
                                                 <Form.Control
                                                     type="date"
                                                     name="event_date"
+                                                    max="9999-12-31"
                                                     value={eventData.event_date}
                                                     onChange={handleInputChange}
                                                     required
@@ -620,6 +621,7 @@ function Annual_Report() {
                                                 <Form.Control
                                                     type="date"
                                                     name="awarness_date"
+                                                    max="9999-12-31"
                                                     value={eventData.awarness_date}
                                                     onChange={handleInputChange}
                                                     required
@@ -702,6 +704,7 @@ function Annual_Report() {
                                                 <Form.Control
                                                     type="date"
                                                     name="outing_date"
+                                                    max="9999-12-31"
                                                     value={eventData.outing_date}
                                                     onChange={handleInputChange}
                                                     required
@@ -843,6 +846,7 @@ function Annual_Report() {
                                             name="celebration_date"
                                             value={celebrationData.celebration_date}
                                             onChange={handleInputChange1}
+                                            max="9999-12-31"
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -976,6 +980,7 @@ function Annual_Report() {
                                         <Form.Control type="date"
                                             name="program_date"
                                             value={programData.program_date}
+                                            max="9999-12-31"
                                             onChange={handleInputChange2}
                                             required />
                                     </Col>
@@ -1070,6 +1075,7 @@ function Annual_Report() {
                                             name="staff_date"
                                             value={staffData.staff_date}
                                             onChange={handleInputChange3}
+                                            max="9999-12-31"
                                             required />
                                     </Col>
                                 </Form.Group>

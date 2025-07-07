@@ -279,7 +279,7 @@ function Psychiatrics_form() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `http://localhost:5002/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");
@@ -322,6 +322,13 @@ function Psychiatrics_form() {
             return;
         }
 
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
+
         if (!date || date.trim() === '') {
             alert("Date is required.");
             return;
@@ -349,6 +356,12 @@ function Psychiatrics_form() {
 
         if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
+            return;
+        }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -379,6 +392,12 @@ function Psychiatrics_form() {
 
         if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
+            return;
+        }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -438,6 +457,12 @@ function Psychiatrics_form() {
             alert("Admission Number is required.");
             return;
         }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
         if (!date || date.trim() === '') {
             alert("Date is required.");
             return;
@@ -474,6 +499,12 @@ function Psychiatrics_form() {
             alert("Admission Number is required.");
             return;
         }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
         if (!date || date.trim() === '') {
             alert("Date is required.");
             return;
@@ -499,6 +530,12 @@ function Psychiatrics_form() {
         e.preventDefault();
         if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
+            return;
+        }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -540,6 +577,12 @@ function Psychiatrics_form() {
             alert("Admission Number is required.");
             return;
         }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
         if (!date || date.trim() === '') {
             alert("Date is required.");
             return;
@@ -564,6 +607,12 @@ function Psychiatrics_form() {
         e.preventDefault();
         if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
+            return;
+        }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -592,6 +641,12 @@ function Psychiatrics_form() {
             alert("Admission Number is required.");
             return;
         }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
         if (!date || date.trim() === '') {
             alert("Date is required.");
             return;
@@ -617,6 +672,12 @@ function Psychiatrics_form() {
         e.preventDefault();
         if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
+            return;
+        }
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -1562,6 +1623,7 @@ function Psychiatrics_form() {
                         <Form.Control name='date'
                             type='date'
                             value={date}
+                            max="9999-12-31"
                             onChange={handleDateChange} />
                     </Form.Group>
                 </Form>
@@ -1622,7 +1684,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleSubmit}>
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Name: </Form.Label>
+                                                        <Form.Label column sm="4">Name: <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='patient_name'
@@ -1634,7 +1696,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Age: </Form.Label>
+                                                        <Form.Label column sm="4">Age:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='patient_age'
@@ -1646,19 +1708,20 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Gender: </Form.Label>
+                                                        <Form.Label column sm="4">Gender:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='patient_gender'
                                                                 value={formData.patient_gender}
                                                                 onChange={handleInputChange}
                                                                 readOnly
+                                                                required
                                                             />
                                                         </Col>
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Sexual Orientation:</Form.Label>
+                                                        <Form.Label column sm="4">Sexual Orientation: <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='sexual_orientation'
@@ -1670,7 +1733,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Educational Background: </Form.Label>
+                                                        <Form.Label column sm="4">Educational Background:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='education_bg'
@@ -1682,7 +1745,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Occupation and Employment Status: </Form.Label>
+                                                        <Form.Label column sm="4">Occupation and Employment Status:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='occupation'
@@ -1694,7 +1757,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Marital Status: </Form.Label>
+                                                        <Form.Label column sm="4">Marital Status:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='marital_status'
@@ -1706,7 +1769,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Socio Economic Status: </Form.Label>
+                                                        <Form.Label column sm="4">Socio Economic Status:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='economic_status'
@@ -1718,7 +1781,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Religion: </Form.Label>
+                                                        <Form.Label column sm="4">Religion:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='religion'
@@ -1729,7 +1792,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Informant: </Form.Label>
+                                                        <Form.Label column sm="4">Informant: <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='informant'
@@ -1740,7 +1803,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Residential Address (current address):  </Form.Label>
+                                                        <Form.Label column sm="4">Residential Address (current address):  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='residential_address'
@@ -1751,7 +1814,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Living Arrangements: </Form.Label>
+                                                        <Form.Label column sm="4">Living Arrangements: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Select name="living_arrangements"
                                                                 value={formData.living_arrangements}
@@ -1767,7 +1830,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Family Structure: </Form.Label>
+                                                        <Form.Label column sm="4">Family Structure:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Select name="family_structure"
                                                                 value={formData.family_structure}
@@ -1782,7 +1845,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Cultural Identity:  </Form.Label>
+                                                        <Form.Label column sm="4">Cultural Identity: <span style={{ color: 'red' }}>*</span>  </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='cultural_identity'
@@ -1793,7 +1856,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Language Preferences:  </Form.Label>
+                                                        <Form.Label column sm="4">Language Preferences:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="4">
                                                             <Form.Control type="text"
                                                                 name='language1'
@@ -1847,7 +1910,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleChiefSubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>The Chief Complaint:</h4>
+                                                        <h4>The Chief Complaint: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-2 text-start" >
                                                         <Form.Label column sm="4">Chief Complaint:  </Form.Label>
@@ -1861,7 +1924,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Onset and Duration:  </Form.Label>
+                                                        <Form.Label column sm="4">Onset and Duration:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='onset_duration'
@@ -1872,7 +1935,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Nature of Symptoms:  </Form.Label>
+                                                        <Form.Label column sm="4">Nature of Symptoms:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='nature_symptoms'
@@ -1883,7 +1946,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Severity:  </Form.Label>
+                                                        <Form.Label column sm="4">Severity: <span style={{ color: 'red' }}>*</span>  </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Select name="severity"
                                                                 value={chiefData.severity}
@@ -1898,7 +1961,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Course Type:  </Form.Label>
+                                                        <Form.Label column sm="4">Course Type:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Select name="course_type"
                                                                 value={chiefData.course_type}
@@ -1913,7 +1976,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Nature of Illness:  </Form.Label>
+                                                        <Form.Label column sm="4">Nature of Illness:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Select name="nature_illness"
                                                                 value={chiefData.nature_illness}
@@ -1932,7 +1995,7 @@ function Psychiatrics_form() {
                                                     </li>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Identify Triggers:  </Form.Label>
+                                                        <Form.Label column sm="4">Identify Triggers:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='identify_trigger'
@@ -1943,7 +2006,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Life Changes and Stressors:  </Form.Label>
+                                                        <Form.Label column sm="4">Life Changes and Stressors:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='life_changes'
@@ -1958,7 +2021,7 @@ function Psychiatrics_form() {
                                                     </li>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Biological:  </Form.Label>
+                                                        <Form.Label column sm="4">Biological:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='biological'
@@ -1969,7 +2032,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Psychological:  </Form.Label>
+                                                        <Form.Label column sm="4">Psychological:   <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='psychological'
@@ -1980,7 +2043,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-2 text-start" >
-                                                        <Form.Label column sm="4">Social / Environmental:  </Form.Label>
+                                                        <Form.Label column sm="4">Social / Environmental:  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Col sm="8">
                                                             <Form.Control type="text"
                                                                 name='social_environment'
@@ -2018,7 +2081,7 @@ function Psychiatrics_form() {
                                                         <h4>Introduction to Presenting Problems:</h4>
                                                     </li>
                                                     <Form.Group className="mb-3" >
-                                                        <Form.Label>History of Presenting Illness: </Form.Label>
+                                                        <Form.Label>History of Presenting Illness:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Form.Control as="textarea" rows={2}
                                                             name='history_presenting'
                                                             value={presentingData.history_presenting}
@@ -2031,7 +2094,7 @@ function Psychiatrics_form() {
                                                     </li>
 
                                                     <Form.Group as={Row} className="mb-3">
-                                                        <Form.Label>a.	Mood and Affect: </Form.Label>
+                                                        <Form.Label>a.	Mood and Affect: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
                                                             {[
                                                                 ["Predominant mood", "Predominant mood"],
@@ -2042,7 +2105,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-3">
-                                                        <Form.Label>b.	Thought Content: </Form.Label>
+                                                        <Form.Label>b.	Thought Content: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
                                                             {[
                                                                 ["Recurrent", "Recurrent"],
@@ -2055,7 +2118,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-3">
-                                                        <Form.Label>c.	Thought Process: </Form.Label>
+                                                        <Form.Label>c.	Thought Process:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
                                                             {[
                                                                 ["Speed of thoughts", "Speed of thoughts"],
@@ -2070,7 +2133,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-3">
-                                                        <Form.Label>d.	Perceptions: </Form.Label>
+                                                        <Form.Label>d.	Perceptions:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
                                                             {[
                                                                 ["Hallucinations", "Hallucinations"],
@@ -2084,7 +2147,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-3">
-                                                        <Form.Label>e.	Behavioural Changes: </Form.Label>
+                                                        <Form.Label>e.	Behavioural Changes:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
                                                             {[
                                                                 ["Activity level", "Activity level"],
@@ -2099,7 +2162,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group as={Row} className="mb-3">
-                                                        <Form.Label>f.	Sleep Patterns: </Form.Label>
+                                                        <Form.Label>f.	Sleep Patterns: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
                                                             {[
                                                                 ["Difficulties falling asleep", "Difficulties falling asleep"],
@@ -2111,7 +2174,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group className="mb-3" >
-                                                        <Form.Label>Appetite and Weight Changes: </Form.Label>
+                                                        <Form.Label>Appetite and Weight Changes:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Form.Control
                                                             as="textarea"
                                                             rows={2}
@@ -2124,7 +2187,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group className="mb-3" >
-                                                        <Form.Label>Energy Level: </Form.Label>
+                                                        <Form.Label>Energy Level: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Form.Control as="textarea" rows={2}
                                                             name='energy_level'
                                                             value={presentingData.energy_level}
@@ -2133,7 +2196,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Impact on Daily Functioning:</h4>
+                                                        <h4>Impact on Daily Functioning: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
 
                                                     <Form.Group className="mb-3" >
@@ -2146,7 +2209,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group className="mb-3" >
-                                                        <Form.Label>Interpersonal Relationships: </Form.Label>
+                                                        <Form.Label>Interpersonal Relationships: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Form.Control as="textarea" rows={2}
                                                             name='interpersonal_relationship'
                                                             value={presentingData.interpersonal_relationship}
@@ -2155,7 +2218,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group className="mb-3" >
-                                                        <Form.Label>Self-Care and Activities of Daily Living: </Form.Label>
+                                                        <Form.Label>Self-Care and Activities of Daily Living: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                         <Form.Control as="textarea" rows={2}
                                                             name='selfCare_activity'
                                                             value={presentingData.selfCare_activity}
@@ -2164,7 +2227,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <Form.Group className="mb-3" >
-                                                        <Form.Label>Recreational Activities: </Form.Label>
+                                                        <Form.Label>Recreational Activities:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                         <Form.Control as="textarea" rows={2}
                                                             name='recreation_activity'
                                                             value={presentingData.recreation_activity}
@@ -2196,7 +2259,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handlePsyHistorySubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>Previous Psychiatric Diagnoses:</h4>
+                                                        <h4>Previous Psychiatric Diagnoses: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group className="mb-3" >
                                                         <Form.Control as="textarea" rows={2}
@@ -2206,7 +2269,7 @@ function Psychiatrics_form() {
                                                             required />
                                                     </Form.Group>
                                                     <li className='icon-li'>
-                                                        <h4>Treatment History:</h4>
+                                                        <h4>Treatment History: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group className="mb-3" >
                                                         <Form.Control as="textarea" rows={2}
@@ -2217,12 +2280,12 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Medication History:</h4>
+                                                        <h4>Medication History: </h4>
                                                     </li>
                                                     <Row>
                                                         <Col md={4}>
                                                             <Form.Group className="mb-3" >
-                                                                <Form.Label>Medications:  </Form.Label>
+                                                                <Form.Label>Medications:   <span style={{ color: 'red' }}>*</span></Form.Label>
                                                                 <Form.Control
                                                                     name='medications'
                                                                     type='text'
@@ -2233,7 +2296,7 @@ function Psychiatrics_form() {
                                                         </Col>
                                                         <Col md={4}>
                                                             <Form.Group className="mb-3" >
-                                                                <Form.Label>Dosage:  </Form.Label>
+                                                                <Form.Label>Dosage:   <span style={{ color: 'red' }}>*</span></Form.Label>
                                                                 <Form.Control
                                                                     name='dosage'
                                                                     type='text'
@@ -2244,7 +2307,7 @@ function Psychiatrics_form() {
                                                         </Col>
                                                         <Col md={4}>
                                                             <Form.Group className="mb-3" >
-                                                                <Form.Label>Adherence:  </Form.Label>
+                                                                <Form.Label>Adherence:   <span style={{ color: 'red' }}>*</span></Form.Label>
                                                                 <Form.Control
                                                                     name='adherence'
                                                                     type='text'
@@ -2255,7 +2318,7 @@ function Psychiatrics_form() {
                                                         </Col>
                                                         <Col md={4}>
                                                             <Form.Group className="mb-3" >
-                                                                <Form.Label>Any side effects :  </Form.Label>
+                                                                <Form.Label>Any side effects :  <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                                 <Form.Control
                                                                     name='sideEffect'
                                                                     type='text'
@@ -2266,7 +2329,7 @@ function Psychiatrics_form() {
                                                         </Col>
                                                         <Col md={4}>
                                                             <Form.Group className="mb-3" >
-                                                                <Form.Label>Experienced Reactions :  </Form.Label>
+                                                                <Form.Label>Experienced Reactions : <span style={{ color: 'red' }}>*</span></Form.Label>
                                                                 <Form.Control
                                                                     name='experience_reaction'
                                                                     type='text'
@@ -2282,7 +2345,7 @@ function Psychiatrics_form() {
                                                     </li>
                                                     <Row>
                                                         <Col md={4}>
-                                                            <Form.Label>Reasons</Form.Label>
+                                                            <Form.Label>Reasons <span style={{ color: 'red' }}>*</span></Form.Label>
                                                             <Form.Control as="textarea" rows={1}
                                                                 name='hospitalisation_reason'
                                                                 value={psyHistoryData.hospitalisation_reason}
@@ -2291,7 +2354,7 @@ function Psychiatrics_form() {
                                                         </Col>
                                                         <Col md={4}>
                                                             <Form.Group>
-                                                                <Form.Label>Duration and the Outcomes</Form.Label>
+                                                                <Form.Label>Duration and the Outcomes <span style={{ color: 'red' }}>*</span></Form.Label>
                                                                 <Form.Control
                                                                     name='duration'
                                                                     text="text"
@@ -2304,7 +2367,7 @@ function Psychiatrics_form() {
                                                     </Row>
 
                                                     <li className='icon-li'>
-                                                        <h4>Crisis Episodes:</h4>
+                                                        <h4>Crisis Episodes: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group className="mb-3" >
                                                         <Form.Control as="textarea" rows={2}
@@ -2315,7 +2378,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Family Members with Mental Health Diagnoses:</h4>
+                                                        <h4>Family Members with Mental Health Diagnoses: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group className="mb-3" >
                                                         <Form.Control as="textarea" rows={2}
@@ -2326,7 +2389,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Significant Life Events and Stressors:</h4>
+                                                        <h4>Significant Life Events and Stressors: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group className="mb-3" >
                                                         <Form.Control as="textarea" rows={2}
@@ -2337,7 +2400,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Chronic Stressors:</h4>
+                                                        <h4>Chronic Stressors: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group className="mb-3" >
                                                         <Form.Control as="textarea" rows={2}
@@ -2348,7 +2411,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Exploration of Trauma:</h4>
+                                                        <h4>Exploration of Trauma: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2363,7 +2426,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Legal Involvement:</h4>
+                                                        <h4>Legal Involvement: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2399,7 +2462,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleMedicalSubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>Disability Status (Physical or Psychological):</h4>
+                                                        <h4>Disability Status (Physical or Psychological): <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control as="textarea" rows={2}
@@ -2410,7 +2473,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Chronic Medical Conditions:</h4>
+                                                        <h4>Chronic Medical Conditions: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control as="textarea" rows={2}
@@ -2421,7 +2484,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Acute Health Concerns:</h4>
+                                                        <h4>Acute Health Concerns: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control as="textarea" rows={2}
@@ -2432,7 +2495,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Medication (Duration and Outcomes):</h4>
+                                                        <h4>Medication (Duration and Outcomes):  <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control as="textarea" rows={2}
@@ -2443,7 +2506,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Medication Allergies:</h4>
+                                                        <h4>Medication Allergies: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control as="textarea" rows={2}
@@ -2454,7 +2517,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Other Allergies or Sensitivities: </h4>
+                                                        <h4>Other Allergies or Sensitivities:  <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2467,7 +2530,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Significant Medical Events: </h4>
+                                                        <h4>Significant Medical Events:  <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2481,7 +2544,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Traumatic Injuries: </h4>
+                                                        <h4>Traumatic Injuries:  <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control as="textarea" rows={2}
@@ -2492,7 +2555,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Sexual Health: </h4>
+                                                        <h4>Sexual Health:</h4> <span style={{ color: 'red' }}>*</span>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2529,7 +2592,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleFamilySubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>Family Composition:</h4>
+                                                        <h4>Family Composition: <span style={{ color: 'red' }}>*</span></h4> 
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2541,7 +2604,7 @@ function Psychiatrics_form() {
                                                         </div>
                                                     </Form.Group>
                                                     <li className='icon-li'>
-                                                        <h4>Family Dynamics:</h4>
+                                                        <h4>Family Dynamics: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2553,7 +2616,7 @@ function Psychiatrics_form() {
                                                         </div>
                                                     </Form.Group>
                                                     <li className='icon-li'>
-                                                        <h4>Type of Marriage: </h4>
+                                                        <h4>Type of Marriage: <span style={{ color: 'red' }}>*</span> </h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2565,7 +2628,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Family History of Psychiatric Disorders: <span>(any hereditary conditions)</span></h4>
+                                                        <h4>Family History of Psychiatric Disorders: <span>(any hereditary conditions)</span> <span style={{ color: 'red' }}>*</span> </h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2577,7 +2640,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Genetic Predispositions: <span>(genetic conditions or predispositions)</span></h4>
+                                                        <h4>Genetic Predispositions: <span>(genetic conditions or predispositions)</span> <span style={{ color: 'red' }}>*</span> </h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2589,7 +2652,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Family Changes or Transitions: </h4>
+                                                        <h4>Family Changes or Transitions: <span style={{ color: 'red' }}>*</span> </h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2604,7 +2667,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Substance Use within the Family</h4>
+                                                        <h4>Substance Use within the Family  <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2637,7 +2700,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleSocialSubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>Relationship with Family:</h4>
+                                                        <h4>Relationship with Family:<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2649,7 +2712,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Relationship with Friends and Social Circles:</h4>
+                                                        <h4>Relationship with Friends and Social Circles:<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2661,7 +2724,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Relationship with Significant Others:</h4>
+                                                        <h4>Relationship with Significant Others:<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2673,7 +2736,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Current Living Arrangements:</h4>
+                                                        <h4>Current Living Arrangements:<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2685,7 +2748,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Educational Background :</h4>
+                                                        <h4>Educational Background :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2697,7 +2760,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Current Employment Status :</h4>
+                                                        <h4>Current Employment Status :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2709,7 +2772,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Recreational Activities :</h4>
+                                                        <h4>Recreational Activities :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2721,7 +2784,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Social Outlets :</h4>
+                                                        <h4>Social Outlets :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2733,7 +2796,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Social Media Engagement :</h4>
+                                                        <h4>Social Media Engagement : <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2745,7 +2808,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Technology-related Stressors :</h4>
+                                                        <h4>Technology-related Stressors : <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2778,7 +2841,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleDevelopmentHistory}>
                                                     <li className='icon-li'>
-                                                        <h4>Prenatal Factors:</h4>
+                                                        <h4>Prenatal Factors:<span style={{ color: 'red' }}>*</span></h4>
                                                         <p className='text-muted small' style={{ marginTop: "5px" }}>(Mother's health during pregnancy, exposure to toxins, and any complications)</p>
                                                     </li>
                                                     <Form.Group>
@@ -2791,7 +2854,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Birth Details:</h4>
+                                                        <h4>Birth Details:<span style={{ color: 'red' }}>*</span></h4>
                                                         <p className='text-muted small' style={{ marginTop: "5px" }}>(any complications, premature birth, or medical interventions)</p>
                                                     </li>
                                                     <Form.Group>
@@ -2804,7 +2867,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Birth Order:</h4>
+                                                        <h4>Birth Order: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2816,7 +2879,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Number of Siblings:</h4>
+                                                        <h4>Number of Siblings: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2828,7 +2891,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Attachment and Bonding:</h4>
+                                                        <h4>Attachment and Bonding: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2840,7 +2903,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Developmental Milestones:</h4>
+                                                        <h4>Developmental Milestones: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2852,7 +2915,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Childhood Illnesses and Injuries:</h4>
+                                                        <h4>Childhood Illnesses and Injuries:<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2864,7 +2927,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Siblings and Relationships:</h4>
+                                                        <h4>Siblings and Relationships: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2888,7 +2951,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Learning Challenges:</h4>
+                                                        <h4>Learning Challenges: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2900,7 +2963,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Pubertal Development:</h4>
+                                                        <h4>Pubertal Development:<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2932,7 +2995,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleSubstanceSubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>Types of Substances Used:</h4>
+                                                        <h4>Types of Substances Used:<span style={{ color: 'red' }}>*</span></h4>
                                                         <p className='text-muted small' style={{ marginTop: "5px" }}>(Mother's health during pregnancy, exposure to toxins, and any complications)</p>
                                                     </li>
                                                     <Form.Select name="substance_use"
@@ -2946,7 +3009,7 @@ function Psychiatrics_form() {
                                                     </Form.Select>
 
                                                     <li className='icon-li'>
-                                                        <h4>Age of Onset :</h4>
+                                                        <h4>Age of Onset :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2958,7 +3021,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Frequency :</h4>
+                                                        <h4>Frequency :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2970,7 +3033,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Quantity :</h4>
+                                                        <h4>Quantity :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2982,7 +3045,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Motivations for Use :</h4>
+                                                        <h4>Motivations for Use :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -2994,7 +3057,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Environmental Triggers :</h4>
+                                                        <h4>Environmental Triggers :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3006,7 +3069,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Impact on Occupational or Academic Functioning :</h4>
+                                                        <h4>Impact on Occupational or Academic Functioning : <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3018,7 +3081,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Impact on Interpersonal Relationships :</h4>
+                                                        <h4>Impact on Interpersonal Relationships :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3030,7 +3093,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Legal or Financial Consequences :</h4>
+                                                        <h4>Legal or Financial Consequences :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3042,7 +3105,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Craving intensity :</h4>
+                                                        <h4>Craving intensity :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3054,7 +3117,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Previous Treatment Attempts :</h4>
+                                                        <h4>Previous Treatment Attempts :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3066,7 +3129,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Relapse History :</h4>
+                                                        <h4>Relapse History :<span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3098,7 +3161,7 @@ function Psychiatrics_form() {
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleSuicidalSubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>History of Suicide Attempts :</h4>
+                                                        <h4>History of Suicide Attempts : <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3110,7 +3173,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Triggers and Stressors:</h4>
+                                                        <h4>Triggers and Stressors: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3122,7 +3185,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>History of Homicidal Ideation:</h4>
+                                                        <h4>History of Homicidal Ideation: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3134,7 +3197,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Target and Method:</h4>
+                                                        <h4>Target and Method: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Control
@@ -3146,7 +3209,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Immediate Threat:</h4>
+                                                        <h4>Immediate Threat: <span style={{ color: 'red' }}>*</span></h4>
                                                         <p className='text-muted small' style={{ marginTop: "5px" }}>(assessed by history taker)</p>
                                                     </li>
                                                     <Form.Group>
@@ -3159,7 +3222,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Necessity of Emergency Response:</h4>
+                                                        <h4>Necessity of Emergency Response: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Check
@@ -3183,7 +3246,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Hospitalization Required:</h4>
+                                                        <h4>Hospitalization Required: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group>
                                                         <Form.Check

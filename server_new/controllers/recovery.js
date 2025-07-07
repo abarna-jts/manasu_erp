@@ -58,6 +58,12 @@ const createMSEForm = async (req, res) => {
 
   } catch (err) {
     console.error("Error in createMSEForm:", err);
+
+    // Handle duplicate entry error
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ error: "A record already exists for this admission number." });
+    }
+
     return res.status(500).json({ error: "Internal server error" });
   }
 }
@@ -1425,9 +1431,9 @@ const updateCognition = async (req, res) => {
     }
     return res.status(200).json({ message: "Cognition Form updated successfully!" });
   } catch (err) {
-  console.error("Error in updateCognition:", err.message);  // log the error message
-  return res.status(500).json({ error: err.message });       // send detailed error for debugging
-}
+    console.error("Error in updateCognition:", err.message);  // log the error message
+    return res.status(500).json({ error: err.message });       // send detailed error for debugging
+  }
 }
 
 
@@ -2197,7 +2203,7 @@ const getSuicidialData = async (req, res) => {
   }
 }
 
-const getallPsychiatric = async(req, res) =>{
+const getallPsychiatric = async (req, res) => {
   try {
     const admission_no = req.params.admission_no;
 
@@ -2251,7 +2257,7 @@ export {
   createBasicInformation, createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData,
   createSocialHistoryData, createDevelopmentalData, createSubstanceData, createSuicidalData,
   getInformation, getCheifComplaint, getPresentingData, getPsychiatricData, getMedicalHistory, getFamilyHistory, getSocialHistory,
-  getDevelopmentalHistory, getSubstanceUse, getSuicidialData, getallPsychiatric, 
+  getDevelopmentalHistory, getSubstanceUse, getSuicidialData, getallPsychiatric,
   updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData,
   updateFamilyHistoryData, updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData
 };

@@ -312,7 +312,7 @@ function Observation_report() {
                                             <td>{item.date}</td>
                                             <td>{item.admission_no}</td>
                                             <td>{item.resident_name}</td>
-                                            <td className='text-justify'>{item.follow_up}</td>
+                                            <td className='text-justify'>{item.follow_up || "NULL"}</td>
                                             <td>
                                                 <img
                                                     src={`https://www.pahrultours.com/app2/${item.recovery_photo}`}
@@ -349,7 +349,7 @@ function Observation_report() {
                     <Col md={12}>
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="formAdmissionNo">
-                                <Form.Label>Admission No.</Form.Label>
+                                <Form.Label>Admission No. <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="number"
                                     placeholder="Enter Admission Number"
@@ -361,7 +361,7 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formResidentName">
-                                <Form.Label>Resident Name</Form.Label>
+                                <Form.Label>Resident Name <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="resident_name"
@@ -373,17 +373,19 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group className="mb-3">
-                                <Form.Label>Date</Form.Label>
+                                <Form.Label>Date <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="date"
                                     name="date"
                                     value={formData.date}
                                     onChange={handleInputChange}
+                                    max="9999-12-31"
+                                    required
                                 />
                             </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3">
-                                <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
+                                <Form.Label>Rescue Recovery Photo Attachment <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="file"
                                     accept=".jpg,.jpeg,.png"
@@ -394,7 +396,7 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formFollowUp">
-                                <Form.Label>Follow Up</Form.Label>
+                                <Form.Label>Follow Up <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
@@ -402,6 +404,7 @@ function Observation_report() {
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     required
+                                    
                                 />
                             </Form.Group>
 
@@ -420,13 +423,13 @@ function Observation_report() {
 
             <Modal show={editshow} onHide={handleEditClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Enter Rescue Condition</Modal.Title>
+                    <Modal.Title>Edit Rescue Condition</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
-                        <Form onSubmit={handleSubmit}>
+                        <Form>
                             <Form.Group className="mb-3" controlId="formAdmissionNo">
-                                <Form.Label>Admission No.</Form.Label>
+                                <Form.Label>Admission No. <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="number"
                                     placeholder="Enter Admission Number"
@@ -438,7 +441,7 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formResidentName">
-                                <Form.Label>Resident Name</Form.Label>
+                                <Form.Label>Resident Name <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="resident_name"
@@ -450,17 +453,19 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group className="mb-3">
-                                <Form.Label>Date</Form.Label>
+                                <Form.Label>Date <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="date"
                                     name="date"
+                                    max="9999-12-31"
                                     value={formData.date}
                                     onChange={handleInputChange}
+                                    required
                                 />
                             </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
-                                <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
+                                <Form.Label>Rescue Recovery Photo Attachment <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <div className="photorow d-flex align-items-center justify-content-between">
                                     {files.recovery_photo ? (
                                         <>
@@ -487,7 +492,7 @@ function Observation_report() {
 
 
                             <Form.Group className="mb-3" controlId="formFollowUp">
-                                <Form.Label>Follow Up</Form.Label>
+                                <Form.Label>Follow Up <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}

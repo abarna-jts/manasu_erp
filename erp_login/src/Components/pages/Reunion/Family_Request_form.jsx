@@ -93,7 +93,36 @@ function Family_Request_form() {
     })
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        let updatedValue = value;
+
+        // Aadhaar card formatting
+        if (name === "f_aadhar_card_no" || name === "r_aadhar_card_no") {
+            const digitsOnly = value.replace(/\D/g, '').slice(0, 12); // Get only digits, max 12
+            updatedValue = digitsOnly.replace(/(.{4})/g, '$1 ').trim(); // Format with space
+
+            // Aadhaar error check: must be exactly 12 digits
+            setFormErrors((prevErrors) => ({
+                ...prevErrors,
+                [name]: digitsOnly.length === 12 ? "" : "Aadhaar number must be exactly 12 digits"
+            }));
+        }
+
+        // Phone number validation
+        if (name === "f_member_phone" || name === "phone_no") {
+            updatedValue = value.replace(/\D/g, '').slice(0, 10);
+
+            // Phone error check: must be exactly 10 digits
+            setFormErrors((prevErrors) => ({
+                ...prevErrors,
+                [name]: updatedValue.length === 10 ? "" : "Please enter exactly 10 digits"
+            }));
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: updatedValue
+        }));
     };
 
     const handleInputChange1 = (e) => {
@@ -110,17 +139,6 @@ function Family_Request_form() {
                 ...prevErrors,
                 [name]: digitsOnly.length === 12 ? "" : "Aadhaar number must be exactly 12 digits"
             }));
-        }
-
-        // Allow only digits (and max 10 digits)
-        const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
-        setAdmissionNumber(digitsOnly);
-
-        // Clear error while typing
-        if (digitsOnly.length === 8 || digitsOnly.length === 10) {
-            setAdmissionNumberError("");
-        } else {
-            setAdmissionNumberError("Admission number must be 8 or 10 digits");
         }
 
 
@@ -186,6 +204,23 @@ function Family_Request_form() {
         if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
             alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
+        }
+
+        // Aadhaar Validation
+        if (storeData.f_aadhar_card_no && storeData.f_aadhar_card_no !== "UNKNOWN") {
+            const digitsOnly = storeData.f_aadhar_card_no.replace(/\D/g, '');
+            if (digitsOnly.length !== 12) {
+                alert("Aadhaar number must be 12 digits or type UNKNOWN");
+                return;
+            }
+        }
+
+        if (storeData.f_member_phone && storeData.f_member_phone !== "UNKNOWN") {
+            const digitsOnly = storeData.f_member_phone.replace(/\D/g, '');
+            if (digitsOnly.length !== 10) {
+                alert("Phone number must be 10 digits or type UNKNOWN");
+                return;
+            }
         }
 
         const data = new FormData();
@@ -333,17 +368,17 @@ function Family_Request_form() {
 
             setFormData((formData) => ({
                 ...formData,
-                rescue_name: data.rescue_name || '',
-                f_member_age: data.age || '',
-                description: data.description || '',
-                family_relationship: data.family_relationship || '',
-                f_member_name: data.f_member_name || '',
-                f_member_phone: data.f_member_phone || '',
-                f_member_address: data.f_member_address || '',
-                f_aadhar_card_no: data.f_aadhar_card_no || '',
-                f_ration_card_no: data.f_ration_card_no || '',
-                r_aadhar_card_no: data.r_aadhar_card_no || '',
-                r_ration_card_no: data.r_ration_card_no || '',
+                rescue_name: data.rescue_name || 'NULL',
+                f_member_age: data.age || 'NULL',
+                description: data.description || 'NULL',
+                family_relationship: data.family_relationship || 'NULL',
+                f_member_name: data.f_member_name || 'NULL',
+                f_member_phone: data.f_member_phone || 'NULL',
+                f_member_address: data.f_member_address || 'NULL',
+                f_aadhar_card_no: data.f_aadhar_card_no || 'NULL',
+                f_ration_card_no: data.f_ration_card_no || 'NULL',
+                r_aadhar_card_no: data.r_aadhar_card_no || 'NULL',
+                r_ration_card_no: data.r_ration_card_no || 'NULL',
             }));
 
             // Handle old and new photo paths correctly
@@ -380,6 +415,23 @@ function Family_Request_form() {
 
     const handleUpdate = async (e, admissionNumber) => {
         e.preventDefault();
+
+        // Aadhaar Validation
+        if (storeData.f_aadhar_card_no && storeData.f_aadhar_card_no !== "UNKNOWN") {
+            const digitsOnly = storeData.f_aadhar_card_no.replace(/\D/g, '');
+            if (digitsOnly.length !== 12) {
+                alert("Aadhaar number must be 12 digits or type UNKNOWN");
+                return;
+            }
+        }
+
+        if (storeData.f_member_phone && storeData.f_member_phone !== "UNKNOWN") {
+            const digitsOnly = storeData.f_member_phone.replace(/\D/g, '');
+            if (digitsOnly.length !== 10) {
+                alert("Phone number must be 10 digits or type UNKNOWN");
+                return;
+            }
+        }
 
         const data = new FormData();
         data.append('rescue_name', formData.rescue_name);
@@ -581,7 +633,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
                                 <Form.Label column sm="4">
-                                    Admission No :
+                                    Admission No : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -596,7 +648,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Name :
+                                    Name : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -610,7 +662,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                                 <Form.Label column sm="4">
-                                    Age :
+                                    Age : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -624,7 +676,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
                                 <Form.Label column sm="4">
-                                    Gender :
+                                    Gender : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -638,7 +690,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start">
                                 <Form.Label column sm="4">
-                                    Phone Number :
+                                    Phone Number : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -663,7 +715,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
                                 <Form.Label column sm="4">
-                                    Relationship :
+                                    Relationship : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -677,7 +729,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Name :
+                                    Name : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -691,7 +743,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                                 <Form.Label column sm="4">
-                                    Age :
+                                    Age : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -706,7 +758,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
                                 <Form.Label column sm="4">
-                                    Phone No :
+                                    Phone No : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -725,7 +777,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Address :
+                                    Address : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -738,7 +790,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Aadhar Card Number (Relation):
+                                    Aadhar Card Number (Relation): <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -756,7 +808,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Aadhar Card  (Relation):
+                                    Aadhar Card  (Relation): <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -768,7 +820,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Ration Card Number (Relation):
+                                    Ration Card Number (Relation): <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -786,7 +838,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Ration Card  (Relation):
+                                    Ration Card  (Relation): <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -808,7 +860,7 @@ function Family_Request_form() {
                                         value={storeData.r_aadhar_card_no}
                                         onChange={handleInputChange1}
                                         isInvalid={!!formErrors.r_aadhar_card_no}
-                                        required />
+                                         />
                                     {formErrors.r_aadhar_card_no && (
                                         <div className="text-danger small mt-1">
                                             {formErrors.r_aadhar_card_no}
@@ -886,7 +938,7 @@ function Family_Request_form() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Description :
+                                    Description : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -1273,7 +1325,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
                                             <Form.Label column sm="6">
-                                                Admission No :
+                                                Admission No : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1287,7 +1339,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                             <Form.Label column sm="6">
-                                                Name :
+                                                Name : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1301,7 +1353,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                                             <Form.Label column sm="6">
-                                                Age :
+                                                Age : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1316,7 +1368,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
                                             <Form.Label column sm="6">
-                                                Gender :
+                                                Gender : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1330,7 +1382,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Phone Number :
+                                                Phone Number : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1338,8 +1390,14 @@ function Family_Request_form() {
                                                     type='number'
                                                     value={storeData.phone_no}
                                                     onChange={handleInputChange1}
+                                                    isInvalid={!!formErrors.phone_no}
                                                     required />
                                             </Col>
+                                            {formErrors.phone_no && (
+                                                <div className="text-danger small mt-1">
+                                                    {formErrors.phone_no}
+                                                </div>
+                                            )}
                                         </Form.Group>
 
                                     </Col>
@@ -1349,7 +1407,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
                                             <Form.Label column sm="6">
-                                                Relationship :
+                                                Relationship : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1363,7 +1421,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                             <Form.Label column sm="6">
-                                                Name :
+                                                Name : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1377,7 +1435,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
                                             <Form.Label column sm="6">
-                                                Age :
+                                                Age : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1392,21 +1450,27 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
                                             <Form.Label column sm="6">
-                                                Phone No :
+                                                Phone No : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
                                                     name="f_member_phone"
                                                     type='text'
                                                     value={formData.f_member_phone}
+                                                    isInvalid={!!formErrors.f_member_phone}
                                                     onChange={handleInputChange}
                                                     required />
                                             </Col>
+                                            {formErrors.f_member_phone && (
+                                                <div className="text-danger small mt-1">
+                                                    {formErrors.f_member_phone}
+                                                </div>
+                                            )}
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Address :
+                                                Address : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1419,16 +1483,21 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Aadhar Card Number (Relation):
+                                                Aadhar Card Number (Relation): <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
                                                     type="text"
                                                     name='f_aadhar_card_no'
-                                                    value={formData.f_aadhar_card_no}
+                                                    value={formData.f_aadhar_card_no || "Null"}
                                                     onChange={handleInputChange}
                                                     required />
                                             </Col>
+                                            {formErrors.f_aadhar_card_no && (
+                                                <div className="text-danger small mt-1">
+                                                    {formErrors.f_aadhar_card_no}
+                                                </div>
+                                            )}
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
@@ -1457,7 +1526,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Ration Card Number (Relation):
+                                                Ration Card Number (Relation): <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1495,7 +1564,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Aadhar Card No. (Resident):
+                                                Aadhar Card No. (Resident): <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control
@@ -1505,6 +1574,11 @@ function Family_Request_form() {
                                                     onChange={handleInputChange}
                                                     required />
                                             </Col>
+                                            {formErrors.r_aadhar_card_no && (
+                                                <div className="text-danger small mt-1">
+                                                    {formErrors.r_aadhar_card_no}
+                                                </div>
+                                            )}
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
@@ -1610,7 +1684,7 @@ function Family_Request_form() {
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Description :
+                                                Description : <span style={{ color: 'red' }}>*</span>
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control

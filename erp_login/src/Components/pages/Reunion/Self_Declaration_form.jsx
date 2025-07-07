@@ -388,7 +388,7 @@ function Self_Declaration_form() {
                                 <Row>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Name :
+                                            Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -401,7 +401,7 @@ function Self_Declaration_form() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Age :
+                                            Age : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -412,23 +412,11 @@ function Self_Declaration_form() {
                                                 required />
                                         </Col>
                                     </Form.Group>
-                                    <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                        <Form.Label column sm="4" className='text-start'>
-                                            Description :
-                                        </Form.Label>
-                                        <Col sm="8">
-                                            <Form.Control
-                                                type="text"
-                                                name="description"
-                                                value={formData.description}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </Col>
-                                    </Form.Group>
+                                    
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Handwritten Document :
+                                            Handwritten Document : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -443,7 +431,7 @@ function Self_Declaration_form() {
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Signature :
+                                            Signature : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -457,7 +445,7 @@ function Self_Declaration_form() {
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Photo :
+                                            Photo : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -466,6 +454,20 @@ function Self_Declaration_form() {
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 required />
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                                        <Form.Label column sm="4" className='text-start'>
+                                            Description : <span style={{ color: 'red' }}>*</span>
+                                        </Form.Label>
+                                        <Col sm="8">
+                                            <Form.Control
+                                                type="text"
+                                                name="description"
+                                                value={formData.description}
+                                                onChange={handleInputChange}
+                                                 />
                                         </Col>
                                     </Form.Group>
 
@@ -617,10 +619,10 @@ function Self_Declaration_form() {
                         <Form className='self_declaration'>
                             <Row>
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        Name :
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Name : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
@@ -630,10 +632,10 @@ function Self_Declaration_form() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        Age :
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Age : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         <Form.Control
                                             type="text"
                                             name="age"
@@ -642,25 +644,13 @@ function Self_Declaration_form() {
                                             required />
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        Description :
-                                    </Form.Label>
-                                    <Col sm="8">
-                                        <Form.Control
-                                            type="text"
-                                            name="description"
-                                            value={formData.description}
-                                            onChange={handleInputChange}
-                                            required />
-                                    </Col>
-                                </Form.Group>
+                                
 
                                 <Form.Group as={Row} className="mb-3 mt-3">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        HandWritten Document :
+                                    <Form.Label column sm="6" className='text-start'>
+                                        HandWritten Document : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         {files.handwritten_document ? (
                                             <>
                                                 <img
@@ -684,10 +674,10 @@ function Self_Declaration_form() {
 
 
                                 <Form.Group as={Row} className="mb-3 mt-3">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        Signation :
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Signation : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         {files.signature ? (
                                             <>
                                                 <img
@@ -710,10 +700,10 @@ function Self_Declaration_form() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-3 mt-3">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        Photo :
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Photo : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         {files.photo ? (
                                             <>
                                                 <img
@@ -732,6 +722,20 @@ function Self_Declaration_form() {
                                             onChange={handleFileChange}
                                             name="photo"
                                         />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Description :
+                                    </Form.Label>
+                                    <Col sm="6">
+                                        <Form.Control
+                                            type="text"
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleInputChange}
+                                             />
                                     </Col>
                                 </Form.Group>
 

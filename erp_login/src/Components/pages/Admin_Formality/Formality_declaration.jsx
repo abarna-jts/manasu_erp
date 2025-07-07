@@ -343,7 +343,7 @@ function Formality_declaration() {
                                 <Row>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Name :
+                                            Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -356,7 +356,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Age :
+                                            Age : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -369,7 +369,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            30 days Medicine Provided :
+                                            30 days Medicine Provided : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -392,7 +392,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            Toiletries provided :
+                                            Toiletries provided : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -415,7 +415,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            1 month dress provided :
+                                            1 month dress provided : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -438,7 +438,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            Travel Expenses Provided:
+                                            Travel Expenses Provided: <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -461,7 +461,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            Welfare Expenses :
+                                            Welfare Expenses : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -484,7 +484,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            Medical Prescription :
+                                            Medical Prescription : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -507,7 +507,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            Copy of Discharge Summary :
+                                            Copy of Discharge Summary : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -530,7 +530,7 @@ function Formality_declaration() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1">
                                         <Form.Label column sm="4" className="text-start">
-                                            Travel Safety Letter :
+                                            Travel Safety Letter : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Check
@@ -854,7 +854,7 @@ function Formality_declaration() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        30 days Medicine Provided :
+                                        30 days Medicine Provided : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
@@ -877,7 +877,7 @@ function Formality_declaration() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        Toiletries provided :
+                                        Toiletries provided : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
@@ -900,7 +900,7 @@ function Formality_declaration() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        1 month dress provided :
+                                        1 month dress provided : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
@@ -924,7 +924,7 @@ function Formality_declaration() {
 
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        Discharge Allowance / Travel Expenses Provided :
+                                        Discharge Allowance / Travel Expenses Provided : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
@@ -947,7 +947,7 @@ function Formality_declaration() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        Welfare Expenses :
+                                        Welfare Expenses : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
@@ -970,7 +970,7 @@ function Formality_declaration() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        Medical Prescription :
+                                        Medical Prescription : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
@@ -993,7 +993,7 @@ function Formality_declaration() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        Copy of Discharge Summary :
+                                        Copy of Discharge Summary : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check
@@ -1016,7 +1016,7 @@ function Formality_declaration() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className="text-start">
-                                        Travel Safety Letter :
+                                        Travel Safety Letter : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Check

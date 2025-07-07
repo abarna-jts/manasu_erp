@@ -411,6 +411,7 @@ function Programms_report() {
                                 <Form.Control type="date"
                                     name="community_date"
                                     value={formatDate1(programData.community_date)}
+                                    max="9999-12-31"
                                     onChange={handleInputChange1}
                                     required />
                             </Col>
@@ -524,6 +525,7 @@ function Programms_report() {
                                     <Form.Control type="date"
                                         name="community_date"
                                         value={programData.community_date}
+                                        max="9999-12-31"
                                         onChange={handleInputChange1}
                                         required />
                                 </Col>

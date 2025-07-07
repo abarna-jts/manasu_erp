@@ -594,6 +594,7 @@ function AllStudentDetails() {
                                     <Form.Control
                                         name="from_date"
                                         type="date"
+                                        max="9999-12-31"
                                         value={formData.from_date}
                                         onChange={handleInputChange}
                                         required
@@ -875,6 +876,7 @@ function AllStudentDetails() {
                                             <Form.Control
                                                 name="from_date"
                                                 type="date"
+                                                max="9999-12-31"
                                                 value={formData.from_date}
                                                 onChange={handleInputChange}
                                                 required
@@ -884,6 +886,7 @@ function AllStudentDetails() {
                                             <Form.Control
                                                 name="to_date"
                                                 type="date"
+                                                max="9999-12-31"
                                                 value={formData.to_date}
                                                 onChange={handleInputChange}
                                                 required

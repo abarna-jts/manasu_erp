@@ -395,6 +395,7 @@ function View_annualReport() {
                             <Form.Control
                                 type="date"
                                 name="event_date"
+                                max="9999-12-31"
                                 value={formatDate(eventData.event_date)}
                                 onChange={handleInputChange}
                                 required
@@ -476,6 +477,7 @@ function View_annualReport() {
                                 type="date"
                                 name="awarness_date"
                                 value={formatDate(eventData.awarness_date)}
+                                max="9999-12-31"
                                 onChange={handleInputChange}
                                 required
                             />
@@ -554,6 +556,7 @@ function View_annualReport() {
                                 type="date"
                                 name="outing_date"
                                 value={formatDate(eventData.outing_date)}
+                                max="9999-12-31"
                                 onChange={handleInputChange}
                                 required
                             />
@@ -654,6 +657,7 @@ function View_annualReport() {
                                     <Form.Control
                                         type="date"
                                         name="event_date"
+                                        max="9999-12-31"
                                         value={eventData.event_date || "NULL"}
                                         onChange={handleInputChange}
                                         required
@@ -734,6 +738,7 @@ function View_annualReport() {
                                     <Form.Control
                                         type="date"
                                         name="awarness_date"
+                                        max="9999-12-31"
                                         value={eventData.awarness_date || "NULL"}
                                         onChange={handleInputChange}
                                         required
@@ -812,6 +817,7 @@ function View_annualReport() {
                                     <Form.Control
                                         type="date"
                                         name="outing_date"
+                                        max="9999-12-31"
                                         value={eventData.outing_date} // remove || "NULL"
                                         onChange={handleInputChange}
                                         required

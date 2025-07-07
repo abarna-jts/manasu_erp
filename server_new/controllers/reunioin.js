@@ -656,6 +656,7 @@ const getReunionChecklistAll = async(req, res) => {
 
 const updateChecklist = async (req, res) => {
     try {
+        await ReunionAsync(req, res);
         const admission_no = req.params.admission_no;
         if (!admission_no) {
             return res.status(400).json({ message: "Admission number is required" });

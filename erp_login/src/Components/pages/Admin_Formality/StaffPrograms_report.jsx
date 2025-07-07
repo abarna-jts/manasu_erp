@@ -352,6 +352,7 @@ function StaffPrograms_report() {
                             <Col sm="7">
                                 <Form.Control type="date"
                                     name="staff_date"
+                                    max="9999-12-31"
                                     value={formatDate1(staffProgramData.staff_date)}
                                     onChange={handleInputChange1}
                                     required />
@@ -424,6 +425,7 @@ function StaffPrograms_report() {
                                 <Col sm="7">
                                     <Form.Control type="date"
                                         name="staff_date"
+                                        max="9999-12-31"
                                         value={staffProgramData.staff_date}
                                         onChange={handleInputChange1}
                                         required />

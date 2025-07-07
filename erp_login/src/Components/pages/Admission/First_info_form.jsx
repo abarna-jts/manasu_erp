@@ -744,7 +744,7 @@ function First_info_form() {
                             <Row className="d-flex justify-content-between first_infoFormRow">
                                 <Col md={6}>
                                     <Form.Group className="mb-3 text-start" controlId="formReferredby">
-                                        <Form.Label>Rescued / Referred by: </Form.Label>
+                                        <Form.Label>Rescued / Referred by: <span style={{ color: 'red' }}>*</span> </Form.Label>
                                         <Form.Control type="text"
                                             name="referred_by"
                                             value={referred_by}
@@ -753,7 +753,7 @@ function First_info_form() {
                                         <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
                                     </Form.Group>
                                     <Form.Group className="mb-3 text-start" controlId="formtakePlace">
-                                        <Form.Label>Taken from (Rescue Place) : </Form.Label>
+                                        <Form.Label>Taken from (Rescue Place) :  <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="from_place"
@@ -762,18 +762,19 @@ function First_info_form() {
                                             required />
                                     </Form.Group>
                                     <Form.Group className="mb-3 text-start" controlId="formdatetime">
-                                        <Form.Label>Date & Time : </Form.Label>
+                                        <Form.Label>Date & Time : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                         <Form.Control
                                             type="datetime-local"
                                             name="date_time"
                                             value={date_time}
+                                            max={new Date().toISOString().slice(0, 16)}
                                             onChange={(e) => setDateTime(e.target.value)}
                                             required />
                                     </Form.Group>
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3 text-start" controlId="formPoliceMemo">
-                                                <Form.Label>Police Memo : </Form.Label>
+                                                <Form.Label>Police Memo : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="police_memo"
@@ -784,7 +785,7 @@ function First_info_form() {
                                         </Col>
                                         <Col md={6} className="text-start">
                                             <Form.Group>
-                                                <Form.Label>Attach Police Memo : </Form.Label>
+                                                <Form.Label>Attach Police Memo : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                 <Form.Control
                                                     type="file"
                                                     name="attach_policeMemo"
@@ -811,7 +812,7 @@ function First_info_form() {
 
 
                                     <Form.Group className="mb-3 text-start" controlId="formPoliceStation">
-                                        <Form.Label>Police Station : </Form.Label>
+                                        <Form.Label>Police Station : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="police_station"
@@ -820,7 +821,7 @@ function First_info_form() {
                                             required />
                                     </Form.Group>
                                     <Form.Group className="mb-3 text-start" controlId="formPublicInfo">
-                                        <Form.Label>Information from Public / Spot : </Form.Label>
+                                        <Form.Label>Information from Public / Spot : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="information_public"
@@ -838,7 +839,7 @@ function First_info_form() {
                                                 name="admission_date"
                                                 value={admission_date}
                                                 onChange={(e) => setAdmissionDate(e.target.value)}
-                                                readOnly
+                                                
                                             />
                                         </Col>
                                     </Form.Group>
@@ -852,12 +853,12 @@ function First_info_form() {
                                                 name="admission_no"
                                                 value={admission_no}
                                                 onChange={(e) => setAdmisisonNo(e.target.value)}
-                                                readOnly required />
+                                                required />
                                         </Col>
                                     </Form.Group>
 
                                     <Form.Group controlId="formFile" className="mb-3 text-start">
-                                        <Form.Label>Attach Rescue Image</Form.Label>
+                                        <Form.Label>Attach Rescue Image <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
                                             type="file"
                                             name="rescue_image"
@@ -906,7 +907,7 @@ function First_info_form() {
                                             <h3 className="section_title">Resident's Details</h3>
                                         </Col>
                                         <Form.Group className="mb-3 text-start" controlId="formName">
-                                            <Form.Label>Name at the time of Rescue : </Form.Label>
+                                            <Form.Label>Name at the time of Rescue :  <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="rescue_name"
@@ -920,18 +921,11 @@ function First_info_form() {
                                                 type="text"
                                                 name="age"
                                                 value={age}
-                                                onChange={(e) => {
-                                                    const value = e.target.value;
-                                                    if (value === '' || /^[0-9\b]+$/.test(value)) {
-                                                        setAge(value); // Only numbers allowed
-                                                    } else {
-                                                        setAge('Unknown'); // Anything else sets to Unknown
-                                                    }
-                                                }}
+                                                onChange={(e) => setAge(e.target.value)}
                                             />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formstatus">
-                                            <Form.Label>Status :</Form.Label>
+                                            <Form.Label>Status : <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Select
                                                 name="rescue_status"
                                                 value={rescue_status}
@@ -952,7 +946,7 @@ function First_info_form() {
                                                 onChange={(e) => setReligion(e.target.value)} />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formLanguage">
-                                            <Form.Label>Known Languages:</Form.Label>
+                                            <Form.Label>Known Languages: <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Row>
                                                 <Col md={4}>
                                                     <Form.Control
@@ -988,7 +982,7 @@ function First_info_form() {
                                         </Form.Group>
 
                                         <Form.Group className="mb-3 text-start" controlId="formEducation">
-                                            <Form.Label>Education : </Form.Label>
+                                            <Form.Label>Education : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="education"
@@ -1006,7 +1000,7 @@ function First_info_form() {
                                                     name="admission_date"
                                                     value={admission_date}
                                                     onChange={(e) => setAdmissionDate(e.target.value)}
-                                                    readOnly
+                                                    required
                                                 />
                                             </Col>
                                         </Form.Group>
@@ -1020,12 +1014,13 @@ function First_info_form() {
                                                     value={admission_no}
                                                     onChange={(e) => setAdmisisonNo(e.target.value)}
                                                     placeholder={admissionNumber}
-                                                    readOnly />
+                                                    required
+                                                     />
                                             </Col>
                                         </Form.Group>
 
                                         <Form.Group className="mb-3 text-start">
-                                            <Form.Label column sm={12}>Government ID Type:</Form.Label>
+                                            <Form.Label column sm={12}>Government ID Type: <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Col sm={12}>
                                                 <Form.Select
                                                     value={govIdType}
@@ -1206,7 +1201,7 @@ function First_info_form() {
                                                     name="admission_date"
                                                     value={admission_date}
                                                     onChange={(e) => setAdmissionDate(e.target.value)}
-                                                    readOnly
+                                                    required
                                                 />
                                             </Col>
                                         </Form.Group>
@@ -1220,7 +1215,7 @@ function First_info_form() {
                                                     value={admission_no}
                                                     onChange={(e) => setAdmisisonNo(e.target.value)}
                                                     placeholder={admissionNumber}
-                                                    readOnly />
+                                                    required />
                                             </Col>
                                         </Form.Group>
                                     </Col>
@@ -1343,7 +1338,7 @@ function First_info_form() {
                                         <Row>
                                             <Col>
                                                 <Form.Group className="mb-3 text-start" controlId="formHeight">
-                                                    <Form.Label>Height : </Form.Label>
+                                                    <Form.Label>Height : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         name="height"
@@ -1355,7 +1350,7 @@ function First_info_form() {
                                             </Col>
                                             <Col>
                                                 <Form.Group className="mb-3 text-start" controlId="formWeight">
-                                                    <Form.Label>Weight : </Form.Label>
+                                                    <Form.Label>Weight :  <span style={{ color: 'red' }}>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         name="weight"
@@ -1397,7 +1392,7 @@ function First_info_form() {
                                                     name="admission_date"
                                                     value={admission_date}
                                                     onChange={(e) => setAdmissionDate(e.target.value)}
-                                                    readOnly
+                                                    required
                                                 />
                                             </Col>
                                         </Form.Group>
@@ -1411,7 +1406,7 @@ function First_info_form() {
                                                     value={admission_no}
                                                     onChange={(e) => setAdmissionNo(e.target.value)}
                                                     placeholder={admissionNumber}
-                                                    readOnly />
+                                                    required />
                                             </Col>
                                         </Form.Group>
                                     </Col>
@@ -1445,7 +1440,7 @@ function First_info_form() {
                                 <Row className="d-flex justify-content-between first_infoFormRow">
                                     <Col md={6}>
                                         <Form.Group className="mb-3 text-start">
-                                            <Form.Label>Mental status : </Form.Label>
+                                            <Form.Label>Mental status : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                             <Form.Control
                                                 as="textarea"
                                                 name="mental_status"
@@ -1455,7 +1450,7 @@ function First_info_form() {
                                                 required />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start">
-                                            <Form.Label>Cognitive Behavior : </Form.Label>
+                                            <Form.Label>Cognitive Behavior :  <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 as="textarea"
                                                 name="behaviour"
@@ -1465,7 +1460,7 @@ function First_info_form() {
                                                 required />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start">
-                                            <Form.Label>Communication Ability : </Form.Label>
+                                            <Form.Label>Communication Ability :  <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 as="textarea"
                                                 name="community_ability"
@@ -1475,7 +1470,7 @@ function First_info_form() {
                                                 required />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start">
-                                            <Form.Label>Self-Care Capacity : </Form.Label>
+                                            <Form.Label>Self-Care Capacity : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                             <Form.Control
                                                 as="textarea"
                                                 name="self_careCapacity"
@@ -1485,7 +1480,7 @@ function First_info_form() {
                                                 required />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start">
-                                            <Form.Label>Diagnosis : </Form.Label>
+                                            <Form.Label>Diagnosis : <span style={{ color: 'red' }}>*</span> </Form.Label>
                                             <Form.Control
                                                 as="textarea"
                                                 name="diagnosis"
@@ -1505,7 +1500,7 @@ function First_info_form() {
                                                     name="admission_date"
                                                     value={admission_date}
                                                     onChange={(e) => setAdmissionDate(e.target.value)}
-                                                    readOnly
+                                                    required
                                                 />
                                             </Col>
                                         </Form.Group>
@@ -1519,7 +1514,7 @@ function First_info_form() {
                                                     value={admission_no}
                                                     onChange={(e) => setAdmisisonNo(e.target.value)}
                                                     placeholder={admissionNumber}
-                                                    readOnly />
+                                                    required />
                                             </Col>
                                         </Form.Group>
                                     </Col>

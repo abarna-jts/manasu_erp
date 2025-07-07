@@ -514,6 +514,19 @@ body {
 		font-size: 12px !important;
 	}
 
+	.psychiatrics_tab>ul,
+	.psychiatrics_tab>ul>li {
+		height: 53em !important;
+	}
+
+	.psychiatrics_tab .tab-content-3 {
+		height: 43em !important;
+	}
+
+	.psychiatrics_tab .tab-content-6 {
+		height: 56em !important;
+	}
+
 	.sidebar .nav-link {
 		font-size: 0.75rem;
 		padding: 0.55rem 0.3rem !important;
@@ -768,7 +781,7 @@ body {
 	}
 }
 
-.pdf_heading{
+.pdf_heading {
 	text-decoration: underline;
 }
 
@@ -1587,7 +1600,7 @@ body {
 /**/
 .pcss3t>ul,
 .pcss3t>ul>li {
-	height: 270em;
+	height: 75em;
 }
 
 .sidebar_logo {
@@ -1862,6 +1875,7 @@ body {
 		line-height: 15px;
 		font-weight: 600;
 	}
+
 	.col-form-label {
 		font-size: 0.9rem !important;
 	}
@@ -1869,4 +1883,41 @@ body {
 
 #root {
 	width: 100% !important;
+}
+
+.MSE_form_tab .tab-content-6{
+	height: 61em !important;
+}
+
+.MSE_form_tab .tab-content-first{
+	height: 61em !important;
+}
+
+.psychiatrics_tab>ul,
+.psychiatrics_tab>ul>li {
+	height: 69em;
+}
+
+.psychiatrics_tab .tab-content-3 {
+	height: 56em !important;
+}
+
+.psychiatrics_tab .tab-content-4 {
+	height: 56em !important;
+}
+
+.psychiatrics_tab .tab-content-5 {
+	height: 56em !important;
+}
+
+.psychiatrics_tab .tab-content-7 {
+	height: 56em !important;
+}
+
+.psychiatrics_tab .tab-content-8 {
+	height: 56em !important;
+}
+
+.psychiatrics_tab .tab-content-9 {
+	height: 56em !important;
 }

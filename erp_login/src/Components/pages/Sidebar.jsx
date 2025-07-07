@@ -213,12 +213,12 @@ const Sidebar = () => {
 
                 {/* Reunion Menus */}
                 <CollapsableNavItem title="Reunion/Discharge" icon={faMapPin} activeKey={activeKey} onToggle={handleAccordionClick}>
-                  <NavItem title="1.Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="2.Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
-                  <NavItem title="3.Media Consent" to="/media_consent" icon={faVideo} />
-                  <NavItem title="4.Essential Documents" to="/essential_record" icon={faClipboardList} />
-                  <NavItem title="5.Handover Form" to="/formality_declaration" icon={faPenSquare} />
-                  <NavItem title="Discharge Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
+                  <NavItem title="1. Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="2. Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
+                  <NavItem title="3. Media Consent" to="/media_consent" icon={faVideo} />
+                  <NavItem title="4. Essential Documents" to="/essential_record" icon={faClipboardList} />
+                  <NavItem title="5. Handover Form" to="/formality_declaration" icon={faPenSquare} />
+                  <NavItem title="6. Discharge Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
                 </CollapsableNavItem>
 
                 {/* Fomality Menus */}
@@ -293,12 +293,12 @@ const Sidebar = () => {
 
                 {/* Reunion Menus */}
                 <CollapsableNavItem title="Reunion/Discharge" icon={faMapPin} activeKey={activeKey} onToggle={handleAccordionClick}>
-                  <NavItem title="1.Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="2.Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
-                  <NavItem title="3.Media Consent" to="/media_consent" icon={faVideo} />
-                  <NavItem title="4.Essential Records" to="/essential_record" icon={faClipboardList} />
-                  <NavItem title="5.Handover Form" to="/formality_declaration" icon={faPenSquare} />
-                  <NavItem title="Discharge Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
+                  <NavItem title="1. Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
+                  <NavItem title="2. Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
+                  <NavItem title="3. Media Consent" to="/media_consent" icon={faVideo} />
+                  <NavItem title="4. Essential Records" to="/essential_record" icon={faClipboardList} />
+                  <NavItem title="5. Handover Form" to="/formality_declaration" icon={faPenSquare} />
+                  <NavItem title="6. Discharge Checklist" to="/reunion_checklist" icon={faClipboardCheck} />
                 </CollapsableNavItem>
 
                 {/* Fomality Menus */}

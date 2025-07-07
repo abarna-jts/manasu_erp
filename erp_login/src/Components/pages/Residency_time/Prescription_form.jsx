@@ -154,12 +154,12 @@ function Prescription_form() {
     const handleRowChange1 = (index, e) => {
         const { name, value } = e.target;
 
-        if (name === 'id') return;
+        if (name === 'id') return; // skip id
 
         const updatedMedicines = [...viewData.prescription_medicines];
         updatedMedicines[index] = {
             ...updatedMedicines[index],
-            [name]: value,
+            [name]: value, // updates medicine or medicine_type
         };
 
         setViewData((prev) => ({
@@ -236,6 +236,10 @@ function Prescription_form() {
         ? generalMedicines
         : psychiatristMedicines;
 
+    const medicineOptions1 = viewData.medical_type === 'General'
+        ? generalMedicines
+        : psychiatristMedicines;
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -245,6 +249,13 @@ function Prescription_form() {
         if (!admissionNumber || admissionNumber.trim() === '') {
             setSubmissionMessage("Admission number is required.");
             setMessageType("danger");
+            return;
+        }
+
+         const trimmedAdNo = admissionNumber.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
         }
 
@@ -548,6 +559,14 @@ function Prescription_form() {
         }));
     };
 
+    const handleMedicalTypeChange1 = (e) => {
+        const { name, value } = e.target;
+        setViewData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
 
 
     return (
@@ -685,7 +704,7 @@ function Prescription_form() {
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
                                     <Form.Label column sm="5" style={{ paddingRight: "5px" }}>
-                                        Admission No:
+                                        Admission No: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control type='number'
@@ -700,7 +719,7 @@ function Prescription_form() {
                             <Col md={5}>
                                 <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
                                     <Form.Label column sm="5" style={{ paddingRight: "5px" }}>
-                                        Resident's Name:
+                                        Resident's Name: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
                                         <Form.Control type='text'
@@ -715,7 +734,7 @@ function Prescription_form() {
                             <Col md={3}>
                                 <Form.Group as={Row} className="mb-3 d-flex align-items-center justify-content-center" controlId="formPlaintextEmail">
                                     <Form.Label column sm="3" style={{ paddingRight: "5px" }}>
-                                        Age:
+                                        Age: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
                                         <Form.Control type='number'
@@ -734,7 +753,7 @@ function Prescription_form() {
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
                                     <Form.Label column sm="5" style={{ paddingRight: "5px" }}>
-                                        Out Patient No:
+                                        Out Patient No: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control type='number'
@@ -749,7 +768,7 @@ function Prescription_form() {
                             <Col md={5}>
                                 <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
-                                        Name of the Hospital:
+                                        Name of the Hospital: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
                                         <Form.Control type='text'
@@ -764,7 +783,7 @@ function Prescription_form() {
                             <Col md={3}>
                                 <Form.Group as={Row} className="mb-3 d-flex align-items-center justify-content-center" controlId="formPlaintextEmail">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
-                                        Department:
+                                        Department: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
                                         <Form.Control type='text'
@@ -778,10 +797,10 @@ function Prescription_form() {
                             </Col>
                         </Row>
                         <Row className='d-flex align-items-center justify-content-start'>
-                            <Col md={5}>
+                            <Col md={6}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
-                                        Master Health Check UP:
+                                        Master Health Check UP: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="5" className='d-flex align-items-center justify-content-start'>
                                         <Form.Check
@@ -807,7 +826,7 @@ function Prescription_form() {
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
-                                        Medicine Type:
+                                        Medicine Type: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
                                         <Form.Select
@@ -823,7 +842,7 @@ function Prescription_form() {
                                     </Col>
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
+                            <Col md={2}>
 
                             </Col>
 
@@ -1322,7 +1341,7 @@ function Prescription_form() {
                                         <Form.Select
                                             name="medical_type"
                                             value={viewData.medical_type}
-                                            onChange={handleMedicalTypeChange}
+                                            onChange={handleMedicalTypeChange1}
                                             required
                                         >
                                             <option value="" disabled hidden>Select Type</option>
@@ -1398,11 +1417,6 @@ function Prescription_form() {
                             </thead>
                             <tbody id="medicine">
                                 {viewData.prescription_medicines.map((med, index) => {
-                                    const allOptions = new Set([
-                                        ...medicineOptions,
-                                        med.medicine // ensure current value is included
-                                    ]);
-
                                     return (
                                         <tr key={med.id}>
                                             <td>
@@ -1421,8 +1435,8 @@ function Prescription_form() {
                                                         style={{ width: '45%' }}
                                                     >
                                                         <option value="" disabled hidden>Select Medicine</option>
-                                                        {[...allOptions].map((option, idx) => (
-                                                            <option key={idx} value={option}>{option}</option>
+                                                        {medicineOptions1.map((med, idx) => (
+                                                            <option key={idx} value={med}>{med}</option>
                                                         ))}
                                                     </select>
                                                     <select

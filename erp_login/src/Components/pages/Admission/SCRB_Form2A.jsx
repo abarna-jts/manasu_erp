@@ -113,16 +113,21 @@ function SCRB_Form2A() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!admission_no || admission_no.trim() === '') {
-            alert("Admission Number is required.");
-            return;
-        }
+      alert("Admission Number is required.");
+      return;
+    }
 
-        const trimmedAdNo = admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
-            return;
-        }
+    if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+      alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+      return;
+    }
+
+    if (category.length === 0 || complexion.length === 0 || face.length === 0) {
+      alert("Please select at least one from Category, Complexion, or Face.");
+      return;
+    }
 
     const payload = {
       ...formData,
@@ -453,7 +458,7 @@ function SCRB_Form2A() {
                     <td style={{ width: '35%' }}>
                       <div className="row">
                         <div className="col-md-12">
-                          <label>FILE NO </label>
+                          <label>FILE NO <span style={{ color: 'red' }}>*</span> </label>
                         </div>
                       </div>
                     </td>
@@ -543,7 +548,7 @@ function SCRB_Form2A() {
                           rows="2"
                           value={formData.addition_category}
                           onChange={handleChange}
-                          required
+
                         ></textarea>
                       </div>
                       <div className="mb-3 text-start">
@@ -554,7 +559,7 @@ function SCRB_Form2A() {
                           rows="2"
                           value={formData.addition_complexion}
                           onChange={handleChange}
-                          required
+
                         ></textarea>
                       </div>
                       <div className="mb-3 text-start">
@@ -565,7 +570,7 @@ function SCRB_Form2A() {
                           rows="2"
                           value={formData.addition_face}
                           onChange={handleChange}
-                          required
+
                         ></textarea>
                       </div>
                     </td>

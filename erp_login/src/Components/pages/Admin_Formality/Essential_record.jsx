@@ -425,6 +425,41 @@ function Essential_record() {
 
     const handleUpdate = async (e, admission_no) => {
         e.preventDefault();
+        // Aadhaar Validation
+        if (formData.aadhar_card && formData.aadhar_card !== "UNKNOWN") {
+            const digitsOnly = formData.aadhar_card.replace(/\D/g, '');
+            if (digitsOnly.length !== 12) {
+                alert("Aadhaar number must be 12 digits or type UNKNOWN");
+                return;
+            }
+        }
+
+        // UDID Validation
+        if (formData.udid_no && formData.udid_no !== "UNKNOWN") {
+            const cleaned = formData.udid_no.replace(/[^A-Z0-9]/gi, '');
+            if (cleaned.length !== 20) {
+                alert("UDID must be exactly 20 alphanumeric characters or type UNKNOWN");
+                return;
+            }
+        }
+
+        // Voter ID Validation
+        if (formData.voter_id && formData.voter_id !== "UNKNOWN") {
+            const cleaned = formData.voter_id.replace(/[^A-Za-z0-9]/g, '');
+            if (!/^[A-Z]{3}[0-9]{7}$/.test(cleaned)) {
+                alert("Voter ID must be 3 letters followed by 7 digits or type UNKNOWN");
+                return;
+            }
+        }
+
+        // IFSC Code Validation
+        if (formData.ifsc_code && formData.ifsc_code !== "UNKNOWN") {
+            const cleaned = formData.ifsc_code.replace(/[^A-Za-z0-9]/g, '');
+            if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(cleaned)) {
+                alert("IFSC Code must follow format like SBIN0001234 or type UNKNOWN");
+                return;
+            }
+        }
 
         const data = new FormData();
         data.append('rescue_name', formData.rescue_name);
@@ -606,7 +641,7 @@ function Essential_record() {
                                 <Row>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Name :
+                                            Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8" className='d-flex align-items-center'>
                                             <Form.Control
@@ -623,7 +658,7 @@ function Essential_record() {
                                         </Form.Label>
                                         <Col sm="8">
                                             {/* Aadhar Card */}
-                                            <Form.Label className="mb-1">Aadhaar Card Number</Form.Label>
+                                            <Form.Label className="mb-1">Aadhaar Card Number <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="aadhar_card"
@@ -638,7 +673,7 @@ function Essential_record() {
 
 
                                             {/* UDID */}
-                                            <Form.Label className="mb-1">UDID Card Number (Unique Disability ID)</Form.Label>
+                                            <Form.Label className="mb-1">UDID Card Number (Unique Disability ID):  <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="udid_no"
@@ -651,7 +686,7 @@ function Essential_record() {
                                             )}
 
                                             {/* Disability Passport */}
-                                            <Form.Label className="mb-1">Disability Certificate No. & Issuing Authority</Form.Label>
+                                            <Form.Label className="mb-1">Disability Certificate No. & Issuing Authority:  <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="disability_no"
@@ -662,7 +697,7 @@ function Essential_record() {
                                             />
 
                                             {/* Voter ID */}
-                                            <Form.Label className="mb-1">Voter ID</Form.Label>
+                                            <Form.Label className="mb-1">Voter ID :  <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="voter_id"
@@ -675,7 +710,7 @@ function Essential_record() {
                                             )}
 
                                             {/* Form 7 */}
-                                            <Form.Label className="mb-1">Form 7</Form.Label>
+                                            <Form.Label className="mb-1">Form 7 <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="form_7"
@@ -686,7 +721,7 @@ function Essential_record() {
                                             />
 
                                             {/* Form 7  attachment*/}
-                                            <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
+                                            <Form.Label className="mb-1">Form 7 Attachment <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="file"
                                                 name="form7_attach"
@@ -703,7 +738,7 @@ function Essential_record() {
                                         </Form.Label>
                                         <Col sm="8">
                                             {/* Aadhar Card */}
-                                            <Form.Label className="mb-1">Bank Name</Form.Label>
+                                            <Form.Label className="mb-1">Bank Name <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="bank_name"
@@ -714,7 +749,7 @@ function Essential_record() {
                                             />
 
                                             {/* UDID */}
-                                            <Form.Label className="mb-1">Account Number</Form.Label>
+                                            <Form.Label className="mb-1">Account Number <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="number"
                                                 name="account_no"
@@ -725,7 +760,7 @@ function Essential_record() {
                                             />
 
                                             {/* Disability Passport */}
-                                            <Form.Label className="mb-1">IFSC Code</Form.Label>
+                                            <Form.Label className="mb-1">IFSC Code <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="ifsc_code"
@@ -750,11 +785,11 @@ function Essential_record() {
 
                                     <Form.Group as={Row} className="mb-3 text-start">
                                         <Form.Label column sm="4" className='form_title'>
-                                            CMCHIS(Chief Minister's Comprehensive Health Insurance Scheme):
+                                            CMCHIS(Chief Minister's Comprehensive Health Insurance Scheme): 
                                         </Form.Label>
                                         <Col sm="8">
                                             {/* Aadhar Card */}
-                                            <Form.Label className="mb-1">Insurance Provider</Form.Label>
+                                            <Form.Label className="mb-1">Insurance Provider <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="insurance_provider"
@@ -765,7 +800,7 @@ function Essential_record() {
                                             />
 
                                             {/* UDID */}
-                                            <Form.Label className="mb-1">Policy Number</Form.Label>
+                                            <Form.Label className="mb-1">Policy Number <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="number"
                                                 name="policy_no"
@@ -776,7 +811,7 @@ function Essential_record() {
                                             />
 
                                             {/* Disability Passport */}
-                                            <Form.Label className="mb-1">Validity Period</Form.Label>
+                                            <Form.Label className="mb-1">Validity Period <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="validity_period"
@@ -1035,7 +1070,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Name :
+                                        Name : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1049,7 +1084,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Aadhaar Card Number :
+                                        Aadhaar Card Number : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1069,7 +1104,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        UDID Card Number (Unique Disability ID) :
+                                        UDID Card Number (Unique Disability ID) : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1088,7 +1123,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Disability Certificate No. & Issuing Authority :
+                                        Disability Certificate No. & Issuing Authority : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1102,7 +1137,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Voter ID :
+                                        Voter ID : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1121,7 +1156,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Form 7 :
+                                        Form 7 : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1135,7 +1170,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Form 7 Attachment:
+                                        Form 7 Attachment: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex flex-column align-items-start'>
                                         <Form.Control
@@ -1161,7 +1196,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Bank Name :
+                                        Bank Name : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1175,7 +1210,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Account Number :
+                                        Account Number : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1189,7 +1224,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        IFSC Code :
+                                        IFSC Code : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1234,7 +1269,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Insurance Provider :
+                                        Insurance Provider : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1248,7 +1283,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Policy Number :
+                                        Policy Number : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control
@@ -1262,7 +1297,7 @@ function Essential_record() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Validity Period :
+                                        Validity Period : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control

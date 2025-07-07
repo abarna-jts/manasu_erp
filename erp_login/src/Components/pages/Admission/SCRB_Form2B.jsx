@@ -158,6 +158,11 @@ function SCRB_Form2B() {
       return;
     }
 
+    if (selectedTattoos.length === 0) {
+      alert("Please select at least one Tattoo option.");
+      return;
+    }
+
     const payload = {
       ...formData,
       admission_no,
@@ -508,7 +513,7 @@ function SCRB_Form2B() {
                     <td style={{ width: '35%' }}>
                       <div className="row">
                         <div className="col-md-12">
-                          <label>FILE NO </label>
+                          <label>FILE NO  <span style={{ color: 'red' }}>*</span></label>
                         </div>
                       </div>
                     </td>
@@ -576,27 +581,29 @@ function SCRB_Form2B() {
                   <tr>
                     <td>
                       <div className="mb-3 text-start">
-                        <label>Tattoo in Letters:</label>
+                        <label>Tattoo in Letters: <span style={{ color: 'red' }}>*</span></label>
                         <textarea
                           className="form-control"
                           name="addition_tatoo"
                           rows="2"
                           value={formData.addition_tatoo}
-                          onChange={handleInputChange} required
+                          onChange={handleInputChange}
+                          required
                         ></textarea>
                       </div>
                       <div className="mb-3 text-start">
-                        <label>Scar:</label>
+                        <label>Scar: <span style={{ color: 'red' }}>*</span></label>
                         <textarea
                           className="form-control"
                           name="scar"
                           rows="2"
                           value={formData.scar}
-                          onChange={handleInputChange} required
+                          onChange={handleInputChange}
+                          required
                         ></textarea>
                       </div>
                       <div className="mb-3 text-start">
-                        <label>Mole:</label>
+                        <label>Mole: <span style={{ color: 'red' }}>*</span></label>
                         <textarea
                           className="form-control"
                           name="mole"
@@ -607,7 +614,7 @@ function SCRB_Form2B() {
 
                       </div>
                       <div className="mb-3 text-start">
-                        <label>Height (cms):</label>
+                        <label>Height (cms): <span style={{ color: 'red' }}>*</span></label>
                         <textarea
                           className="form-control"
                           name="height"

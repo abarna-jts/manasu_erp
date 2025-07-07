@@ -105,6 +105,15 @@ function SCRB_Form2C() {
       return;
     }
 
+    if (
+      upperdress_1.length === 0 &&
+      upperdress_2.length === 0 ||
+      lowerdress.length === 0
+    ) {
+      alert("Please select at least one dress item from Upperdress or Lowerdress.");
+      return;
+    }
+
     const payload = {
       ...formData,
       admission_no,
@@ -481,7 +490,7 @@ function SCRB_Form2C() {
                     <td style={{ width: '35%' }}>
                       <div className="row">
                         <div className="col-md-12">
-                          <label>FILE NO </label>
+                          <label>FILE NO  <span style={{ color: 'red' }}>*</span></label>
                         </div>
                       </div>
                     </td>
@@ -566,7 +575,7 @@ function SCRB_Form2C() {
                           value={formData.addition_upperdress}
                           onChange={handleChange}
                           placeholder="Specify any other upper dress details"
-                          required
+                          
                         />
                       </div>
                     </td>
@@ -583,7 +592,7 @@ function SCRB_Form2C() {
                           value={formData.addition_lowerdress}
                           onChange={handleChange}
                           placeholder="Specify any other lower dress details"
-                          required
+                          
                         />
                       </div>
                     </td>
@@ -600,7 +609,7 @@ function SCRB_Form2C() {
                           value={formData.upperdress_color}
                           onChange={handleChange}
                           placeholder="Enter color"
-                          required
+                          
                         />
                       </div>
                     </td>
@@ -617,7 +626,7 @@ function SCRB_Form2C() {
                           value={formData.lowerdress_color}
                           onChange={handleChange}
                           placeholder="Enter color"
-                          required
+                          
                         />
                       </div>
                     </td>

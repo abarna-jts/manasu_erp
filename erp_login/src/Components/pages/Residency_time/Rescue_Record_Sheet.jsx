@@ -54,6 +54,18 @@ function Rescue_Record_Sheet() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
+
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+            return;
+        }
+
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('resident_name', rescueName);
@@ -320,7 +332,7 @@ function Rescue_Record_Sheet() {
                     <Col md={12}>
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="formAdmissionNo">
-                                <Form.Label>Admission No.</Form.Label>
+                                <Form.Label>Admission No. <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="number"
                                     placeholder="Enter Admission Number"
@@ -332,7 +344,7 @@ function Rescue_Record_Sheet() {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formResidentName">
-                                <Form.Label>Resident Name</Form.Label>
+                                <Form.Label>Resident Name <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="resident_name"
@@ -344,17 +356,18 @@ function Rescue_Record_Sheet() {
                             </Form.Group>
 
                             <Form.Group className="mb-3">
-                                <Form.Label>Date</Form.Label>
+                                <Form.Label>Date <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="date"
                                     name="date"
+                                    max="9999-12-31"
                                     value={formData.date}
                                     onChange={handleInputChange}
                                 />
                             </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3">
-                                <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
+                                <Form.Label>Rescue Recovery Photo Attachment <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="file"
                                     accept=".jpg,.jpeg,.png"
@@ -365,7 +378,7 @@ function Rescue_Record_Sheet() {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formFollowUp">
-                                <Form.Label>Follow Up</Form.Label>
+                                <Form.Label>Follow Up <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
@@ -373,6 +386,7 @@ function Rescue_Record_Sheet() {
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     required
+                                    
                                 />
                             </Form.Group>
 
@@ -395,9 +409,9 @@ function Rescue_Record_Sheet() {
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
-                        <Form onSubmit={handleSubmit}>
+                        <Form>
                             <Form.Group className="mb-3" controlId="formAdmissionNo">
-                                <Form.Label>Admission No.</Form.Label>
+                                <Form.Label>Admission No. <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="number"
                                     placeholder="Enter Admission Number"
@@ -409,7 +423,7 @@ function Rescue_Record_Sheet() {
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formResidentName">
-                                <Form.Label>Resident Name</Form.Label>
+                                <Form.Label>Resident Name <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="resident_name"
@@ -425,6 +439,7 @@ function Rescue_Record_Sheet() {
                                 <Form.Control
                                     type="date"
                                     name="date"
+                                    max="9999-12-31"
                                     value={formData.date}
                                     onChange={handleInputChange}
                                     required
@@ -432,7 +447,7 @@ function Rescue_Record_Sheet() {
                             </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
-                                <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
+                                <Form.Label>Rescue Recovery Photo Attachment <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <div className="photorow d-flex align-items-center justify-content-between">
                                     {files.rescue_recovery_photo ? (
                                         <>
@@ -459,7 +474,7 @@ function Rescue_Record_Sheet() {
 
 
                             <Form.Group className="mb-3" controlId="formFollowUp">
-                                <Form.Label>Follow Up</Form.Label>
+                                <Form.Label>Follow Up <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
@@ -467,6 +482,7 @@ function Rescue_Record_Sheet() {
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     required
+                                    
                                 />
                             </Form.Group>
 

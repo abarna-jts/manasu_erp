@@ -473,7 +473,7 @@ function Media_consent_form() {
 
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Name :
+                                            Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -486,7 +486,7 @@ function Media_consent_form() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
                                         <Form.Label column sm="4" className="text-start">
-                                            Did the Resident give the Media Consent? :
+                                            Did the Resident give the Media Consent? : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Check
@@ -510,7 +510,7 @@ function Media_consent_form() {
 
                                     <Form.Group as={Row} className="mb-1" controlId="formScanImage">
                                         <Form.Label column sm="4" className="text-start">
-                                            Scan The Report :
+                                            Scan The Report : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -525,7 +525,7 @@ function Media_consent_form() {
 
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Description :
+                                            Description :  <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -534,7 +534,7 @@ function Media_consent_form() {
                                                 name="description"
                                                 value={formData.description}
                                                 onChange={handleInputChange}
-                                                required />
+                                                 />
                                         </Col>
                                     </Form.Group>
 
@@ -658,10 +658,10 @@ function Media_consent_form() {
                         <Form className='media_consent'>
                             <Row>
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        Name :
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Name : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
@@ -671,10 +671,10 @@ function Media_consent_form() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
-                                    <Form.Label column sm="4" className="text-start">
-                                        Is our rescue's face used on social media? :
+                                    <Form.Label column sm="6" className="text-start">
+                                        Is our rescue's face used on social media? : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -695,10 +695,10 @@ function Media_consent_form() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-3 mt-3">
-                                    <Form.Label column sm="4" className='text-start'>
-                                        Scan The Report :
+                                    <Form.Label column sm="6" className='text-start'>
+                                        Scan The Report : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         {files.scan_report ? (
                                             <>
                                                 <img
@@ -722,17 +722,17 @@ function Media_consent_form() {
                                 </Form.Group>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="4" className='text-start'>
+                                    <Form.Label column sm="6" className='text-start'>
                                         Description :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    <Col sm="6">
                                         <Form.Control
                                             as="textarea"
                                             rows={2}
                                             name="description"
                                             value={formData.description}
                                             onChange={handleInputChange}
-                                            required />
+                                             />
                                     </Col>
                                 </Form.Group>
 

@@ -355,7 +355,7 @@ function Medical_camp() {
                                 <Col md={12}>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Camp Name :
+                                            Camp Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -368,7 +368,7 @@ function Medical_camp() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Hospital Name :
+                                            Hospital Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -381,19 +381,20 @@ function Medical_camp() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Date :
+                                            Date : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
                                                 type="date"
                                                 name="date"
+                                                max="9999-12-31"
                                                 value={formData.date}
                                                 onChange={handleChange}
                                                 required />
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-3" controlId="formAdmissionNo">
-                                        <Form.Label column sm="5" className='text-start'>Camp Type</Form.Label>
+                                        <Form.Label column sm="5" className='text-start'>Camp Type <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Col sm="7">
                                             <Form.Select
                                                 name="camp_type"
@@ -411,7 +412,7 @@ function Medical_camp() {
                                     </Form.Group>
                                     {formData.camp_type === "General" && (
                                         <Form.Group as={Row} className="mb-3" controlId="formGeneralDetails">
-                                            <Form.Label column sm="5" className='text-start'>General Camp Details</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>General Camp Details <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
                                                     type="text"
@@ -426,7 +427,7 @@ function Medical_camp() {
                                     )}
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Organised by :
+                                            Organised by : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -440,7 +441,7 @@ function Medical_camp() {
 
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            No. of Participants :
+                                            No. of Participants : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -461,7 +462,7 @@ function Medical_camp() {
                                                 name="feedback"
                                                 value={formData.feedback}
                                                 onChange={handleChange}
-                                                required />
+                                                 />
                                         </Col>
                                     </Form.Group>
                                 </Col>
@@ -522,6 +523,7 @@ function Medical_camp() {
                                     <Form.Control
                                         type="date"
                                         name="date"
+                                        max="9999-12-31"
                                         value={formatDateForInput(formData.date)}
                                         onChange={handleChange}
                                         required />
@@ -616,7 +618,7 @@ function Medical_camp() {
                                 <Col md={12}>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Camp Name :
+                                            Camp Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -629,7 +631,7 @@ function Medical_camp() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Hospital Name :
+                                            Hospital Name : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -642,19 +644,20 @@ function Medical_camp() {
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Date :
+                                            Date : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
                                                 type="date"
                                                 name="date"
+                                                max="9999-12-31"
                                                 value={formatDateForInput(formData.date)}
                                                 onChange={handleChange}
                                                 required />
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-3" controlId="formAdmissionNo">
-                                        <Form.Label column sm="5" className='text-start'>Camp Type</Form.Label>
+                                        <Form.Label column sm="5" className='text-start'>Camp Type <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Col sm="7">
                                             <Form.Select
                                                 name="camp_type"
@@ -672,7 +675,7 @@ function Medical_camp() {
                                     </Form.Group>
                                     {formData.camp_type === "General" && (
                                         <Form.Group as={Row} className="mb-3" controlId="formGeneralDetails">
-                                            <Form.Label column sm="5" className='text-start'>General Camp Details</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>General Camp Details <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Col sm="7">
                                                 <Form.Control
                                                     type="text"
@@ -687,7 +690,7 @@ function Medical_camp() {
                                     )}
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            Organised by :
+                                            Organised by : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -701,7 +704,7 @@ function Medical_camp() {
 
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            No. of Participants :
+                                            No. of Participants : <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Col sm="7">
                                             <Form.Control
@@ -722,7 +725,7 @@ function Medical_camp() {
                                                 name="feedback"
                                                 value={formData.feedback}
                                                 onChange={handleChange}
-                                                required />
+                                                 />
                                         </Col>
                                     </Form.Group>
                                 </Col>

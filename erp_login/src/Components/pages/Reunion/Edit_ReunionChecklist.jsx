@@ -137,6 +137,88 @@ function Edit_ReunionChecklist() {
 
     const updateFormData = async (e) => {
         e.preventDefault();
+
+        if (!formData.familyRequestLetter || formData.familyRequestLetter.trim() === '') {
+            alert("Please select Family Request Letter field Yes or No.");
+            return;
+        }
+         if (!formData.selfDeclarationLetter || formData.selfDeclarationLetter.trim() === '') {
+            alert("Please select Self-Declaration Letter field Yes or No.");
+            return;
+        }
+         if (!formData.mediaConsentLetter || formData.mediaConsentLetter.trim() === '') {
+            alert("Please select Media Consent Letter field Yes or No.");
+            return;
+        }
+         if (!formData.residentIDproof || formData.residentIDproof.trim() === '') {
+            alert("Please select Resident’s ID Proof field Yes or No.");
+            return;
+        }
+         if (!formData.aadharCard || formData.aadharCard.trim() === '') {
+            alert("Please select Aadhaar Card field Yes or No.");
+            return;
+        }
+         if (!formData.udidCard || formData.udidCard.trim() === '') {
+            alert("Please select UDID Card field Yes or No.");
+            return;
+        }
+         if (!formData.disabilityCertificate || formData.disabilityCertificate.trim() === '') {
+            alert("Please select Disability Certificate field Yes or No.");
+            return;
+        }
+         if (!formData.bankPassbook || formData.bankPassbook.trim() === '') {
+            alert("Please select Bank Passbook / ATM Card field Yes or No.");
+            return;
+        }
+         if (!formData.healthInsurance || formData.healthInsurance.trim() === '') {
+            alert("Please select Health Insurance Document field Yes or No.");
+            return;
+        }
+         if (!formData.medicalReport || formData.medicalReport.trim() === '') {
+            alert("Please select Medical Report field Yes or No.");
+            return;
+        }
+         if (!formData.dischargeSummary || formData.familyRequestLetter.trim() === '') {
+            alert("Please select Discharge Summary Report field Yes or No.");
+            return;
+        }
+         if (!formData.medications || formData.medications.trim() === '') {
+            alert("Please select One-Month Supply of Prescribed Medications field Yes or No.");
+            return;
+        }
+         if (!formData.Clothes || formData.Clothes.trim() === '') {
+            alert("Please select Clothes field Yes or No.");
+            return;
+        }
+         if (!formData.possessionsRecovered || formData.possessionsRecovered.trim() === '') {
+            alert("Please select Possessions Recovered field Yes or No.");
+            return;
+        }
+         if (!formData.dischargeAllowance || formData.dischargeAllowance.trim() === '') {
+            alert("Please select Discharge Allowance field Yes or No.");
+            return;
+        }
+         if (!formData.travelExpenses || formData.travelExpenses.trim() === '') {
+            alert("Please select Travel Expenses field Yes or No.");
+            return;
+        }
+         if (!formData.copyOfdischargeSummary || formData.copyOfdischargeSummary.trim() === '') {
+            alert("Please select Copy of Discharge Summary field Yes or No.");
+            return;
+        }
+         if (!formData.travelSafetyLetter || formData.travelSafetyLetter.trim() === '') {
+            alert("Please select Safety and Travel Arrangements field Yes or No.");
+            return;
+        }
+         if (!formData.reunionPhoto || formData.reunionPhoto.trim() === '') {
+            alert("Please select Reunion Photo field Yes or No.");
+            return;
+        }
+         if (!formData.witnessSignature || formData.witnessSignature.trim() === '') {
+            alert("Please select Witness Signature field Yes or No.");
+            return;
+        }
+
         const formPayload = new FormData();
 
         for (const key in formData) {

@@ -375,6 +375,7 @@ function Celebration_report() {
                             <Col sm="7">
                                 <Form.Control type="date"
                                     name="celebration_date"
+                                    max="9999-12-31"
                                     value={formatDate1(celebrationData.celebration_date)}
                                     onChange={handleInputChange1}
                                     required />
@@ -467,6 +468,7 @@ function Celebration_report() {
                                 <Col sm="6">
                                     <Form.Control type="date"
                                         name="celebration_date"
+                                        max="9999-12-31"
                                         value={celebrationData.celebration_date}
                                         onChange={handleInputChange1}
                                         required />
