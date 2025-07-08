@@ -246,11 +246,29 @@ function Essential_record() {
             });
             console.log(res);
             if (res.data.message === "Essential Records Form Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
+                alert("Form Created Successfully");
+                setFormData({
+                    admission_no:'',
+                    rescue_name: '',
+                    aadhar_card: '',
+                    udid_no: '',
+                    disability_no: '',
+                    voter_id: '',
+                    form_7: '',
+                    bank_name: '',
+                    account_no: '',
+                    ifsc_code: '',
+                    insurance_provider: '',
+                    policy_no: '',
+                    validity_period: '',
+                    other_gvt_scheme: '',
+                    any_other: ''
+                })
+                setAdmissionNumber("");
+                setFiles({
+                    bank_passbook: null,
+                    form7_attach: null,
+                })
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -785,7 +803,7 @@ function Essential_record() {
 
                                     <Form.Group as={Row} className="mb-3 text-start">
                                         <Form.Label column sm="4" className='form_title'>
-                                            CMCHIS(Chief Minister's Comprehensive Health Insurance Scheme): 
+                                            CMCHIS(Chief Minister's Comprehensive Health Insurance Scheme):
                                         </Form.Label>
                                         <Col sm="8">
                                             {/* Aadhar Card */}

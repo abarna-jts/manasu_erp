@@ -221,6 +221,7 @@ function Rescue_details() {
                 wound_infection: data.wound_infection || '',
                 height: data.height || '',
                 weight: data.weight || '',
+                tattoo: data.tattoo || '',
                 things_carried: data.things_carried || '',
                 remark: data.remark || '',
                 mental_status: data.mental_status || '',

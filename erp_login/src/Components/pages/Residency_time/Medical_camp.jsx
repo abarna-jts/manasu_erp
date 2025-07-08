@@ -286,6 +286,11 @@ function Medical_camp() {
             </div>
 
             <Container>
+                <Col md={4}>
+                    {userType === "3" && (
+                        <Button variant="success" className="m-1 d-flex justify-content-start align-items-center" type="submit" onClick={handleShow}>Enter Camp Report</Button>
+                    )}
+                </Col>
                 <Row>
                     <Table responsive="sm">
 
@@ -462,7 +467,7 @@ function Medical_camp() {
                                                 name="feedback"
                                                 value={formData.feedback}
                                                 onChange={handleChange}
-                                                 />
+                                            />
                                         </Col>
                                     </Form.Group>
                                 </Col>
@@ -725,7 +730,7 @@ function Medical_camp() {
                                                 name="feedback"
                                                 value={formData.feedback}
                                                 onChange={handleChange}
-                                                 />
+                                            />
                                         </Col>
                                     </Form.Group>
                                 </Col>

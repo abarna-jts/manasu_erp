@@ -247,6 +247,71 @@ function Annual_Report() {
     const handleEventSubmit = async (e) => {
         e.preventDefault();
 
+        const { event_type } = eventData;
+
+        if (!event_type || event_type.length === 0) {
+            alert("Event Type is required.");
+            return;
+        }
+
+        if (event_type === 'event') {
+            if (!eventData.event_name) {
+                alert("Event Name is required.");
+                return;
+            }
+            if (!eventData.event_date) {
+                alert("Event Date is required.");
+                return;
+            }
+            if (!eventData.event_place) {
+                alert("Event Place is required.");
+                return;
+            }
+            if (!eventData.event_rescue_count) {
+                alert("Event participants is required.");
+                return;
+            }
+        }
+
+        if (event_type === 'awareness') {
+            if (!eventData.awareness_name) {
+                alert("Awareness Name is required.");
+                return;
+            }
+            if (!eventData.awarness_date) {
+                alert("Awareness Date is required.");
+                return;
+            }
+            if (!eventData.awarness_place) {
+                alert("Awareness Place is required.");
+                return;
+            }
+            if (!eventData.awarness_rescue_count) {
+                alert("Awareness Participants is required.");
+                return;
+            }
+        }
+
+        if (event_type === 'outing') {
+            if (!eventData.outing_name) {
+                alert("Outing Name is required.");
+                return;
+            }
+            if (!eventData.outing_date) {
+                alert("Outing Date is required.");
+                return;
+            }
+            if (!eventData.outing_place) {
+                alert("Outing Place is required.");
+                return;
+            }
+            if (!eventData.outing_rescue_count) {
+                alert("Outing Participants is required.");
+                return;
+            }
+        }
+
+
         const data = new FormData();
         data.append('event_type', eventData.event_type);
         data.append('event_name', eventData.event_name);
@@ -291,9 +356,31 @@ function Annual_Report() {
             if (res.data.message === "Event Report Form Created Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
-
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
+                setEventData({
+                    event_type: 'event',
+                    event_date: '',
+                    awarness_date: '',
+                    outing_date: '',
+                    event_name: '',
+                    awareness_name: '',
+                    outing_name: '',
+                    event_date: '',
+                    event_place: '',
+                    event_rescue_count: '',
+                    awarness_date: '',
+                    awarness_place: '',
+                    awarness_rescue_count: '',
+                    outing_date: '',
+                    outing_place: '',
+                    outing_rescue_count: '',
+                    event_report: '',
+                    awarness_report: '',
+                    outing_report: '',
+                })
+                setTimeout(() => {
+                    setSubmissionMessage('');
+                    setMessageType('');
+                }, 1000);
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -307,6 +394,22 @@ function Annual_Report() {
 
     const handleCelebrationSubmit = async (e) => {
         e.preventDefault();
+        if (!celebrationData.celebration_name || celebrationData.celebration_name.length === 0) {
+            alert("Celebration Name is required.");
+            return;
+        }
+        if (!celebrationData.celebration_date || celebrationData.celebration_date.length === 0) {
+            alert("Celebration Date is required.");
+            return;
+        }
+        if (!celebrationData.celebration_place || celebrationData.celebration_place.length === 0) {
+            alert("Celebration Place is required.");
+            return;
+        }
+        if (!celebrationData.celebration_rescue_count || celebrationData.celebration_rescue_count.length === 0) {
+            alert("Celebration Participants is required.");
+            return;
+        }
         try {
             const response = await apiRoute.post("/formality/createCelebrationReport", celebrationData);
             console.log(response);
@@ -314,7 +417,18 @@ function Annual_Report() {
             if (response.data.message === "Celebration Report Form Created Successfully") {
                 setSubmissionMessage("Form Submitted Successfully!");
                 setMessageType("success");
-                window.location.reload();
+                setCelebrationData({
+                    celebration_name: '',
+                    celebration_date: '',
+                    celebration_place: '',
+                    celebration_rescue_count: '',
+                    celebration_report: '',
+                    other_celebration: ''
+                })
+                setTimeout(() => {
+                    setSubmissionMessage('');
+                    setMessageType('');
+                }, 1000);
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -325,18 +439,55 @@ function Annual_Report() {
             setMessageType("danger");
 
         }
-
     }
 
     const handleCommunitySubmit = async (e) => {
         e.preventDefault();
+        if (!programData.program_name || programData.program_name.length === 0) {
+            alert("Community Programs Name is required.");
+            return;
+        }
+
+        if (!programData.clg_dept || programData.clg_dept.length === 0) {
+            alert("College department is required.");
+            return;
+        }
+        if (!programData.clg_name || programData.clg_name.length === 0) {
+            alert("College Name is required.");
+            return;
+        }
+        if (!programData.resource_person || programData.resource_person.length === 0) {
+            alert("Resource Person is required.");
+            return;
+        }
+        if (!programData.program_date || programData.program_date.length === 0) {
+            alert("Community Programs Date is required.");
+            return;
+        }
+        if (!programData.program_rescue_count || programData.program_rescue_count.length === 0) {
+            alert("Community Programs Participants is required.");
+            return;
+        }
         try {
             const reponse = await apiRoute.post("/formality/createCommunityReport", programData);
             console.log(reponse);
             if (reponse.data.message === "Community Report Form Created Successfully") {
                 setSubmissionMessage("Form Submitted Successfully!");
                 setMessageType("success");
-                window.location.reload();
+                setProgramData({
+                    program_name: '',
+                    clg_name: '',
+                    clg_dept: '',
+                    resource_person: '',
+                    program_date: '',
+                    program_place: '',
+                    program_rescue_count: '',
+                    program_report: '',
+                })
+                setTimeout(() => {
+                    setSubmissionMessage('');
+                    setMessageType('');
+                }, 1000);
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -351,23 +502,26 @@ function Annual_Report() {
     const handleStaffSubmit = async (e) => {
         e.preventDefault();
 
-        // Step 4 required fields
-        const requiredFields = [
-            "staff_name",
-            "staff_date",
-            "staff_place",
-            "staff_rescue_count",
-            "staff_report"
-        ];
-
-        const allFilled = requiredFields.every(field => staffData[field]);
-
-        if (!allFilled) {
-            setIsStep4Invalid(true); // Show red step number
+        if (!staffData.staff_name || staffData.staff_name.length === 0) {
+            alert("Staff Programs Name is required.");
             return;
-        } else {
-            setIsStep4Invalid(false);
         }
+
+        if (!staffData.staff_date || staffData.staff_date.length === 0) {
+            alert("Staff Programs Date is required.");
+            return;
+        }
+
+        if (!staffData.staff_place || staffData.staff_place.length === 0) {
+            alert("Staff Programs Place is required.");
+            return;
+        }
+
+        if (!staffData.staff_rescue_count || staffData.staff_rescue_count.length === 0) {
+            alert("Staff Programs Participants is required.");
+            return;
+        }
+
 
         try {
             const response = await apiRoute.post("/formality/createStaffReport", staffData);
@@ -376,7 +530,17 @@ function Annual_Report() {
             if (response.data.message === "Staff Report Form Created Successfully") {
                 setSubmissionMessage("Form Submitted Successfully!");
                 setMessageType("success");
-                window.location.reload();
+                setStaffData({
+                    staff_name: '',
+                    staff_date: '',
+                    staff_place: '',
+                    staff_rescue_count: '',
+                    staff_report: ''
+                })
+                setTimeout(() => {
+                    setSubmissionMessage('');
+                    setMessageType('');
+                }, 1000);
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -407,11 +571,11 @@ function Annual_Report() {
         navigate("/celebration_report");
     };
 
-    const ViewCommunityReport = () =>{
+    const ViewCommunityReport = () => {
         navigate("/programs_report");
     }
 
-    const ViewStaffReport = () =>{
+    const ViewStaffReport = () => {
         navigate("/staffPrograms_report");
     }
 
@@ -446,6 +610,13 @@ function Annual_Report() {
                         (stepNumber === 3 && isStep3Invalid) ||
                         (stepNumber === 4 && isStep4Invalid);
 
+                    // Decide background color
+                    let backgroundColor = '#ccc'; // default for upcoming
+                    
+                    if (isActive) {
+                        backgroundColor = '#84c342'; // brighter green for active
+                    }
+
                     return (
                         <div
                             key={index}
@@ -454,9 +625,10 @@ function Annual_Report() {
                             <div
                                 className="step-number"
                                 style={{
-                                    color: isInvalid ? 'white' : 'inherit',
-                                    fontWeight: isInvalid ? 'bold' : 'normal',
-                                    background: isInvalid ? 'red' : '#84c342',
+                                    background: backgroundColor,
+                                    color: isInvalid ? '#fff' : '#fff', // white text for all
+                                    fontWeight: isInvalid ? 'bold' : 'normal', // only bold if invalid
+                                    border: isInvalid ? '2px solid #fff' : 'none', // optional subtle border if invalid
                                 }}
                             >
                                 {stepNumber}
@@ -466,6 +638,7 @@ function Annual_Report() {
                     );
                 })}
             </div>
+
 
 
             <div>

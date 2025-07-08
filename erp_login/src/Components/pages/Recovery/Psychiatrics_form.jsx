@@ -344,7 +344,25 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_information', completeFormData);
             console.log("Form submitted successfully:", response.data);
             alert("Demographic Information submitted successfully!");
-            window.location.reload();
+            // window.location.reload();
+            setFormData({
+                patient_name: '',
+                patient_age: '',
+                patient_gender: 'Male',
+                sexual_orientation: '',
+                education_bg: '',
+                occupation: '',
+                marital_status: '',
+                economic_status: '',
+                religion: '',
+                informant: '',
+                residential_address: '',
+                living_arrangements: '',
+                family_structure: '',
+                cultural_identity: '',
+                language1: '',
+                language2: '',
+            })
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -379,7 +397,20 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_chiefComplaint', completeChiefData);
             console.log("Chief Complaint submitted successfully:", response.data);
             alert("Chief Complaint submitted successfully!");
-            window.location.reload();
+            setChiefData({
+                chief_complaint: '',
+                onset_duration: '',
+                nature_symptoms: '',
+                severity: '',
+                course_type: '',
+                nature_illness: '',
+                identify_trigger: '',
+                life_changes: '',
+                biological: '',
+                psychological: '',
+                social_environment: '',
+            })
+            // window.location.reload();
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -443,7 +474,22 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_presenting', completedPresentingData);
             console.log("Presenting Problems submitted successfully:", response.data);
             alert("Presenting Problems submitted successfully!");
-            window.location.reload();
+            setPresentingData({
+                history_presenting: '',
+                mood_affect: [],
+                though_content: [],
+                though_process: [],
+                perception: [],
+                behavioural_changes: [],
+                sleep_patterns: [],
+                energy_level: '',
+                appetite_weight: '',
+                occupation_academic: '',
+                interpersonal_relationship: '',
+                selfCare_activity: '',
+                recreation_activity: '',
+            })
+            // window.location.reload();
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -485,7 +531,24 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_psyhistory', completePsyHistoryData);
             console.log("Psychiatric History submitted successfully:", response.data);
             alert("Psychiatric History submitted successfully!");
-            window.location.reload();
+            setPsyHistoryData({
+                psychiatric_diagnoses: '',
+                treatment_history: '',
+                medications: '',
+                dosage: '',
+                adherence: '',
+                sideEffect: '',
+                experience_reaction: '',
+                hospitalisation_reason: '',
+                duration: '',
+                crisis_episodes: '',
+                fm_mentalHealth: '',
+                significant_life: '',
+                chronic_stressors: '',
+                trauma_exploration: [],
+                legal_environment: []
+            })
+            // window.location.reload();
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -519,7 +582,18 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_medicalData', completeMedicalData);
             console.log("Medical History submitted successfully:", response.data);
             alert("Medical History submitted successfully!");
-            window.location.reload();
+            setMedicalData({
+                disability_status: '',
+                chronic_medical: '',
+                acute_health: '',
+                medication: '',
+                medication_allergies: '',
+                other_allergy: [],
+                significant_medical: [],
+                traumatic_injuries: '',
+                sexual_health: []
+            })
+            // window.location.reload();
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -564,7 +638,16 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_familyData', completeFamilyData);
             console.log("Family History submitted successfully:", response.data);
             alert("Family History submitted successfully!");
-            window.location.reload();
+            setFamilyData({
+                family_composition: [],
+                family_dynamics: [],
+                marriage_type: '',
+                family_history: '',
+                genetic_predisposition: '',
+                family_changes: [],
+                family_substance: ''
+            })
+            // window.location.reload();
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -596,7 +679,19 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_socialData', completeSocialData);
             console.log("Social History submitted successfully:", response.data);
             alert("Social History submitted successfully!");
-            window.location.reload();
+            setSocialData({
+                family_relationship: '',
+                socialCircle_relationship: '',
+                relationship_significant: '',
+                living_arrangements: '',
+                education_bg: '',
+                currentEmp_status: '',
+                socialRecreation_activity: '',
+                social_outlets: '',
+                socialMed_engagement: '',
+                technology_related: ''
+            })
+            // window.location.reload();
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -628,7 +723,20 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_developmentalData', completeDevelopmentalData);
             console.log("Developmental History submitted successfully:", response.data);
             alert("Developmental History submitted successfully!");
-            window.location.reload();
+            setDeveleopmentData({
+                prenatal_factors: '',
+                birth_details: '',
+                birth_order: '',
+                siblings_number: '',
+                bonding_attachment: '',
+                milestones_development: '',
+                childhood_illness: '',
+                siblings_relationship: '',
+                parenting_style: '',
+                learning_challenge: '',
+                pubertal_development: '',
+            })
+            // window.location.reload();
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -660,7 +768,20 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_substanceData', completeSubstanceData);
             console.log("Substance Use History submitted successfully:", response.data);
             alert("Substance Use History submitted successfully!");
-            window.location.reload();
+            setSubstanceData({
+                substance_use: '',
+                age_onset: '',
+                frequency: '',
+                quantity: '',
+                motivation_use: '',
+                environmental_trigger: '',
+                impact_occupation: '',
+                impact_interpersonal: '',
+                financial_consequences: '',
+                craving_intensity: '',
+                previous_treatment: '',
+                relapse_history: '',
+            })
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -693,7 +814,15 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_suicidalData', completeSuicidalData);
             console.log("Suicidal and Homicidal Ideation submitted successfully:", response.data);
             alert("Suicidal and Homicidal Ideation submitted successfully!");
-            window.location.reload();
+            setSuicidalData({
+                suicide_history: '',
+                triggers_stressors: '',
+                homicidal_ideation: '',
+                target_method: '',
+                immediate_threat: '',
+                emergency_response: '',
+                hospital_required: ''
+            })
         } catch (error) {
             console.error(error);
             alert("Error submitting form.");
@@ -1629,7 +1758,7 @@ function Psychiatrics_form() {
                 </Form>
             </Container>
 
-            <Container>
+            <Container className='psychiatric_container'>
                 <Row>
                     <Col>
                         <div className="page">
@@ -1676,8 +1805,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>DEMOGRAPHIC INFORMATION</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -1902,8 +2031,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>THE CHIEF COMPLAINT</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleCheifComplaintShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleCheifComplaintShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -2070,8 +2199,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>PRESENTING PROBLEMS</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handlePresentingShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handlePresentingShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -2251,8 +2380,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>PSYCHIATRIC HISTORY</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handlePsychiatricShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handlePsychiatricShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -2454,8 +2583,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>MEDICAL HISTORY</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleMedicalShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleMedicalShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -2555,7 +2684,7 @@ function Psychiatrics_form() {
                                                     </Form.Group>
 
                                                     <li className='icon-li'>
-                                                        <h4>Sexual Health:</h4> <span style={{ color: 'red' }}>*</span>
+                                                        <h4>Sexual Health: <span style={{ color: 'red' }}>*</span></h4> 
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2584,15 +2713,15 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>FAMILY HISTORY</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleFamilyShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleFamilyShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
                                                 <Form className='mt-4' onSubmit={handleFamilySubmit}>
                                                     <li className='icon-li'>
-                                                        <h4>Family Composition: <span style={{ color: 'red' }}>*</span></h4> 
+                                                        <h4>Family Composition: <span style={{ color: 'red' }}>*</span></h4>
                                                     </li>
                                                     <Form.Group as={Row} className="mb-3">
                                                         <div className="d-flex flex-wrap gap-3 mt-2">
@@ -2692,8 +2821,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>SOCIAL HISTORY </h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleSocialShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleSocialShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -2833,8 +2962,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>DEVELOPMENTAL HISTORY </h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleDevelopmentalShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleDevelopmentalShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -2987,8 +3116,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>SUBSTANCE USE HISTORY</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleSubstanceShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleSubstanceShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
@@ -3153,8 +3282,8 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>SUICIDAL AND HOMICIDAL IDEATION</h1>
                                             {userType === "4" && (
-                                            <button type="button" className="btn btn-success mx-3" onClick={handleSuicidalShow}>
-                                                <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                                                <button type="button" className="btn btn-success mx-3" onClick={handleSuicidalShow}>
+                                                    <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
                                         </div>
                                         <Row className='d-flex justify-content-around'>

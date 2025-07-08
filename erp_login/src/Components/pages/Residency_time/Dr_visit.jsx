@@ -116,7 +116,7 @@ function Dr_visit() {
                                                     name="date_time"
                                                     value={formData.date_time}
                                                     onChange={handleChange}
-                                                    max={new Date().toISOString().slice(0, 16)}
+                                                    max="2025-07-08T17:30"
                                                     required />
                                             </Col>
                                         </Form.Group>

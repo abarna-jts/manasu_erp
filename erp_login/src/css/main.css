@@ -567,6 +567,10 @@ body {
 		padding-right: 5px !important;
 	}
 
+	.first_info_form {
+		width: 95% !important;
+	}
+
 	.sidebar .multi-level .nav-link {
 		padding-left: 8px !important;
 	}
@@ -778,6 +782,16 @@ body {
 
 	.admission_report {
 		width: 50% !important;
+	}
+}
+
+@media(max-width:1610px) and (min-width:1551) {
+	body {
+		background-color: #0056b3;
+	}
+
+	.first_info_form {
+		width: 90% !important;
 	}
 }
 
@@ -1815,6 +1829,76 @@ body {
 	}
 }
 
+@media(max-width:1408px) and (min-width:1300px) {
+	.first_info_form {
+		width: 96% !important;
+	}
+
+	.section_title {
+		font-size: 1.6rem;
+	}
+
+	.breadcrumb-item+.breadcrumb-item {
+		padding-left: 0.3rem !important;
+	}
+
+	.h6,
+	h6 {
+		font-size: 0.9rem;
+	}
+
+	.section_title_1 {
+		margin-bottom: 10px;
+		font-size: 1.4rem;
+	}
+
+	.sub_title {
+		margin-bottom: 10px;
+		font-size: 0.9rem;
+	}
+
+	.form_2A_breadcrumb {
+		padding-right: 0rem !important;
+	}
+
+	.form_2A_container {
+		width: 98% !important;
+	}
+
+	.scrb_form_container {
+		width: 98% !important;
+	}
+
+	.form_2B_container {
+		width: 98% !important;
+	}
+
+	.form_2C_container {
+		width: 98% !important;
+	}
+
+	.breadcrumb-item,
+	.breadcrumb-item a {
+		font-size: 0.8rem;
+	}
+
+	.psychiatric_container {
+		width: 96% !important;
+	}
+
+	.mse_container {
+		width: 96% !important;
+	}
+
+	.annual_section_title {
+		font-size: 1.4rem;
+	}
+}
+
+.form_2A_breadcrumb {
+	padding: 0rem 1rem;
+}
+
 @media(max-width:1550px) and (min-width:1408px) {
 	.sidebar {
 		width: 247px !important;
@@ -1879,17 +1963,21 @@ body {
 	.col-form-label {
 		font-size: 0.9rem !important;
 	}
+
+	.first_info_form {
+		width: 95% !important;
+	}
 }
 
 #root {
 	width: 100% !important;
 }
 
-.MSE_form_tab .tab-content-6{
+.MSE_form_tab .tab-content-6 {
 	height: 61em !important;
 }
 
-.MSE_form_tab .tab-content-first{
+.MSE_form_tab .tab-content-first {
 	height: 61em !important;
 }
 

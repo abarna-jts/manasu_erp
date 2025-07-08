@@ -176,11 +176,28 @@ function SCRB_form() {
             });
             console.log(res);
             if (res.data.message === "SCRB FORM2 Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
+                alert("SCRB Form Submitted Successfully");
+                setFormData({
+                    koppu_en: '',
+                    admission_no: '',
+                    name_rescue: '',
+                    phone_no: '',
+                    rescue_name: '',
+                    father: '',
+                    date_time: '',
+                    rescue_status: '',
+                    language1: '',
+                    place: '',
+                    police_station: '',
+                    addition_info: '',
+                })
+                setFiles({
+                    old_photo: null,
+                    new_photo: null,
+                    signature: null,
+                    seal: null,
+                })
+                setAdmissionNumber("");
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -844,7 +861,7 @@ function SCRB_form() {
                                                         name="addition_info"
                                                         id="exampleFormControlTextarea1"
                                                         onChange={handleInputChange}
-                                                        
+
                                                         rows="3"></textarea>
                                                 </div>
                                             </div>

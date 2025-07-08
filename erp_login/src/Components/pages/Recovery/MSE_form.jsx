@@ -189,9 +189,9 @@ function MSE_form() {
     setCanConcentrate(e.target.value);
   };
 
-  // const handleAdmissionChange = (e) => {
-  //   setAdmissionNumber(e.target.value);
-  // };
+  const handleAdmissionChange = (e) => {
+    setAdmissionNumber(e.target.value);
+  };
 
   const apiRoute = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -279,11 +279,11 @@ function MSE_form() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return; // Stop form submission
     }
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -336,14 +336,26 @@ function MSE_form() {
 
     const completeFormData = {
       ...formData,
-      date: date
+      date: date,
+      admission_no: admission_no
     };
 
     try {
       const response = await apiRoute.post('/recovery/create_MSE', completeFormData);
       console.log("Form submitted successfully:", response.data);
       alert("Form submitted successfully!");
-      window.location.reload(); // Reload the page to reflect changes
+      setFormData({
+        general_appearance: [],
+        attitude: [],
+        comprehension: [],
+        gait_posture: [],
+        motor_activity: [],
+        catatonic_sign: [],
+        conversion_dissociative: [],
+        social_manner: [],
+        rapport: [],
+        hallucinatory_behaviour: []
+      })
     } catch (error) {
       console.error(error);
       if (error.response && error.response.status === 409) {
@@ -358,12 +370,12 @@ function MSE_form() {
   const handleSpeechSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return;
     }
 
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -394,13 +406,18 @@ function MSE_form() {
     const payload = {
       ...speechFormData,
       date: date,
-      admission_no: formData.admission_no
+      admission_no: admission_no
     };
 
     try {
       const response = await apiRoute.post('/recovery/create_speech', payload);
       console.log("Speech data submitted:", response.data);
       alert("Speech form submitted successfully!");
+      setSpeechFormData({
+        rate_quantity: [],
+        volume_tone: [],
+        flow_rhythm: [],
+      })
     } catch (error) {
       console.error("Error submitting speech form:", error);
       alert("Error submitting speech form.");
@@ -409,11 +426,11 @@ function MSE_form() {
 
   const handleMoodAffectSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return;
     }
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -454,7 +471,7 @@ function MSE_form() {
 
     const payload = {
       ...moodFormData,
-      admission_no: formData.admission_no,
+      admission_no: admission_no,
       date: date,
     };
 
@@ -462,7 +479,15 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_mood', payload);
       console.log("Mood data submitted:", response.data);
       alert("Mood form submitted successfully!");
-      window.location.reload(); // Reload the page to reflect changes
+      setMoodFormData({
+        mood_description: [],
+        appearance: "",
+        resident_feeling: "",
+        general_feeling: "",
+        mood_like: "",
+        resident_general_feeling: "",
+        resident_look: [],
+      })
 
     } catch (error) {
       console.error("Error submitting mood form:", error);
@@ -473,11 +498,11 @@ function MSE_form() {
 
   const handlethoughSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return;
     }
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -500,15 +525,17 @@ function MSE_form() {
     const payload = {
       ...thoughFormData,
       date: date,
-      admission_no: formData.admission_no
+      admission_no: admission_no
     };
 
     try {
       const response = await apiRoute.post('/recovery/create_though', payload);
       console.log("Though Data submitted:", response.data);
       alert("Though form submitted successfully!");
-      window.location.reload(); // Reload the page to reflect changes
-
+      setThoughFormData({
+        stream_form_though: [],
+        content_though: [],
+      })
     } catch (error) {
       console.error("Error submitting Though form:", error);
       alert("Error submitting Though form.");
@@ -518,11 +545,11 @@ function MSE_form() {
 
   const handleJudgementSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return;
     }
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -553,15 +580,19 @@ function MSE_form() {
     const payload = {
       ...judgementData,
       date: date,
-      admission_no: formData.admission_no
+      admission_no: admission_no
     };
 
     try {
       const response = await apiRoute.post('/recovery/create_judgement', payload);
       console.log("Judgement Data submitted:", response.data);
       alert("Judgement form submitted successfully!");
-      window.location.reload(); // Reload the page to reflect changes
-
+      setJudgementFormData({
+        personal_judgement: '',
+        social_judgement: '',
+        test_judgement: '',
+        judgement: '',
+      })
     } catch (error) {
       console.error("Error submitting Judgement form:", error);
       alert("Error submitting Judgement form.");
@@ -570,11 +601,11 @@ function MSE_form() {
 
   const handleInsightSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return;
     }
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -613,15 +644,21 @@ function MSE_form() {
     const payload = {
       ...insightData,
       date: date,
-      admission_no: formData.admission_no
+      admission_no: admission_no
     };
 
     try {
       const response = await apiRoute.post('/recovery/create_insight', payload);
       console.log("Insight Data submitted:", response.data);
       alert("Insight form submitted successfully!");
-      window.location.reload(); // Reload the page to reflect changes
-
+      setInsightData({
+        denail_illness: '',
+        slight_awareness: '',
+        awarness_sick: '',
+        awarness_illness: '',
+        intellectual_insight: '',
+        true_emotion: ''
+      })
     } catch (error) {
       console.error("Error submitting Insight form:", error);
       alert("Error submitting Insight form.");
@@ -630,11 +667,11 @@ function MSE_form() {
 
   const handlePerceptionSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return;
     }
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -673,15 +710,25 @@ function MSE_form() {
     const payload = {
       ...perceptionData,
       date: date,
-      admission_no: formData.admission_no
+      admission_no: admission_no
     };
 
     try {
       const response = await apiRoute.post('/recovery/create_perception', payload);
       console.log("Perception Data submitted:", response.data);
       alert("Perception form submitted successfully!");
-      window.location.reload(); // Reload the page to reflect changes
-
+      setPerceptionData({
+        hallucination_type: [],
+        heard: '',
+        voices_heard: '',
+        part_of_day: '',
+        female_male_voices: '',
+        interpreted_person: '',
+        illusion: [],
+        perception_changes: [],
+        somatic: [],
+        others: []
+      })
     } catch (error) {
       console.error("Error submitting Perception form:", error);
       alert("Error submitting Perception form.");
@@ -690,11 +737,11 @@ function MSE_form() {
 
   const handleCognitionSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.admission_no || formData.admission_no.trim() === '') {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Admission Number is required.");
       return;
     }
-    const trimmedAdNo = formData.admission_no.trim();
+    const trimmedAdNo = admission_no.trim();
 
     if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
       alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -765,7 +812,7 @@ function MSE_form() {
     const payload = {
       ...cognitionData,
       date: date,
-      admission_no: formData.admission_no,
+      admission_no: admission_no,
       consciousnessState: selectedStates.join(', '),  // ✔️ Store array as comma-separated string
       canConcentrate: canConcentrate,                 // ✔️ Radio button value
     };
@@ -774,8 +821,35 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_cognition', payload);
       console.log("Cognition Data submitted:", response.data);
       alert("Cognition form submitted successfully!");
-      window.location.reload(); // Reload the page to reflect changes
-
+      setCognitionData({
+        consciousness: [],
+        orientation_time: '',
+        orientation_place: '',
+        orientation_person: '',
+        distractibility: '',
+        asking_test: '',
+        names_months: '',
+        test_performance: '',
+        immediate_retention: '',
+        recall: '',
+        patient_place: '',
+        dinner_ate: '',
+        date_ofMrg: '',
+        birthdays_children: '',
+        person_past: '',
+        amnesia: '',
+        live_growing: '',
+        person_school: '',
+        breakfast_ques: '',
+        do_yesterday: '',
+        general_info: '',
+        test_red_wri: '',
+        calculation_test: '',
+        proverb_testing: '',
+        familiar_object: ''
+      })
+      setSelectedStates([]);
+      setCanConcentrate('');
     } catch (error) {
       console.error("Error submitting Cognition form:", error);
       alert("Error submitting Cognition form.");
@@ -1650,13 +1724,8 @@ function MSE_form() {
                         <InputGroup className="input-group-merge search-bar">
                           <Form.Control
                             type="text"
-                            value={formData.admission_no || ""}
-                            onChange={(e) => {
-                              setFormData((prev) => ({
-                                ...prev,
-                                admission_no: e.target.value
-                              }));
-                            }}
+                            value={admission_no || ""}
+                            onChange={handleAdmissionChange}
                           />
 
                         </InputGroup>

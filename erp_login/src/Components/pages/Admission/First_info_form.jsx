@@ -735,7 +735,7 @@ function First_info_form() {
 
 
             {step === 1 && (
-                <Container>
+                <Container className="first_info_form">
                     <Row>
                         <Col md={12} className="text-start">
                             <h3 className="section_title">Rescue Details</h3>
@@ -896,7 +896,7 @@ function First_info_form() {
 
             {
                 step === 2 && (
-                    <Container>
+                    <Container className="first_info_form">
                         <Row>
 
 
@@ -1099,7 +1099,7 @@ function First_info_form() {
 
             {
                 step === 3 && (
-                    <Container>
+                    <Container className="first_info_form">
                         <Row>
 
                             <Col md={12} className="text-start">
@@ -1240,7 +1240,7 @@ function First_info_form() {
 
             {
                 step === 4 && (
-                    <Container>
+                    <Container className="first_info_form">
                         <Row>
 
                             <Col md={12} className="text-start">
@@ -1431,7 +1431,7 @@ function First_info_form() {
 
             {
                 step === 5 && (
-                    <Container>
+                    <Container className="first_info_form">
                         <Row>
                             <Col md={12} className="text-start">
                                 <h3 className="section_title"> Initial Psychological Assessment.</h3>

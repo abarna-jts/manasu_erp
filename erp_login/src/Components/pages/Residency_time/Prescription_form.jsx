@@ -252,7 +252,7 @@ function Prescription_form() {
             return;
         }
 
-         const trimmedAdNo = admissionNumber.trim();
+        const trimmedAdNo = admissionNumber.trim();
 
         if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
             alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
@@ -260,7 +260,6 @@ function Prescription_form() {
         }
 
         const todayDate = new Date().toISOString().split('T')[0]; // e.g., "2025-05-23"
-
 
         // ✅ Helper to flatten row fields into comma-separated strings
         const flattenField = (field) => rows.map(r => r[field] || '').join(',');
@@ -286,22 +285,21 @@ function Prescription_form() {
             const res = await apiRoute.post('/residency/createPrescription', data);
             console.log(res);
             alert("Prescription and Medicine Summary Saved Successfully");
-
-            if (res.data.message === "Prescription and Medicine Summary Saved Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-                setTimeout(() => window.location.reload(), 3000);
-            } else {
-                setSubmissionMessage("Submission failed.");
-                setMessageType("danger");
-            }
+            window.location.reload();
+            // if (res.data.message === "Prescription and Medicine Summary Saved Successfully") {
+            //     setSubmissionMessage("Form submitted successfully!");
+            //     setMessageType("success");
+            //     setTimeout(() => window.location.reload(), 3000);
+            // } else {
+            //     setSubmissionMessage("Submission failed.");
+            //     setMessageType("danger");
+            // }
         } catch (error) {
             console.error("Error submitting form", error);
             setSubmissionMessage("Something went wrong.");
             setMessageType("danger");
         }
     };
-
 
 
     //fetching prescription details

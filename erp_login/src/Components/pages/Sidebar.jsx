@@ -37,25 +37,20 @@ import { useNavigate } from "react-router-dom";
 const Sidebar = () => {
   const [show, setShow] = useState(false);
   const onCollapse = () => setShow(!show);
-  const [activeKey, setActiveKey] = useState(null);
-  const [mainActiveKey, setMainActiveKey] = useState(null);
-  const [nurseActiveKey, setNurseActiveKey] = useState(null);
-  const [socialActiveKey, setSocialActiveKey] = useState(null);
+  const [activeAccordionKey, setActiveAccordionKey] = useState(null);
+  const [recoverySubKey, setRecoverySubKey] = useState(null);
 
-  const handleMainToggle = (key) => {
-    setMainActiveKey(prev => prev === key ? null : key);
+
+  const handleAccordionToggle = (key) => {
+    setActiveAccordionKey(prev => (prev === key ? null : key));
   };
 
-  const handleNurseToggle = (key) => {
-    setNurseActiveKey(prev => prev === key ? null : key);
+  const handleCloseAccordion = () => {
+    setActiveAccordionKey(null); // 👈 Close when clicking non-collapsible item
   };
 
-  const handleSocialToggle = (key) => {
-    setSocialActiveKey(prev => prev === key ? null : key);
-  };
-
-  const handleAccordionClick = (key) => {
-    setActiveKey(prevKey => (prevKey === key ? null : key));
+  const handleRecoverySubToggle = (key) => {
+    setRecoverySubKey((prev) => (prev === key ? null : key));
   };
 
   const navigate = useNavigate();
@@ -69,7 +64,7 @@ const Sidebar = () => {
           <Accordion.Button
             as={Nav.Link}
             className="d-flex justify-content-between align-items-center"
-            onClick={() => onToggle(title)} // control manually
+            onClick={() => onToggle(title)}
           >
             <span className="d-flex align-items-center">
               {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
@@ -77,9 +72,7 @@ const Sidebar = () => {
             </span>
           </Accordion.Button>
           <Accordion.Body className="multi-level">
-            <Nav className="flex-column">
-              {children}
-            </Nav>
+            <Nav className="flex-column">{children}</Nav>
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
@@ -87,30 +80,29 @@ const Sidebar = () => {
   };
 
 
-  const NavItem = ({ title, icon, badgeText, badgeBg = "secondary", badgeColor = "primary", to }) => {
+
+  const NavItem = ({ title, icon, to, onAnyClick }) => {
+    const navigate = useNavigate();
+
     return (
       <Nav.Item>
         <Nav.Link
           className="d-flex justify-content-between align-items-center"
           onClick={() => {
-            to && navigate(to);
-            setShow(false); // auto-close sidebar on mobile
+            onAnyClick?.(); // 👈 Close accordion
+            if (to) navigate(to);
           }}
           style={{ cursor: 'pointer' }}
         >
           <span className="d-flex align-items-center">
-            {icon && <FontAwesomeIcon icon={icon} className="me-2" />} {/* <- Add icon */}
+            {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
             <span className="sidebar-text">{title}</span>
           </span>
-          {badgeText && (
-            <Badge pill bg={badgeBg} text={badgeColor} className="badge-md notification-count ms-2">
-              {badgeText}
-            </Badge>
-          )}
         </Nav.Link>
       </Nav.Item>
     );
   };
+
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
@@ -166,53 +158,52 @@ const Sidebar = () => {
             {userType === '1' && (
               <>
                 {/* Admission Form Menu */}
-                <CollapsableNavItem title="Admission" icon={faBook} activeKey={activeKey} onToggle={handleAccordionClick}>
+                <CollapsableNavItem title="Admission" icon={faBook} activeKey={activeAccordionKey} onToggle={handleAccordionToggle}>
                   <NavItem title="1. Resident Intake Form" to="/first_info_form" icon={faFileAlt} />
                   <NavItem title="2. Resident Report" to="/rescue_details" icon={faUsers} />
                 </CollapsableNavItem>
 
                 {/* Essential Records Menu */}
-                <NavItem title="Resident Document" to="/essential_record" icon={faClipboardList} />
+                <NavItem title="Resident Document" to="/essential_record" icon={faClipboardList} onAnyClick={handleCloseAccordion} />
 
                 {/* SCRB Form Menu */}
-                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} />
-                {/* <CollapsableNavItem title="SCRB Form" icon={faBook}>
-                  <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
-                    <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
-                    <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
-                    <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
-                </CollapsableNavItem> */}
-
-                {/* Residency Time menu */}
-                {/* <CollapsableNavItem title="Residency Time" icon={faCalendarAlt}>
-                  <NavItem title="Doctor Consultant Form" to="/Dr_consultant" icon={faUserMd} />
-                  <NavItem title="Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
-                  <NavItem title="First Consultation Report" to="/rescue_record_sheet" icon={faStethoscope} />
-                </CollapsableNavItem> */}
+                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} onAnyClick={handleCloseAccordion} />
 
                 {/* Recovery menus */}
-                <CollapsableNavItem title="Recovery" icon={faHome} activeKey={mainActiveKey} onToggle={handleMainToggle}>
-                  {/* <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="Articles carried Form" to="/articles_form" icon={faSuitcase} /> */}
-                  <CollapsableNavItem title="1. Nurse User" icon={faMapPin} activeKey={nurseActiveKey} onToggle={handleNurseToggle}>
-                    <NavItem title="1. Consultation Report" to="/rescue_record_sheet" icon={faUserMd} />
-                    <NavItem title="2. Doctor Visit" to="/dr_visitView" icon={faStethoscope} />
-                    <NavItem title="3. Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
-                    <NavItem title="4. Prescription Form" to="/prescription_form" icon={faNotesMedical} />
-                    <NavItem title="5. Medical Camp" to="/medical_camp" icon={faNotesMedical} />
+                <CollapsableNavItem
+                  title="Recovery"
+                  icon={faMapPin}
+                  activeKey={activeAccordionKey}
+                  onToggle={handleAccordionToggle}
+                >
+                  <CollapsableNavItem
+                    title="1. Nurse User"
+                    icon={faMapPin}
+                    activeKey={recoverySubKey}
+                    onToggle={handleRecoverySubToggle}
+                  >
+                    <NavItem title="1. Consultation Report" to="/rescue_record_sheet" icon={faUserMd} setShow={setShow} />
+                    <NavItem title="2. Doctor Visit" to="/dr_visitView" icon={faStethoscope} setShow={setShow} />
+                    <NavItem title="3. Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} setShow={setShow} />
+                    <NavItem title="4. Prescription Form" to="/prescription_form" icon={faNotesMedical} setShow={setShow} />
+                    <NavItem title="5. Medical Camp" to="/medical_camp" icon={faNotesMedical} setShow={setShow} />
                   </CollapsableNavItem>
 
-                  <CollapsableNavItem title="2. Social Worker User" icon={faMapPin} activeKey={socialActiveKey} onToggle={handleSocialToggle}>
-                    <NavItem title="1. Observation Report" to="/observation_report" icon={faUserNurse} />
-                    <NavItem title="2. Psychiatric Case History" to="/psychatrics_form" icon={faBrain} />
-                    <NavItem title="3. MSE Form" to="/mseform" icon={faNotesMedical} />
-                    <NavItem title="4. Reunion Summary" to="/reunion_summary" icon={faNotesMedical} />
+                  <CollapsableNavItem
+                    title="2. Social Worker User"
+                    icon={faMapPin}
+                    activeKey={recoverySubKey}
+                    onToggle={handleRecoverySubToggle}
+                  >
+                    <NavItem title="1. Observation Report" to="/observation_report" icon={faUserNurse} setShow={setShow} />
+                    <NavItem title="2. Psychiatric Case History" to="/psychatrics_form" icon={faNotesMedical} setShow={setShow} />
+                    <NavItem title="3. MSE Form" to="/mseform" icon={faNotesMedical} setShow={setShow} />
+                    <NavItem title="4. Reunion Summary" to="/reunion_summary" icon={faNotesMedical} setShow={setShow} />
                   </CollapsableNavItem>
-
                 </CollapsableNavItem>
 
                 {/* Reunion Menus */}
-                <CollapsableNavItem title="Reunion/Discharge" icon={faMapPin} activeKey={activeKey} onToggle={handleAccordionClick}>
+                <CollapsableNavItem title="Reunion/Discharge" icon={faMapPin} activeKey={activeAccordionKey} onToggle={handleAccordionToggle}>
                   <NavItem title="1. Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
                   <NavItem title="2. Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
                   <NavItem title="3. Media Consent" to="/media_consent" icon={faVideo} />
@@ -222,14 +213,14 @@ const Sidebar = () => {
                 </CollapsableNavItem>
 
                 {/* Fomality Menus */}
-                <NavItem title="Activites & Annual Report" to="/annual_report" icon={faChartLine} />
-                <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers} />
+                <NavItem title="Activites & Annual Report" to="/annual_report" icon={faChartLine} onAnyClick={handleCloseAccordion}/>
+                <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers} onAnyClick={handleCloseAccordion}/>
 
                 {/* Residency Details */}
 
 
                 {/* Internship Form */}
-                <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate} />
+                <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate} onAnyClick={handleCloseAccordion} />
 
                 {/* Reunion Member Details */}
                 {/* <NavItem title="Reunited Resident" to="/reunited_people" icon={faHandshake} /> */}
@@ -254,26 +245,30 @@ const Sidebar = () => {
               <>
 
                 {/* Admission Form Menu */}
-                <CollapsableNavItem title="Admission" icon={faBook} activeKey={activeKey} onToggle={handleAccordionClick}>
-                 <NavItem title="1. Resident Intake Form" to="/first_info_form" icon={faFileAlt} />
+                <CollapsableNavItem title="Admission" icon={faBook} activeKey={activeAccordionKey} onToggle={handleAccordionToggle}>
+                  <NavItem title="1. Resident Intake Form" to="/first_info_form" icon={faFileAlt} />
                   <NavItem title="2. Resident Report" to="/rescue_details" icon={faUsers} />
                 </CollapsableNavItem>
 
                 {/* SCRB Form Menu */}
-                <NavItem title="Resident Document" to="/essential_record" icon={faClipboardList} />
-                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard} />
-                {/* <CollapsableNavItem title="SCRB Form" icon={faBook}>
-                  <NavItem title="Form 2" to="/scrb_form" icon={faFileAlt} />
-                    <NavItem title="Form 2A" to="/scrb_form2A" icon={faFileAlt} />
-                    <NavItem title="Form 2B" to="/scrb_form2B" icon={faFileAlt} />
-                    <NavItem title="Form 2C" to="/scrb_form2C" icon={faFileAlt} />
-                </CollapsableNavItem> */}
+                <NavItem title="Resident Document" to="/essential_record" icon={faClipboardList}  onAnyClick={handleCloseAccordion}/>
+                <NavItem title="SCRB Form" to="/scrb_form" icon={faClipboard}  onAnyClick={handleCloseAccordion}/>
+                
 
                 {/* Recovery menus */}
-                <CollapsableNavItem title="Recovery" icon={faHome} activeKey={mainActiveKey} onToggle={handleMainToggle}>
-                  {/* <NavItem title="Family Identification Form" to="/family_request_letter" icon={faFileAlt} />
-                  <NavItem title="Articles carried Form" to="/articles_form" icon={faSuitcase} /> */}
-                  <CollapsableNavItem title="1. Nurse User" icon={faMapPin} activeKey={nurseActiveKey} onToggle={handleNurseToggle}>
+                <CollapsableNavItem
+                  title="Recovery"
+                  icon={faMapPin}
+                  activeKey={activeAccordionKey}
+                  onToggle={handleAccordionToggle}
+                >
+                 
+                  <CollapsableNavItem
+                    title="1. Nurse User"
+                    icon={faMapPin}
+                    activeKey={recoverySubKey}
+                    onToggle={handleRecoverySubToggle}
+                  >
                     <NavItem title="1. Consultation Report" to="/rescue_record_sheet" icon={faUserMd} />
                     <NavItem title="2. Doctor Visit" to="/dr_visitView" icon={faStethoscope} />
                     <NavItem title="3. Nurse Record Sheet" to="/nurse_sheet" icon={faUserNurse} />
@@ -281,7 +276,12 @@ const Sidebar = () => {
                     <NavItem title="5. Medical Camp" to="/medical_camp" icon={faNotesMedical} />
                   </CollapsableNavItem>
 
-                  <CollapsableNavItem title="2. Social Worker User" icon={faMapPin} activeKey={socialActiveKey} onToggle={handleSocialToggle}>
+                  <CollapsableNavItem
+                    title="2. Social Worker User"
+                    icon={faMapPin}
+                    activeKey={recoverySubKey}
+                    onToggle={handleRecoverySubToggle}
+                  >
                     <NavItem title="1. Observation Report" to="/observation_report" icon={faUserNurse} />
                     <NavItem title="2. Psychiatric Case History" to="/psychatrics_form" icon={faBrain} />
                     <NavItem title="3. MSE Form" to="/mseform" icon={faNotesMedical} />
@@ -292,7 +292,7 @@ const Sidebar = () => {
 
 
                 {/* Reunion Menus */}
-                <CollapsableNavItem title="Reunion/Discharge" icon={faMapPin} activeKey={activeKey} onToggle={handleAccordionClick}>
+                <CollapsableNavItem title="Reunion/Discharge" icon={faMapPin} activeKey={activeAccordionKey} onToggle={handleAccordionToggle}>
                   <NavItem title="1. Family Request Letter" to="/family_request_letter" icon={faFileAlt} />
                   <NavItem title="2. Self Declaration Form" to="/self_declaration" icon={faPenSquare} />
                   <NavItem title="3. Media Consent" to="/media_consent" icon={faVideo} />
@@ -302,11 +302,11 @@ const Sidebar = () => {
                 </CollapsableNavItem>
 
                 {/* Fomality Menus */}
-                <NavItem title="Activites & Annual Report" to="/annual_report" icon={faChartLine} />
-                <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers} />
+                <NavItem title="Activites & Annual Report" to="/annual_report" icon={faChartLine} onAnyClick={handleCloseAccordion}/>
+                <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers} onAnyClick={handleCloseAccordion} />
 
                 {/* Internship Form */}
-                <NavItem title="Intern Information" to="/allStudentDetails" icon={faUserGraduate} />
+                <NavItem title="Intern Information" to="/allStudentDetails" icon={faUserGraduate} onAnyClick={handleCloseAccordion}/>
 
                 {/* Reunion Member Details */}
                 {/* <NavItem title="Reunited Resident" to="/reunited_people" icon={faHandshake} /> */}

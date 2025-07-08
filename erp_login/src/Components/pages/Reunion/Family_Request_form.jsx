@@ -249,11 +249,27 @@ function Family_Request_form() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             if (res.data.message === "Family Request Letter Form Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
+                alert("Family Request Form Submitted Successfully");
+                setStoreData({
+                    admission_no: '',
+                    rescue_name: '',
+                    age: '',
+                    gender: 'Male',
+                    phone_no: '',
+                    rescue_relationship: '',
+                    f_member_name: '',
+                    f_member_age: '',
+                    f_member_address: '',
+                    f_member_phone: '',
+                    f_aadhar_card_no: '',
+                    f_ration_card_no: '',
+                    r_aadhar_card_no: '',
+                    r_ration_card_no: '',
+                    any_other: '',
+                    description: '',
+                })
+                setAdmissionNumber("");
 
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -462,11 +478,8 @@ function Family_Request_form() {
             const message = res.data.message?.toLowerCase() || "";
 
             if (message.includes("updated successfully")) {
-                setSubmissionMessage("Family Request Letter updated successfully!");
-                setMessageType("success");
-
-                // Optional: reload after 3s
-                setTimeout(() => window.location.reload(), 3000);
+               alert("Form Updated Successfully");
+               window.location.reload();
             } else {
                 setSubmissionMessage(res.data.message || "Update failed.");
                 setMessageType("danger");
@@ -860,7 +873,7 @@ function Family_Request_form() {
                                         value={storeData.r_aadhar_card_no}
                                         onChange={handleInputChange1}
                                         isInvalid={!!formErrors.r_aadhar_card_no}
-                                         />
+                                    />
                                     {formErrors.r_aadhar_card_no && (
                                         <div className="text-danger small mt-1">
                                             {formErrors.r_aadhar_card_no}
@@ -1186,7 +1199,7 @@ function Family_Request_form() {
                                         )}
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-4 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Aadhar Card Number (Resident):
                                     </Form.Label>
@@ -1199,7 +1212,7 @@ function Family_Request_form() {
                                             required />
                                     </Col>
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-5 text-start" controlId="formPoliceMemo">
+                                <Form.Group as={Row} className="mb-5 mt-5 text-start" controlId="formPoliceMemo">
                                     <Form.Label column sm="4">
                                         Aadhar Card (Resident):
                                     </Form.Label>

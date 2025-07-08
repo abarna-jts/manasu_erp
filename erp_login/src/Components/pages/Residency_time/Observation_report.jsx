@@ -248,7 +248,7 @@ function Observation_report() {
                         <h6 className="breadcrumb_title">Observation Report</h6>
                     </Col>
                     <Col md={7} className="text-start">
-                        <h3 className="section_title">Resident Observation & Progress Report – Social Worker</h3>
+                        <h3 className="section_title text-center">Resident Observation & Progress Report – Social Worker</h3>
                     </Col>
                     <Col md={2}>
                         <Form className="navbar-search">

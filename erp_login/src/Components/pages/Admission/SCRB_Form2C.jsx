@@ -127,11 +127,19 @@ function SCRB_Form2C() {
       const response = await apiRoute.post('/scrb_form/create_form_2C', payload);
       console.log(response.data);
       if (response.status === 201 || response.status === 200) {
-        setSubmissionMessage("Form submitted successfully!");
-        setMessageType("success");
-
-        // Optionally reload after 3 seconds
-        setTimeout(() => window.location.reload(), 3000);
+        alert("SCRB Form2C Submitted Successfully");
+        setFormData({
+          admission_no: '',
+          file_no: '',
+          addition_upperdress: '',
+          addition_lowerdress: '',
+          upperdress_color: '',
+          lowerdress_color: '',
+        })
+        setAdmissionNumber("");
+        setUpperDress1("");
+        setUpperDress2("");
+        setLowerDress("");
       } else {
         setSubmissionMessage("Submission failed.");
         setMessageType("danger");
@@ -357,7 +365,7 @@ function SCRB_Form2C() {
       <div className="d-xl-flex justify-content-between align-items-center flex-wrap flex-md-nowrap text-start py-2">
         <Row className='w-100 d-flex align-items-center'>
           <Col md={2}>
-            <div className="d-block mb-4 mb-xl-0 px-4 ">
+            <div className="d-block mb-4 mb-xl-0 form_2A_breadcrumb">
               <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                 <Breadcrumb.Item></Breadcrumb.Item>
                 <Breadcrumb.Item>Home</Breadcrumb.Item>
@@ -404,10 +412,10 @@ function SCRB_Form2C() {
 
                   <Form className="navbar-search col-md-9">
                     <Form.Group id="topbarSearch" className="d-flex align-items-center">
-                      <Col md={3}>
+                      <Col md={4}>
                         <Form.Label>Admission Number:</Form.Label>
                       </Col>
-                      <Col md={2}>
+                      <Col md={3}>
                         <InputGroup className="input-group-merge search-bar">
                           <Form.Control
                             type="text"
@@ -575,7 +583,7 @@ function SCRB_Form2C() {
                           value={formData.addition_upperdress}
                           onChange={handleChange}
                           placeholder="Specify any other upper dress details"
-                          
+
                         />
                       </div>
                     </td>
@@ -592,7 +600,7 @@ function SCRB_Form2C() {
                           value={formData.addition_lowerdress}
                           onChange={handleChange}
                           placeholder="Specify any other lower dress details"
-                          
+
                         />
                       </div>
                     </td>
@@ -609,7 +617,7 @@ function SCRB_Form2C() {
                           value={formData.upperdress_color}
                           onChange={handleChange}
                           placeholder="Enter color"
-                          
+
                         />
                       </div>
                     </td>
@@ -626,7 +634,7 @@ function SCRB_Form2C() {
                           value={formData.lowerdress_color}
                           onChange={handleChange}
                           placeholder="Enter color"
-                          
+
                         />
                       </div>
                     </td>

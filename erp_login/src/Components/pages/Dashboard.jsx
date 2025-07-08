@@ -278,7 +278,7 @@ function Dashboard() {
                                                 }}
                                             />
                                             <span style={{ fontSize: "0.875rem" }}>
-                                                {entry.month} ({entry.value})
+                                                {entry.month}
                                             </span>
                                         </div>
                                     ))

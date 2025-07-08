@@ -513,7 +513,7 @@ function Edit_Rescue_details() {
                     <Col sm="8">
                       <Form.Control
                         name="age"
-                        type='number'
+                        type='text'
                         value={formData.age}
                         onChange={handleInputChange}
                         required />
@@ -756,7 +756,7 @@ function Edit_Rescue_details() {
                         <Col sm="4">
                           <Form.Control
                             name="height"
-                            type='number'
+                            type='text'
                             value={formData.height}
                             onChange={handleInputChange}
                             required />
@@ -771,7 +771,7 @@ function Edit_Rescue_details() {
                         <Col sm="8">
                           <Form.Control
                             name="weight"
-                            type='number'
+                            type='text'
                             value={formData.weight}
                             onChange={handleInputChange}
                             required />
