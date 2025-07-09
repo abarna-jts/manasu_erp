@@ -15,6 +15,9 @@ function Formality_declaration() {
     const [show, setShow] = useState(false);
     const [admission_no, setAdmissionNumber] = useState('');
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [error, setError] = useState("");
+    const [rescueImage, setRescueImage] = useState(null);
+    const [rescueName, setRescueName] = useState("");
 
     const userType = Cookies.get('usertype');
 
@@ -47,6 +50,45 @@ function Formality_declaration() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const fetchRescueDetails = async (admission_no) => {
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_image) {
+                const imagePath = result.rescue_image.startsWith("http")
+                    ? result.rescue_image
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+
+                setRescueImage(imagePath);
+                setRescueName(result.rescue_name || "");
+                setError(""); // clear any previous error
+            } else {
+                setRescueImage(null);
+                setRescueName("");
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueImage(null);
+            setRescueName("");
+            setError("Admission Number Not found");
+        }
+    };
+
+    // Trigger when admission number changes
+    useEffect(() => {
+        if (admission_no.trim() !== "") {
+            fetchRescueDetails(admission_no);
+        } else {
+            setRescueImage(null);
+            setRescueName("");
+            setError("");
+        }
+    }, [admission_no]);
+
+
     // Automatically fetch data when admission number is typed
     useEffect(() => {
         if (admission_no.trim().length >= 8) { // Adjust minimum length as needed
@@ -74,7 +116,7 @@ function Formality_declaration() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-         if (!admission_no || admission_no.trim() === '') {
+        if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
             return;
         }
@@ -91,31 +133,31 @@ function Formality_declaration() {
             return;
         }
 
-         if (!formData.toiletries_provided || formData.toiletries_provided.trim() === '') {
+        if (!formData.toiletries_provided || formData.toiletries_provided.trim() === '') {
             alert("Please select Toiletries provided field Yes or No.");
             return;
         }
-         if (!formData.dress_provided || formData.dress_provided.trim() === '') {
+        if (!formData.dress_provided || formData.dress_provided.trim() === '') {
             alert("Please select Dress Provided field Yes or No.");
             return;
         }
-         if (!formData.travel_expenses || formData.travel_expenses.trim() === '') {
+        if (!formData.travel_expenses || formData.travel_expenses.trim() === '') {
             alert("Please select Travel Expenses Provided field Yes or No.");
             return;
         }
-         if (!formData.welfare_expenses || formData.welfare_expenses.trim() === '') {
+        if (!formData.welfare_expenses || formData.welfare_expenses.trim() === '') {
             alert("Please select Welfare Expenses field Yes or No.");
             return;
         }
-         if (!formData.medical_prescription || formData.medical_prescription.trim() === '') {
+        if (!formData.medical_prescription || formData.medical_prescription.trim() === '') {
             alert("Please select Medical Prescription field Yes or No.");
             return;
         }
-         if (!formData.discharge_summary || formData.discharge_summary.trim() === '') {
+        if (!formData.discharge_summary || formData.discharge_summary.trim() === '') {
             alert("Please select Copy of Discharge Summary field Yes or No.");
             return;
         }
-         if (!formData.travel_letter || formData.travel_letter.trim() === '') {
+        if (!formData.travel_letter || formData.travel_letter.trim() === '') {
             alert("Please select Travel Safety Letter field Yes or No.");
             return;
         }
@@ -125,7 +167,20 @@ function Formality_declaration() {
                 headers: { 'Content-Type': 'application/json' },
             });
             alert('Document Handover Form submitted successfully!');
-            window.location.reload();
+            setFormData({
+                admission_no: '',
+                rescue_name: '',
+                age: '',
+                medicine_provided: '',
+                toiletries_provided: '',
+                dress_provided: '',
+                travel_expenses: '',
+                welfare_expenses: '',
+                medical_prescription: '',
+                discharge_summary: '',
+                travel_letter: ''
+            })
+            setAdmissionNumber("");
         } catch (err) {
             console.error(err);
             alert('Submission failed.');
@@ -247,7 +302,20 @@ function Formality_declaration() {
             if (response.status === 200) {
                 alert('Form Updated successfully!');
                 handleClose(true);
-                window.location.reload();
+                setFormData({
+                    admission_no: '',
+                    rescue_name: '',
+                    age: '',
+                    medicine_provided: '',
+                    toiletries_provided: '',
+                    dress_provided: '',
+                    travel_expenses: '',
+                    welfare_expenses: '',
+                    medical_prescription: '',
+                    discharge_summary: '',
+                    travel_letter: ''
+                })
+                setAdmissionNumber("");
             } else {
                 alert('Error Updating form.');
             }
@@ -281,8 +349,26 @@ function Formality_declaration() {
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Declaration Form</h6>
                     </Col>
-                    <Col md={9} className="text-start">
+                    <Col md={8} className="text-center">
                         <h3 className="section_title">5. Resident's Possessions and Document Handover Form</h3>
+                    </Col>
+
+                    <Col md={2} className='text-center'>
+                        {error && <div className="text-danger mt-2">{error}</div>}
+
+                        {/* Rescue Name and Image */}
+                        {rescueImage && (
+                            <div>
+
+                                <img
+
+                                    alt={rescueName || "Rescue Image"}
+                                    style={{ width: "100px", height: "100px" }}
+                                    src={rescueImage}
+                                />
+                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                            </div>
+                        )}
                     </Col>
                 </Row>
             </Container>

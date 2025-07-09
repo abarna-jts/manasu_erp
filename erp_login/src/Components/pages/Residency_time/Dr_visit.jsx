@@ -26,6 +26,7 @@ function Dr_visit() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -34,7 +35,14 @@ function Dr_visit() {
 
             if (response.status === 200 || response.status === 201) {
                 alert('Form submitted successfully!');
-                window.location.reload();
+                setFormData({
+                    dr_name: '',
+                    hospital_name: '',
+                    date_time: '',
+                    resident_examinite: '',
+                    report: ''
+                })
+                
             } else {
                 alert('Error submitting form.');
             }

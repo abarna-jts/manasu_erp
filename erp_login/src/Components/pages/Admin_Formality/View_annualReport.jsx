@@ -286,7 +286,9 @@ function View_annualReport() {
 
                 </Row>
             </Container>
-
+            <Col md={3}>
+                <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
+            </Col>
             <Container>
                 <>
                     <Row>
@@ -364,7 +366,7 @@ function View_annualReport() {
                     </Col>
                 </Row>
                 <Container>
-                    <h5>Event Report</h5>
+                    <h5 className='text-start'>Event Report</h5>
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Event Type:</Form.Label>
                         <Col sm="7">
@@ -457,7 +459,7 @@ function View_annualReport() {
                             />
                         </Col>
                     </Form.Group>
-                    <h5>Awarness Report</h5>
+                    <h5 className='text-start'>Awarness Report</h5>
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Awareness Camp Name:</Form.Label>
                         <Col sm="7">
@@ -536,7 +538,7 @@ function View_annualReport() {
                             />
                         </Col>
                     </Form.Group>
-                    <h5>Outing Report</h5>
+                    <h5 className='text-start'>Outing Report</h5>
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Outing Name:</Form.Label>
                         <Col sm="7">

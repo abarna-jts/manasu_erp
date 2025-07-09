@@ -51,6 +51,7 @@ import Prescription_demo from './Components/pages/Residency_time/Prescription_de
 import Celebration_report from './Components/pages/Admin_Formality/Celebration_report';
 import Programms_report from './Components/pages/Admin_Formality/Programms_report';
 import StaffPrograms_report from './Components/pages/Admin_Formality/StaffPrograms_report';
+import User_permission from './Components/pages/Admin_Formality/User_permission';
 
 function App() {
 
@@ -89,6 +90,17 @@ function App() {
                 <MainLayout><Rescue_details /></MainLayout>
               )
             }
+          />
+
+          <Route path='/user_permission'
+          element={
+            userType === '2' ? (
+              <MainLayout><User_permission /></MainLayout>
+            )
+            : (
+                <MainLayout><User_permission /></MainLayout>
+              )
+          }
           />
 
           <Route

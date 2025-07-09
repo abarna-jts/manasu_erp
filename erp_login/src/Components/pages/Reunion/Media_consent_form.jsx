@@ -72,7 +72,7 @@ function Media_consent_form() {
     };
 
     const ViewFormData = async () => {
-        
+
         try {
             const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
             const data = response.data;
@@ -155,6 +155,8 @@ function Media_consent_form() {
         }
     };
 
+    const scan_reportRef = useRef(null);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -193,9 +195,14 @@ function Media_consent_form() {
             });
 
             if (res.data.message === "Media Consent Form Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-                setTimeout(() => window.location.reload(), 3000);
+                alert("Media consent form Submitted Successfully");
+                setFormData({
+                    rescue_name: '',
+                    social_media_consent: '',
+                    description: '',
+                })
+                setAdmissionNumber("");
+                if (scan_reportRef.current) scan_reportRef.current.value = "";
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -298,7 +305,14 @@ function Media_consent_form() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert("Media Consent Form Updated successfully");
-            window.location.reload();
+            handleClose(true);
+            setFormData({
+                rescue_name: '',
+                social_media_consent: '',
+                description: '',
+            })
+            setAdmissionNumber("");
+            if (scan_reportRef.current) scan_reportRef.current.value = "";
         } catch (err) {
             console.error(err);
             alert('Update failed.');
@@ -376,9 +390,7 @@ function Media_consent_form() {
                         {/* Rescue Name and Image */}
                         {rescueImage && (
                             <div>
-
                                 <img
-
                                     alt={rescueName || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}
@@ -412,7 +424,7 @@ function Media_consent_form() {
                                 ViewFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                         {userType === "1" && (
+                        {userType === "1" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
@@ -517,6 +529,7 @@ function Media_consent_form() {
                                                 type="file"
                                                 accept=".jpg,.jpeg,.png"
                                                 name="scan_report"
+                                                ref={scan_reportRef}
                                                 onChange={handleImageUpload}
                                                 required
                                             />
@@ -534,15 +547,15 @@ function Media_consent_form() {
                                                 name="description"
                                                 value={formData.description}
                                                 onChange={handleInputChange}
-                                                 />
+                                            />
                                         </Col>
                                     </Form.Group>
 
-                                        {userType === "1" && (
-                                            <div className="mt-3">
-                                                <Button variant="success" className="m-1" type="submit">Submit</Button>
-                                            </div>
-                                        )}
+                                    {userType === "1" && (
+                                        <div className="mt-3">
+                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                        </div>
+                                    )}
 
                                 </Row>
                             </Form>
@@ -732,7 +745,7 @@ function Media_consent_form() {
                                             name="description"
                                             value={formData.description}
                                             onChange={handleInputChange}
-                                             />
+                                        />
                                     </Col>
                                 </Form.Group>
 

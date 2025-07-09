@@ -119,6 +119,8 @@ function Reunion_summary() {
         }
     }, [admission_no]);
 
+    const summary_attachRef = useRef();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -145,7 +147,13 @@ function Reunion_summary() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Reunion Summary Form submitted successfully!');
-            window.location.reload();
+            setFormData({
+                rescue_name: '',
+                date: '',
+                report: '',
+            })
+            setAdmissionNumber("");
+            if (summary_attachRef.current) summary_attachRef.current.value = "";
         } catch (err) {
             console.error(err);
             alert('Submission failed.');
@@ -312,7 +320,14 @@ function Reunion_summary() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert("Updated Successfully");
-            window.location.reload();
+            handleClose(true);
+            setFormData({
+                rescue_name: '',
+                date: '',
+                report: '',
+            })
+            if (summary_attachRef.current) summary_attachRef.current.value = "";
+            setAdmissionNumber("");
         } catch (err) {
             console.error(err);
             alert('Update failed.');
@@ -446,6 +461,7 @@ function Reunion_summary() {
                                                     type="File"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="summary_attach"
+                                                    ref={summary_attachRef}
                                                     onChange={handleFileChange}
                                                     required />
                                             </Col>
@@ -460,7 +476,7 @@ function Reunion_summary() {
                                                     name="report"
                                                     value={formData.report}
                                                     onChange={handleChange}
-                                                     />
+                                                />
                                             </Col>
                                         </Form.Group>
                                     </Col>

@@ -191,6 +191,12 @@ function Family_Request_form() {
         }
     };
 
+    const f_aadhar_cardRef = useRef(null);
+    const f_ration_cardRef = useRef(null);
+    const r_aadhar_cardRef = useRef(null);
+    const r_ration_cardRef = useRef(null);
+    const govt_idRef = useRef(null);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -232,7 +238,7 @@ function Family_Request_form() {
         data.append('f_ration_card', files.f_ration_card);
         data.append('r_aadhar_card', files.r_aadhar_card);
         data.append('r_ration_card', files.r_ration_card);
-        data.append('govt_id', storeData.govt_id);
+        data.append('govt_id', files.govt_id);
         data.append('rescue_relationship', storeData.rescue_relationship);
         data.append('f_member_name', storeData.f_member_name);
         data.append('f_member_phone', storeData.f_member_phone);
@@ -269,11 +275,16 @@ function Family_Request_form() {
                     description: '',
                 })
                 setAdmissionNumber("");
-
+                if (f_aadhar_cardRef.current) f_aadhar_cardRef.current.value = "";
+                if (f_ration_cardRef.current) f_ration_cardRef.current.value = "";
+                if (r_aadhar_cardRef.current) r_aadhar_cardRef.current.value = "";
+                if (r_ration_cardRef.current) r_ration_cardRef.current.value = "";
+                if (govt_idRef.current) govt_idRef.current.value = "";
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
             }
+
         } catch (error) {
             console.error("Error submitting form", error);
             setSubmissionMessage("Something went wrong.");
@@ -433,16 +444,16 @@ function Family_Request_form() {
         e.preventDefault();
 
         // Aadhaar Validation
-        if (storeData.f_aadhar_card_no && storeData.f_aadhar_card_no !== "UNKNOWN") {
-            const digitsOnly = storeData.f_aadhar_card_no.replace(/\D/g, '');
+        if (formData.f_aadhar_card_no && formData.f_aadhar_card_no !== "UNKNOWN") {
+            const digitsOnly = formData.f_aadhar_card_no.replace(/\D/g, '');
             if (digitsOnly.length !== 12) {
                 alert("Aadhaar number must be 12 digits or type UNKNOWN");
                 return;
             }
         }
 
-        if (storeData.f_member_phone && storeData.f_member_phone !== "UNKNOWN") {
-            const digitsOnly = storeData.f_member_phone.replace(/\D/g, '');
+        if (formData.f_member_phone && formData.f_member_phone !== "UNKNOWN") {
+            const digitsOnly = formData.f_member_phone.replace(/\D/g, '');
             if (digitsOnly.length !== 10) {
                 alert("Phone number must be 10 digits or type UNKNOWN");
                 return;
@@ -478,8 +489,38 @@ function Family_Request_form() {
             const message = res.data.message?.toLowerCase() || "";
 
             if (message.includes("updated successfully")) {
-               alert("Form Updated Successfully");
-               window.location.reload();
+                alert("Form Updated Successfully");
+                handleClose(true);
+                setFormData({
+                    admission_no: '',
+                    rescue_name: '',
+                    age: '',
+                    gender: 'Male',
+                    phone_no: '',
+                    rescue_relationship: '',
+                    f_member_name: '',
+                    f_member_age: '',
+                    f_member_address: '',
+                    f_member_phone: '',
+                    f_aadhar_card_no: '',
+                    f_ration_card_no: '',
+                    r_aadhar_card_no: '',
+                    r_ration_card_no: '',
+                    any_other: '',
+                    description: '',
+                })
+                setStoreData({
+                    rescue_name:'',
+                    age:'',
+                    gender:'',
+                    phone_no:'',
+                })
+                setAdmissionNumber("");
+                if (f_aadhar_cardRef.current) f_aadhar_cardRef.current.value = "";
+                if (f_ration_cardRef.current) f_ration_cardRef.current.value = "";
+                if (r_aadhar_cardRef.current) r_aadhar_cardRef.current.value = "";
+                if (r_ration_cardRef.current) r_ration_cardRef.current.value = "";
+                if (govt_idRef.current) govt_idRef.current.value = "";
             } else {
                 setSubmissionMessage(res.data.message || "Update failed.");
                 setMessageType("danger");
@@ -828,6 +869,7 @@ function Family_Request_form() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name='f_aadhar_card'
+                                        ref={f_aadhar_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
@@ -858,6 +900,7 @@ function Family_Request_form() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name="f_ration_card"
+                                        ref={f_ration_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
@@ -890,6 +933,7 @@ function Family_Request_form() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name='r_aadhar_card'
+                                        ref={r_aadhar_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
@@ -920,6 +964,7 @@ function Family_Request_form() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name="r_ration_card"
+                                        ref={r_ration_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
@@ -945,6 +990,7 @@ function Family_Request_form() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name="govt_id"
+                                        ref={govt_idRef}
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>

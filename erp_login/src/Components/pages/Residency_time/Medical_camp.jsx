@@ -76,7 +76,18 @@ function Medical_camp() {
             // console.log(response.formData);
             if (response.status === 200 || response.status === 201) {
                 alert('Form submitted successfully!');
-                window.location.reload();
+                setFormData({
+                    camp_name: '',
+                    hospital_name: '',
+                    date: '',
+                    camp_type: '',
+                    organised_by: '',
+                    participants: '',
+                    feedback: '',
+                    general_details: ''
+                })
+                handleClose(true);
+                getMedicalCamp();
             } else {
                 alert('Error submitting form.');
             }
@@ -220,13 +231,9 @@ function Medical_camp() {
             console.log(response.data);
 
             if (response.data.message === "Medical Camp updated successfully!") {
-                setSubmissionMessage("Form updated successfully!");
-                setMessageType("success");
-
-                handleClose(true);
-
-                // Reload after 3 seconds
-                setTimeout(() => window.location.reload(), 1000);
+                alert("Medical Camp Updated successfully");
+                handleClose1(true);
+                getMedicalCamp();
             } else {
                 setSubmissionMessage("Error updating the form.");
                 setMessageType("danger");
@@ -601,7 +608,7 @@ function Medical_camp() {
                                     <Form.Control
                                         as="textarea"
                                         name="feedback"
-                                        value={formData.feedback}
+                                        value={formData.feedback || "NULL"}
                                         onChange={handleChange}
                                         required />
                                 </Col>

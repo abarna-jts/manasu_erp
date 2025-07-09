@@ -4,7 +4,7 @@ import { Breadcrumb, Container, Row, Table, Button } from 'react-bootstrap';
 import { Col, Form } from 'react-bootstrap';
 import { Alert } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
-
+import { useRef } from 'react';
 
 function InternshipForm() {
     const [formData, setFormData] = useState({
@@ -52,10 +52,27 @@ function InternshipForm() {
         navigate("/allStudentDetails");
     }
 
+    const stud_photRef = useRef(null);
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
+            const phoneRegex = /^\d{10}$/;
+
+            if (!phoneRegex.test(formData.phone)) {
+                alert("Please enter a valid 10-digit contact number.");
+                return;
+            }
+
+            if (formData.secondary_phone && !phoneRegex.test(formData.secondary_phone)) {
+                alert("Please enter a valid 10-digit emergency contact number.");
+                return;
+            }
+
+            if (formData.supervisor_phone && !phoneRegex.test(formData.supervisor_phone)) {
+                alert("Please enter a valid 10-digit Supervisor contact number.");
+                return;
+            }
             const data = new FormData();
 
             // Append file from files state
@@ -87,9 +104,25 @@ function InternshipForm() {
             });
 
             if (response.data.message === "Internship Form Created successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-                setTimeout(() => window.location.reload(), 3000);
+                alert("Student Internship Form Submitted successfully");
+                setFormData({
+                    stud_name: '',
+                    stud_id: '',
+                    department: '',
+                    email: '',
+                    phone: '',
+                    secondary_phone: '',
+                    field: '',
+                    clg_name: '',
+                    duration: '',
+                    from_date: '',
+                    to_date: '',
+                    supervisor_name: '',
+                    supervisor_email: '',
+                    supervisor_phone: '',
+                    choose_intern: '',
+                })
+                if (stud_photRef.current) stud_photRef.current.value = "";
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -143,7 +176,7 @@ function InternshipForm() {
                         <Row>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Student Name :
+                                    Student Name : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -157,7 +190,7 @@ function InternshipForm() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Student ID :
+                                    Student ID : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -172,7 +205,7 @@ function InternshipForm() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Attach Student Photo :
+                                    Attach Student Photo : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -181,6 +214,7 @@ function InternshipForm() {
                                         accept=".jpg,.jpeg,.png"
                                         value={formData.stud_photo}
                                         onChange={handleFileChange}
+                                        ref={stud_photRef}
                                         required
                                     />
                                 </Col>
@@ -188,7 +222,7 @@ function InternshipForm() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Name of the College :
+                                    Name of the College : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -202,7 +236,7 @@ function InternshipForm() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Name of the Department :
+                                    Name of the Department : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -216,7 +250,7 @@ function InternshipForm() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Email ID :
+                                    Email ID : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -245,15 +279,17 @@ function InternshipForm() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
                                 <Form.Label column sm="4">
-                                    Contact Number:
+                                    Contact Number: <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         name="phone"
-                                        type="text"
+                                        type="number"
+                                        pattern="\d{10}"
                                         value={formData.phone}
                                         onChange={handleInputChange}
                                         required
+                                        maxLength={10}
                                     />
                                 </Col>
                             </Form.Group>
@@ -265,16 +301,18 @@ function InternshipForm() {
                                 <Col sm="8">
                                     <Form.Control
                                         name="secondary_phone"
-                                        type="text"
+                                        type="number"
+                                        pattern="\d{10}"
                                         value={formData.secondary_phone}
                                         onChange={handleInputChange}
+                                        maxLength={10}
                                     />
                                 </Col>
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start d-flex align-items-center" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Supervisor's Name from College/Institution :
+                                    Supervisor's Name from College/Institution : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -289,7 +327,7 @@ function InternshipForm() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Supervisor's Email :
+                                    Supervisor's Email : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -304,22 +342,24 @@ function InternshipForm() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Supervisor's Contact Number :
+                                    Supervisor's Contact Number : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         name="supervisor_phone"
-                                        type="text"
+                                        type="number"
+                                        pattern="\d{10}"
                                         value={formData.supervisor_phone}
                                         onChange={handleInputChange}
                                         required
+                                        maxLength={10}
                                     />
                                 </Col>
                             </Form.Group>
 
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formField">
-                                <Form.Label column sm="4">Preferred Field :</Form.Label>
+                                <Form.Label column sm="4">Preferred Field : <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         as="select"
@@ -364,7 +404,7 @@ function InternshipForm() {
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                 <Form.Label column sm="4">
-                                    Duration :
+                                    Duration : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -380,7 +420,7 @@ function InternshipForm() {
                             {/* From and To Date in the same row */}
                             <Form.Group as={Row} className="mb-3 text-start">
                                 <Form.Label column sm="4">
-                                    Internship Date :
+                                    Internship Date : <span style={{ color: 'red' }}>*</span>
                                 </Form.Label>
                                 <Col sm="4" className='intern_class'>
                                     <Form.Control

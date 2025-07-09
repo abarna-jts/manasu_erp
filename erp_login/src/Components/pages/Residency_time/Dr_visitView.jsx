@@ -47,17 +47,15 @@ function Dr_visitView() {
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
-
+    const getVisitDetails = async () => {
+        try {
+            const response = await apiRoute.get('/residency/getDrVisit');
+            setVisitDetails(response.data.data); // Should be an array
+        } catch (error) {
+            console.error("Error fetching annual report:", error);
+        }
+    };
     useEffect(() => {
-        const getVisitDetails = async () => {
-            try {
-                const response = await apiRoute.get('/residency/getDrVisit');
-                setVisitDetails(response.data.data); // Should be an array
-            } catch (error) {
-                console.error("Error fetching annual report:", error);
-            }
-        };
-
         getVisitDetails();
     }, []);
 
@@ -190,19 +188,15 @@ function Dr_visitView() {
 
     const handleUpdate = async (e, id) => {
         e.preventDefault();
-
         try {
             const response = await apiRoute.put(`/residency/updateDrVisit/${id}`, formData);
             console.log(response.data);
 
             if (response.data.message === "Dr Visit updated successfully!") {
-                setSubmissionMessage("Form updated successfully!");
-                setMessageType("success");
+                alert("Doctor Visit Updated Successfully")
 
                 handleClose(true);
-
-                // Reload after 3 seconds
-                setTimeout(() => window.location.reload(), 1000);
+                getVisitDetails();
             } else {
                 setSubmissionMessage("Error updating the form.");
                 setMessageType("danger");
@@ -476,7 +470,7 @@ function Dr_visitView() {
                                                 name="report"
                                                 value={formData.report}
                                                 onChange={handleChange}
-                                                 />
+                                            />
                                         </Col>
                                     </Form.Group>
                                 </Col>

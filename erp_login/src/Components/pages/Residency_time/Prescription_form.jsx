@@ -285,15 +285,21 @@ function Prescription_form() {
             const res = await apiRoute.post('/residency/createPrescription', data);
             console.log(res);
             alert("Prescription and Medicine Summary Saved Successfully");
-            window.location.reload();
-            // if (res.data.message === "Prescription and Medicine Summary Saved Successfully") {
-            //     setSubmissionMessage("Form submitted successfully!");
-            //     setMessageType("success");
-            //     setTimeout(() => window.location.reload(), 3000);
-            // } else {
-            //     setSubmissionMessage("Submission failed.");
-            //     setMessageType("danger");
-            // }
+            setFormData({
+                admission_no: '',
+                rescue_name: '',
+                age: '',
+                op_no: '',
+                hospital_name: '',
+                department: '',
+                masterHealthCheckup: '',
+                medical_type: '',
+                instruction: '',
+                advice: '',
+                follow_up: '',
+            })
+            handleClose(true);
+            getPrescriptionDetails();
         } catch (error) {
             console.error("Error submitting form", error);
             setSubmissionMessage("Something went wrong.");
@@ -534,7 +540,8 @@ function Prescription_form() {
 
             if (response.status === 200) {
                 alert("Updated successfully!");
-                window.location.reload();
+                handleEditClose(true);
+                getPrescriptionDetails();
             } else {
                 alert(`Update failed: ${response.data.message}`);
             }
@@ -1455,7 +1462,7 @@ function Prescription_form() {
 
                                             <td>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     min={1}
                                                     name="duration"
                                                     value={med.duration}

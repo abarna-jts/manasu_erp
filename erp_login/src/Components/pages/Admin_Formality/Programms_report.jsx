@@ -275,6 +275,10 @@ function Programms_report() {
                 </Row>
             </Container>
 
+            <Col md={3}>
+                <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
+            </Col>
+
             <Container>
                 <>
                     <Row>
@@ -339,6 +343,7 @@ function Programms_report() {
                 </>
 
             </Container>
+
 
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
                 <Row>

@@ -120,7 +120,10 @@ function SCRB_form() {
         }
     };
 
-
+    const old_photoRef = useRef(null);
+    const new_photoRef = useRef(null);
+    const signatureRef = useRef(null);
+    const sealRef = useRef(null);
 
     const formatDateOnly = (dateStr) => {
         const date = new Date(dateStr);
@@ -198,6 +201,11 @@ function SCRB_form() {
                     seal: null,
                 })
                 setAdmissionNumber("");
+                 // Clear the file input elements in the DOM
+                if (old_photoRef.current) old_photoRef.current.value = "";
+                if (new_photoRef.current) new_photoRef.current.value = "";
+                if (signatureRef.current) signatureRef.current.value = "";
+                if (sealRef.current) sealRef.current.value = "";
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -544,6 +552,7 @@ function SCRB_form() {
                                                         className="form-control"
                                                         style={{ width: '300px', height: '100px' }}
                                                         onChange={handleFileChange}
+                                                        ref={old_photoRef}
                                                         required
                                                     />
                                                 </div>
@@ -559,6 +568,7 @@ function SCRB_form() {
                                                         accept=".jpg,.jpeg,.png"
                                                         className="form-control"
                                                         onChange={handleFileChange}
+                                                        ref={new_photoRef}
                                                         style={{ width: '331px', height: '100px' }}
                                                         required
                                                     />
@@ -886,6 +896,7 @@ function SCRB_form() {
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 className="form-control"
+                                                ref={signatureRef}
                                                 required
                                             />
                                         </td>
@@ -947,6 +958,7 @@ function SCRB_form() {
                                                 onChange={handleFileChange}
                                                 accept=".jpg,.jpeg,.png"
                                                 className="form-control"
+                                                ref={sealRef}
                                                 required
                                             />
                                         </td>

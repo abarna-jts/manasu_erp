@@ -86,7 +86,20 @@ function Admin_RescueDetails() {
                 headers: { 'Content-Type': 'application/json' },
             });
             alert('Rescue Discharge Summary Form Created successfully!');
-            window.location.reload();
+            handleClose(true);
+            setFormData({
+                admission_no: '',
+                rescue_name: '',
+                referred_by: '',
+                escape: '',
+                death: '',
+                discharge: '',
+                transfer: '',
+                reunited: '',
+                state_venue: '',
+                state: ''
+            })
+            getRerportDetail();
         } catch (err) {
             console.error(err);
             alert('Submission failed.');
@@ -228,8 +241,20 @@ function Admin_RescueDetails() {
             console.log(response.data);
             if (response.status === 200) {
                 alert('Form Updated successfully!');
+                setFormData({
+                    admission_no: '',
+                    rescue_name: '',
+                    referred_by: '',
+                    escape: '',
+                    death: '',
+                    discharge: '',
+                    transfer: '',
+                    reunited: '',
+                    state_venue: '',
+                    state: ''
+                })
                 handleEditClose(true);
-                window.location.reload();
+                getRerportDetail();
             } else {
                 alert('Error Updating form.');
             }
@@ -272,9 +297,9 @@ function Admin_RescueDetails() {
             <Container>
                 <Row className='d-flex align-items-center justify-content-between'>
                     <Col md={4} className='d-flex align-items-center justify-content-start'>
-                     {userType === "1" && (
-                        <Button type="button" className="btn btn-success" onClick={handleShow}>Add Details</Button>
-                     )}
+                        {userType === "1" && (
+                            <Button type="button" className="btn btn-success" onClick={handleShow}>Add Details</Button>
+                        )}
                     </Col>
                     <Col md={3}>
                         <div className="d-flex align-items-center px-3">

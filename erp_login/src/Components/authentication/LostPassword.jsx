@@ -6,8 +6,7 @@ import axios from 'axios';
 
 const apiRoute = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-  });
-
+});
 
 function LostPassword() {
     const [email, setEmail] = useState('');

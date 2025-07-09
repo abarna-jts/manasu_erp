@@ -308,6 +308,8 @@ const Sidebar = () => {
                 {/* Internship Form */}
                 <NavItem title="Intern Information" to="/allStudentDetails" icon={faUserGraduate} onAnyClick={handleCloseAccordion}/>
 
+                {/* <NavItem title="User Permission" to="/user_permission" icon={faUsers} onAnyClick={handleCloseAccordion}/> */}
+
                 {/* Reunion Member Details */}
                 {/* <NavItem title="Reunited Resident" to="/reunited_people" icon={faHandshake} /> */}
 

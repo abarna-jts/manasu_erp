@@ -439,12 +439,16 @@ const UpdateMediaConsent = async (req, res) => {
         if (!admission_no) {
             return res.status(400).json({ message: "Admission number is required" });
         }
+        const scanReportPath = req.files['scan_report']
+            ? `uploads/MediaConsent/${req.files['scan_report'][0].filename}`
+            : null;
 
         const updateQuery = `
     UPDATE media_consent SET 
     rescue_name = ?, 
     social_media_consent = ?, 
-    description = ?
+    description = ?,
+    scan_report = ?
     WHERE admission_no = ?
   `;
 
@@ -452,6 +456,7 @@ const UpdateMediaConsent = async (req, res) => {
             rescue_name,
             social_media_consent,
             description,
+            scanReportPath,
             admission_no
         ];
 
@@ -482,8 +487,8 @@ const UpdateMediaConsent = async (req, res) => {
 //     });
 // }
 
-const createDischargeList = async(req, res) => {
-    try{
+const createDischargeList = async (req, res) => {
+    try {
         await ReunionAsync(req, res); // your custom middleware
 
         const {
@@ -618,37 +623,37 @@ const createDischargeList = async(req, res) => {
         console.error("Error creating Discharge checklist Form:", error);
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
-    
+
 }
 
-const getReunionChecklist = async(req, res) => {
+const getReunionChecklist = async (req, res) => {
     const admission_no = req.params.admission_no;
     const query = 'SELECT * FROM discharge_checklist WHERE admission_no = ?';
 
-    try{
+    try {
         const [results] = await db.query(query, [admission_no]);
         if (results.length === 0) {
             return res.status(404).json({ message: 'Discharge Reunion not found' });
         }
         res.status(200).json(results[0]);
-    }catch (error) {
+    } catch (error) {
         console.error("Error fetching Discharge Reunion:", error);
         return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 }
 
 
-const getReunionChecklistAll = async(req, res) => {
+const getReunionChecklistAll = async (req, res) => {
     const admission_no = req.params.admission_no;
     const query = 'SELECT * FROM discharge_checklist WHERE admission_no = ?';
 
-    try{
+    try {
         const [results] = await db.query(query, [admission_no]);
         if (results.length === 0) {
             return res.status(404).json({ message: 'Discharge Reunion not found' });
         }
         res.status(200).json(results[0]);
-    }catch (error) {
+    } catch (error) {
         console.error("Error fetching Discharge Reunion:", error);
         return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }

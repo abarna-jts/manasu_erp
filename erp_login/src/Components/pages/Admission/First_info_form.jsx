@@ -111,19 +111,29 @@ function First_info_form() {
     });
 
     const handlePhoneChange = (e) => {
-        // Remove all non-digit characters
-        let value = e.target.value.replace(/\D/g, '');
+        let value = e.target.value;
 
-        // Limit to 10 digits only
+        // Allow "Unknown" (case-insensitive)
+        if (value.toLowerCase() === "unknown") {
+            setPhoneNumber("Unknown");
+            setPhoneNoError(false); // No error
+            return;
+        }
+
+        // Remove non-digit characters
+        value = value.replace(/\D/g, '');
+
+        // Limit to 10 digits
         if (value.length > 10) {
             value = value.slice(0, 10);
         }
 
         setPhoneNumber(value);
 
-        // Validate length
+        // Set error if not exactly 10 digits
         setPhoneNoError(value.length !== 10);
     };
+
 
 
 
@@ -610,8 +620,6 @@ function First_info_form() {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
 
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -839,7 +847,7 @@ function First_info_form() {
                                                 name="admission_date"
                                                 value={admission_date}
                                                 onChange={(e) => setAdmissionDate(e.target.value)}
-                                                
+
                                             />
                                         </Col>
                                     </Form.Group>
@@ -1015,7 +1023,7 @@ function First_info_form() {
                                                     onChange={(e) => setAdmisisonNo(e.target.value)}
                                                     placeholder={admissionNumber}
                                                     required
-                                                     />
+                                                />
                                             </Col>
                                         </Form.Group>
 
@@ -1174,7 +1182,7 @@ function First_info_form() {
                                                         isInvalid={phone_noError}
                                                     />
                                                     <Form.Control.Feedback type="invalid">
-                                                        Please enter a valid 10-digit phone number.
+                                                        Please enter a valid 10-digit phone number or Unknown.
                                                     </Form.Control.Feedback>
                                                 </Col>
                                                 <Form.Control.Feedback type="invalid">

@@ -144,6 +144,7 @@ function SCRB_Form2A() {
         alert("SCRB Form2A Submitted Successfully");
         setFormData({
           admission_no: '',
+          name_ngo:"MANASU (Mental Health Charity Home)",
           file_no: '',
           addition_category: '',
           addition_complexion: '',

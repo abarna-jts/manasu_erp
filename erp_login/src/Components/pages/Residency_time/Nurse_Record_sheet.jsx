@@ -61,15 +61,12 @@ function Nurse_Record_sheet() {
             alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
             return;
         }
-
-
         try {
             const response = await apiRoute.post("/residency/nurse_record", formData);
             console.log(response);
 
             if (response.data.message === "Nurse Record Sheet Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
+                alert("Form submitted successfully!");
 
                 // Reset the form
                 setFormData({
@@ -83,13 +80,10 @@ function Nurse_Record_sheet() {
                     date: ''
                 });
 
-                handleClose(); // Close modal
-
-                // Reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
+                handleClose(); 
+                getNurseRecords();
             } else {
-                setSubmissionMessage("Submission failed.");
-                setMessageType("danger");
+                alert("Something Went Wrong to Create Form");
             }
         } catch (error) {
             console.error("Error submitting form", error);
@@ -178,13 +172,9 @@ function Nurse_Record_sheet() {
             console.log(response.data);
 
             if (response.data.message === "Nurse Record updated successfully!") {
-                setSubmissionMessage("Form updated successfully!");
-                setMessageType("success");
-
+                alert("Form Updated Successfully");
                 handleClose1(true);
-
-                // Reload after 3 seconds
-                setTimeout(() => window.location.reload(), 1000);
+                getNurseRecords();
             } else {
                 setSubmissionMessage("Error updating the form.");
                 setMessageType("danger");
@@ -423,7 +413,7 @@ function Nurse_Record_sheet() {
                                     <Form.Group className="mb-3" controlId="formResidentName">
                                         <Form.Label>Weight <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
-                                            type="number"
+                                            type="text"
                                             name="weight"
                                             value={formData.weight}
                                             onChange={handleInputChange}
@@ -544,7 +534,7 @@ function Nurse_Record_sheet() {
                                     <Form.Group className="mb-3" controlId="formResidentName">
                                         <Form.Label>Weight <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
-                                            type="number"
+                                            type="text"
                                             name="weight"
                                             value={formData.weight}
                                             onChange={handleInputChange}

@@ -1240,15 +1240,16 @@ function MSE_form() {
   };
 
   const handleShow = async () => {
-    console.log("hi");
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getappearance/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getappearance/${admission_no}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1278,14 +1279,16 @@ function MSE_form() {
   };
 
   const handleSpeechShow = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getSpeech/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getSpeech/${admission_no}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1307,14 +1310,16 @@ function MSE_form() {
   };
 
   const handleMoodShow = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getMood/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getMood/${admission_no}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1340,14 +1345,16 @@ function MSE_form() {
   }
 
   const handleThoughShow = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getThough/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getThough/${admission_no}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1368,14 +1375,16 @@ function MSE_form() {
   }
 
   const handlePerceptionShow = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getPerception/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getPerception/${admission_no}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1404,12 +1413,15 @@ function MSE_form() {
   }
 
   const handleCognitionShow = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
     try {
-      const response = await apiRoute.get(`/recovery/getCognition/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getCognition/${admission_no}`);
       const data = response.data;
 
       // Split and trim fetched checkbox values
@@ -1461,14 +1473,16 @@ function MSE_form() {
 
 
   const handleJudgementShow = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getJudgement/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getJudgement/${admission_no}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1491,14 +1505,16 @@ function MSE_form() {
   }
 
   const handleInsightShow = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no || admission_no.trim() === '') {
       alert("Please enter admission number.");
       return;
     }
-    console.log(formData.admission_no);
+
+    const trimmedAdNo = admission_no.trim();
+    console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getInsight/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/getInsight/${admission_no}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1533,7 +1549,19 @@ function MSE_form() {
       });
 
       alert('General Appearance Form updated successfully!');
-      window.location.reload();
+      setFormData({
+        general_appearance: [],
+        attitude: [],
+        comprehension: [],
+        gait_posture: [],
+        motor_activity: [],
+        catatonic_sign: [],
+        conversion_dissociative: [],
+        social_manner: [],
+        rapport: [],
+        hallucinatory_behaviour: []
+      })
+      handleClose(true);
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1551,7 +1579,12 @@ function MSE_form() {
       });
 
       alert('Speech Form updated successfully!');
-      window.location.reload();
+      setSpeechFormData({
+        rate_quantity: [],
+        volume_tone: [],
+        flow_rhythm: []
+      })
+      handleSpeechClose(true);
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1569,7 +1602,16 @@ function MSE_form() {
       });
 
       alert('Mood and Affect Form updated successfully!');
-      window.location.reload();
+      setMoodFormData({
+        mood_description: [],
+        appearance: "",
+        resident_feeling: "",
+        general_feeling: "",
+        mood_like: "",
+        resident_general_feeling: "",
+        resident_look: [],
+      })
+      handleMoodClose(true);
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1587,8 +1629,11 @@ function MSE_form() {
       });
 
       alert('Though Form updated successfully!');
-
-      window.location.reload();
+      setThoughFormData({
+        stream_form_though: [],
+        content_though: [],
+      })
+      handleThoughClose(true);
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1606,7 +1651,19 @@ function MSE_form() {
       });
 
       alert('Perception Form updated successfully!');
-      window.location.reload();
+      setPerceptionData({
+        hallucination_type: [],
+        heard: '',
+        voices_heard: '',
+        part_of_day: '',
+        female_male_voices: '',
+        interpreted_person: '',
+        illusion: [],
+        perception_changes: [],
+        somatic: [],
+        others: [],
+      })
+      handlePerceptionClose(true);
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1624,7 +1681,13 @@ function MSE_form() {
       });
 
       alert('Judgement Form updated successfully!');
-      window.location.reload();
+      setJudgementFormData({
+        personal_judgement: '',
+        social_judgement: '',
+        test_judgement: '',
+        judgement: ''
+      })
+      handleJudgementClose(true);
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1642,7 +1705,15 @@ function MSE_form() {
       });
 
       alert('Insight Form updated successfully!');
-      window.location.reload();
+      setInsightData({
+        denail_illness: '',
+        slight_awareness: '',
+        awarness_sick: '',
+        awarness_illness: '',
+        intellectual_insight: '',
+        true_emotion: ''
+      })
+      hanldeInsightClose(true);
     } catch (err) {
       console.error(err);
       alert('Update failed.');
@@ -1662,7 +1733,38 @@ function MSE_form() {
         },
       });
       alert('Cognition Form updated successfully!');
-      window.location.reload();
+      setCognitionData({
+        consciousness: [],
+        orientation_time: '',
+        orientation_place: '',
+        orientation_person: '',
+        consciousnessState: '',
+        canConcentrate: '',
+        distractibility: '',
+        asking_test: '',
+        names_months: '',
+        test_performance: '',
+        immediate_retention: '',
+        recall: '',
+        patient_place: '',
+        dinner_ate: '',
+        date_ofMrg: '',
+        birthdays_children: '',
+        person_past: '',
+        amnesia: '',
+        live_growing: '',
+        person_school: '',
+        breakfast_ques: '',
+        do_yesterday: '',
+        general_info: '',
+        test_red_wri: '',
+        calculation_test: '',
+        proverb_testing: '',
+        familiar_object: '',
+      })
+      hanldeCognitionClose(true);
+      setCanConcentrate('');
+      setSelectedStates("");
     } catch (err) {
       console.error(err);
       alert('Update failed.');

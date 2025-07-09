@@ -44,7 +44,7 @@ function AllStudentDetails() {
 
     const getStudentDetails = async () => {
         try {
-            const response = await apiRoute.get('/formality/getStudentDetails');;
+            const response = await apiRoute.get('/formality/getStudentDetails');
             console.log("API response:", response.data);
             setStudentDetails(response.data.data);
         } catch (error) {
@@ -234,7 +234,26 @@ function AllStudentDetails() {
             console.log(response.data);
             if (response.status === 200 || response.status === 201) {
                 alert('Form Updated successfully!');
-                window.location.reload();
+                handleClose(true);
+                setFormData({
+                    id: '',
+                    stud_name: '',
+                    stud_id: '',
+                    department: '',
+                    email: '',
+                    phone: '',
+                    secondary_phone: '',
+                    field: '',
+                    clg_name: '',
+                    duration: '',
+                    from_date: '',
+                    to_date: '',
+                    supervisor_name: '',
+                    supervisor_email: '',
+                    supervisor_phone: '',
+                    choose_intern: '',
+                })
+                getStudentDetails();
             } else {
                 alert('Error Updating form.');
             }
@@ -381,10 +400,10 @@ function AllStudentDetails() {
                         <Row>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Student Name :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="stud_name"
                                         type="text"
@@ -395,10 +414,10 @@ function AllStudentDetails() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Student ID :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="stud_id"
                                         type="number"
@@ -409,10 +428,10 @@ function AllStudentDetails() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Name of the College :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="clg_name"
                                         type="text"
@@ -423,10 +442,10 @@ function AllStudentDetails() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Name of the Department :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="department"
                                         type="text"
@@ -437,10 +456,10 @@ function AllStudentDetails() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Email ID :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="email"
                                         type="text"
@@ -451,10 +470,10 @@ function AllStudentDetails() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Contact Number:
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="phone"
                                         type="text"
@@ -467,10 +486,10 @@ function AllStudentDetails() {
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPhoneNumbers">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Emergency Contact Number:
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
 
                                     <Form.Control
                                         name="secondary_phone"
@@ -482,10 +501,10 @@ function AllStudentDetails() {
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start d-flex align-items-center" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Supervisor's Name from College/Institution :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="supervisor_name"
                                         type="text"
@@ -497,10 +516,10 @@ function AllStudentDetails() {
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Supervisor's Email :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="supervisor_email"
                                         type="text"
@@ -512,10 +531,10 @@ function AllStudentDetails() {
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Supervisor's Contact Number :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="supervisor_phone"
                                         type="text"
@@ -527,10 +546,10 @@ function AllStudentDetails() {
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Preferred Field :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         as="select"
                                         name="field"
@@ -557,8 +576,8 @@ function AllStudentDetails() {
 
                             {formData.field === 'Any other' && (
                                 <Form.Group as={Row} className="mb-1">
-                                    <Form.Label column sm="4" className='text-start'>Any Other Field:</Form.Label>
-                                    <Col sm="8">
+                                    <Form.Label column sm="5" className='text-start'>Any Other Field:</Form.Label>
+                                    <Col sm="6">
                                         <Form.Control
                                             type="text"
                                             name="other_field"
@@ -571,10 +590,10 @@ function AllStudentDetails() {
                             )}
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Duration :
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         name="duration"
                                         type="text"
@@ -587,10 +606,10 @@ function AllStudentDetails() {
 
                             {/* From and To Date in the same row */}
                             <Form.Group as={Row} className="mb-3 text-start">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Internship Date :
                                 </Form.Label>
-                                <Col sm="4">
+                                <Col sm="3">
                                     <Form.Control
                                         name="from_date"
                                         type="date"
@@ -600,7 +619,7 @@ function AllStudentDetails() {
                                         required
                                     />
                                 </Col>
-                                <Col sm="4">
+                                <Col sm="3">
                                     <Form.Control
                                         name="to_date"
                                         type="date"
@@ -611,10 +630,10 @@ function AllStudentDetails() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                <Form.Label column sm="4">
+                                <Form.Label column sm="5">
                                     Why did you choose MANASU for your internship?
                                 </Form.Label>
-                                <Col sm="8">
+                                <Col sm="6">
                                     <Form.Control
                                         as="textarea" rows={3}
                                         name="choose_intern"

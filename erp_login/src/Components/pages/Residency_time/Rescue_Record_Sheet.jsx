@@ -77,9 +77,18 @@ function Rescue_Record_Sheet() {
             const res = await apiRoute.post('/residency/rescue_condition', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            
+
             alert('Rescue Condition submitted successfully!');
-            window.location.reload();
+            setFormData({
+                admission_no: '',
+                resident_name: '',
+                follow_up: '',
+                date: '',
+            })
+            setAdmissionNumber("");
+            setRescueName("");
+            handleClose(true);
+            getConditionDetails();
         } catch (err) {
             console.error(err);
             alert('Submission failed.');
@@ -134,7 +143,7 @@ function Rescue_Record_Sheet() {
             const response = await apiRoute.get(`/residency/rescueConditionShow/${id}`);
             const data = response.data;
 
-             const [fromFormatted, toFormatted] = data.date.split(' to ');
+            const [fromFormatted, toFormatted] = data.date.split(' to ');
 
             const parseDate = (dmy) => {
                 const [day, month, year] = dmy.split("-");
@@ -253,11 +262,11 @@ function Rescue_Record_Sheet() {
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                     {userType === "3" && (
-                                    <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
-                                    
-                                        <i className="fas fa-plus"></i>
-                                    
-                                    </InputGroup.Text>
+                                        <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
+
+                                            <i className="fas fa-plus"></i>
+
+                                        </InputGroup.Text>
                                     )}
 
                                 </InputGroup>
@@ -386,7 +395,7 @@ function Rescue_Record_Sheet() {
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     required
-                                    
+
                                 />
                             </Form.Group>
 
@@ -482,7 +491,7 @@ function Rescue_Record_Sheet() {
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     required
-                                    
+
                                 />
                             </Form.Group>
 

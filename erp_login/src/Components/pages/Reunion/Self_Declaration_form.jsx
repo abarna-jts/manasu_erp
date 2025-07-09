@@ -154,6 +154,10 @@ function Self_Declaration_form() {
         }
     }, [previewRequested]);
 
+    const handwritten_documentRef = useRef(null);
+    const signatureRef = useRef(null);
+    const photoRef = useRef(null);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -184,7 +188,14 @@ function Self_Declaration_form() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Self Declaration Form Created Successfully!');
-            window.location.reload();
+            setFormData({
+                rescue_name: '',
+                age: '',
+                description: '',
+            })
+            if (handwritten_documentRef.current) handwritten_documentRef.current.value = "";
+            if (signatureRef.current) signatureRef.current.value = "";
+            if (photoRef.current) photoRef.current.value = "";
         } catch (err) {
             console.error(err);
             alert('Submission failed.');
@@ -240,7 +251,16 @@ function Self_Declaration_form() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert("Self Declaration Form Updated successfully");
-            window.location.reload();
+            handleClose(true);
+            setAdmissionNumber("");
+            setFormData({
+                rescue_name: '',
+                age: '',
+                description: '',
+            })
+            if (handwritten_documentRef.current) handwritten_documentRef.current.value = "";
+            if (signatureRef.current) signatureRef.current.value = "";
+            if (photoRef.current) photoRef.current.value = "";
         } catch (err) {
             console.error(err);
             alert('Update failed.');
@@ -412,7 +432,7 @@ function Self_Declaration_form() {
                                                 required />
                                         </Col>
                                     </Form.Group>
-                                    
+
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
@@ -423,6 +443,7 @@ function Self_Declaration_form() {
                                                 type="file"
                                                 accept=".jpg,.jpeg,.png"
                                                 name='handwritten_document'
+                                                ref={handwritten_documentRef}
                                                 onChange={handleFileChange}
                                                 required />
                                         </Col>
@@ -437,6 +458,7 @@ function Self_Declaration_form() {
                                             <Form.Control
                                                 type="file"
                                                 name='signature'
+                                                ref={signatureRef}
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 required />
@@ -451,6 +473,7 @@ function Self_Declaration_form() {
                                             <Form.Control
                                                 type="file"
                                                 name='photo'
+                                                ref={photoRef}
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 required />
@@ -467,7 +490,7 @@ function Self_Declaration_form() {
                                                 name="description"
                                                 value={formData.description}
                                                 onChange={handleInputChange}
-                                                 />
+                                            />
                                         </Col>
                                     </Form.Group>
 
@@ -644,7 +667,7 @@ function Self_Declaration_form() {
                                             required />
                                     </Col>
                                 </Form.Group>
-                                
+
 
                                 <Form.Group as={Row} className="mb-3 mt-3">
                                     <Form.Label column sm="6" className='text-start'>
@@ -735,7 +758,7 @@ function Self_Declaration_form() {
                                             name="description"
                                             value={formData.description}
                                             onChange={handleInputChange}
-                                             />
+                                        />
                                     </Col>
                                 </Form.Group>
 

@@ -22,7 +22,7 @@ function Observation_report() {
 
     const handleEditClose = () => setEditShow(false);
 
-     const userType = Cookies.get('usertype');
+    const userType = Cookies.get('usertype');
 
     //alert box values
     const [submissionMessage, setSubmissionMessage] = useState("");
@@ -68,11 +68,18 @@ function Observation_report() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             if (res.data.message === "Rescue Condition Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
+                alert("Observation Report Created Successfully");
 
-                // Optionally reload after 3 seconds
-                setTimeout(() => window.location.reload(), 3000);
+                setFormData({
+                    admission_no: '',
+                    resident_name: '',
+                    follow_up: '',
+                    date: ''
+                })
+                handleClose(true);
+                setAdmissionNumber("");
+                setRescueName("");
+                getConditionDetails();
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -141,8 +148,7 @@ function Observation_report() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             if (res.data.message === "Observation updated successfully") {
-                setSubmissionMessage("Form updated successfully!");
-                setMessageType("success");
+                alert("Observation Report Updated Successfully");
 
                 setEditShow(false);
                 getConditionDetails('');
@@ -261,9 +267,9 @@ function Observation_report() {
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                     {userType === "4" && (
-                                    <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
-                                        <i className="fas fa-plus"></i>
-                                    </InputGroup.Text>
+                                        <InputGroup.Text style={{ cursor: 'pointer', background: "#6abc15", color: "#fff" }} onClick={handleShow}>
+                                            <i className="fas fa-plus"></i>
+                                        </InputGroup.Text>
                                     )}
 
                                 </InputGroup>
@@ -286,9 +292,9 @@ function Observation_report() {
             <Container>
                 <Row>
                     <Col md={4}>
-                    {userType === "4" && (
-                        <Button variant="success" className="m-1 d-flex justify-content-start align-items-center" type="submit" onClick={handleShow}>Enter Condition</Button>
-                    )}
+                        {userType === "4" && (
+                            <Button variant="success" className="m-1 d-flex justify-content-start align-items-center" type="submit" onClick={handleShow}>Enter Condition</Button>
+                        )}
                     </Col>
                     <Col md={12} className="mt-3 my-3">
 
@@ -404,7 +410,7 @@ function Observation_report() {
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     required
-                                    
+
                                 />
                             </Form.Group>
 

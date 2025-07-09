@@ -1342,6 +1342,15 @@ const updateEventDetail = async (req, res) => {
             return res.status(400).json({ message: "Missing ID" });
         }
 
+        const formatDate = (isoDate) => {
+            const d = new Date(isoDate);
+            if (isNaN(d)) return null;
+            const year = d.getFullYear();
+            const month = (`0${d.getMonth() + 1}`).slice(-2);
+            const day = (`0${d.getDate()}`).slice(-2);
+            return `${year}-${month}-${day}`;
+        };
+
         const usquery = `UPDATE event_report SET
                     event_type = ?,
                     event_name = ?,
@@ -1361,9 +1370,9 @@ const updateEventDetail = async (req, res) => {
                     WHERE id= ?`;
 
         const values = [
-            event_type, event_name, event_date, event_place, event_report, event_rescue_count,
-            awareness_name, awarness_date, awarness_place, awarness_report, awarness_rescue_count,
-            outing_name, outing_date, outing_place, outing_report, id
+            event_type, event_name, formatDate(event_date), event_place, event_report, event_rescue_count,
+            awareness_name, formatDate(awarness_date), awarness_place, awarness_report, awarness_rescue_count,
+            outing_name, formatDate(outing_date), outing_place, outing_report, id
         ];
 
         const [result] = await db.query(usquery, values);

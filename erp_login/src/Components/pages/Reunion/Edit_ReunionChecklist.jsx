@@ -96,12 +96,12 @@ function Edit_ReunionChecklist() {
                     Clothes: data.Clothes || '',
                     possessionsRecovered: data.possessionsRecovered || '',
                     travelExpenses: data.travelExpenses || '',
+                    dischargeAllowance: data.dischargeAllowance || '',
                     copyOfdischargeSummary: data.copyOfdischargeSummary || '',
                     travelSafetyLetter: data.travelSafetyLetter || '',
                     reunionPhoto: data.reunionPhoto || '',
                     witnessSignature: data.witnessSignature || '',
                     any_other: data.any_other || '',
-
                     familyRequestLetterFile: data.familyRequestLetterFile || null,
                     selfDeclarationFile: data.selfDeclarationFile || null,
                     mediaConsentFile: data.mediaConsentFile || null,

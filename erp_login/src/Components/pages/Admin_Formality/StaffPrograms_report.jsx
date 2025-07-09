@@ -259,6 +259,10 @@ function StaffPrograms_report() {
                 </Row>
             </Container>
 
+            <Col md={3}>
+                <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
+            </Col>
+
             <Container>
                 <>
                     <Row>

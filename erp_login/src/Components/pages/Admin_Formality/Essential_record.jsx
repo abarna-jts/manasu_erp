@@ -47,6 +47,9 @@ function Essential_record() {
         any_other: ''
     })
 
+    const bankPassbookRef = useRef(null);
+    const form7AttachRef = useRef(null);
+
     const [files, setFiles] = useState({
         bank_passbook: null,
         form7_attach: null,
@@ -220,7 +223,6 @@ function Essential_record() {
             }
         }
 
-
         const data = new FormData();
         data.append('admission_no', admission_no);
         data.append('rescue_name', formData.rescue_name);
@@ -248,7 +250,7 @@ function Essential_record() {
             if (res.data.message === "Essential Records Form Created Successfully") {
                 alert("Form Created Successfully");
                 setFormData({
-                    admission_no:'',
+                    admission_no: '',
                     rescue_name: '',
                     aadhar_card: '',
                     udid_no: '',
@@ -269,6 +271,9 @@ function Essential_record() {
                     bank_passbook: null,
                     form7_attach: null,
                 })
+                // Clear the file input elements in the DOM
+                if (bankPassbookRef.current) bankPassbookRef.current.value = "";
+                if (form7AttachRef.current) form7AttachRef.current.value = "";
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -502,7 +507,28 @@ function Essential_record() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Updated successfully!');
-            window.location.reload();
+            handleClose(true);
+            setFormData({
+                admission_no: '',
+                rescue_name: '',
+                aadhar_card: '',
+                udid_no: '',
+                disability_no: '',
+                voter_id: '',
+                form_7: '',
+                bank_name: '',
+                account_no: '',
+                ifsc_code: '',
+                insurance_provider: '',
+                policy_no: '',
+                validity_period: '',
+                other_gvt_scheme: '',
+                any_other: ''
+            })
+            setAdmissionNumber("");
+            // Clear the file input elements in the DOM
+            if (bankPassbookRef.current) bankPassbookRef.current.value = "";
+            if (form7AttachRef.current) form7AttachRef.current.value = "";
         } catch (err) {
             console.error(err);
             alert('Update failed.');
@@ -735,6 +761,7 @@ function Essential_record() {
                                                 value={formData.form_7}
                                                 onChange={handleInputChange}
                                                 className="mb-2"
+
                                                 required
                                             />
 
@@ -745,6 +772,7 @@ function Essential_record() {
                                                 name="form7_attach"
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
+                                                ref={form7AttachRef}
                                                 required
                                             />
                                         </Col>
@@ -797,6 +825,7 @@ function Essential_record() {
                                                 accept=".jpg,.jpeg,.png"
                                                 name="bank_passbook"
                                                 onChange={handleFileChange}
+                                                ref={bankPassbookRef}
                                             />
                                         </Col>
                                     </Form.Group>
