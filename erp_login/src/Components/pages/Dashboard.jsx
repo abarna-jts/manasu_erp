@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Cookies from 'js-cookie';
 
 function Dashboard() {
     const [totalRescue, setTotalRescue] = useState(0);
@@ -21,10 +22,16 @@ function Dashboard() {
     const [admissionData, setAdmissionData] = useState([]);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
+    const userType = Cookies.get('usertype');
+
     useEffect(() => {
         const fetchTotalRescue = async () => {
             try {
-                const response = await apiRoute.get("/dashboard/totalRescue");
+                const response = await apiRoute.get("/dashboard/totalRescue",{
+                     headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 setTotalRescue(response.data.totalRescue);
             } catch (error) {
                 console.error("Failed to fetch rescue data:", error);
@@ -37,7 +44,11 @@ function Dashboard() {
     useEffect(() => {
         const fetchTotalResident = async () => {
             try {
-                const response = await apiRoute.get("/dashboard/totalResident");
+                const response = await apiRoute.get("/dashboard/totalResident",{
+                     headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 setTotalResident(response.data.totalResident);
             } catch (error) {
                 console.error("Failed to fetch Resident data:", error);
@@ -50,7 +61,11 @@ function Dashboard() {
     useEffect(() => {
         const fetchTotalReunion = async () => {
             try {
-                const response = await apiRoute.get("/dashboard/totalReunion");
+                const response = await apiRoute.get("/dashboard/totalReunion",{
+                     headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 setTotalReunion(response.data.totalReunion);
             } catch (error) {
                 console.error("Failed to fetch Resident data:", error);
@@ -63,7 +78,11 @@ function Dashboard() {
     useEffect(() => {
         const fetchNurseRecord = async () => {
             try {
-                const res = await apiRoute.get("/dashboard/getMonthlyResidentConditions");
+                const res = await apiRoute.get("/dashboard/getMonthlyResidentConditions",{
+                     headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 console.log("API response for nurse record:", res.data);
 
                 // Normalize and align the data
@@ -89,7 +108,11 @@ function Dashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await apiRoute.get(`/dashboard/getMonthlyAdmissionsByYear/${selectedYear}`);
+                const res = await apiRoute.get(`/dashboard/getMonthlyAdmissionsByYear/${selectedYear}`,{
+                     headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 setAdmissionData(res.data.data);
             } catch (error) {
                 console.error("Failed to fetch data:", error);
@@ -131,10 +154,17 @@ function Dashboard() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
+    const token = localStorage.getItem('jwt');
+
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await apiRoute.get("/dashboard/get_recent_rescue");
+                const response = await apiRoute.get("/dashboard/get_recent_rescue", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 setRescues(response.data);
             } catch (error) {
                 console.error("Failed to fetch rescue data:", error);
@@ -290,6 +320,7 @@ function Dashboard() {
                         </div>
                     </Col>
                 </Row>
+                {(userType === "1" || userType === "2") && (
                 <Row className="d-flex align-items-center justify-content-center mb-3">
                     <Col md={7} className="rescue_detailsClass">
                         <h5 className="text-start">Recent Rescue Details</h5>
@@ -329,6 +360,7 @@ function Dashboard() {
                     <Col md={4}>
                     </Col>
                 </Row>
+                )}
 
             </Container>
         </>

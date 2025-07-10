@@ -30,6 +30,8 @@
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^5.0.2",
+    "jwt-decode": "^4.0.0",
+    "motion": "^12.23.1",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-date-range": "^2.0.1",

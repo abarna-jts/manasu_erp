@@ -320,12 +320,17 @@ function Observation_report() {
                                             <td>{item.resident_name}</td>
                                             <td className='text-justify'>{item.follow_up || "NULL"}</td>
                                             <td>
-                                                <img
-                                                    src={`https://www.pahrultours.com/app2/${item.recovery_photo}`}
-                                                    alt="Rescue Condition Photo"
-                                                    style={{ width: "70px", height: "70px", objectFit: "cover" }}
-                                                />
+                                                {item.recovery_photo ? (
+                                                    <img
+                                                        src={`https://www.pahrultours.com/app2/${item.recovery_photo}`}
+                                                        alt="Rescue Condition Photo"
+                                                        style={{ width: "70px", height: "70px", objectFit: "cover" }}
+                                                    />
+                                                ) : (
+                                                    "NULL"
+                                                )}
                                             </td>
+
                                             <td>
                                                 <button className="btn btn-success icon_details" onClick={() => handleEdiShow(item.id)}>
                                                     <i className="fas fa-edit"></i>
@@ -391,13 +396,13 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3">
-                                <Form.Label>Rescue Recovery Photo Attachment <span style={{ color: 'red' }}>*</span></Form.Label>
+                                <Form.Label>Rescue Recovery Photo Attachment </Form.Label>
                                 <Form.Control
                                     type="file"
                                     accept=".jpg,.jpeg,.png"
                                     onChange={handleFileChange}
                                     name="recovery_photo"
-                                    required
+
                                 />
                             </Form.Group>
 
@@ -471,7 +476,7 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
-                                <Form.Label>Rescue Recovery Photo Attachment <span style={{ color: 'red' }}>*</span></Form.Label>
+                                <Form.Label>Rescue Recovery Photo Attachment </Form.Label>
                                 <div className="photorow d-flex align-items-center justify-content-between">
                                     {files.recovery_photo ? (
                                         <>
@@ -490,7 +495,7 @@ function Observation_report() {
                                         onChange={handleFileChange}
                                         accept=".jpg,.jpeg,.png"
                                         name="recovery_photo"
-                                        required={!formData.recovery_photo} // required only if there's no existing image
+                                    // required={!formData.recovery_photo} 
                                     />
                                 </div>
 

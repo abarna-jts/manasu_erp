@@ -39,7 +39,7 @@ const createRescueCondition = async (req, res) => {
       admission_no,
       resident_name,
       dateFormatted,
-      resrecovery_photo_path,
+      resrecovery_photo_path || "NULL",
       follow_up
     ];
 
@@ -424,7 +424,7 @@ const createObservationReport = async (req, res) => {
       admission_no,
       resident_name,
       obdateFormatted,
-      recovery_photo_path,
+      recovery_photo_path || "NULL",
       follow_up
     ];
 
@@ -512,7 +512,7 @@ const updateObservationReport = async (req, res) => {
     const values = [
       resident_name,
       obdateFormatted,
-      finalRecoveryPath,
+      finalRecoveryPath || "NULL",
       follow_up,
       admission_no
     ];
@@ -571,9 +571,9 @@ const updateRescueCondition = async (req, res) => {
     }
     const existingRecoveryPath = selectData[0].rescue_recovery_photo;
     const finalRecoveryPath = newRecoveryPhoto || existingRecoveryPath;
-    if (!finalRecoveryPath) {
-      return res.status(400).json({ message: "No recovery photo provided" });
-    }
+    // if (!finalRecoveryPath) {
+    //   return res.status(400).json({ message: "No recovery photo provided" });
+    // }
 
     const updateQuery = `
         UPDATE rescue_condition SET
@@ -594,7 +594,7 @@ const updateRescueCondition = async (req, res) => {
     const values = [
       resident_name,
       dateFormatted,
-      finalRecoveryPath,
+      finalRecoveryPath || "NULL",
       follow_up,
       admission_no
     ]
@@ -625,6 +625,7 @@ const createPrescription = async (req, res) => {
     op_no,
     hospital_name,
     department,
+    diagnosis,
     masterHealthCheckup,
     instruction,
     medical_type,
@@ -644,14 +645,14 @@ const createPrescription = async (req, res) => {
   try {
     const insertQuery = `
       INSERT INTO prescription_medicines (
-        admission_no, rescue_name, age, op_no, hospital_name, department, masterHealthCheckup,
+        admission_no, rescue_name, age, op_no, hospital_name, department, diagnosis, masterHealthCheckup,
         instruction, medical_type, advice, follow_up, created_date,
         medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-      admission_no, rescue_name, age, op_no, hospital_name, department, masterHealthCheckup,
+      admission_no, rescue_name, age, op_no, hospital_name, department, diagnosis, masterHealthCheckup,
       instruction, medical_type, advice, follow_up, current_date,
       medicine, medicine_type, duration, intake, med_instruction, morning, afternoon, night
     ];
@@ -664,9 +665,6 @@ const createPrescription = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
-
 
 
 const getPrescription = async (req, res) => {
@@ -744,6 +742,7 @@ const updatePrescription = async (req, res) => {
       op_no,
       hospital_name,
       department,
+      diagnosis, 
       masterHealthCheckup,
       instruction,
       medical_type,
@@ -762,14 +761,14 @@ const updatePrescription = async (req, res) => {
     const updateQuery = `
       UPDATE prescription_medicines SET
         admission_no = ?, rescue_name = ?, age = ?, op_no = ?, hospital_name = ?, department = ?,
-        masterHealthCheckup = ?, instruction = ?, medical_type = ?, advice = ?, follow_up = ?,
+        diagnosis =?, masterHealthCheckup = ?, instruction = ?, medical_type = ?, advice = ?, follow_up = ?,
         medicine = ?, medicine_type = ?, duration = ?, intake = ?, med_instruction = ?,
         morning = ?, afternoon = ?, night = ?
       WHERE id = ?
     `;
 
     const values = [
-      admission_no, rescue_name, age, op_no, hospital_name, department,
+      admission_no, rescue_name, age, op_no, hospital_name, department,diagnosis, 
       masterHealthCheckup, instruction, medical_type, advice, follow_up,
       medicine, medicine_type, duration, intake, med_instruction,
       morning, afternoon, night,

@@ -10,6 +10,7 @@ import ReunionRoutes from './routes/reunion.js';
 import FormalityRoutes from './routes/formality.js';
 import recoveryRoutes from './routes/recovery.js';
 import residencyRoutes from './routes/residency.js';
+import { authenticateToken } from './middleware/auth.js';
 
 // Load environment variables
 dotenv.config();
@@ -68,7 +69,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api', authRoutes);
-app.use('/dashboard', dashboardRoutes);
+app.use('/dashboard',authenticateToken, dashboardRoutes);
 app.use('/admision', admissionRoutes);
 app.use('/scrb_form', SCRBRoutes);
 app.use('/reunion', ReunionRoutes);

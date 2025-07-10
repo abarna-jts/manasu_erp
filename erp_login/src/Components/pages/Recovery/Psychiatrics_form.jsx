@@ -1574,190 +1574,222 @@ function Psychiatrics_form() {
             return;
         }
 
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            const dateObj = new Date(dateString);
+            if (isNaN(dateObj)) return dateString; // fallback for invalid dates
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // months start from 0
+            const year = dateObj.getFullYear();
+            return `${day}-${month}-${year}`;
+        };
+
         try {
             const response = await apiRoute.get(`/recovery/getallPsychiatric/${admission_no}`);
-            console.log("Fetched data from API:", response.data);
-
             const fetchedData = response.data;
 
-            if (!fetchedData || typeof fetchedData !== "object") {
-                alert("Invalid or missing data from server.");
+            if (!Array.isArray(fetchedData) || fetchedData.length === 0) {
+                alert("No data found for this admission number.");
                 return;
             }
 
-            // ✅ Set all necessary form states
-            if (fetchedData.basic_detail) {
+            // 👉 You can change this to let user pick a date
+            const latestEntry = fetchedData[fetchedData.length - 1];
+
+            const {
+                basic_detail,
+                cheif_complaint,
+                presenting_problems,
+                psy_history,
+                medical_history,
+                familyhis_data,
+                social_history,
+                development_history,
+                substance_use,
+                suicidal_data
+            } = latestEntry;
+
+            if (basic_detail) {
                 setFormData({
-                    ...fetchedData.basic_detail,
-                    patient_name: fetchedData.basic_detail.patient_name || '',
-                    patient_age: fetchedData.basic_detail.patient_age || '',
-                    patient_gender: fetchedData.basic_detail.patient_gender || '',
-                    sexual_orientation: fetchedData.basic_detail.sexual_orientation || '',
-                    education_bg: fetchedData.basic_detail.education_bg || '',
-                    occupation: fetchedData.basic_detail.occupation || '',
-                    marital_status: fetchedData.basic_detail.marital_status || '',
-                    economic_status: fetchedData.basic_detail.economic_status || '',
-                    religion: fetchedData.basic_detail.religion || '',
-                    informant: fetchedData.basic_detail.informant || '',
-                    residential_address: fetchedData.basic_detail.residential_address || '',
-                    living_arrangements: fetchedData.basic_detail.living_arrangements || '',
-                    family_structure: fetchedData.basic_detail.family_structure || '',
-                    cultural_identity: fetchedData.basic_detail.cultural_identity || '',
-                    language1: fetchedData.basic_detail.language1 || '',
-                    language2: fetchedData.basic_detail.language2 || '',
+                    ...basic_detail,
+                    date: formatDate(basic_detail.date || ''),
+                    patient_name: basic_detail.patient_name || '',
+                    patient_age: basic_detail.patient_age || '',
+                    patient_gender: basic_detail.patient_gender || '',
+                    sexual_orientation: basic_detail.sexual_orientation || '',
+                    education_bg: basic_detail.education_bg || '',
+                    occupation: basic_detail.occupation || '',
+                    marital_status: basic_detail.marital_status || '',
+                    economic_status: basic_detail.economic_status || '',
+                    religion: basic_detail.religion || '',
+                    informant: basic_detail.informant || '',
+                    residential_address: basic_detail.residential_address || '',
+                    living_arrangements: basic_detail.living_arrangements || '',
+                    family_structure: basic_detail.family_structure || '',
+                    cultural_identity: basic_detail.cultural_identity || '',
+                    language1: basic_detail.language1 || '',
+                    language2: basic_detail.language2 || '',
                 });
             }
 
-            if (fetchedData.cheif_complaint) {
+            if (cheif_complaint) {
                 setChiefData({
-                    ...fetchedData.cheif_complaint,
-                    chief_complaint: fetchedData.cheif_complaint.chief_complaint || '',
-                    onset_duration: fetchedData.cheif_complaint.onset_duration || '',
-                    nature_symptoms: fetchedData.cheif_complaint.nature_symptoms || '',
-                    severity: fetchedData.cheif_complaint.severity || '',
-                    course_type: fetchedData.cheif_complaint.course_type || '',
-                    nature_illness: fetchedData.cheif_complaint.nature_illness || '',
-                    identify_trigger: fetchedData.cheif_complaint.identify_trigger || '',
-                    life_changes: fetchedData.cheif_complaint.life_changes || '',
-                    biological: fetchedData.cheif_complaint.biological || '',
-                    psychological: fetchedData.cheif_complaint.psychological || '',
-                    social_environment: fetchedData.cheif_complaint.social_environment || '',
+                    ...cheif_complaint,
+                    date: formatDate(cheif_complaint.date || ''),
+                    chief_complaint: cheif_complaint.chief_complaint || '',
+                    onset_duration: cheif_complaint.onset_duration || '',
+                    nature_symptoms: cheif_complaint.nature_symptoms || '',
+                    severity: cheif_complaint.severity || '',
+                    course_type: cheif_complaint.course_type || '',
+                    nature_illness: cheif_complaint.nature_illness || '',
+                    identify_trigger: cheif_complaint.identify_trigger || '',
+                    life_changes: cheif_complaint.life_changes || '',
+                    biological: cheif_complaint.biological || '',
+                    psychological: cheif_complaint.psychological || '',
+                    social_environment: cheif_complaint.social_environment || '',
                 });
             }
 
-            if (fetchedData.presenting_problems) {
+            if (presenting_problems) {
                 setPresentingData({
-                    ...fetchedData.presenting_problems,
-                    history_presenting: fetchedData.presenting_problems.history_presenting || '',
-                    mood_affect: fetchedData.presenting_problems.mood_affect?.split(',') || [],
-                    though_content: fetchedData.presenting_problems.though_content?.split(',') || [],
-                    though_process: fetchedData.presenting_problems.though_process?.split(',') || [],
-                    perception: fetchedData.presenting_problems.perception?.split(',') || [],
-                    behavioural_changes: fetchedData.presenting_problems.behavioural_changes?.split(',') || [],
-                    sleep_patterns: fetchedData.presenting_problems.sleep_patterns?.split(',') || [],
-                    energy_level: fetchedData.presenting_problems.energy_level || '',
-                    appetite_weight: fetchedData.presenting_problems.appetite_weight || '',
-                    occupation_academic: fetchedData.presenting_problems.occupation_academic || '',
-                    interpersonal_relationship: fetchedData.presenting_problems.interpersonal_relationship || '',
-                    selfCare_activity: fetchedData.presenting_problems.selfCare_activity || '',
-                    recreation_activity: fetchedData.presenting_problems.recreation_activity || '',
+                    ...presenting_problems,
+                    date: formatDate(presenting_problems.date || ''),
+                    history_presenting: presenting_problems.history_presenting || '',
+                    mood_affect: presenting_problems.mood_affect?.split(',') || [],
+                    though_content: presenting_problems.though_content?.split(',') || [],
+                    though_process: presenting_problems.though_process?.split(',') || [],
+                    perception: presenting_problems.perception?.split(',') || [],
+                    behavioural_changes: presenting_problems.behavioural_changes?.split(',') || [],
+                    sleep_patterns: presenting_problems.sleep_patterns?.split(',') || [],
+                    energy_level: presenting_problems.energy_level || '',
+                    appetite_weight: presenting_problems.appetite_weight || '',
+                    occupation_academic: presenting_problems.occupation_academic || '',
+                    interpersonal_relationship: presenting_problems.interpersonal_relationship || '',
+                    selfCare_activity: presenting_problems.selfCare_activity || '',
+                    recreation_activity: presenting_problems.recreation_activity || '',
                 });
             }
 
-            if (fetchedData.psy_history) {
+            if (psy_history) {
                 setPsyHistoryData({
-                    ...fetchedData.psy_history,
-                    psychiatric_diagnoses: fetchedData.psy_history.psychiatric_diagnoses || '',
-                    treatment_history: fetchedData.psy_history.treatment_history || '',
-                    medications: fetchedData.psy_history.medications || '',
-                    dosage: fetchedData.psy_history.dosage || '',
-                    adherence: fetchedData.psy_history.adherence || '',
-                    sideEffect: fetchedData.psy_history.sideEffect || '',
-                    experience_reaction: fetchedData.psy_history.experience_reaction || '',
-                    hospitalisation_reason: fetchedData.psy_history.hospitalisation_reason || '',
-                    duration: fetchedData.psy_history.duration || '',
-                    crisis_episodes: fetchedData.psy_history.crisis_episodes || '',
-                    fm_mentalHealth: fetchedData.psy_history.fm_mentalHealth || '',
-                    significant_life: fetchedData.psy_history.significant_life || '',
-                    chronic_stressors: fetchedData.psy_history.chronic_stressors || '',
-                    trauma_exploration: fetchedData.psy_history.trauma_exploration?.split(',') || [],
-                    legal_environment: fetchedData.psy_history.legal_environment?.split(',') || [],
+                    ...psy_history,
+                    date: formatDate(psy_history.date || ''),
+                    psychiatric_diagnoses: psy_history.psychiatric_diagnoses || '',
+                    treatment_history: psy_history.treatment_history || '',
+                    medications: psy_history.medications || '',
+                    dosage: psy_history.dosage || '',
+                    adherence: psy_history.adherence || '',
+                    sideEffect: psy_history.sideEffect || '',
+                    experience_reaction: psy_history.experience_reaction || '',
+                    hospitalisation_reason: psy_history.hospitalisation_reason || '',
+                    duration: psy_history.duration || '',
+                    crisis_episodes: psy_history.crisis_episodes || '',
+                    fm_mentalHealth: psy_history.fm_mentalHealth || '',
+                    significant_life: psy_history.significant_life || '',
+                    chronic_stressors: psy_history.chronic_stressors || '',
+                    trauma_exploration: psy_history.trauma_exploration?.split(',') || [],
+                    legal_environment: psy_history.legal_environment?.split(',') || [],
                 });
             }
 
-            if (fetchedData.medical_history) {
+            if (medical_history) {
                 setMedicalData({
-                    ...fetchedData.medical_history,
-                    disability_status: fetchedData.medical_history.disability_status,
-                    chronic_medical: fetchedData.medical_history.chronic_medical,
-                    acute_health: fetchedData.medical_history.acute_health,
-                    medication: fetchedData.medical_history.medication,
-                    medication_allergies: fetchedData.medical_history.medication_allergies,
-                    other_allergy: fetchedData.medical_history.other_allergy?.split(',') || [],
-                    significant_medical: fetchedData.medical_history.significant_medical?.split(',') || [],
-                    traumatic_injuries: fetchedData.medical_history.traumatic_injuries,
-                    sexual_health: fetchedData.medical_history.sexual_health?.split(',') || [],
+                    ...medical_history,
+                    date: formatDate(medical_history.date || ''),
+                    disability_status: medical_history.disability_status,
+                    chronic_medical: medical_history.chronic_medical,
+                    acute_health: medical_history.acute_health,
+                    medication: medical_history.medication,
+                    medication_allergies: medical_history.medication_allergies,
+                    other_allergy: medical_history.other_allergy?.split(',') || [],
+                    significant_medical: medical_history.significant_medical?.split(',') || [],
+                    traumatic_injuries: medical_history.traumatic_injuries,
+                    sexual_health: medical_history.sexual_health?.split(',') || [],
                 });
             }
 
-            if (fetchedData.familyhis_data) {
+            if (familyhis_data) {
                 setFamilyData({
-                    ...fetchedData.familyhis_data,
-                    family_composition: fetchedData.familyhis_data.family_composition?.split(',') || [],
-                    family_dynamics: fetchedData.familyhis_data.family_dynamics?.split(',') || [],
-                    marriage_type: fetchedData.familyhis_data.marriage_type,
-                    family_history: fetchedData.familyhis_data.family_history,
-                    genetic_predisposition: fetchedData.familyhis_data.genetic_predisposition,
-                    family_changes: fetchedData.familyhis_data.family_changes?.split(',') || [],
-                    family_substance: fetchedData.familyhis_data.family_substance,
+                    ...familyhis_data,
+                    date: formatDate(familyhis_data.date || ''),
+                    family_composition: familyhis_data.family_composition?.split(',') || [],
+                    family_dynamics: familyhis_data.family_dynamics?.split(',') || [],
+                    marriage_type: familyhis_data.marriage_type,
+                    family_history: familyhis_data.family_history,
+                    genetic_predisposition: familyhis_data.genetic_predisposition,
+                    family_changes: familyhis_data.family_changes?.split(',') || [],
+                    family_substance: familyhis_data.family_substance,
                 });
             }
 
-            if (fetchedData.social_history) {
+            if (social_history) {
                 setSocialData({
-                    ...fetchedData.social_history,
-                    family_relationship: fetchedData.social_history.family_relationship,
-                    socialCircle_relationship: fetchedData.social_history.socialCircle_relationship,
-                    relationship_significant: fetchedData.social_history.relationship_significant,
-                    living_arrangements: fetchedData.social_history.living_arrangements,
-                    education_bg: fetchedData.social_history.education_bg,
-                    currentEmp_status: fetchedData.social_history.currentEmp_status,
-                    socialRecreation_activity: fetchedData.social_history.socialRecreation_activity,
-                    social_outlets: fetchedData.social_history.social_outlets,
-                    socialMed_engagement: fetchedData.social_history.socialMed_engagement,
-                    technology_related: fetchedData.social_history.technology_related,
+                    ...social_history,
+                    date: formatDate(social_history.date || ''),
+                    family_relationship: social_history.family_relationship,
+                    socialCircle_relationship: social_history.socialCircle_relationship,
+                    relationship_significant: social_history.relationship_significant,
+                    living_arrangements: social_history.living_arrangements,
+                    education_bg: social_history.education_bg,
+                    currentEmp_status: social_history.currentEmp_status,
+                    socialRecreation_activity: social_history.socialRecreation_activity,
+                    social_outlets: social_history.social_outlets,
+                    socialMed_engagement: social_history.socialMed_engagement,
+                    technology_related: social_history.technology_related,
                 });
             }
 
-            if (fetchedData.development_history) {
+            if (development_history) {
                 setDeveleopmentData({
-                    ...fetchedData.development_history,
-                    prenatal_factors: fetchedData.development_history.prenatal_factors,
-                    birth_details: fetchedData.development_history.birth_details,
-                    birth_order: fetchedData.development_history.birth_order,
-                    siblings_number: fetchedData.development_history.siblings_number,
-                    bonding_attachment: fetchedData.development_history.bonding_attachment,
-                    milestones_development: fetchedData.development_history.milestones_development,
-                    childhood_illness: fetchedData.development_history.childhood_illness,
-                    siblings_relationship: fetchedData.development_history.siblings_relationship,
-                    parenting_style: fetchedData.development_history.parenting_style,
-                    learning_challenge: fetchedData.development_history.learning_challenge,
-                    pubertal_development: fetchedData.development_history.pubertal_development,
+                    ...development_history,
+                    date: formatDate(development_history.date || ''),
+                    prenatal_factors: development_history.prenatal_factors,
+                    birth_details: development_history.birth_details,
+                    birth_order: development_history.birth_order,
+                    siblings_number: development_history.siblings_number,
+                    bonding_attachment: development_history.bonding_attachment,
+                    milestones_development: development_history.milestones_development,
+                    childhood_illness: development_history.childhood_illness,
+                    siblings_relationship: development_history.siblings_relationship,
+                    parenting_style: development_history.parenting_style,
+                    learning_challenge: development_history.learning_challenge,
+                    pubertal_development: development_history.pubertal_development,
                 });
             }
 
-            if (fetchedData.substance_use) {
+            if (substance_use) {
                 setSubstanceData({
-                    ...fetchedData.substance_use,
-                    substance_use: fetchedData.substance_use.substance_use,
-                    age_onset: fetchedData.substance_use.age_onset,
-                    frequency: fetchedData.substance_use.frequency,
-                    quantity: fetchedData.substance_use.quantity,
-                    motivation_use: fetchedData.substance_use.motivation_use,
-                    environmental_trigger: fetchedData.substance_use.environmental_trigger,
-                    impact_occupation: fetchedData.substance_use.impact_occupation,
-                    impact_interpersonal: fetchedData.substance_use.impact_interpersonal,
-                    financial_consequences: fetchedData.substance_use.financial_consequences,
-                    craving_intensity: fetchedData.substance_use.craving_intensity,
-                    previous_treatment: fetchedData.substance_use.previous_treatment,
-                    relapse_history: fetchedData.substance_use.relapse_history,
+                    ...substance_use,
+                    date: formatDate(substance_use.date || ''),
+                    substance_use: substance_use.substance_use,
+                    age_onset: substance_use.age_onset,
+                    frequency: substance_use.frequency,
+                    quantity: substance_use.quantity,
+                    motivation_use: substance_use.motivation_use,
+                    environmental_trigger: substance_use.environmental_trigger,
+                    impact_occupation: substance_use.impact_occupation,
+                    impact_interpersonal: substance_use.impact_interpersonal,
+                    financial_consequences: substance_use.financial_consequences,
+                    craving_intensity: substance_use.craving_intensity,
+                    previous_treatment: substance_use.previous_treatment,
+                    relapse_history: substance_use.relapse_history,
                 });
             }
 
-            if (fetchedData.suicidal_data) {
+            if (suicidal_data) {
                 setSuicidalData({
-                    ...fetchedData.suicidal_data,
-                    suicide_history: fetchedData.suicidal_data.suicide_history,
-                    triggers_stressors: fetchedData.suicidal_data.triggers_stressors,
-                    homicidal_ideation: fetchedData.suicidal_data.homicidal_ideation,
-                    target_method: fetchedData.suicidal_data.target_method,
-                    immediate_threat: fetchedData.suicidal_data.immediate_threat,
-                    emergency_response: fetchedData.suicidal_data.emergency_response,
-                    hospital_required: fetchedData.suicidal_data.hospital_required
+                    ...suicidal_data,
+                    date: formatDate(suicidal_data.date || ''),
+                    suicide_history: suicidal_data.suicide_history,
+                    triggers_stressors: suicidal_data.triggers_stressors,
+                    homicidal_ideation: suicidal_data.homicidal_ideation,
+                    target_method: suicidal_data.target_method,
+                    immediate_threat: suicidal_data.immediate_threat,
+                    emergency_response: suicidal_data.emergency_response,
+                    hospital_required: suicidal_data.hospital_required
                 });
             }
 
-            // ✅ Now trigger PDF generation
             setShouldGeneratePDF(true);
 
         } catch (error) {
@@ -1765,6 +1797,7 @@ function Psychiatrics_form() {
             alert("This form does not have a valid admission number");
         }
     };
+
 
 
     useEffect(() => {
@@ -1949,8 +1982,8 @@ function Psychiatrics_form() {
                                 <input type="radio" name="pcss3t" id="tab10" className="tab-content-10" />
                                 <label htmlFor="tab10">Suicidal and Homicidal Ideation</label>
 
-                                <input type="radio" name="pcss3t" id="tab11" className="tab-content-last" onClick={handleNavigateMSE} />
-                                <label htmlFor="tab11">MSE</label>
+                                {/* <input type="radio" name="pcss3t" id="tab11" className="tab-content-last" onClick={handleNavigateMSE} />
+                                <label htmlFor="tab11">MSE</label> */}
 
 
                                 <ul>
@@ -5090,7 +5123,7 @@ function Psychiatrics_form() {
 
                 <ul style={{ listStyleType: "none", textAlign: "start" }}>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>DEMOGRAPHIC INFORMATION</strong></h5>
+                        <h5 className='pdf_heading'><strong>DEMOGRAPHIC INFORMATION</strong> DATE: {formData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <li className='d-flex'>
                                 <strong>Name : </strong>
@@ -5156,7 +5189,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>THE CHIEF COMPLAINT</strong></h5>
+                        <h5 className='pdf_heading'><strong>THE CHIEF COMPLAINT</strong> DATE: {chiefData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <h5>The Chief Complaint:</h5>
                             <li className='d-flex'>
@@ -5209,7 +5242,7 @@ function Psychiatrics_form() {
                     </li>
 
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>PRESENTING PROBLEMS</strong></h5>
+                        <h5 className='pdf_heading'><strong>PRESENTING PROBLEMS</strong> DATE: {presentingData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <h5>Introduction to Presenting Problems:</h5>
 
@@ -5301,7 +5334,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>PSYCHIATRIC HISTORY</strong></h5>
+                        <h5 className='pdf_heading'><strong>PSYCHIATRIC HISTORY</strong> DATE: {psyHistoryData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
 
                             <li className='d-flex'>
@@ -5377,7 +5410,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>MEDICAL HISTORY</strong></h5>
+                        <h5 className='pdf_heading'><strong>MEDICAL HISTORY</strong> DATE: {medicalData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <li className='d-flex'>
                                 <strong>Disability Status (Physical or Psychological) :</strong>
@@ -5430,7 +5463,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>FAMILY HISTORY</strong></h5>
+                        <h5 className='pdf_heading'><strong>FAMILY HISTORY</strong> DATE: {familyData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <li className='d-flex'>
                                 <strong>Family Composition:</strong>
@@ -5471,7 +5504,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>SOCIAL HISTORY</strong></h5>
+                        <h5 className='pdf_heading'><strong>SOCIAL HISTORY</strong> DATE: {socialData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <li className='d-flex'>
                                 <strong>Relationship with Family : </strong>
@@ -5516,7 +5549,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>DEVELOPMENTAL HISTORY</strong></h5>
+                        <h5 className='pdf_heading'><strong>DEVELOPMENTAL HISTORY</strong> DATE: {developmentalData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <li className='d-flex'>
                                 <strong>Prenatal Factors : </strong>
@@ -5565,7 +5598,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3 mt-5">
-                        <h5 className='pdf_heading'><strong>SUBSTANCE USE HISTORY</strong></h5>
+                        <h5 className='pdf_heading'><strong>SUBSTANCE USE HISTORY</strong> DATE: {substanceData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <li className='d-flex'>
                                 <strong>Types of Substances Used : </strong>
@@ -5618,7 +5651,7 @@ function Psychiatrics_form() {
                         </ul>
                     </li>
                     <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>SUICIDAL AND HOMICIDAL IDEATION</strong></h5>
+                        <h5 className='pdf_heading'><strong>SUICIDAL AND HOMICIDAL IDEATION</strong> DATE: {substanceData.date}</h5>
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
                             <li className='d-flex'>
                                 <strong>History of Suicide Attempts : </strong>

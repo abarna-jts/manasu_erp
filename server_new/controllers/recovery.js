@@ -2207,37 +2207,92 @@ const getallPsychiatric = async (req, res) => {
   try {
     const admission_no = req.params.admission_no;
 
-    const query = (q) => db.query(q, [admission_no]);
+    // Step 1: Get all basic_detail entries by admission_no
+    const [basicEntries] = await db.query(
+      `SELECT * FROM basic_detail WHERE admission_no = ? ORDER BY date ASC`,
+      [admission_no]
+    );
 
-    const [basic_detail] = await query(`SELECT * FROM basic_detail WHERE admission_no = ?`);
-    const [cheif_complaint] = await query(`SELECT * FROM cheif_complaint WHERE admission_no = ?`);
-    const [presenting_problems] = await query(`SELECT * FROM presenting_problems WHERE admission_no = ?`);
-    const [psy_history] = await query(`SELECT * FROM psy_history WHERE admission_no = ?`);
-    const [medical_history] = await query(`SELECT * FROM medical_history WHERE admission_no = ?`);
-    const [familyhis_data] = await query(`SELECT * FROM familyhis_data WHERE admission_no = ?`);
-    const [social_history] = await query(`SELECT * FROM social_history WHERE admission_no = ?`);
-    const [development_history] = await query(`SELECT * FROM development_history WHERE admission_no = ?`);
-    const [substance_use] = await query(`SELECT * FROM substance_use WHERE admission_no = ?`);
-    const [suicidal_data] = await query(`SELECT * FROM suicidal_data WHERE admission_no = ?`);
+    if (basicEntries.length === 0) {
+      return res.status(404).json({ message: "No data found" });
+    }
 
-    return res.status(200).json({
-      basic_detail: basic_detail[0] || null,
-      cheif_complaint: cheif_complaint[0] || null,
-      presenting_problems: presenting_problems[0] || null,
-      psy_history: psy_history[0] || null,
-      medical_history: medical_history[0] || null,
-      familyhis_data: familyhis_data[0] || null,
-      social_history: social_history[0] || null,
-      development_history: development_history[0] || null,
-      substance_use: substance_use[0] || null,
-      suicidal_data: suicidal_data[0] || null
-    });
+    const fullForms = [];
+
+    for (const basic of basicEntries) {
+      const date = basic.date;
+
+      // For each form table, get row where admission_no and date match
+      const [cheif_complaint] = await db.query(
+        `SELECT * FROM cheif_complaint WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [presenting_problems] = await db.query(
+        `SELECT * FROM presenting_problems WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [psy_history] = await db.query(
+        `SELECT * FROM psy_history WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [medical_history] = await db.query(
+        `SELECT * FROM medical_history WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [familyhis_data] = await db.query(
+        `SELECT * FROM familyhis_data WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [social_history] = await db.query(
+        `SELECT * FROM social_history WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [development_history] = await db.query(
+        `SELECT * FROM development_history WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [substance_use] = await db.query(
+        `SELECT * FROM substance_use WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [suicidal_data] = await db.query(
+        `SELECT * FROM suicidal_data WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      // Combine into one full set
+      fullForms.push({
+        date: basic.date,
+        basic_detail: basic || null,
+        cheif_complaint: cheif_complaint[0] || null,
+        presenting_problems: presenting_problems[0] || null,
+        psy_history: psy_history[0] || null,
+        medical_history: medical_history[0] || null,
+        familyhis_data: familyhis_data[0] || null,
+        social_history: social_history[0] || null,
+        development_history: development_history[0] || null,
+        substance_use: substance_use[0] || null,
+        suicidal_data: suicidal_data[0] || null
+      });
+    }
+
+    return res.status(200).json(fullForms);
 
   } catch (error) {
-    console.error("Error fetching Psychiatric form data:", error);
+    console.error("Error fetching psychiatric form data:", error);
     return res.status(500).json({ message: "Internal server error", error });
   }
-}
+};
+
+ 
 
 export {
   createMSEForm,

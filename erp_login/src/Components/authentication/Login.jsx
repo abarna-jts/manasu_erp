@@ -19,36 +19,22 @@ function Login() {
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-        e.preventDefault(); // Prevent form default submission behavior
-        console.log("Button functionality working");
+        e.preventDefault();
 
         try {
             const res = await apiRoute.post('/api/login', form);
 
-            // Save JWT token
-            setToken(res.data.token);
-            localStorage.setItem('jwt', res.data.token);
+            // ✅ Save token
+            const token = res.data.token;
+            localStorage.setItem('jwt', token);
 
             const userType = res.data.usertype;
-            Cookies.set('usertype', userType);
-
-            console.log("Login successful:", res.data);
+            Cookies.set('usertype', userType); // you're already doing this
 
             navigate('/dashboard');
         } catch (err) {
-            const status = err.response?.status;
-            const message = err.response?.data?.message || 'Login failed. Please try again.';
-
-            if (status === 401 && message === "Invalid email or password") {
-                alert("Invalid email or password");
-            } else if (status === 404 && message === "User not found") {
-                alert("User not found. Please register first.");
-            } else if (status === 400 && message === "Email already registered") {
-                alert("Email ID is already registered"); // Usually not a login case, but still handling it
-            } else {
-                alert(message); // Generic fallback
-            }
-
+            const message = err.response?.data?.message || 'Login failed';
+            alert(message);
             console.error("Login error:", message);
         }
     };

@@ -29,6 +29,7 @@ function Prescription_form() {
         op_no: '',
         hospital_name: '',
         department: '',
+        diagnosis:'',
         masterHealthCheckup: '',
         medical_type: '',
         instruction: '',
@@ -58,6 +59,7 @@ function Prescription_form() {
         op_no: '',
         hospital_name: '',
         department: '',
+        diagnosis:'',
         masterHealthCheckup: '',
         instruction: '',
         medical_type: '',
@@ -292,6 +294,7 @@ function Prescription_form() {
                 op_no: '',
                 hospital_name: '',
                 department: '',
+                diagnosis:'',
                 masterHealthCheckup: '',
                 medical_type: '',
                 instruction: '',
@@ -458,7 +461,7 @@ function Prescription_form() {
                 ) {
                     console.log("Detected row-wise medicine format.");
                     setViewData({
-                        ...data,
+                        ...data.prescription,
                         prescription_medicines: meds,
                     });
                 } else {
@@ -491,14 +494,14 @@ function Prescription_form() {
                     console.log("Parsed intake values:", intakes);
 
                     setViewData({
-                        ...data,
+                        ...data.prescription,
                         prescription_medicines: formattedMeds,
                     });
                 }
             } else {
                 console.warn("No valid prescription_medicines data.");
                 setViewData({
-                    ...data,
+                    ...data.prescription,
                     prescription_medicines: [],
                 });
             }
@@ -802,12 +805,29 @@ function Prescription_form() {
                             </Col>
                         </Row>
                         <Row className='d-flex align-items-center justify-content-start'>
-                            <Col md={6}>
+                            <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
+                                    <Form.Label column sm="5" style={{ paddingRight: "5px" }}>
+                                        Diagnosis:
+                                    </Form.Label>
+                                    <Col sm="7">
+                                        <Form.Control
+                                            type='text'
+                                            name="diagnosis"
+                                            value={formData.diagnosis}
+                                            onChange={handleInputChange}
+                                            required
+                                        >
+                                        </Form.Control>
+                                    </Col>
+                                </Form.Group>
+                            </Col>
+                            <Col md={4}>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="8" style={{ paddingRight: "5px" }}>
                                         Master Health Check UP: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
-                                    <Col sm="5" className='d-flex align-items-center justify-content-start'>
+                                    <Col sm="4" className='d-flex align-items-center justify-content-start'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -830,7 +850,7 @@ function Prescription_form() {
                             </Col>
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
+                                    <Form.Label column sm="6" style={{ paddingRight: "5px" , textAlign:"end"}}>
                                         Medicine Type: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
@@ -1103,7 +1123,6 @@ function Prescription_form() {
                                     </Col>
                                 </Row>
                                 <Row>
-
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Hospital Name:</Form.Label>
@@ -1122,7 +1141,14 @@ function Prescription_form() {
                                     </Col>
                                 </Row>
                                 <Row>
-
+                                    <Col md={6}>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="5">Diagnosis:</Form.Label>
+                                            <Col sm="7">
+                                                <Form.Control readOnly value={viewData.diagnosis} />
+                                            </Col>
+                                        </Form.Group>
+                                    </Col>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Date:</Form.Label>
@@ -1131,6 +1157,9 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
+                                    
+                                </Row>
+                                <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Instruction:</Form.Label>
@@ -1139,9 +1168,6 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
-                                </Row>
-                                <Row>
-
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Advice:</Form.Label>
@@ -1150,6 +1176,9 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
+                                    
+                                </Row>
+                                <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
                                             <Form.Label column sm="5">Follow Up:</Form.Label>
@@ -1311,12 +1340,29 @@ function Prescription_form() {
                             </Col>
                         </Row>
                         <Row className='d-flex align-items-center justify-content-start'>
-                            <Col md={5}>
+                            <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
+                                    <Form.Label column sm="5" style={{ paddingRight: "5px" }}>
+                                        Diagnosis:
+                                    </Form.Label>
+                                    <Col sm="7">
+                                        <Form.Control
+                                            type='text'
+                                            name="diagnosis"
+                                            value={viewData.diagnosis}
+                                            onChange={handleInputChange1}
+                                            required
+                                        >
+                                        </Form.Control>
+                                    </Col>
+                                </Form.Group>
+                            </Col>
+                            <Col md={4}>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="8" style={{ paddingRight: "5px" }}>
                                         Master Health Check UP:
                                     </Form.Label>
-                                    <Col sm="5" className='d-flex align-items-center justify-content-start'>
+                                    <Col sm="4" className='d-flex align-items-center justify-content-start'>
                                         <Form.Check
                                             type="radio"
                                             label="Yes"
@@ -1339,7 +1385,7 @@ function Prescription_form() {
                             </Col>
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="6" style={{ paddingRight: "5px" }}>
+                                    <Form.Label column sm="6" style={{ paddingRight: "5px" , textAlign:"end"}}>
                                         Medicine Type:
                                     </Form.Label>
                                     <Col sm="6">
@@ -1356,9 +1402,7 @@ function Prescription_form() {
                                     </Col>
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
-
-                            </Col>
+                            
 
                         </Row>
                         <Row className='d-flex align-items-center justify-content-center'>
