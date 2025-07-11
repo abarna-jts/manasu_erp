@@ -40,6 +40,7 @@ function Psychiatrics_form() {
     const handleSubstanceClose = () => setSubstanceShow(false);
     const handleSuicideClose = () => setSuicidalShow(false);
     const [shouldGeneratePDF, setShouldGeneratePDF] = useState(false);
+    const [allFormEntries, setAllFormEntries] = useState([]);
 
     const [formData, setFormData] = useState({
         admission_no: '',
@@ -940,9 +941,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_information/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_information/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setFormData(prev => ({
@@ -978,9 +983,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_chiefComplaint/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_chiefComplaint/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setChiefData(prev => ({
@@ -1011,9 +1020,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_presentingData/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_presentingData/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setPresentingData(prev => ({
@@ -1046,9 +1059,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_psychiatric/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_psychiatric/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setPsyHistoryData(prev => ({
@@ -1083,9 +1100,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_medicalHistory/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_medicalHistory/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setMedicalData(prev => ({
@@ -1114,9 +1135,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_familyHistory/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_familyHistory/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setFamilyData(prev => ({
@@ -1144,9 +1169,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_SocialHistory/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_SocialHistory/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setSocialData(prev => ({
@@ -1176,9 +1205,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_DevelopmentalHistory/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_DevelopmentalHistory/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setDeveleopmentData(prev => ({
@@ -1208,9 +1241,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_substance/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_substance/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setSubstanceData(prev => ({
@@ -1241,9 +1278,13 @@ function Psychiatrics_form() {
             alert("Please enter admission number.");
             return;
         }
+        if (!date.trim()) {
+            alert("Please enter Date of your updation admission_no.");
+            return;
+        }
         console.log(admission_no);
         try {
-            const response = await apiRoute.get(`/recovery/get_suicidal/${admission_no}`);
+            const response = await apiRoute.get(`/recovery/get_suicidal/${admission_no}/${date}`);
             const data = response.data;
             console.log(response.data);
             setSuicidalData(prev => ({
@@ -1264,11 +1305,11 @@ function Psychiatrics_form() {
         }
     }
 
-    const handleUpdate = async (e, admission_no) => {
+    const handleUpdate = async (e, admission_no, date) => {
         e.preventDefault();
 
         try {
-            const res = await apiRoute.post(`/recovery/updateInformation/${admission_no}`, formData, {
+            const res = await apiRoute.post(`/recovery/updateInformation/${admission_no}/${date}`, formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1301,10 +1342,10 @@ function Psychiatrics_form() {
         }
     };
 
-    const handleCheifUpdate = async (e, admission_no) => {
+    const handleCheifUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updateCheifComplaint/${admission_no}`, chiefData, {
+            const res = await apiRoute.post(`/recovery/updateCheifComplaint/${admission_no}/${date}`, chiefData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1330,10 +1371,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handlePresentingUpdate = async (e, admission_no) => {
+    const handlePresentingUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updatePresentingData/${admission_no}`, presentingData, {
+            const res = await apiRoute.post(`/recovery/updatePresentingData/${admission_no}/${date}`, presentingData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1361,10 +1402,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handlePsyciatricUpdate = async (e, admission_no) => {
+    const handlePsyciatricUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updatePsychiatricData/${admission_no}`, psyHistoryData, {
+            const res = await apiRoute.post(`/recovery/updatePsychiatricData/${admission_no}/${date}`, psyHistoryData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1394,10 +1435,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handleMedicalUpdate = async (e, admission_no) => {
+    const handleMedicalUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updateMedicalHistory/${admission_no}`, medicalData, {
+            const res = await apiRoute.post(`/recovery/updateMedicalHistory/${admission_no}/${date}`, medicalData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1421,10 +1462,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handleFamilyUpdate = async (e, admission_no) => {
+    const handleFamilyUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updateFamilyHistory/${admission_no}`, familyData, {
+            const res = await apiRoute.post(`/recovery/updateFamilyHistory/${admission_no}/${date}`, familyData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1446,10 +1487,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handleSocialUpdate = async (e, admission_no) => {
+    const handleSocialUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updateSocialHistory/${admission_no}`, socialData, {
+            const res = await apiRoute.post(`/recovery/updateSocialHistory/${admission_no}/${date}`, socialData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1474,10 +1515,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handleSuicidalUpdate = async (e, admission_no) => {
+    const handleSuicidalUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updateSuicidal/${admission_no}`, suicidalData, {
+            const res = await apiRoute.post(`/recovery/updateSuicidal/${admission_no}/${date}`, suicidalData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1499,10 +1540,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handleDevelopmentalUpdate = async (e, admission_no) => {
+    const handleDevelopmentalUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updateDevelopmentalHistory/${admission_no}`, developmentalData, {
+            const res = await apiRoute.post(`/recovery/updateDevelopmentalHistory/${admission_no}/${date}`, developmentalData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1538,10 +1579,10 @@ function Psychiatrics_form() {
         }
     }
 
-    const handleSubstanceUpdate = async (e, admission_no) => {
+    const handleSubstanceUpdate = async (e, admission_no, date) => {
         e.preventDefault();
         try {
-            const res = await apiRoute.post(`/recovery/updateSubstance/${admission_no}`, substanceData, {
+            const res = await apiRoute.post(`/recovery/updateSubstance/${admission_no}/${date}`, substanceData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -1577,9 +1618,9 @@ function Psychiatrics_form() {
         const formatDate = (dateString) => {
             if (!dateString) return '';
             const dateObj = new Date(dateString);
-            if (isNaN(dateObj)) return dateString; // fallback for invalid dates
+            if (isNaN(dateObj)) return dateString;
             const day = String(dateObj.getDate()).padStart(2, '0');
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // months start from 0
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
             const year = dateObj.getFullYear();
             return `${day}-${month}-${year}`;
         };
@@ -1593,210 +1634,74 @@ function Psychiatrics_form() {
                 return;
             }
 
-            // 👉 You can change this to let user pick a date
-            const latestEntry = fetchedData[fetchedData.length - 1];
+            // Map and format all entries
+            const formattedEntries = fetchedData.map(entry => ({
+                basic_detail: {
+                    ...entry.basic_detail,
+                    date: formatDate(entry.basic_detail?.date || '')
+                },
+                cheif_complaint: {
+                    ...entry.cheif_complaint,
+                    date: formatDate(entry.cheif_complaint?.date || '')
+                },
+                // Add all other sections like presenting_problems, etc.
+                presenting_problems: {
+                    ...entry.presenting_problems,
+                    date: formatDate(entry.presenting_problems?.date || ''),
+                    mood_affect: entry.presenting_problems?.mood_affect?.split(',') || ["NULL"],
+                    though_content: entry.presenting_problems?.though_content?.split(',') || ["NULL"],
+                    though_process: entry.presenting_problems?.though_process?.split(',') || ["NULL"],
+                    perception: entry.presenting_problems?.perception?.split(',') || ["NULL"],
+                    behavioural_changes: entry.presenting_problems?.behavioural_changes?.split(',') || ["NULL"],
+                    sleep_patterns: entry.presenting_problems?.sleep_patterns?.split(',') || ["NULL"],
+                    sexual_health: entry.medical_history?.sexual_health?.split(',') || ["NULL"],
+                    // ... more arrays you need to split
+                },
+                psy_history: {
+                    ...entry.psy_history,
+                    date: formatDate(entry.psy_history?.date || ''),
+                    trauma_exploration: entry.psy_history?.trauma_exploration?.split(',') || ["NULL"],
+                    legal_environment: entry.psy_history?.legal_environment?.split(',') || ["NULL"]
+                },
+                medical_history: {
+                    ...entry.medical_history,
+                    date: formatDate(entry.medical_history?.date || ''),
+                    other_allergy: entry.medical_history?.other_allergy?.split(',') || ["NULL"],
+                    significant_medical: entry.medical_history?.significant_medical?.split(',') || ["NULL"]
+                },
+                familyhis_data: {
+                    ...entry.familyhis_data,
+                    date: formatDate(entry.familyhis_data?.date || ''),
+                    family_composition: entry.familyhis_data?.family_composition?.split(',') || ["NULL"],
+                    family_dynamics: entry.familyhis_data?.family_dynamics?.split(',') || ["NULL"],
+                    family_changes: entry.familyhis_data?.family_changes?.split(',') || ["NULL"]
+                },
+                social_history: {
+                    ...entry.social_history,
+                    date: formatDate(entry.social_history?.date || '')
+                },
+                development_history: {
+                    ...entry.development_history,
+                    date: formatDate(entry.development_history?.date || '')
+                },
+                substance_use: {
+                    ...entry.substance_use,
+                    date: formatDate(entry.substance_use?.date || '')
+                },
+                suicidal_data: {
+                    ...entry.suicidal_data,
+                    date: formatDate(entry.suicidal_data?.date || '')
+                }
+            }));
 
-            const {
-                basic_detail,
-                cheif_complaint,
-                presenting_problems,
-                psy_history,
-                medical_history,
-                familyhis_data,
-                social_history,
-                development_history,
-                substance_use,
-                suicidal_data
-            } = latestEntry;
-
-            if (basic_detail) {
-                setFormData({
-                    ...basic_detail,
-                    date: formatDate(basic_detail.date || ''),
-                    patient_name: basic_detail.patient_name || '',
-                    patient_age: basic_detail.patient_age || '',
-                    patient_gender: basic_detail.patient_gender || '',
-                    sexual_orientation: basic_detail.sexual_orientation || '',
-                    education_bg: basic_detail.education_bg || '',
-                    occupation: basic_detail.occupation || '',
-                    marital_status: basic_detail.marital_status || '',
-                    economic_status: basic_detail.economic_status || '',
-                    religion: basic_detail.religion || '',
-                    informant: basic_detail.informant || '',
-                    residential_address: basic_detail.residential_address || '',
-                    living_arrangements: basic_detail.living_arrangements || '',
-                    family_structure: basic_detail.family_structure || '',
-                    cultural_identity: basic_detail.cultural_identity || '',
-                    language1: basic_detail.language1 || '',
-                    language2: basic_detail.language2 || '',
-                });
-            }
-
-            if (cheif_complaint) {
-                setChiefData({
-                    ...cheif_complaint,
-                    date: formatDate(cheif_complaint.date || ''),
-                    chief_complaint: cheif_complaint.chief_complaint || '',
-                    onset_duration: cheif_complaint.onset_duration || '',
-                    nature_symptoms: cheif_complaint.nature_symptoms || '',
-                    severity: cheif_complaint.severity || '',
-                    course_type: cheif_complaint.course_type || '',
-                    nature_illness: cheif_complaint.nature_illness || '',
-                    identify_trigger: cheif_complaint.identify_trigger || '',
-                    life_changes: cheif_complaint.life_changes || '',
-                    biological: cheif_complaint.biological || '',
-                    psychological: cheif_complaint.psychological || '',
-                    social_environment: cheif_complaint.social_environment || '',
-                });
-            }
-
-            if (presenting_problems) {
-                setPresentingData({
-                    ...presenting_problems,
-                    date: formatDate(presenting_problems.date || ''),
-                    history_presenting: presenting_problems.history_presenting || '',
-                    mood_affect: presenting_problems.mood_affect?.split(',') || [],
-                    though_content: presenting_problems.though_content?.split(',') || [],
-                    though_process: presenting_problems.though_process?.split(',') || [],
-                    perception: presenting_problems.perception?.split(',') || [],
-                    behavioural_changes: presenting_problems.behavioural_changes?.split(',') || [],
-                    sleep_patterns: presenting_problems.sleep_patterns?.split(',') || [],
-                    energy_level: presenting_problems.energy_level || '',
-                    appetite_weight: presenting_problems.appetite_weight || '',
-                    occupation_academic: presenting_problems.occupation_academic || '',
-                    interpersonal_relationship: presenting_problems.interpersonal_relationship || '',
-                    selfCare_activity: presenting_problems.selfCare_activity || '',
-                    recreation_activity: presenting_problems.recreation_activity || '',
-                });
-            }
-
-            if (psy_history) {
-                setPsyHistoryData({
-                    ...psy_history,
-                    date: formatDate(psy_history.date || ''),
-                    psychiatric_diagnoses: psy_history.psychiatric_diagnoses || '',
-                    treatment_history: psy_history.treatment_history || '',
-                    medications: psy_history.medications || '',
-                    dosage: psy_history.dosage || '',
-                    adherence: psy_history.adherence || '',
-                    sideEffect: psy_history.sideEffect || '',
-                    experience_reaction: psy_history.experience_reaction || '',
-                    hospitalisation_reason: psy_history.hospitalisation_reason || '',
-                    duration: psy_history.duration || '',
-                    crisis_episodes: psy_history.crisis_episodes || '',
-                    fm_mentalHealth: psy_history.fm_mentalHealth || '',
-                    significant_life: psy_history.significant_life || '',
-                    chronic_stressors: psy_history.chronic_stressors || '',
-                    trauma_exploration: psy_history.trauma_exploration?.split(',') || [],
-                    legal_environment: psy_history.legal_environment?.split(',') || [],
-                });
-            }
-
-            if (medical_history) {
-                setMedicalData({
-                    ...medical_history,
-                    date: formatDate(medical_history.date || ''),
-                    disability_status: medical_history.disability_status,
-                    chronic_medical: medical_history.chronic_medical,
-                    acute_health: medical_history.acute_health,
-                    medication: medical_history.medication,
-                    medication_allergies: medical_history.medication_allergies,
-                    other_allergy: medical_history.other_allergy?.split(',') || [],
-                    significant_medical: medical_history.significant_medical?.split(',') || [],
-                    traumatic_injuries: medical_history.traumatic_injuries,
-                    sexual_health: medical_history.sexual_health?.split(',') || [],
-                });
-            }
-
-            if (familyhis_data) {
-                setFamilyData({
-                    ...familyhis_data,
-                    date: formatDate(familyhis_data.date || ''),
-                    family_composition: familyhis_data.family_composition?.split(',') || [],
-                    family_dynamics: familyhis_data.family_dynamics?.split(',') || [],
-                    marriage_type: familyhis_data.marriage_type,
-                    family_history: familyhis_data.family_history,
-                    genetic_predisposition: familyhis_data.genetic_predisposition,
-                    family_changes: familyhis_data.family_changes?.split(',') || [],
-                    family_substance: familyhis_data.family_substance,
-                });
-            }
-
-            if (social_history) {
-                setSocialData({
-                    ...social_history,
-                    date: formatDate(social_history.date || ''),
-                    family_relationship: social_history.family_relationship,
-                    socialCircle_relationship: social_history.socialCircle_relationship,
-                    relationship_significant: social_history.relationship_significant,
-                    living_arrangements: social_history.living_arrangements,
-                    education_bg: social_history.education_bg,
-                    currentEmp_status: social_history.currentEmp_status,
-                    socialRecreation_activity: social_history.socialRecreation_activity,
-                    social_outlets: social_history.social_outlets,
-                    socialMed_engagement: social_history.socialMed_engagement,
-                    technology_related: social_history.technology_related,
-                });
-            }
-
-            if (development_history) {
-                setDeveleopmentData({
-                    ...development_history,
-                    date: formatDate(development_history.date || ''),
-                    prenatal_factors: development_history.prenatal_factors,
-                    birth_details: development_history.birth_details,
-                    birth_order: development_history.birth_order,
-                    siblings_number: development_history.siblings_number,
-                    bonding_attachment: development_history.bonding_attachment,
-                    milestones_development: development_history.milestones_development,
-                    childhood_illness: development_history.childhood_illness,
-                    siblings_relationship: development_history.siblings_relationship,
-                    parenting_style: development_history.parenting_style,
-                    learning_challenge: development_history.learning_challenge,
-                    pubertal_development: development_history.pubertal_development,
-                });
-            }
-
-            if (substance_use) {
-                setSubstanceData({
-                    ...substance_use,
-                    date: formatDate(substance_use.date || ''),
-                    substance_use: substance_use.substance_use,
-                    age_onset: substance_use.age_onset,
-                    frequency: substance_use.frequency,
-                    quantity: substance_use.quantity,
-                    motivation_use: substance_use.motivation_use,
-                    environmental_trigger: substance_use.environmental_trigger,
-                    impact_occupation: substance_use.impact_occupation,
-                    impact_interpersonal: substance_use.impact_interpersonal,
-                    financial_consequences: substance_use.financial_consequences,
-                    craving_intensity: substance_use.craving_intensity,
-                    previous_treatment: substance_use.previous_treatment,
-                    relapse_history: substance_use.relapse_history,
-                });
-            }
-
-            if (suicidal_data) {
-                setSuicidalData({
-                    ...suicidal_data,
-                    date: formatDate(suicidal_data.date || ''),
-                    suicide_history: suicidal_data.suicide_history,
-                    triggers_stressors: suicidal_data.triggers_stressors,
-                    homicidal_ideation: suicidal_data.homicidal_ideation,
-                    target_method: suicidal_data.target_method,
-                    immediate_threat: suicidal_data.immediate_threat,
-                    emergency_response: suicidal_data.emergency_response,
-                    hospital_required: suicidal_data.hospital_required
-                });
-            }
-
+            setAllFormEntries(formattedEntries);
             setShouldGeneratePDF(true);
-
         } catch (error) {
-            console.error("Error fetching or downloading:", error);
+            console.error("Error fetching data:", error);
             alert("This form does not have a valid admission number");
         }
     };
+
 
 
 
@@ -3796,7 +3701,7 @@ function Psychiatrics_form() {
                             </Form.Group>
 
                             <div className="mt-3">
-                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, formData.admission_no)}>Update</Button>
+                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, formData.admission_no, date)}>Update</Button>
                                 <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
                             </div>
 
@@ -3955,7 +3860,7 @@ function Psychiatrics_form() {
                             </Col>
                         </Form.Group>
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleCheifUpdate(e, chiefData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleCheifUpdate(e, chiefData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handleChiefClose}>Close</Button>
                         </div>
                     </Form>
@@ -4127,7 +4032,7 @@ function Psychiatrics_form() {
                         </Form.Group>
 
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePresentingUpdate(e, presentingData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePresentingUpdate(e, presentingData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handlePresentingClose}>Close</Button>
                         </div>
                     </Form>
@@ -4322,7 +4227,7 @@ function Psychiatrics_form() {
                         </Form.Group>
 
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePsyciatricUpdate(e, psyHistoryData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePsyciatricUpdate(e, psyHistoryData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handlePsychiatriClose}>Close</Button>
                         </div>
 
@@ -4443,7 +4348,7 @@ function Psychiatrics_form() {
                             </div>
                         </Form.Group>
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleMedicalUpdate(e, medicalData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleMedicalUpdate(e, medicalData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handleMedicalClose}>Close</Button>
                         </div>
                     </Form>
@@ -4543,7 +4448,7 @@ function Psychiatrics_form() {
                                 required />
                         </Form.Group>
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleFamilyUpdate(e, familyData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleFamilyUpdate(e, familyData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handleFamilyClose}>Close</Button>
                         </div>
                     </Form>
@@ -4676,7 +4581,7 @@ function Psychiatrics_form() {
                                 required />
                         </Form.Group>
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSocialUpdate(e, socialData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSocialUpdate(e, socialData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handleSocialClose}>Close</Button>
                         </div>
                     </Form>
@@ -4823,7 +4728,7 @@ function Psychiatrics_form() {
                                 required />
                         </Form.Group>
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleDevelopmentalUpdate(e, developmentalData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleDevelopmentalUpdate(e, developmentalData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handleDevelopmentalClose}>Close</Button>
                         </div>
                     </Form>
@@ -4982,7 +4887,7 @@ function Psychiatrics_form() {
                                 required />
                         </Form.Group>
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSubstanceUpdate(e, substanceData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSubstanceUpdate(e, substanceData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handleSubstanceClose}>Close</Button>
                         </div>
                     </Form>
@@ -5104,7 +5009,7 @@ function Psychiatrics_form() {
                             />
                         </Form.Group>
                         <div className="mt-3">
-                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSuicidalUpdate(e, suicidalData.admission_no)}>Update</Button>
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSuicidalUpdate(e, suicidalData.admission_no, date)}>Update</Button>
                             <Button variant="secondary" className="m-1" onClick={handleSuicideClose}>Close</Button>
                         </div>
                     </Form>
@@ -5117,574 +5022,527 @@ function Psychiatrics_form() {
                         <img src={manasu_logo} className="pdf_logo" alt="" />
                     </Col>
                     <Col md={10}>
-                        <h4 className="text-center">Mental Status Examination (MSE)</h4>
                     </Col>
                 </Row>
+                {allFormEntries.map((entry, index) => (
+                    <div key={index} style={{ pageBreakAfter: "always" }}>
+                        {/* BASIC DETAILS */}
+                        <Row className="d-flex align-items-center justify-content-center mb-2">
+                            <Col md={1}>
 
-                <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>DEMOGRAPHIC INFORMATION</strong> DATE: {formData.date}</h5>
+                            </Col>
+                            <Col md={11}>
+                                <h4 className="text-center">Psychiatrics Case History of {entry.basic_detail?.date}</h4>
+                            </Col>
+                        </Row>
+
                         <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <li className='d-flex'>
-                                <strong>Name : </strong>
-                                <p className='mx-3'>{formData.patient_name}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Age : </strong>
-                                <p className='mx-3'>{formData.patient_age}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Gender : </strong>
-                                <p className='mx-3'>{formData.patient_gender}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Sexual Orientation : </strong>
-                                <p className='mx-3'>{formData.sexual_orientation}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Educational Background : </strong>
-                                <p className='mx-3'>{formData.education_bg}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Occupation and Employment Status : </strong>
-                                <p className='mx-3'>{formData.occupation}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Marital Status : </strong>
-                                <p className='mx-3'>{formData.marital_status}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Socio Economic Status : </strong>
-                                <p className='mx-3'>{formData.economic_status}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Religion : </strong>
-                                <p className='mx-3'>{formData.religion}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Informant : </strong>
-                                <p className='mx-3'>{formData.informant}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Residential Address (current address) : </strong>
-                                <p className='mx-3'>{formData.residential_address}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Living Arrangements : </strong>
-                                <p className='mx-3'>{formData.living_arrangements}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Family Structure : </strong>
-                                <p className='mx-3'>{formData.family_structure}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Cultural Identity : </strong>
-                                <p className='mx-3'>{formData.cultural_identity}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Language Preferences : </strong>
-                                <p className='mx-3'>{formData.language1}</p>,
-                                <p className='mx-3'>{formData.language2}</p>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>THE CHIEF COMPLAINT</strong> DATE: {chiefData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <h5>The Chief Complaint:</h5>
-                            <li className='d-flex'>
-                                <strong>Chief Complaint :</strong>
-                                <p className='mx-3'>{chiefData.chief_complaint}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Onset and Duration : </strong>
-                                <p className='mx-3'>{chiefData.onset_duration}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Nature of Symptoms : </strong>
-                                <p className='mx-3'>{chiefData.nature_symptoms}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Severity : </strong>
-                                <p className='mx-3'>{chiefData.severity}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Course Type : </strong>
-                                <p className='mx-3'>{chiefData.course_type}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Nature of Illness : </strong>
-                                <p className='mx-3'>{chiefData.nature_illness}</p>
-                            </li>
-                            <h5>Precipitating Factors:</h5>
-                            <li className='d-flex'>
-                                <strong>Identify Triggers : </strong>
-                                <p className='mx-3'>{chiefData.identify_trigger}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Life Changes and Stressors : </strong>
-                                <p className='mx-3'>{chiefData.life_changes}</p>
-                            </li>
-                            <h5>Precipitating Factors:</h5>
-                            <li className='d-flex'>
-                                <strong>Biological : </strong>
-                                <p className='mx-3'>{chiefData.biological}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Psychological : </strong>
-                                <p className='mx-3'>{chiefData.psychological}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Social / Environmental : </strong>
-                                <p className='mx-3'>{chiefData.social_environment}</p>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>PRESENTING PROBLEMS</strong> DATE: {presentingData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <h5>Introduction to Presenting Problems:</h5>
-
-                            <li className='d-flex'>
-                                <strong>History of Presenting Illness :</strong>
-                                <p className='mx-3'>{presentingData.history_presenting}</p>
-                            </li>
-                            <h5>Detailed Exploration of Symptoms:</h5>
-
-                            <li className='d-flex'>
-                                <strong>a.	Mood and Affect:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {presentingData.mood_affect.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>b.	Thought Content:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {presentingData.though_content.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>c.	Thought Process:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {presentingData.though_process.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>d.	Perceptions:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {presentingData.perception.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>e.	Behavioural Changes:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {presentingData.behavioural_changes.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>f.	Sleep Patterns:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {presentingData.sleep_patterns.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
+                            <li className="tab-content my-3">
+                                <h5><strong>DEMOGRAPHIC INFORMATION</strong> DATE: {entry.basic_detail?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Name : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.patient_name || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Age : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.patient_age || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Gender : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.patient_gender || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Sexual Orientation : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.sexual_orientation || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Educational Background : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.education_bg || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Occupation and Employment Status : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.occupation || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Marital Status : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.marital_status || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Socio Economic Status : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.economic_status || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Religion : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.religion || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Informant : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.informant || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Residential Address (current address) : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.residential_address || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Living Arrangements : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.living_arrangements || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Family Structure : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.family_structure || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Cultural Identity : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.family_structure || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Language Preferences : </strong>
+                                        <p className='mx-3'>{entry.basic_detail?.family_structure || "NULL"}</p>
+                                    </li>
+                                    {/* Repeat for all other fields like Age, Gender, etc. */}
                                 </ul>
                             </li>
 
-                            <li className='d-flex'>
-                                <strong>Appetite and Weight Changes : </strong>
-                                <p className='mx-3'>{presentingData.appetite_weight}</p>
+                            <li className="tab-content my-3">
+                                <h5><strong>THE CHIEF COMPLAINT</strong> DATE: {entry.cheif_complaint?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Chief Complaint :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.chief_complaint || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Onset and Duration :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.onset_duration || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Nature of Symptoms :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.nature_symptoms || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Severity :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.severity || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Course Type :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.course_type || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Nature of Illness :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.nature_illness || "NULL"}</p>
+                                    </li>
+                                    <h6>Precipitating Factors:</h6>
+                                    <li className='d-flex'>
+                                        <strong>Identify Triggers :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.identify_trigger || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Life Changes and Stressors :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.life_changes || "NULL"}</p>
+                                    </li>
+                                    <h6>Predisposing Factors:</h6>
+                                    <li className='d-flex'>
+                                        <strong>Biological :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.biological || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Psychological :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.psychological || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Social / Environmental :</strong>
+                                        <p className='mx-3'>{entry.cheif_complaint?.social_environment || "NULL"}</p>
+                                    </li>
+                                </ul>
                             </li>
-                            <li className='d-flex'>
-                                <strong>Energy Level : </strong>
-                                <p className='mx-3'>{presentingData.energy_level}</p>
+                            <li className="tab-content my-3">
+                                <h5><strong>PRESENTING PROBLEMS</strong> DATE: {entry.presenting_problems?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <h6>Introduction to Presenting Problems : </h6>
+                                    <li className='d-flex'>
+                                        <strong>History of Presenting Illness :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.history_presenting || "NULL"}</p>
+                                    </li>
+                                    <h6>Detailed Exploration of Symptoms : </h6>
+                                    <li className='d-flex'>
+                                        <strong>a.	Mood and Affect :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.mood_affect || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>b.	Thought Content :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.though_content || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>c.	Thought Process :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.though_process || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>d.	Perceptions :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.perception || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>e.	Behavioural Changes :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.behavioural_changes || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>f.	Sleep Patterns :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.sleep_patterns || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Appetite and Weight Changes :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.appetite_weight || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Energy Level :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.energy_level || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Impact on Daily Functioning :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.occupation_academic || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Interpersonal Relationships :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.interpersonal_relationship || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Self-Care and Activities of Daily Living :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.selfCare_activity || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Recreational Activities :</strong>
+                                        <p className='mx-3'>{entry.presenting_problems?.recreation_activity || "NULL"}</p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className="tab-content my-3">
+                                <h5><strong>PSYCHIATRIC HISTORY</strong> DATE: {entry.psy_history?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Previous Psychiatric Diagnoses :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.psychiatric_diagnoses || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Treatment History :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.treatment_history || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Medication History :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.medications || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Dosage :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.dosage || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Adherence :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.adherence || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Any side effects :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.sideEffect || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Experienced Reactions :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.experience_reaction || "NULL"}</p>
+                                    </li>
+                                    <h6>Psychiatric Hospitalizations :</h6>
+                                    <li className='d-flex'>
+                                        <strong>Reasons :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.hospitalisation_reason || "NULL"}</p>
+                                    </li>
+                                     <li className='d-flex'>
+                                        <strong>Duration and the Outcomes :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.duration || "NULL"}</p>
+                                    </li>
+                                     <li className='d-flex'>
+                                        <strong>Crisis Episodes :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.crisis_episodes || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Family Members with Mental Health Diagnoses :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.fm_mentalHealth || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Significant Life Events and Stressors :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.significant_life || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Chronic Stressors :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.chronic_stressors || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Exploration of Trauma :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.trauma_exploration || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Legal Involvement :</strong>
+                                        <p className='mx-3'>{entry.psy_history?.legal_environment || "NULL"}</p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className="tab-content my-3">
+                                <h5><strong>MEDICAL HISTORY</strong> DATE: {entry.medical_history?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Disability Status (Physical or Psychological) :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.disability_status || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Chronic Medical Conditions :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.chronic_medical || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Acute Health Concerns :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.acute_health || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Medication (Duration and Outcomes) :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.medication || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Medication Allergies :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.medication_allergies || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Other Allergies or Sensitivities :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.other_allergy || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Significant Medical Events :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.significant_medical || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Traumatic Injuries :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.traumatic_injuries || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Sexual Health :</strong>
+                                        <p className='mx-3'>{entry.medical_history?.sexual_health || "NULL"}</p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className="tab-content my-3">
+                                <h5><strong>FAMILY HISTORY</strong> DATE: {entry.familyhis_data?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Family Composition :</strong>
+                                        <p className='mx-3'>{entry.familyhis_data?.family_composition || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Family Dynamics :</strong>
+                                        <p className='mx-3'>{entry.familyhis_data?.family_dynamics || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Type of Marriage :</strong>
+                                        <p className='mx-3'>{entry.familyhis_data?.marriage_type || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Family History of Psychiatric Disorders :</strong>
+                                        <p className='mx-3'>{entry.familyhis_data?.family_history || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Genetic Predispositions :</strong>
+                                        <p className='mx-3'>{entry.familyhis_data?.genetic_predisposition || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Family Changes or Transitions :</strong>
+                                        <p className='mx-3'>{entry.familyhis_data?.family_changes || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Substance Use within the Family :</strong>
+                                        <p className='mx-3'>{entry.familyhis_data?.family_substance || "NULL"}</p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className="tab-content my-3">
+                                <h5><strong>SOCIAL HISTORY</strong> DATE: {entry.social_history?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Relationship with Family :</strong>
+                                        <p className='mx-3'>{entry.social_history?.family_relationship || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Relationship with Friends and Social Circles :</strong>
+                                        <p className='mx-3'>{entry.social_history?.socialCircle_relationship || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Relationship with Significant Others :</strong>
+                                        <p className='mx-3'>{entry.social_history?.relationship_significant || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Current Living Arrangements :</strong>
+                                        <p className='mx-3'>{entry.social_history?.living_arrangements || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Educational Background :</strong>
+                                        <p className='mx-3'>{entry.social_history?.education_bg || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Current Employment Status :</strong>
+                                        <p className='mx-3'>{entry.social_history?.currentEmp_status || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Recreational Activities :</strong>
+                                        <p className='mx-3'>{entry.social_history?.socialRecreation_activity || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Social Outlets :</strong>
+                                        <p className='mx-3'>{entry.social_history?.social_outlets || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Social Media Engagement :</strong>
+                                        <p className='mx-3'>{entry.social_history?.socialMed_engagement || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Technology-related Stressors :</strong>
+                                        <p className='mx-3'>{entry.social_history?.technology_related || "NULL"}</p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className="tab-content my-3">
+                                <h5><strong>DEVELOPMENTAL HISTORY</strong> DATE: {entry.development_history?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Prenatal Factors :</strong>
+                                        <p className='mx-3'>{entry.development_history?.prenatal_factors || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Birth Details :</strong>
+                                        <p className='mx-3'>{entry.development_history?.birth_details || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Birth Order :</strong>
+                                        <p className='mx-3'>{entry.development_history?.birth_order || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Number of Siblings :</strong>
+                                        <p className='mx-3'>{entry.development_history?.siblings_number || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Attachment and Bonding :</strong>
+                                        <p className='mx-3'>{entry.development_history?.bonding_attachment || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Developmental Milestones :</strong>
+                                        <p className='mx-3'>{entry.development_history?.milestones_development || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Childhood Illnesses and Injuries :</strong>
+                                        <p className='mx-3'>{entry.development_history?.childhood_illness || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Siblings and Relationships :</strong>
+                                        <p className='mx-3'>{entry.development_history?.siblings_relationship || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Parenting Styles :</strong>
+                                        <p className='mx-3'>{entry.development_history?.parenting_style || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Learning Challenges :</strong>
+                                        <p className='mx-3'>{entry.development_history?.learning_challenge || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Pubertal Development :</strong>
+                                        <p className='mx-3'>{entry.development_history?.pubertal_development || "NULL"}</p>
+                                    </li>
+                                    
+                                </ul>
+                            </li>
+                            <li className="tab-content my-3 mt-5">
+                                <h5><strong>SUBSTANCE USE HISTORY</strong> DATE: {entry.substance_use?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>Types of Substances Used :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.substance_use || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Age of Onset :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.age_onset || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Frequency :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.frequency || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Quantity :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.quantity || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Motivations for Use :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.motivation_use || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Environmental Triggers :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.environmental_trigger || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Impact on Occupational or Academic Functioning :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.impact_occupation || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Impact on Interpersonal Relationships :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.impact_interpersonal || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Legal or Financial Consequences :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.financial_consequences || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Craving intensity :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.craving_intensity || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Previous Treatment Attempts :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.previous_treatment || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Relapse History :</strong>
+                                        <p className='mx-3'>{entry.substance_use?.relapse_history || "NULL"}</p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className="tab-content my-3">
+                                <h5><strong>SUICIDAL AND HOMICIDAL IDEATION</strong> DATE: {entry.suicidal_data?.date}</h5>
+                                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                                    <li className='d-flex'>
+                                        <strong>History of Suicide Attempts :</strong>
+                                        <p className='mx-3'>{entry.suicidal_data?.suicide_history || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Triggers and Stressors :</strong>
+                                        <p className='mx-3'>{entry.suicidal_data?.triggers_stressors || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>History of Homicidal Ideation :</strong>
+                                        <p className='mx-3'>{entry.suicidal_data?.homicidal_ideation || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Target and Method :</strong>
+                                        <p className='mx-3'>{entry.suicidal_data?.target_method || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Immediate Threat :</strong>
+                                        <p className='mx-3'>{entry.suicidal_data?.immediate_threat || "NULL"}</p>
+                                    </li>
+                                    <li className='d-flex'>
+                                        <strong>Necessity of Emergency Response :</strong>
+                                        <p className='mx-3'>{entry.suicidal_data?.emergency_response || "NULL"}</p>
+                                    </li>
+
+                                    <li className='d-flex'>
+                                        <strong>Hospitalization Required :</strong>
+                                        <p className='mx-3'>{entry.suicidal_data?.hospital_required || "NULL"}</p>
+                                    </li>
+                                </ul>
                             </li>
 
-
-                            <h5>Impact on Daily Functioning:</h5>
-
-                            <li className='d-flex'>
-                                <strong>Occupational or Academic Functioning : </strong>
-                                <p className='mx-3'>{presentingData.occupation_academic}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Interpersonal Relationships : </strong>
-                                <p className='mx-3'>{presentingData.interpersonal_relationship}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Self-Care and Activities of Daily Living : </strong>
-                                <p className='mx-3'>{presentingData.selfCare_activity}</p>
-                            </li>
-
-                            <li className='d-flex'>
-                                <strong>Recreational Activities : </strong>
-                                <p className='mx-3'>{presentingData.recreation_activity}</p>
-                            </li>
-
+                            {/* Repeat for all other sections like presenting_problems, medical_history, etc. */}
                         </ul>
-                    </li>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>PSYCHIATRIC HISTORY</strong> DATE: {psyHistoryData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-
-                            <li className='d-flex'>
-                                <strong>Previous Psychiatric Diagnoses :</strong>
-                                <p className='mx-3'>{psyHistoryData.psychiatric_diagnoses}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Treatment History : </strong>
-                                <p className='mx-3'>{psyHistoryData.treatment_history}</p>
-                            </li>
-                            <h5>Medication History: </h5>
-                            <li className='d-flex'>
-                                <strong>Medications : </strong>
-                                <p className='mx-3'>{psyHistoryData.medications}</p>
-                            </li>
-                            <li className='d-flex mt-5'>
-                                <strong>Dosage : </strong>
-                                <p className='mx-3'>{psyHistoryData.dosage}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Adherence : </strong>
-                                <p className='mx-3'>{psyHistoryData.adherence}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Any side effects : </strong>
-                                <p className='mx-3'>{psyHistoryData.sideEffect}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Experienced Reactions : </strong>
-                                <p className='mx-3'>{psyHistoryData.experience_reaction}</p>
-                            </li>
-                            <h5>Psychiatric Hospitalizations: </h5>
-                            <li className='d-flex'>
-                                <strong>Reasons : </strong>
-                                <p className='mx-3'>{psyHistoryData.experience_reaction}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Duration and the Outcomes : </strong>
-                                <p className='mx-3'>{psyHistoryData.duration}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Crisis Episodes : </strong>
-                                <p className='mx-3'>{psyHistoryData.crisis_episodes}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Family Members with Mental Health Diagnoses : </strong>
-                                <p className='mx-3'>{psyHistoryData.fm_mentalHealth}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Significant Life Events and Stressors : </strong>
-                                <p className='mx-3'>{psyHistoryData.significant_life}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Chronic Stressors : </strong>
-                                <p className='mx-3'>{psyHistoryData.chronic_stressors}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Exploration of Trauma:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {psyHistoryData.trauma_exploration.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Legal Involvement:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {psyHistoryData.legal_environment.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>MEDICAL HISTORY</strong> DATE: {medicalData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <li className='d-flex'>
-                                <strong>Disability Status (Physical or Psychological) :</strong>
-                                <p className='mx-3'>{medicalData.disability_status}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Chronic Medical Conditions :</strong>
-                                <p className='mx-3'>{medicalData.chronic_medical}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Acute Health Concerns :</strong>
-                                <p className='mx-3'>{medicalData.acute_health}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Medication (Duration and Outcomes) :</strong>
-                                <p className='mx-3'>{medicalData.medication}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Medication Allergies :</strong>
-                                <p className='mx-3'>{medicalData.medication_allergies}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Other Allergies or Sensitivities:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {medicalData.other_allergy.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Significant Medical Events:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {medicalData.significant_medical.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Traumatic Injuries :</strong>
-                                <p className='mx-3'>{medicalData.traumatic_injuries}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Sexual Health:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {medicalData.significant_medical.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>FAMILY HISTORY</strong> DATE: {familyData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <li className='d-flex'>
-                                <strong>Family Composition:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {familyData.family_composition.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Family Dynamics:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {familyData.family_dynamics.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Type of Marriage : </strong>
-                                <p className='mx-3'>{familyData.marriage_type}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Family History of Psychiatric Disorders : </strong>
-                                <p className='mx-3'>{familyData.family_history}</p>
-                            </li>
-                            <li className='d-flex mt-5'>
-                                <strong>Genetic Predispositions : </strong>
-                                <p className='mx-3'>{familyData.genetic_predisposition}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Family Changes or Transitions:</strong>
-                                <ul className='d-flex' style={{ listStyleType: "none" }}>
-                                    {familyData.family_changes.map((item, idx) => (
-                                        <li key={idx}>{item} ,</li>
-                                    ))}
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>SOCIAL HISTORY</strong> DATE: {socialData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <li className='d-flex'>
-                                <strong>Relationship with Family : </strong>
-                                <p className='mx-3'>{socialData.family_relationship}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Relationship with Friends and Social Circles : </strong>
-                                <p className='mx-3'>{socialData.socialCircle_relationship}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Relationship with Significant Others : </strong>
-                                <p className='mx-3'>{socialData.relationship_significant}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Current Living Arrangements : </strong>
-                                <p className='mx-3'>{socialData.living_arrangements}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Educational Background : </strong>
-                                <p className='mx-3'>{socialData.education_bg}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Current Employment Status : </strong>
-                                <p className='mx-3'>{socialData.currentEmp_status}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Recreational Activities : </strong>
-                                <p className='mx-3'>{socialData.socialRecreation_activity}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Social Outlets : </strong>
-                                <p className='mx-3'>{socialData.social_outlets}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Social Media Engagement : </strong>
-                                <p className='mx-3'>{socialData.socialMed_engagement}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Technology-related Stressors : </strong>
-                                <p className='mx-3'>{socialData.technology_related}</p>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>DEVELOPMENTAL HISTORY</strong> DATE: {developmentalData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <li className='d-flex'>
-                                <strong>Prenatal Factors : </strong>
-                                <p className='mx-3'>{developmentalData.prenatal_factors}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Birth Details : </strong>
-                                <p className='mx-3'>{developmentalData.birth_details}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Birth Order : </strong>
-                                <p className='mx-3'>{developmentalData.birth_order}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Number of Siblings : </strong>
-                                <p className='mx-3'>{developmentalData.siblings_number}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Attachment and Bonding : </strong>
-                                <p className='mx-3'>{developmentalData.bonding_attachment}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Developmental Milestones : </strong>
-                                <p className='mx-3'>{developmentalData.milestones_development}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Childhood Illnesses and Injuries : </strong>
-                                <p className='mx-3'>{developmentalData.childhood_illness}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Siblings and Relationships : </strong>
-                                <p className='mx-3'>{developmentalData.siblings_relationship}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Parenting Styles : </strong>
-                                <p className='mx-3'>{developmentalData.parenting_style}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Learning Challenges : </strong>
-                                <p className='mx-3'>{developmentalData.learning_challenge}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Pubertal Development : </strong>
-                                <p className='mx-3'>{developmentalData.pubertal_development}</p>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="tab-content my-3 mt-5">
-                        <h5 className='pdf_heading'><strong>SUBSTANCE USE HISTORY</strong> DATE: {substanceData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <li className='d-flex'>
-                                <strong>Types of Substances Used : </strong>
-                                <p className='mx-3'>{substanceData.substance_use}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Age of Onset : </strong>
-                                <p className='mx-3'>{substanceData.age_onset}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Frequency : </strong>
-                                <p className='mx-3'>{substanceData.frequency}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Quantity : </strong>
-                                <p className='mx-3'>{substanceData.quantity}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Motivations for Use : </strong>
-                                <p className='mx-3'>{substanceData.motivation_use}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Environmental Triggers : </strong>
-                                <p className='mx-3'>{substanceData.environmental_trigger}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Impact on Occupational or Academic Functioning : </strong>
-                                <p className='mx-3'>{substanceData.impact_occupation}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Impact on Interpersonal Relationships : </strong>
-                                <p className='mx-3'>{substanceData.impact_interpersonal}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Legal or Financial Consequences : </strong>
-                                <p className='mx-3'>{substanceData.financial_consequences}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Craving intensity : </strong>
-                                <p className='mx-3'>{substanceData.craving_intensity}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Previous Treatment Attempts : </strong>
-                                <p className='mx-3'>{substanceData.previous_treatment}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Relapse History : </strong>
-                                <p className='mx-3'>{substanceData.relapse_history}</p>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="tab-content my-3">
-                        <h5 className='pdf_heading'><strong>SUICIDAL AND HOMICIDAL IDEATION</strong> DATE: {substanceData.date}</h5>
-                        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-                            <li className='d-flex'>
-                                <strong>History of Suicide Attempts : </strong>
-                                <p className='mx-3'>{suicidalData.suicide_history}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Triggers and Stressors : </strong>
-                                <p className='mx-3'>{suicidalData.triggers_stressors}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>History of Homicidal Ideation : </strong>
-                                <p className='mx-3'>{suicidalData.homicidal_ideation}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Target and Method : </strong>
-                                <p className='mx-3'>{suicidalData.target_method}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Immediate Threat : </strong>
-                                <p className='mx-3'>{suicidalData.immediate_threat}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Necessity of Emergency Response : </strong>
-                                <p className='mx-3'>{suicidalData.emergency_response}</p>
-                            </li>
-                            <li className='d-flex'>
-                                <strong>Hospitalization Required : </strong>
-                                <p className='mx-3'>{suicidalData.hospital_required}</p>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                    </div>
+                ))}
             </div>
+
 
         </>
     )

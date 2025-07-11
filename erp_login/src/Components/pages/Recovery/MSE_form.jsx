@@ -36,6 +36,7 @@ function MSE_form() {
   const [selectedStates, setSelectedStates] = useState([]);
   const [shouldGeneratePDF, setShouldGeneratePDF] = useState(false);
   const [date, setDate] = useState('');
+  const [allFormEntries, setAllFormEntries] = useState([]);
   const [formData, setFormData] = useState({
     admission_no: '',
     date: '',
@@ -1051,138 +1052,93 @@ function MSE_form() {
   );
 
   const fetchFormData = async () => {
-    if (!formData.admission_no.trim()) {
+    if (!admission_no.trim()) {
       alert("Please enter admission number.");
       return;
     }
 
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      const dateObj = new Date(dateString);
+      if (isNaN(dateObj)) return dateString;
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const year = dateObj.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
     try {
-      const response = await apiRoute.get(`/recovery/mseAllForm/${formData.admission_no}`);
+      const response = await apiRoute.get(`/recovery/mseAllForm/${admission_no}`);
       console.log("Fetched data from API:", response.data);
 
-      const fetchedData = response.data.data || response.data;
+      const fetchedData = response.data;
 
-      if (!fetchedData || typeof fetchedData !== "object") {
-        alert("Invalid or missing data from server.");
+      if (!Array.isArray(fetchedData) || fetchedData.length === 0) {
+        alert("No data found for this admission number.");
         return;
       }
 
-      // ✅ Set all necessary form states
-      if (fetchedData.appearance_behaviour) {
-        setFormData({
-          ...fetchedData.appearance_behaviour,
-          general_appearance: fetchedData.appearance_behaviour.general_appearance?.split(',') || [],
-          attitude: fetchedData.appearance_behaviour.attitude?.split(',') || [],
-          comprehension: fetchedData.appearance_behaviour.comprehension?.split(',') || [],
-          gait_posture: fetchedData.appearance_behaviour.gait_posture?.split(',') || [],
-          motor_activity: fetchedData.appearance_behaviour.motor_activity?.split(',') || [],
-          catatonic_sign: fetchedData.appearance_behaviour.catatonic_sign?.split(',') || [],
-          conversion_dissociative: fetchedData.appearance_behaviour.conversion_dissociative?.split(',') || [],
-          social_manner: fetchedData.appearance_behaviour.social_manner?.split(',') || [],
-          rapport: fetchedData.appearance_behaviour.rapport?.split(',') || [],
-          hallucinatory_behaviour: fetchedData.appearance_behaviour.hallucinatory_behaviour?.split(',') || [],
-        });
-      }
+      const formattedEntries = fetchedData.map(entry => ({
+        appearance_behaviour: {
+          ...entry.appearance_behaviour,
+          date: formatDate(entry.appearance_behaviour?.date || ''),
+          general_appearance: entry.appearance_behaviour?.general_appearance?.split(',') || ["NULL"],
+          attitude: entry.appearance_behaviour?.attitude?.split(',') || ["NULL"],
+          comprehension: entry.appearance_behaviour?.comprehension?.split(',') || ["NULL"],
+          gait_posture: entry.appearance_behaviour?.gait_posture?.split(',') || ["NULL"],
+          motor_activity: entry.appearance_behaviour?.motor_activity?.split(',') || ["NULL"],
+          catatonic_sign: entry.appearance_behaviour?.catatonic_sign?.split(',') || ["NULL"],
+          conversion_dissociative: entry.appearance_behaviour?.conversion_dissociative?.split(',') || ["NULL"],
+          social_manner: entry.appearance_behaviour?.social_manner?.split(',') || ["NULL"],
+          rapport: entry.appearance_behaviour?.rapport?.split(',') || ["NULL"],
+          hallucinatory_behaviour: entry.appearance_behaviour?.hallucinatory_behaviour?.split(',') || ["NULL"],
+        },
+        speech: {
+          ...entry.speech,
+          date: formatDate(entry.speech?.date || ''),
+          rate_quantity: entry.speech?.rate_quantity?.split(',') || ["NULL"],
+          volume_tone: entry.speech?.volume_tone?.split(',') || ["NULL"],
+          flow_rhythm: entry.speech?.flow_rhythm?.split(',') || ["NULL"],
+        },
+        mood_affect: {
+          ...entry.mood_affect,
+          date: formatDate(entry.mood_affect?.date || ''),
+          mood_description: entry.mood_affect?.mood_description?.split(',') || ["NULL"],
+          resident_look: entry.speech?.resident_look?.split(',') || ["NULL"],
+        },
+        though: {
+          ...entry.though,
+          date: formatDate(entry.though?.date || ''),
+          stream_form_though: entry.though?.stream_form_though?.split(',') || ["NULL"],
+          content_though: entry.speech?.content_though?.split(',') || ["NULL"],
+        },
+        perceiption: {
+          ...entry.perceiption,
+          date: formatDate(entry.perceiption?.date || ''),
+          hallucination_type: entry.perceiption?.hallucination_type?.split(',') || ["NULL"],
+          illusion: entry.perceiption?.illusion?.split(',') || ["NULL"],
+          perception_changes: entry.perceiption?.perception_changes?.split(',') || ["NULL"],
+          somatic: entry.perceiption?.somatic?.split(',') || ["NULL"],
+          others: entry.perceiption?.others?.split(',') || ["NULL"],
+        },
+        conginition: {
+          ...entry.conginition,
+          date: formatDate(entry.conginition?.date || ''),
+          consciousness: entry.conginition?.consciousness?.split(',') || ["NULL"],
+        },
+        judgement: {
+          ...entry.judgement,
+          date: formatDate(entry.judgement?.date || ''),
+        },
+        insight: {
+          ...entry.insight,
+          date: formatDate(entry.insight?.date || ''),
+        }
 
-      if (fetchedData.speech) {
-        setSpeechFormData({
-          ...fetchedData.speech,
-          rate_quantity: fetchedData.speech.rate_quantity?.split(',') || [],
-          volume_tone: fetchedData.speech.volume_tone?.split(',') || [],
-          flow_rhythm: fetchedData.speech.flow_rhythm?.split(',') || [],
-        });
-      }
-
-      if (fetchedData.mood_affect) {
-        setMoodFormData({
-          ...fetchedData.mood_affect,
-          mood_description: fetchedData.mood_affect.mood_description?.split(',') || [],
-          appearance: fetchedData.mood_affect.appearance,
-          resident_feeling: fetchedData.mood_affect.resident_feeling,
-          general_feeling: fetchedData.mood_affect.general_feeling,
-          mood_like: fetchedData.mood_affect.mood_like,
-          resident_general_feeling: fetchedData.mood_affect.resident_general_feeling,
-          resident_look: fetchedData.mood_affect.resident_look?.split(',') || [],
-        });
-      }
-
-      if (fetchedData.though) {
-        setThoughFormData({
-          ...fetchedData.though,
-          stream_form_though: fetchedData.though.stream_form_though?.split(',') || [],
-          content_though: fetchedData.though.content_though?.split(',') || []
-        });
-      }
-
-      if (fetchedData.perceiption) {
-        setPerceptionData({
-          ...fetchedData.perceiption,
-          hallucination_type: fetchedData.perceiption.hallucination_type?.split(',') || [],
-          heard: fetchedData.perceiption.heard,
-          voices_heard: fetchedData.perceiption.voices_heard,
-          female_male_voices: fetchedData.perceiption.female_male_voices,
-          interpreted_person: fetchedData.perceiption.interpreted_person,
-          illusion: fetchedData.perceiption.illusion?.split(',') || [],
-          perception_changes: fetchedData.perceiption.perception_changes?.split(',') || [],
-          somatic: fetchedData.perceiption.somatic?.split(',') || [],
-          others: fetchedData.perceiption.others?.split(',') || [],
-        });
-      }
-
-      if (fetchedData.conginition) {
-        setCognitionData({
-          ...fetchedData.conginition,
-          consciousness: fetchedData.conginition.consciousness?.split(',') || [],
-          orientation_time: fetchedData.conginition.orientation_time,
-          orientation_place: fetchedData.conginition.orientation_place,
-          orientation_person: fetchedData.conginition.orientation_person,
-          distractibility: fetchedData.conginition.distractibility,
-          asking_test: fetchedData.conginition.asking_test,
-          names_months: fetchedData.conginition.names_months,
-          test_performance: fetchedData.conginition.test_performance,
-          immediate_retention: fetchedData.conginition.immediate_retention,
-          recall: fetchedData.conginition.recall,
-          patient_place: fetchedData.conginition.patient_place,
-          dinner_ate: fetchedData.conginition.dinner_ate,
-          date_ofMrg: fetchedData.conginition.date_ofMrg,
-          birthdays_children: fetchedData.conginition.birthdays_children,
-          person_past: fetchedData.conginition.person_past,
-          amnesia: fetchedData.conginition.amnesia,
-          live_growing: fetchedData.conginition.live_growing,
-          person_school: fetchedData.conginition.person_school,
-          breakfast_ques: fetchedData.conginition.breakfast_ques,
-          do_yesterday: fetchedData.conginition.do_yesterday,
-          general_info: fetchedData.conginition.general_info,
-          test_red_wri: fetchedData.conginition.test_red_wri,
-          calculation_test: fetchedData.conginition.calculation_test,
-          proverb_testing: fetchedData.conginition.proverb_testing,
-          familiar_object: fetchedData.conginition.familiar_object,
-        });
-      }
-
-      if (fetchedData.judgement) {
-        setJudgementFormData({
-          ...fetchedData.judgement,
-          personal_judgement: fetchedData.judgement.personal_judgement,
-          social_judgement: fetchedData.judgement.social_judgement,
-          test_judgement: fetchedData.judgement.test_judgement,
-          judgement: fetchedData.judgement.judgement
-        });
-      }
-
-      if (fetchedData.insight) {
-        setInsightData({
-          ...fetchedData.insight,
-          denail_illness: fetchedData.insight.denail_illness,
-          slight_awareness: fetchedData.insight.slight_awareness,
-          awarness_sick: fetchedData.insight.awarness_sick,
-          awarness_illness: fetchedData.insight.awarness_illness,
-          intellectual_insight: fetchedData.insight.intellectual_insight,
-          true_emotion: fetchedData.insight.true_emotion,
-        });
-      }
+      }))
 
       // ✅ Now trigger PDF generation
+      setAllFormEntries(formattedEntries);
       setShouldGeneratePDF(true);
 
     } catch (error) {
@@ -1244,12 +1200,16 @@ function MSE_form() {
       alert("Please enter admission number.");
       return;
     }
+     if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
 
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getappearance/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getappearance/${admission_no}/${date}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1284,11 +1244,16 @@ function MSE_form() {
       return;
     }
 
+     if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
+
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getSpeech/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getSpeech/${admission_no}/${date}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1315,11 +1280,16 @@ function MSE_form() {
       return;
     }
 
+    if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
+
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getMood/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getMood/${admission_no}/${date}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1350,11 +1320,16 @@ function MSE_form() {
       return;
     }
 
+    if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
+
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getThough/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getThough/${admission_no}/${date}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1380,11 +1355,16 @@ function MSE_form() {
       return;
     }
 
+    if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
+
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getPerception/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getPerception/${admission_no}/${date}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1418,10 +1398,15 @@ function MSE_form() {
       return;
     }
 
+    if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
+
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
     try {
-      const response = await apiRoute.get(`/recovery/getCognition/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getCognition/${admission_no}/${date}`);
       const data = response.data;
 
       // Split and trim fetched checkbox values
@@ -1477,12 +1462,16 @@ function MSE_form() {
       alert("Please enter admission number.");
       return;
     }
+    if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
 
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getJudgement/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getJudgement/${admission_no}/${date}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1510,11 +1499,16 @@ function MSE_form() {
       return;
     }
 
+    if (!date || date.trim() === '') {
+      alert("Please enter Date of your updation admission_no.");
+      return;
+    }
+
     const trimmedAdNo = admission_no.trim();
     console.log(trimmedAdNo);
 
     try {
-      const response = await apiRoute.get(`/recovery/getInsight/${admission_no}`);
+      const response = await apiRoute.get(`/recovery/getInsight/${admission_no}/${date}`);
       const data = response.data;
 
       console.log(response.data);
@@ -1538,11 +1532,11 @@ function MSE_form() {
     }
   }
 
-  const handleUpdate = async (e, admission_no) => {
+  const handleUpdate = async (e, admission_no, date) => {
     e.preventDefault();
 
     try {
-      const res = await apiRoute.post(`/recovery/updateAppearance/${formData.admission_no}`, formData, {
+      const res = await apiRoute.post(`/recovery/updateAppearance/${admission_no}/${date}`, formData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1568,11 +1562,11 @@ function MSE_form() {
     }
   };
 
-  const handleSpeechUpdate = async (e, admission_no) => {
+  const handleSpeechUpdate = async (e, admission_no, date) => {
     e.preventDefault();
 
     try {
-      const res = await apiRoute.post(`/recovery/updateSpeech/${speechFormData.admission_no}`, speechFormData, {
+      const res = await apiRoute.post(`/recovery/updateSpeech/${admission_no}/${date}`, speechFormData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1591,11 +1585,11 @@ function MSE_form() {
     }
   };
 
-  const handleMoodUpdate = async (e, admission_no) => {
+  const handleMoodUpdate = async (e, admission_no, date) => {
     e.preventDefault();
 
     try {
-      const res = await apiRoute.post(`/recovery/updateMood/${moodFormData.admission_no}`, moodFormData, {
+      const res = await apiRoute.post(`/recovery/updateMood/${admission_no}/${date}`, moodFormData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1618,11 +1612,11 @@ function MSE_form() {
     }
   };
 
-  const handleThoughUpdate = async (e, admission_no) => {
+  const handleThoughUpdate = async (e, admission_no, date) => {
     e.preventDefault();
 
     try {
-      const res = await apiRoute.post(`/recovery/updateThough/${thoughFormData.admission_no}`, thoughFormData, {
+      const res = await apiRoute.post(`/recovery/updateThough/${admission_no}/${date}`, thoughFormData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1640,11 +1634,11 @@ function MSE_form() {
     }
   };
 
-  const handlePerceptionUpdate = async (e, admission_no) => {
+  const handlePerceptionUpdate = async (e, admission_no, date) => {
     e.preventDefault();
 
     try {
-      const res = await apiRoute.post(`/recovery/updatePerception/${perceptionData.admission_no}`, perceptionData, {
+      const res = await apiRoute.post(`/recovery/updatePerception/${admission_no}/${date}`, perceptionData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1670,11 +1664,11 @@ function MSE_form() {
     }
   };
 
-  const handleJudgementUpdate = async (e, admission_no) => {
+  const handleJudgementUpdate = async (e, admission_no, date) => {
     e.preventDefault();
 
     try {
-      const res = await apiRoute.post(`/recovery/updateJudgement/${judgementData.admission_no}`, judgementData, {
+      const res = await apiRoute.post(`/recovery/updateJudgement/${admission_no}/${date}`, judgementData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1694,11 +1688,11 @@ function MSE_form() {
     }
   };
 
-  const handleInsightUpdate = async (e, admission_no) => {
+  const handleInsightUpdate = async (e, admission_no, date) => {
     e.preventDefault();
 
     try {
-      const res = await apiRoute.post(`/recovery/updateInsight/${insightData.admission_no}`, insightData, {
+      const res = await apiRoute.post(`/recovery/updateInsight/${admission_no}/${date}`, insightData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1720,14 +1714,14 @@ function MSE_form() {
     }
   };
 
-  const handleCognitionUpdate = async (e, admission_no) => {
+  const handleCognitionUpdate = async (e, admission_no, date) => {
     e.preventDefault();
     const completeCognition = {
       ...cognitionData,
       canConcentrate
     };
     try {
-      const res = await apiRoute.post(`/recovery/updateCognition/${cognitionData.admission_no}`, completeCognition, {
+      const res = await apiRoute.post(`/recovery/updateCognition/${admission_no}/${date}`, completeCognition, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -2368,7 +2362,7 @@ function MSE_form() {
                             <Col md={4}>
 
                               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                <Form.Label>in which part of the day? <span style={{ color: 'red' }}>*</span></Form.Label>
+                                <Form.Label>In which part of the day? <span style={{ color: 'red' }}>*</span></Form.Label>
                                 <Form.Control as="textarea" rows={2}
                                   name='part_of_day'
                                   value={perceptionData.part_of_day}
@@ -2990,703 +2984,361 @@ function MSE_form() {
             <img src={manasu_logo} className="pdf_logo" alt="" />
           </Col>
           <Col md={10}>
-            <h4 className="text-center">Mental Status Examination (MSE)</h4>
           </Col>
         </Row>
 
-        <ul style={{ listStyleType: "none", textAlign: "start" }}>
-          {/* GENERAL APPEARANCE AND BEHAVIOUR START*/}
-          <li className="tab-content my-3">
-            <h6>1. GENERAL APPEARANCE AND BEHAVIOUR:</h6>
+        {allFormEntries.map((entry, index) => (
+          <div key={index} style={{ pageBreakAfter: "always" }}>
+            <Row className="d-flex align-items-center justify-content-center mb-2">
+              <Col md={1}>
+
+              </Col>
+              <Col md={11}>
+                <h4 className="text-center">MSE Form of {entry.appearance_behaviour?.date}</h4>
+              </Col>
+            </Row>
             <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* General Appearance */}
-              {formData.general_appearance?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>General Appearance:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.general_appearance.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Attitude */}
-              {formData.attitude?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Attitude towards the examiner:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.attitude.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Comprehension */}
-              {formData.comprehension && (
-                <li className='d-flex'>
-                  <strong>Comprehension:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.comprehension.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Gait and Posture */}
-              {formData.gait_posture?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Gait and posture:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.gait_posture.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Motor Activity */}
-              {formData.motor_activity?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Motor activity:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.motor_activity.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Catatonic Signs */}
-              {formData.catatonic_sign?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Catatonic signs:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.catatonic_sign.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Conversion and Dissociative Signs */}
-              {formData.conversion_dissociative?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Conversion and dissociative signs:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.conversion_dissociative.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Social Manner */}
-              {formData.social_manner?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Social manner:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.social_manner.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Rapport */}
-              {formData.rapport?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Rapport:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.rapport.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Hallucinatory Behaviour */}
-              {formData.hallucinatory_behaviour?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Hallucinatory behaviour:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {formData.hallucinatory_behaviour.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
+              <li className="tab-content my-5">
+                <h5><strong>1. GENERAL APPEARANCE AND BEHAVIOUR</strong> DATE: {entry.appearance_behaviour?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <strong>General Appearance : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.general_appearance || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Attitude towards the examiner : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.attitude || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Comprehension : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.comprehension || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Gait and posture : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.gait_posture || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Motor activity : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.motor_activity || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Catatonic signs : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.catatonic_sign || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Conversion and dissociative signs : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.conversion_dissociative || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Social manner : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.social_manner || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Rapport : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.rapport || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Hallucinatory behaviour : </strong>
+                    <p className='mx-3'>{entry.appearance_behaviour?.hallucinatory_behaviour || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
+              <li className="tab-content my-5">
+                <h5><strong>2. SPEECH</strong> DATE: {entry.speech?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <strong>Rate and quantity of speech : </strong>
+                    <p className='mx-3'>{entry.speech?.rate_quantity || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Volume and tone of speech : </strong>
+                    <p className='mx-3'>{entry.speech?.volume_tone || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Flow and rhythm of speech : </strong>
+                    <p className='mx-3'>{entry.speech?.flow_rhythm || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
+              <li className="tab-content my-5">
+                <h5><strong>3. MOOD AND AFFECT</strong> DATE: {entry.mood_affect?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <strong>Mood Described as : </strong>
+                    <p className='mx-3'>{entry.mood_affect?.mood_description || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>How do they appear to you? : </strong>
+                    <p className='mx-3'>{entry.mood_affect?.appearance || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Ask the Resident directly how he/she feels : </strong>
+                    <p className='mx-3'>{entry.mood_affect?.resident_feeling || "NULL"}</p>
+                  </li>
+                  <h6>Question to ask about Mood : </h6>
+                  <li>
+                    <strong>How do you generally feel most of the time? : </strong>
+                    <p className='mx-3'>{entry.mood_affect?.general_feeling || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>What's your mood like? : </strong>
+                    <p className='mx-3'>{entry.mood_affect?.mood_like || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>How would you say you feel generally - happy, sad, frightened, angry ? : </strong>
+                    <p className='mx-3'>{entry.mood_affect?.resident_general_feeling || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Resident's Looks like : </strong>
+                    <p className='mx-3'>{entry.mood_affect?.resident_look || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
+              <li className="tab-content my-5">
+                <h5><strong>4. THOUGHT</strong> DATE: {entry.though?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <strong>Stream and form of thought : </strong>
+                    <p className='mx-3'>{entry.though?.stream_form_though || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Content of thought : </strong>
+                    <p className='mx-3'>{entry.though?.content_though || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
+              <li className="tab-content my-5">
+                <h5><strong>5. PERCEPTION</strong> DATE: {entry.perceiption?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <strong>Hallucinations : </strong>
+                    <p className='mx-3'>{entry.perceiption?.hallucination_type || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>What was heard? : </strong>
+                    <p className='mx-3'>{entry.perceiption?.heard || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>How many voices were heard? : </strong>
+                    <p className='mx-3'>{entry.perceiption?.voices_heard || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>In which part of the day? : </strong>
+                    <p className='mx-3'>{entry.perceiption?.part_of_day || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Male or Female voices? : </strong>
+                    <p className='mx-3'>{entry.perceiption?.female_male_voices || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>In which part of the day? : </strong>
+                    <p className='mx-3'>{entry.perceiption?.part_of_day || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>How interpreted and whether second person or third person hallucinations? (i.e., whether the voices are addressing the patient or are discussing him in third person) : </strong>
+                    <p className='mx-3'>{entry.perceiption?.interpreted_person || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Illusions and misinterpretations : </strong>
+                    <p className='mx-3'>{entry.perceiption?.illusion || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Perception Changes : </strong>
+                    <p className='mx-3'>{entry.perceiption?.perception_changes || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Somatic passivity phenomenon : </strong>
+                    <p className='mx-3'>{entry.perceiption?.somatic || "NULL"}</p>
+                  </li>
+                  <li >
+                    <strong>Others : </strong>
+                    <p className='mx-3'>{entry.perceiption?.others || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
+              <li className="tab-content my-5">
+                <h5><strong>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</strong> DATE: {entry.conginition?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <strong>Consciousness : </strong>
+                    <p className='mx-3'>{entry.conginition?.consciousness || "NULL"}</p>
+                  </li>
+                  <h6>Orientation</h6>
+                  <li>
+                    <strong>Oriented to Time : </strong>
+                    <p className='mx-3'>{entry.conginition?.orientation_time || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Oriented to sPlace : </strong>
+                    <p className='mx-3'>{entry.conginition?.orientation_place || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Oriented to Person : </strong>
+                    <p className='mx-3'>{entry.conginition?.orientation_person || "NULL"}</p>
+                  </li>
+                  <h6>Attention</h6>
+                  <li>
+                    <strong>Is the attention easily aroused and sustained. Ask the patient to repeat digits forwards backwards. </strong>
+                    <p className='mx-3'>{entry.conginition?.consciousnessState || "NULL"}</p>
+                  </li>
+                  <h6>Concentration</h6>
+                  <li>
+                    <strong>1. Can the patient concentrate? </strong>
+                    <p className='mx-3'>{entry.conginition?.canConcentrate || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>2. Ease of distractibility </strong>
+                    <p className='mx-3'>{entry.conginition?.distractibility || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>2. Ease of distractibility </strong>
+                    <p className='mx-3'>{entry.conginition?.distractibility || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>3. Ask to subtract serial sevens from hundred (100-7 test), or serial threes from forty (40-3 test), or to count backwards from 20  </strong>
+                    <p className='mx-3'>{entry.conginition?.asking_test || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>4. Enumerate the names of the months (or days of the week) in the reverse order.  </strong>
+                    <p className='mx-3'>{entry.conginition?.names_months || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>5. Note down the answers and the time take perform the tests.</strong>
+                    <p className='mx-3'>{entry.conginition?.test_performance || "NULL"}</p>
+                  </li>
+                  <h6>Memory</h6>
+                  <li>
+                    <strong>Immediate Retention (IR)</strong>
+                    <p className='mx-3'>{entry.conginition?.immediate_retention || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Recall (R) after a delay</strong>
+                    <p className='mx-3'>{entry.conginition?.recall || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>How did the patient come to the room/hospital ?</strong>
+                    <p className='mx-3'>{entry.conginition?.patient_place || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>What he ate for dinner the day before or for breakfast the same morning ?</strong>
+                    <p className='mx-3'>{entry.conginition?.dinner_ate || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Ask for the date of marriage</strong>
+                    <p className='mx-3'>{entry.conginition?.date_ofMrg || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Name and birthdays of children</strong>
+                    <p className='mx-3'>{entry.conginition?.birthdays_children || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Any other relevant questions from the person's past</strong>
+                    <p className='mx-3'>{entry.conginition?.person_past || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Note any amnesia (anterograde/retrograde)</strong>
+                    <p className='mx-3'>{entry.conginition?.amnesia || "NULL"}</p>
+                  </li>
+                  <h6>Question to ask for the Memory : </h6>
+                  <h6>Long-term Memory : </h6>
+                  <li>
+                    <strong>Where did you live when you were growing up?</strong>
+                    <p className='mx-3'>{entry.conginition?.live_growing || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>What was the name of the school you went to?</strong>
+                    <p className='mx-3'>{entry.conginition?.person_school || "NULL"}</p>
+                  </li>
+                  <h6>Short-term Memory</h6>
+                  <li>
+                    <strong>What did you have for breakfast?</strong>
+                    <p className='mx-3'>{entry.conginition?.breakfast_ques || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>What did you do Yesterday?</strong>
+                    <p className='mx-3'>{entry.conginition?.do_yesterday || "NULL"}</p>
+                  </li>
+                  <h6>Intelligence : </h6>
+                  <li>
+                    <strong>Ask questions about general information, keeping in mind the patient's educational and social background, his experiences and interests</strong>
+                    <p className='mx-3'>{entry.conginition?.general_info || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Test for reading and writing</strong>
+                    <p className='mx-3'>{entry.conginition?.test_red_wri || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Give simple tests of calculation</strong>
+                    <p className='mx-3'>{entry.conginition?.calculation_test || "NULL"}</p>
+                  </li>
+                  <h6>Abstract thinking :</h6>
+                  <li>
+                    <strong>Abstract thinking testing assesses patient's concept formation. The methods used are:</strong>
+                    <p className='mx-3'>{entry.conginition?.proverb_testing || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Ask the resident to identify the similarities and differences between familiar objects such as a table and a chair, a banana and an orange, a dog and a lion, and an eye and an ear.</strong>
+                    <p className='mx-3'>{entry.conginition?.familiar_object || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
+              <li className="tab-content my-5">
+                <h5><strong>7. JUDGEMENT</strong> DATE: {entry.judgement?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <strong>Personal judgement : </strong>
+                    <p className='mx-3'>{entry.judgement?.personal_judgement || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Social judgement : </strong>
+                    <p className='mx-3'>{entry.judgement?.social_judgement || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Test judgement : </strong>
+                    <p className='mx-3'>{entry.judgement?.test_judgement || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>Judgement : </strong>
+                    <p className='mx-3'>{entry.judgement?.judgement || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
+              <li className="tab-content my-5">
+                <h5><strong>8. INSIGHT</strong> DATE: {entry.insight?.date}</h5>
+                <ul style={{ listStyleType: "none", textAlign: "start" }}>
+                  <li>
+                    <h6>Levels of Insight</h6>
+                    <p>Insight is assessed using a six-point scale ranging from one to six.</p>
+                    <strong>1. Complete denial of illness : </strong>
+                    <p className='mx-3'>{entry.insight?.denail_illness || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>2. Slight awareness of being sick & needing help but denying it at the same time : </strong>
+                    <p className='mx-3'>{entry.insight?.slight_awareness || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>3. Awareness of being sick but blaming it on others, on external factors, or on organic factors : </strong>
+                    <p className='mx-3'>{entry.insight?.awarness_sick || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>4. Awareness that illness is due to something unknown in the patient : </strong>
+                    <p className='mx-3'>{entry.insight?.awarness_illness || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>5. Intellectual insight: </strong>
+                    <p className='mx-3'>{entry.insight?.intellectual_insight || "NULL"}</p>
+                  </li>
+                  <li>
+                    <strong>6. True emotional insight : </strong>
+                    <p className='mx-3'>{entry.insight?.true_emotion || "NULL"}</p>
+                  </li>
+                </ul>
+              </li>
             </ul>
-          </li>
+          </div>
+        ))}
 
-          {/* SPEECH START*/}
-          <li className="tab-content my-3">
-            <h6>2. SPEECH:</h6>
-            <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* Rate and quantity of speech */}
-              {speechFormData.rate_quantity?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Rate and quantity of speech:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {speechFormData.rate_quantity.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
 
-              {/* Volume and tone of speech */}
-              {speechFormData.volume_tone?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Volume and tone of speech:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {speechFormData.volume_tone.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Flow and rhythm of speech */}
-              {speechFormData.flow_rhythm && (
-                <li className='d-flex'>
-                  <strong>Flow and rhythm of speech:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {speechFormData.flow_rhythm.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-
-            </ul>
-          </li>
-
-          {/* MOOOD AFFECT START*/}
-          <li className="tab-content my-3">
-            <h6>3. MOOD AND AFFECT</h6>
-            <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* Mood Described */}
-              {moodFormData.mood_description?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Mood Described as:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {moodFormData.mood_description.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* appearance */}
-              {moodFormData.appearance?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>How do they appear to you?</strong>
-                  <p className='mx-3'>{moodFormData.appearance}</p>
-                </li>
-              )}
-
-              {/* resident_feeling */}
-              {moodFormData.resident_feeling && (
-                <li className='d-flex'>
-                  <strong>Ask the Resident directly how he/she feels :</strong>
-                  <p className='mx-3'>{moodFormData.resident_feeling}</p>
-                </li>
-              )}
-              <h6>Question to ask about Mood:</h6>
-              {/* general_feeling */}
-              {moodFormData.general_feeling && (
-                <li className='d-flex'>
-                  <strong>How do you generally feel most of the time?</strong>
-                  <p className='mx-3'>{moodFormData.general_feeling}</p>
-                </li>
-              )}
-
-              {/* mood_like */}
-              {moodFormData.mood_like && (
-                <li className='d-flex'>
-                  <strong>What's your mood like?</strong>
-                  <p className='mx-3'>{moodFormData.mood_like}</p>
-                </li>
-              )}
-
-              {/* resident_general_feeling */}
-              {moodFormData.resident_general_feeling && (
-                <li className='d-flex'>
-                  <strong>How would you say you feel generally - happy, sad, frightened, angry ?</strong>
-                  <p className='mx-3'>{moodFormData.resident_general_feeling}</p>
-                </li>
-              )}
-
-              {moodFormData.resident_look?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Resident's Looks like:</strong>
-                  <ul className='d-flex' style={{ listStyleType: "none" }}>
-                    {moodFormData.resident_look.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-            </ul>
-          </li>
-
-          {/* THOUGH START*/}
-          <li className="tab-content my-5">
-            <h6>4. THOUGHT</h6>
-            <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* Rate and quantity of speech */}
-              {thoughFormData.stream_form_though?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Rate and quantity of speech:</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {thoughFormData.stream_form_though.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Volume and tone of speech */}
-              {thoughFormData.content_though?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Volume and tone of speech:</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {thoughFormData.content_though.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-            </ul>
-          </li>
-
-          {/* PECEIPTION START*/}
-          <li className="tab-content mt-5">
-            <h6>5. PERCEPTION</h6>
-            <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* Hallucinations */}
-              {perceptionData.hallucination_type?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Hallucinations:</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {perceptionData.hallucination_type.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* heard */}
-              {perceptionData.heard?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>What was heard?</strong>
-                  <p className='mx-3'>{perceptionData.heard}</p>
-                </li>
-              )}
-
-              {/* voices_heard */}
-              {perceptionData.voices_heard?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>In which part of the day?</strong>
-                  <p className='mx-3'>{perceptionData.voices_heard}</p>
-                </li>
-              )}
-
-              {/* part_of_day */}
-              {perceptionData.part_of_day?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>In which part of the day?</strong>
-                  <p className='mx-3'>{perceptionData.part_of_day}</p>
-                </li>
-              )}
-
-              {/* female_male_voices */}
-              {perceptionData.female_male_voices?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Male or Female voices?</strong>
-                  <p className='mx-3'>{perceptionData.female_male_voices}</p>
-                </li>
-              )}
-
-              {/* interpreted_person */}
-              {perceptionData.interpreted_person?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>How interpreted and whether second person or third person hallucinations? </strong>
-                  <p className='mx-3'>{perceptionData.interpreted_person}</p>
-                </li>
-              )}
-
-              {/* Illusions and misinterpretations */}
-              {perceptionData.illusion?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Illusions and misinterpretations:</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {perceptionData.illusion.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* Illusions and misinterpretations */}
-              {perceptionData.perception_changes?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Perception Changes :</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {perceptionData.perception_changes.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* somatic */}
-              {perceptionData.somatic?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Somatic passivity phenomenon :</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {perceptionData.somatic.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* others */}
-              {perceptionData.others?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Others :</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {perceptionData.others.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-            </ul>
-          </li>
-
-          {/* Cognition START*/}
-          <li className="tab-content mt-5">
-            <h6>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</h6>
-            <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* Hallucinations */}
-              {cognitionData.consciousness?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Consciousness:</strong>
-                  <ul style={{ listStyleType: "none" }}>
-                    {cognitionData.consciousness.map((item, idx) => (
-                      <li key={idx}>{item} ,</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-
-              {/* orientation_time */}
-              {cognitionData.orientation_time?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Oriented to Time:</strong>
-                  <p className='mx-3'>{cognitionData.orientation_time}</p>
-                </li>
-              )}
-
-              {/* orientation_place */}
-              {cognitionData.orientation_place?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Oriented to Place:</strong>
-                  <p className='mx-3'>{cognitionData.orientation_place}</p>
-                </li>
-              )}
-
-              {/* orientation_person */}
-              {cognitionData.orientation_person?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Oriented to Person:</strong>
-                  <p className='mx-3'>{cognitionData.orientation_person}</p>
-                </li>
-              )}
-              <h6>Concentration</h6>
-              {/* distractibility */}
-              {cognitionData.distractibility?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>1. Ease of distractibility:</strong>
-                  <p className='mx-3'>{cognitionData.distractibility}</p>
-                </li>
-              )}
-
-              {/* asking_test */}
-              {cognitionData.asking_test?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>2. Ask to subtract serial sevens from hundred (100-7 test), or serial threes from forty (40-3 test), or to count backwards from 20</strong>
-                  <p className='mx-3'>{cognitionData.asking_test}</p>
-                </li>
-              )}
-
-              {/* names_months */}
-              {cognitionData.names_months?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>3. Enumerate the names of the months (or days of the week) in the reverse order.</strong>
-                  <p className='mx-3'>{cognitionData.names_months}</p>
-                </li>
-              )}
-
-              {/* names_months */}
-              {cognitionData.test_performance?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>4. Note down the answers and the time take perform the tests.</strong>
-                  <p className='mx-3'>{cognitionData.test_performance}</p>
-                </li>
-              )}
-
-              <h6>Memory:</h6>
-              {/* immediate_retention */}
-              {cognitionData.immediate_retention?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Immediate Retention (IR) :</strong>
-                  <p className='mx-3'>{cognitionData.immediate_retention}</p>
-                </li>
-              )}
-
-              {/* recall */}
-              {cognitionData.recall?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Recall (R) after a delay :</strong>
-                  <p className='mx-3'>{cognitionData.recall}</p>
-                </li>
-              )}
-
-              {/* patient_place */}
-              {cognitionData.patient_place?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>How did the patient come to the room/hospital ?</strong>
-                  <p className='mx-3'>{cognitionData.patient_place}</p>
-                </li>
-              )}
-
-              {/* dinner_ate */}
-              {cognitionData.dinner_ate?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>What he ate for dinner the day before or for breakfast the same morning ?</strong>
-                  <p className='mx-3'>{cognitionData.dinner_ate}</p>
-                </li>
-              )}
-
-              {/* date_ofMrg */}
-              {cognitionData.date_ofMrg?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Ask for the date of marriage</strong>
-                  <p className='mx-3'>{cognitionData.date_ofMrg}</p>
-                </li>
-              )}
-
-              {/* date_ofMrg */}
-              {cognitionData.birthdays_children?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Name and birthdays of children</strong>
-                  <p className='mx-3'>{cognitionData.birthdays_children}</p>
-                </li>
-              )}
-
-              {/* person_past */}
-              {cognitionData.person_past?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Any other relevant questions from the person's past</strong>
-                  <p className='mx-3'>{cognitionData.person_past}</p>
-                </li>
-              )}
-
-              {/* amnesia */}
-              {cognitionData.amnesia?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Note any amnesia (anterograde/retrograde)</strong>
-                  <p className='mx-3'>{cognitionData.amnesia}</p>
-                </li>
-              )}
-
-              <h6>Question to ask for the Memory</h6>
-              <h6>Long-term Memory</h6>
-              {/* live_growing */}
-              {cognitionData.live_growing?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Where did you live when you were growing up?</strong>
-                  <p className='mx-3'>{cognitionData.live_growing}</p>
-                </li>
-              )}
-
-              {/* person_school */}
-              {cognitionData.person_school?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>What was the name of the school you went to?</strong>
-                  <p className='mx-3'>{cognitionData.person_school}</p>
-                </li>
-              )}
-
-              <h6>Short-term Memory</h6>
-              {/* breakfast_ques */}
-              {cognitionData.breakfast_ques?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>What did you have for breakfast?</strong>
-                  <p className='mx-3'>{cognitionData.breakfast_ques}</p>
-                </li>
-              )}
-
-              {/* do_yesterday */}
-              {cognitionData.do_yesterday?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>What did you do Yesterday?</strong>
-                  <p className='mx-3'>{cognitionData.do_yesterday}</p>
-                </li>
-              )}
-
-              <h6>Intelligence</h6>
-              {/* general_info */}
-              {cognitionData.general_info?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Ask questions about general information, keeping in mind the patient's educational and social background, his experiences and interests</strong>
-                  <p className='mx-3'>{cognitionData.general_info}</p>
-                </li>
-              )}
-
-              {/* test_red_wri */}
-              {cognitionData.test_red_wri?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Test for reading and writing</strong>
-                  <p className='mx-3'>{cognitionData.test_red_wri}</p>
-                </li>
-              )}
-
-              {/* calculation_test */}
-              {cognitionData.calculation_test?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Give simple tests of calculation</strong>
-                  <p className='mx-3'>{cognitionData.calculation_test}</p>
-                </li>
-              )}
-
-              {/* proverb_testing */}
-              {cognitionData.proverb_testing?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Proverb testing: Asking the meaning of simple proverbs.</strong>
-                  <p className='mx-3'>{cognitionData.proverb_testing}</p>
-                </li>
-              )}
-
-              {/* familiar_object */}
-              {cognitionData.familiar_object?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Ask the resident to identify the similarities and differences between familiar objects such as a table and a chair, a banana and an orange, a dog and a lion, and an eye and an ear.</strong>
-                  <p className='mx-3'>{cognitionData.familiar_object}</p>
-                </li>
-              )}
-
-            </ul>
-          </li>
-
-          {/* JUDGEMENT START*/}
-          <li className="tab-content my-5">
-            <h6>7. JUDGEMENT</h6>
-            <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* Personal judgement */}
-              {judgementData.personal_judgement?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Personal judgement:</strong>
-                  <p className='mx-3'>{judgementData.personal_judgement}</p>
-                </li>
-              )}
-
-              {/* Social judgement */}
-              {judgementData.social_judgement?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Social judgement:</strong>
-                  <p className='mx-3'>{judgementData.social_judgement}</p>
-                </li>
-              )}
-
-              {/* Test judgment */}
-              {judgementData.test_judgement?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Test judgement:</strong>
-                  <p className='mx-3'>{judgementData.test_judgement}</p>
-                </li>
-              )}
-
-              {/* Judgment */}
-              {judgementData.judgement?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>Judgement:</strong>
-                  <p className='mx-3'>{judgementData.judgement}</p>
-                </li>
-              )}
-
-            </ul>
-          </li>
-
-          {/* INSIGHT START*/}
-          <li className="tab-content my-5">
-            <h6>8. INSIGHT</h6>
-            <ul style={{ listStyleType: "none", textAlign: "start" }}>
-              {/* denail_illness */}
-              {insightData.denail_illness?.length > 0 && (
-                <li className="d-flex flex-column mb-2">
-                  <h6><strong>LEVELS OF INSIGHT:</strong></h6>
-                  <div className="d-flex">
-                    <strong>1. Complete denial of illness:</strong>
-                    <p className="mx-2 mb-0">{insightData.denail_illness}</p>
-                  </div>
-                </li>
-              )}
-
-              {/* slight_awareness */}
-              {insightData.slight_awareness?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>2. Slight awareness of being sick & needing help but denying it at the same time : </strong>
-                  <p className='mx-3'>{insightData.slight_awareness}</p>
-                </li>
-              )}
-
-              {/* awarness_sick */}
-              {insightData.awarness_sick?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>3. Awareness of being sick but blaming it on others, on external factors, or on organic factors.</strong>
-                  <p className='mx-3'>{insightData.awarness_sick}</p>
-                </li>
-              )}
-
-              {/* awarness_illness */}
-              {insightData.awarness_illness?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>4. Awareness that illness is due to something unknown in the patient</strong>
-                  <p className='mx-3'>{insightData.awarness_illness}</p>
-                </li>
-              )}
-
-              {/* awarness_illness */}
-              {insightData.intellectual_insight?.length > 0 && (
-                <li className='d-flex'>
-                  <strong>5. Intellectual insight</strong>
-                  <p className='mx-3'>{insightData.intellectual_insight}</p>
-                </li>
-              )}
-
-              {/* true_emotion */}
-              {insightData.true_emotion?.length > 0 && (
-                <li className='d-flex mt-5'>
-                  <strong>6. True emotional insight</strong>
-                  <p className='mx-3'>{insightData.true_emotion}</p>
-                </li>
-              )}
-
-
-            </ul>
-          </li>
-        </ul>
       </div>
 
       <Modal show={show} onHide={handleClose}>
@@ -3851,7 +3503,7 @@ function MSE_form() {
               </Form.Group>
 
               <div className="mt-3">
-                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, formData.admission_no)}>Update</Button>
+                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, formData.admission_no, date)}>Update</Button>
                 <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
               </div>
             </Form>
@@ -3915,7 +3567,7 @@ function MSE_form() {
               </li>
 
               <div className="mt-3">
-                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSpeechUpdate(e, speechFormData.admission_no)}>Update</Button>
+                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSpeechUpdate(e, speechFormData.admission_no, date)}>Update</Button>
                 <Button variant="secondary" className="m-1" onClick={handleSpeechClose}>Close</Button>
               </div>
             </Form>
@@ -4019,7 +3671,7 @@ function MSE_form() {
               </li>
 
               <div className="mt-3">
-                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleMoodUpdate(e, moodFormData.admission_no)}>Update</Button>
+                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleMoodUpdate(e, moodFormData.admission_no, date)}>Update</Button>
                 <Button variant="secondary" className="m-1" onClick={handleMoodClose}>Close</Button>
               </div>
 
@@ -4086,7 +3738,7 @@ function MSE_form() {
                   </div>
 
                   <div className="mt-3">
-                    <Button variant="success" className="m-1" type="submit" onClick={(e) => handleThoughUpdate(e, thoughFormData.admission_no)}>Update</Button>
+                    <Button variant="success" className="m-1" type="submit" onClick={(e) => handleThoughUpdate(e, thoughFormData.admission_no, date)}>Update</Button>
                     <Button variant="secondary" className="m-1" onClick={handleThoughClose}>Close</Button>
                   </div>
                 </li>
@@ -4214,7 +3866,7 @@ function MSE_form() {
                   </div>
 
                   <div className="mt-3">
-                    <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePerceptionUpdate(e, perceptionData.admission_no)}>Update</Button>
+                    <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePerceptionUpdate(e, perceptionData.admission_no, date)}>Update</Button>
                     <Button variant="secondary" className="m-1" onClick={handlePerceptionClose}>Close</Button>
                   </div>
 
@@ -4291,7 +3943,7 @@ function MSE_form() {
               </li>
 
               <div className="mt-3">
-                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleJudgementUpdate(e, judgementData.admission_no)}>Update</Button>
+                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleJudgementUpdate(e, judgementData.admission_no, date)}>Update</Button>
                 <Button variant="secondary" className="m-1" onClick={handleJudgementClose}>Close</Button>
               </div>
 
@@ -4364,7 +4016,7 @@ function MSE_form() {
 
 
               <div className="mt-3">
-                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleInsightUpdate(e, perceptionData.admission_no)}>Update</Button>
+                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleInsightUpdate(e, perceptionData.admission_no, date)}>Update</Button>
                 <Button variant="secondary" className="m-1" onClick={hanldeInsightClose}>Close</Button>
               </div>
 
@@ -4729,7 +4381,7 @@ function MSE_form() {
                   </Form.Group>
                 </li>
                 <div className="mt-3">
-                  <Button variant="success" className="m-1" type="submit" onClick={(e) => handleCognitionUpdate(e, cognitionData.admission_no)}>Update</Button>
+                  <Button variant="success" className="m-1" type="submit" onClick={(e) => handleCognitionUpdate(e, cognitionData.admission_no, date)}>Update</Button>
                   <Button variant="secondary" className="m-1" onClick={hanldeCognitionClose}>Close</Button>
                 </div>
 

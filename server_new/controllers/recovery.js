@@ -19,7 +19,7 @@ const createMSEForm = async (req, res) => {
     } = req.body;
 
     const query = `
-    INSERT INTO appearance_behaviour (
+    INSERT INTO general_appearance (
         admission_no,
         date,
       general_appearance,
@@ -51,6 +51,7 @@ const createMSEForm = async (req, res) => {
     ];
 
     const [result] = await db.query(query, values);
+    
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
@@ -563,9 +564,9 @@ const updateAppearance = async (req, res) => {
       social_manner, rapport, hallucinatory_behaviour
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
-    const uquery = `UPDATE appearance_behaviour SET 
+    const uquery = `UPDATE general_appearance SET 
                     general_appearance = ?, 
                     attitude = ?, 
                     comprehension = ?, 
@@ -576,7 +577,7 @@ const updateAppearance = async (req, res) => {
                     social_manner = ?,
                     rapport = ?,
                     hallucinatory_behaviour = ?
-                    WHERE admission_no = ?`;
+                    WHERE date = ? AND admission_no = ?`;
 
     const values = [
       general_appearance.join(", "),
@@ -589,6 +590,7 @@ const updateAppearance = async (req, res) => {
       social_manner.join(", "),
       rapport.join(", "),
       hallucinatory_behaviour.join(", "),
+      date,
       admission_no
     ];
     const [result] = await db.query(uquery, values);
@@ -624,7 +626,7 @@ const updateInformation = async (req, res) => {
 
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE basic_detail SET
                     patient_name = ?,
@@ -643,7 +645,7 @@ const updateInformation = async (req, res) => {
                     cultural_identity = ?,
                     language1 = ?,
                     language2 = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
     const values = [
       patient_name,
       patient_age,
@@ -660,7 +662,7 @@ const updateInformation = async (req, res) => {
       family_structure,
       cultural_identity,
       language1,
-      language2, admission_no
+      language2, admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -690,7 +692,7 @@ const updateCheifComplaint = async (req, res) => {
 
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE cheif_complaint SET
                     chief_complaint = ?,
@@ -704,7 +706,7 @@ const updateCheifComplaint = async (req, res) => {
                     biological = ?,
                     psychological = ?,
                     social_environment = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
     const values = [
       chief_complaint,
       onset_duration,
@@ -716,7 +718,7 @@ const updateCheifComplaint = async (req, res) => {
       life_changes,
       biological,
       psychological,
-      social_environment, admission_no
+      social_environment, admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -747,7 +749,7 @@ const updatePresentingData = async (req, res) => {
       recreation_activity,
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE presenting_problems SET
                     history_presenting = ?,
@@ -763,7 +765,7 @@ const updatePresentingData = async (req, res) => {
                     interpersonal_relationship = ?,
                     selfCare_activity = ?,
                     recreation_activity = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       history_presenting,
@@ -778,7 +780,7 @@ const updatePresentingData = async (req, res) => {
       occupation_academic,
       interpersonal_relationship,
       selfCare_activity,
-      recreation_activity, admission_no
+      recreation_activity, admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -810,7 +812,7 @@ const updatePsychiatricData = async (req, res) => {
       trauma_exploration,
       legal_environment
     } = req.body;
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE psy_history SET
                     psychiatric_diagnoses = ?,
@@ -828,7 +830,7 @@ const updatePsychiatricData = async (req, res) => {
                     chronic_stressors = ?,
                     trauma_exploration = ?,
                     legal_environment = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
     const values = [
       psychiatric_diagnoses,
       treatment_history,
@@ -844,7 +846,7 @@ const updatePsychiatricData = async (req, res) => {
       significant_life,
       chronic_stressors,
       trauma_exploration.join(", "),
-      legal_environment.join(", "), admission_no
+      legal_environment.join(", "), admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -871,7 +873,7 @@ const updateMedicalHistoryData = async (req, res) => {
       sexual_health
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const query = `UPDATE medical_history SET
                   disability_status = ?,
@@ -883,7 +885,7 @@ const updateMedicalHistoryData = async (req, res) => {
                   significant_medical = ?,
                   traumatic_injuries = ?,
                   sexual_health = ?
-                  WHERE admission_no = ?`;
+                  WHERE admission_no = ? AND date = ?`;
 
     const values = [
       disability_status,
@@ -895,7 +897,7 @@ const updateMedicalHistoryData = async (req, res) => {
       significant_medical.join(", "),
       traumatic_injuries,
       sexual_health.join(", "),
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(query, values);
     if (result.affectedRows === 0) {
@@ -920,7 +922,7 @@ const updateFamilyHistoryData = async (req, res) => {
       family_substance
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE familyhis_data SET
                     family_composition = ?,
@@ -930,7 +932,7 @@ const updateFamilyHistoryData = async (req, res) => {
                     genetic_predisposition = ?,
                     family_changes = ?,
                     family_substance = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       family_composition.join(", "),
@@ -939,7 +941,7 @@ const updateFamilyHistoryData = async (req, res) => {
       family_history,
       genetic_predisposition,
       family_changes.join(", "),
-      family_substance, admission_no
+      family_substance, admission_no, date
     ];
 
     const [result] = await db.query(uquery, values);
@@ -968,7 +970,7 @@ const updateSocialHistoryData = async (req, res) => {
       technology_related,
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE social_history SET
                     family_relationship = ?,
@@ -981,7 +983,7 @@ const updateSocialHistoryData = async (req, res) => {
                     social_outlets = ?,
                     socialMed_engagement = ?,
                     technology_related = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       family_relationship,
@@ -994,7 +996,7 @@ const updateSocialHistoryData = async (req, res) => {
       social_outlets,
       socialMed_engagement,
       technology_related,
-      admission_no
+      admission_no, date
     ];
 
     const [result] = await db.query(uquery, values);
@@ -1024,7 +1026,7 @@ const updateDevelopmentalData = async (req, res) => {
       pubertal_development
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE development_history SET
                     prenatal_factors = ?,
@@ -1038,7 +1040,7 @@ const updateDevelopmentalData = async (req, res) => {
                     parenting_style = ?,
                     learning_challenge = ?,
                     pubertal_development = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       prenatal_factors,
@@ -1051,7 +1053,7 @@ const updateDevelopmentalData = async (req, res) => {
       siblings_relationship,
       parenting_style,
       learning_challenge,
-      pubertal_development, admission_no
+      pubertal_development, admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1081,7 +1083,7 @@ const updateSubstanceData = async (req, res) => {
       relapse_history,
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE substance_use SET
                     substance_use = ?,
@@ -1096,7 +1098,7 @@ const updateSubstanceData = async (req, res) => {
                     craving_intensity = ?,
                     previous_treatment = ?,
                     relapse_history = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       substance_use,
@@ -1111,7 +1113,7 @@ const updateSubstanceData = async (req, res) => {
       craving_intensity,
       previous_treatment,
       relapse_history,
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1136,7 +1138,7 @@ const updateSuicidalData = async (req, res) => {
       hospital_required,
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const {admission_no, date} = req.params;
 
     const uquery = `UPDATE suicidal_data SET
                     suicide_history = ?,
@@ -1146,7 +1148,7 @@ const updateSuicidalData = async (req, res) => {
                     immediate_threat = ?,
                     emergency_response = ?,
                     hospital_required = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       suicide_history,
@@ -1156,7 +1158,7 @@ const updateSuicidalData = async (req, res) => {
       immediate_threat,
       emergency_response,
       hospital_required,
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1175,19 +1177,19 @@ const UpdateSpeech = async (req, res) => {
       rate_quantity, volume_tone, flow_rhythm
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
     const uquery = `UPDATE speech SET 
                     rate_quantity = ?, 
                     volume_tone = ?, 
                     flow_rhythm = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       rate_quantity.join(", "),
       volume_tone.join(", "),
       flow_rhythm.join(", "),
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1207,7 +1209,7 @@ const UpdateMood = async (req, res) => {
       mood_like, resident_general_feeling, resident_look
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
     const uquery = `UPDATE mood_affect SET 
                     mood_description = ?, 
@@ -1217,7 +1219,7 @@ const UpdateMood = async (req, res) => {
                     mood_like = ?,
                     resident_general_feeling = ?,
                     resident_look = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date =?`;
 
     const values = [
       mood_description.join(", "),
@@ -1227,7 +1229,7 @@ const UpdateMood = async (req, res) => {
       mood_like,
       resident_general_feeling,
       resident_look.join(", "),
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1247,17 +1249,17 @@ const updateThough = async (req, res) => {
       stream_form_though, content_though
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
     const uquery = `UPDATE though_form SET 
                     stream_form_though = ?, 
                     content_though = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       stream_form_though.join(", "),
       content_though.join(", "),
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1277,7 +1279,7 @@ const updatePerception = async (req, res) => {
       interpreted_person, illusion, perception_changes, somatic, others
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
     const uquery = `UPDATE perception SET 
                     hallucination_type = ?, 
@@ -1290,7 +1292,7 @@ const updatePerception = async (req, res) => {
                     perception_changes = ?,
                     somatic = ?,
                     others = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       hallucination_type.join(", "),
@@ -1303,7 +1305,7 @@ const updatePerception = async (req, res) => {
       perception_changes.join(", "),
       somatic.join(", "),
       others.join(", "),
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1322,21 +1324,21 @@ const updateJudgement = async (req, res) => {
       personal_judgement, social_judgement, test_judgement, judgement
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
     const uquery = `UPDATE judgement SET 
                     personal_judgement = ?, 
                     social_judgement = ?,
                     test_judgement = ?,
                     judgement = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       personal_judgement,
       social_judgement,
       test_judgement,
       judgement,
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1355,7 +1357,7 @@ const updateInsight = async (req, res) => {
       denail_illness, slight_awareness, awarness_sick, awarness_illness, intellectual_insight, true_emotion,
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
     const uquery = `UPDATE insight SET 
                     denail_illness = ?, 
@@ -1364,7 +1366,7 @@ const updateInsight = async (req, res) => {
                     awarness_illness = ?,
                     intellectual_insight = ?,
                     true_emotion = ?
-                    WHERE admission_no = ?`;
+                    WHERE admission_no = ? AND date = ?`;
 
     const values = [
       denail_illness,
@@ -1373,7 +1375,7 @@ const updateInsight = async (req, res) => {
       awarness_illness,
       intellectual_insight,
       true_emotion,
-      admission_no
+      admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1396,34 +1398,44 @@ const updateCognition = async (req, res) => {
       familiar_object
     } = req.body;
 
-    const admission_no = req.params.admission_no;
+    const { admission_no, date } = req.params;
 
     const uquery = `UPDATE conginition SET 
-                    consciousness = ?, 
-                    orientation_time = ?,
-                    orientation_place = ?,
-                    orientation_person = ?,
-                    consciousnessState = ?,
-                    canConcentrate = ?,
-                    distractibility = ?,
-                    asking_test = ?, 
-                    names_months = ?,
-                    test_performance = ?,
-                    immediate_retention = ?,
-                    recall =?,
-                    patient_place = ?,dinner_ate = ?, date_ofMrg = ?,
-                    birthdays_children = ?, person_past = ?,amnesia = ?,
-                    live_growing = ?, person_school = ?,breakfast_ques = ?,do_yesterday = ?,
-                    general_info = ?,test_red_wri = ?,calculation_test = ?,proverb_testing = ?,
-                    familiar_object = ?
-                    WHERE admission_no = ?`;
+  consciousness = ?, 
+  orientation_time = ?,
+  orientation_place = ?,
+  orientation_person = ?,
+  consciousnessState = ?,
+  canConcentrate = ?,
+  distractibility = ?,
+  asking_test = ?, 
+  names_months = ?,
+  test_performance = ?,
+  immediate_retention = ?,
+  recall = ?,
+  patient_place = ?,
+  dinner_ate = ?, 
+  date_ofMrg = ?,
+  birthdays_children = ?, 
+  person_past = ?,
+  amnesia = ?,
+  live_growing = ?, 
+  person_school = ?,
+  breakfast_ques = ?,
+  do_yesterday = ?,
+  general_info = ?,
+  test_red_wri = ?,
+  calculation_test = ?,
+  proverb_testing = ?,
+  familiar_object = ?
+  WHERE admission_no = ? AND date = ?`;
 
     const values = [
-      consciousness, orientation_time, orientation_place, orientation_person, consciousnessState, canConcentrate,
+      consciousness.join(', '), orientation_time, orientation_place, orientation_person, consciousnessState.join(', '), canConcentrate,
       distractibility, asking_test, names_months, test_performance, immediate_retention,
       recall, patient_place, dinner_ate, date_ofMrg, birthdays_children, person_past, amnesia,
       live_growing, person_school, breakfast_ques, do_yesterday, general_info, test_red_wri, calculation_test, proverb_testing,
-      familiar_object, admission_no
+      familiar_object, admission_no, date
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1438,27 +1450,28 @@ const updateCognition = async (req, res) => {
 
 
 const getallappearance = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM appearance_behaviour WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM general_appearance WHERE admission_no = ? AND date = ?';
+
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
-      return res.status(404).json({ message: 'General Appearance Form not found' });
+      return res.status(404).json({ message: 'No form found for this Admission Number and Date' });
     }
-    res.json(results[0]);
+    res.json(results[0]); // Send the matched row
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Database error' });
+    res.status(500).json({ message: 'Database error' });
   }
 }
 
 
 const getallmood = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM mood_affect WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM mood_affect WHERE admission_no = ? AND date = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Mood and Affect Form not found' });
     }
@@ -1470,12 +1483,12 @@ const getallmood = async (req, res) => {
 }
 
 const getallspeech = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM speech WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM speech WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
-      return res.status(404).json({ message: 'Speech Form not found' });
+      return res.status(404).json({ message: 'No form found for this Admission Number and Date' });
     }
     res.json(results[0]);
   } catch (err) {
@@ -1485,11 +1498,11 @@ const getallspeech = async (req, res) => {
 }
 
 const getallThough = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM though_form WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM though_form WHERE admission_no = ? AND date = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Though Form not found' });
     }
@@ -1501,11 +1514,11 @@ const getallThough = async (req, res) => {
 }
 
 const getallperception = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM perception WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM perception WHERE admission_no = ? AND date = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Perception Form not found' });
     }
@@ -1517,11 +1530,11 @@ const getallperception = async (req, res) => {
 }
 
 const getalljudgement = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM judgement WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM judgement WHERE admission_no = ? AND date = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Judgement Form not found' });
     }
@@ -1533,11 +1546,11 @@ const getalljudgement = async (req, res) => {
 }
 
 const getallInsight = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM insight WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM insight WHERE admission_no = ? AND date = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Insight Form not found' });
     }
@@ -1549,11 +1562,11 @@ const getallInsight = async (req, res) => {
 }
 
 const getallcognition = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM conginition WHERE admission_no = ?';
+  const { admission_no, date } = req.params;
+  const query = 'SELECT * FROM conginition WHERE admission_no = ? AND date = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Cognition Form not found' });
     }
@@ -1568,28 +1581,68 @@ const getMseAllForm = async (req, res) => {
   try {
     const admission_no = req.params.admission_no;
 
-    const query = (q) => db.query(q, [admission_no]);
+    const [appearance_behaviour] = await db.query(
+      `SELECT * FROM general_appearance WHERE admission_no = ? ORDER BY date ASC`,
+      [admission_no]
+    );
+    if (appearance_behaviour.length === 0) {
+      return res.status(404).json({ message: "No data found" });
+    }
 
-    const [appearance_behaviour] = await query(`SELECT * FROM appearance_behaviour WHERE admission_no = ?`);
-    const [speech] = await query(`SELECT * FROM speech WHERE admission_no = ?`);
-    const [mood_affect] = await query(`SELECT * FROM mood_affect WHERE admission_no = ?`);
-    const [though] = await query(`SELECT * FROM though_form WHERE admission_no = ?`);
-    const [perceiption] = await query(`SELECT * FROM perception WHERE admission_no = ?`);
-    const [conginition] = await query(`SELECT * FROM conginition WHERE admission_no = ?`);
-    const [judgement] = await query(`SELECT * FROM judgement WHERE admission_no = ?`);
-    const [insight] = await query(`SELECT * FROM insight WHERE admission_no = ?`);
+    const fullForms = [];
 
-    return res.status(200).json({
-      appearance_behaviour: appearance_behaviour[0] || null,
-      speech: speech[0] || null,
-      mood_affect: mood_affect[0] || null,
-      though: though[0] || null,
-      perceiption: perceiption[0] || null,
-      conginition: conginition[0] || null,
-      judgement: judgement[0] || null,
-      insight: insight[0] || null
-    });
+    for (const basic of appearance_behaviour) {
+      const date = basic.date;
 
+      const [speech] = await db.query(
+        `SELECT * FROM speech WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [mood_affect] = await db.query(
+        `SELECT * FROM mood_affect WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [though] = await db.query(
+        `SELECT * FROM though_form WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [perceiption] = await db.query(
+        `SELECT * FROM perception WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [conginition] = await db.query(
+        `SELECT * FROM conginition WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [judgement] = await db.query(
+        `SELECT * FROM judgement WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      const [insight] = await db.query(
+        `SELECT * FROM insight WHERE admission_no = ? AND date = ?`,
+        [admission_no, date]
+      );
+
+      // Combine into one full set
+      fullForms.push({
+        date: basic.date,
+        appearance_behaviour: basic || null,
+        speech: speech[0] || null,
+        mood_affect: mood_affect[0] || null,
+        though: though[0] || null,
+        perceiption: perceiption[0] || null,
+        conginition: conginition[0] || null,
+        judgement: judgement[0] || null,
+        insight: insight[0] || null
+      });
+    }
+    return res.status(200).json(fullForms);
   } catch (error) {
     console.error("Error fetching MSE form data:", error);
     return res.status(500).json({ message: "Internal server error", error });
@@ -2054,10 +2107,10 @@ const createSuicidalData = async (req, res) => {
 }
 
 const getInformation = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM basic_detail WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM basic_detail WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Demographic Information Form not found' });
     }
@@ -2069,10 +2122,10 @@ const getInformation = async (req, res) => {
 }
 
 const getCheifComplaint = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM cheif_complaint WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM cheif_complaint WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Cheif Complaint Form not found' });
     }
@@ -2084,10 +2137,10 @@ const getCheifComplaint = async (req, res) => {
 }
 
 const getPresentingData = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM presenting_problems WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM presenting_problems WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Presenting Problems Form not found' });
     }
@@ -2099,10 +2152,10 @@ const getPresentingData = async (req, res) => {
 }
 
 const getPsychiatricData = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM psy_history WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM psy_history WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Psychiatric History Form not found' });
     }
@@ -2114,10 +2167,10 @@ const getPsychiatricData = async (req, res) => {
 }
 
 const getMedicalHistory = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM medical_history WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM medical_history WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Medical History Form not found' });
     }
@@ -2129,10 +2182,10 @@ const getMedicalHistory = async (req, res) => {
 }
 
 const getFamilyHistory = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM familyhis_data WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM familyhis_data WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Family History Form not found' });
     }
@@ -2144,10 +2197,10 @@ const getFamilyHistory = async (req, res) => {
 }
 
 const getSocialHistory = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM social_history WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM social_history WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Social History Form not found' });
     }
@@ -2159,10 +2212,10 @@ const getSocialHistory = async (req, res) => {
 }
 
 const getDevelopmentalHistory = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM development_history WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM development_history WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Developmental History Form not found' });
     }
@@ -2174,10 +2227,10 @@ const getDevelopmentalHistory = async (req, res) => {
 }
 
 const getSubstanceUse = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM substance_use WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM substance_use WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Substance Use History Form not found' });
     }
@@ -2189,10 +2242,10 @@ const getSubstanceUse = async (req, res) => {
 }
 
 const getSuicidialData = async (req, res) => {
-  const admission_no = req.params.admission_no;
-  const query = 'SELECT * FROM suicidal_data WHERE admission_no = ?';
+  const {admission_no, date} = req.params;
+  const query = 'SELECT * FROM suicidal_data WHERE admission_no = ? AND date = ?';
   try {
-    const [results] = await db.query(query, [admission_no]);
+    const [results] = await db.query(query, [admission_no, date]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Suicidal and Homicidal Ideation Form not found' });
     }
@@ -2292,7 +2345,7 @@ const getallPsychiatric = async (req, res) => {
   }
 };
 
- 
+
 
 export {
   createMSEForm,

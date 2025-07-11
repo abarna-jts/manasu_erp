@@ -2,6 +2,7 @@
 import db from '../db.js';
 import { residencyAsync } from '../util/residentMulter.js';
 import fs from 'fs';
+import transporter from '../config/mailer.js';
 
 const createRescueCondition = async (req, res) => {
   try {
@@ -44,6 +45,28 @@ const createRescueCondition = async (req, res) => {
     ];
 
     const [result] = await db.query(q, values);
+    // ✅ Email the Director
+    const mailOptions = {
+      from: 'yourgmail@gmail.com',
+      to: 'abarnadevi.jorimts@gmail.com', // Replace with director's email
+      subject: `New First Consultation Report Submitted by Nurse`,
+      html: `
+        <h3>New First Consultation Report Submitted by Nurse</h3>
+        <p><strong>Resident Name:</strong> ${resident_name}</p>
+        <p><strong>Admission No:</strong> ${admission_no}</p>
+        <p><strong>Date:</strong> ${dateFormatted}</p>
+        <p><strong>Follow Up:</strong> ${follow_up}</p>
+        ${resrecovery_photo_path ? `<p><strong>Photo:</strong> ${resrecovery_photo_path}</p>` : ''}
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
     res.status(201).json({ message: "Rescue Condition Created Successfully", data: result });
   } catch (err) {
     console.error('Error creating rescue condition:', err);
@@ -151,6 +174,25 @@ const createRecord = async (req, res) => {
     ];
     const [result] = await db.query(q, values);
     console.log("Record created successfully:", result);
+    // ✅ Email the Director
+    const mailOptions = {
+      from: 'yourgmail@gmail.com',
+      to: 'abarnadevi.jorimts@gmail.com', // Replace with director's email
+      subject: `New Nurse Record Sheet Submitted by Nurse`,
+      html: `
+        <h3>New Nurse Record Sheet Submitted by Nurse</h3>
+        <p><strong>Admission No:</strong> ${admission_no}</p>
+        <p><strong>Date:</strong> ${dateFormatted}</p>
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
     res.status(201).json({ message: "Nurse Record Sheet Created Successfully", data: result });
   } catch (err) {
     console.error('Error creating nurse record:', err);
@@ -430,6 +472,27 @@ const createObservationReport = async (req, res) => {
 
     const [result] = await db.query(q, values);
 
+    // ✅ Email the Director
+    const mailOptions = {
+      from: 'yourgmail@gmail.com',
+      to: 'abarnadevi.jorimts@gmail.com',
+      subject: `New Resident Observation Report Submitted by Social Worker`,
+      html: `
+        <h3>Resident Observation & Progress Report – Social Worker</h3>
+        <p><strong>Admission No:</strong> ${admission_no}</p>
+        <p><strong>Resident Name:</strong> ${resident_name}</p>
+        <p><strong>Date:</strong> ${obdateFormatted}</p>
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
     res.status(201).json({ message: "Rescue Condition Created Successfully", result });
 
   } catch (err) {
@@ -658,7 +721,26 @@ const createPrescription = async (req, res) => {
     ];
 
     await db.query(insertQuery, values);
+    // ✅ Email the Director
+    const mailOptions = {
+      from: 'yourgmail@gmail.com',
+      to: 'abarnadevi.jorimts@gmail.com',
+      subject: `New Prescription Form Submitted by Nurse`,
+      html: `
+        <h3>New Prescription Form Submitted by Nurse</h3>
+        <p><strong>Admission No:</strong> ${admission_no}</p>
+        <p><strong>Resident Name:</strong> ${rescue_name}</p>
+        <p><strong>Date:</strong> ${current_date}</p>
+      `
+    };
 
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
     res.status(201).json({ message: "Prescription and Medicine Summary Saved Successfully" });
   } catch (error) {
     console.error("Error inserting prescription:", error);
@@ -688,7 +770,7 @@ const getPrescriptionbyID = async (req, res) => {
   const query = `
    SELECT * from prescription_medicines WHERE id=?;
   `;
-  
+
   try {
     const [results] = await db.query(query, [id]);
     if (results.length === 0) {
@@ -742,7 +824,7 @@ const updatePrescription = async (req, res) => {
       op_no,
       hospital_name,
       department,
-      diagnosis, 
+      diagnosis,
       masterHealthCheckup,
       instruction,
       medical_type,
@@ -768,7 +850,7 @@ const updatePrescription = async (req, res) => {
     `;
 
     const values = [
-      admission_no, rescue_name, age, op_no, hospital_name, department,diagnosis, 
+      admission_no, rescue_name, age, op_no, hospital_name, department, diagnosis,
       masterHealthCheckup, instruction, medical_type, advice, follow_up,
       medicine, medicine_type, duration, intake, med_instruction,
       morning, afternoon, night,
@@ -816,6 +898,26 @@ const createDrVisit = async (req, res) => {
   try {
     const [result] = await db.query(sql, values);
     console.log('Data inserted successfully:', result);
+    // ✅ Email the Director
+    const mailOptions = {
+      from: 'yourgmail@gmail.com',
+      to: 'abarnadevi.jorimts@gmail.com',
+      subject: `New Doctor Visit Submitted by Nurse`,
+      html: `
+        <h3>Doctor Visit Form</h3>
+        <p><strong>Doctor Name:</strong> ${dr_name}</p>
+        <p><strong>Hospital Name:</strong> ${hospital_name}</p>
+        <p><strong>Date & Time:</strong> ${date_time}</p>
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
     res.status(201).json({ message: 'Doctor visit data inserted successfully' });
   } catch (err) {
     console.error('Error inserting doctor visit data:', err);
@@ -937,6 +1039,28 @@ const createMedicalCamp = async (req, res) => {
   try {
     const [result] = await db.query(sql, values);
     console.log('Data inserted successfully');
+    // ✅ Email the Director
+    const mailOptions = {
+      from: 'yourgmail@gmail.com',
+      to: 'abarnadevi.jorimts@gmail.com',
+      subject: `Medical Camp Report Form Submitted by Nurse`,
+      html: `
+        <h3>Medical Camp Report </h3>
+        <p><strong>Camp Name:</strong> ${camp_name}</p>
+        <p><strong>Hospital Name:</strong> ${hospital_name}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Camp Type:</strong> ${camp_type}</p>
+        <p><strong>Organised by:</strong> ${organised_by}</p>
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
     res.status(201).json({ message: 'Medical camp created successfully', result });
   } catch (err) {
     console.error('Error inserting medical camp data:', err);
@@ -1070,6 +1194,26 @@ const createSummary = async (req, res) => {
     ];
 
     const [result] = await db.query(q, values);
+
+    // ✅ Email the Director
+    const mailOptions = {
+      from: 'yourgmail@gmail.com',
+      to: 'abarnadevi.jorimts@gmail.com',
+      subject: `Reunion Summary Form Submitted by Nurse`,
+      html: `
+        <h3>Reunion Summary Form </h3>
+        <p><strong>Resident Name:</strong> ${rescue_name}</p>
+        <p><strong>Date:</strong> ${date}</p>
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
 
     res.status(201).json({
       message: "Reunion Summary Form Created Successfully",
