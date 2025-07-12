@@ -8,6 +8,7 @@ import  { createMSEForm, createSpeech, createMood, createThough, createJudgement
     getInformation, getCheifComplaint, getPresentingData, getPsychiatricData, getMedicalHistory, getFamilyHistory, getSocialHistory, getDevelopmentalHistory, getSubstanceUse,getSuicidialData,
     updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData, updateFamilyHistoryData, 
     updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData, getallPsychiatric
+    // getBasicDetail, getCheif, getPresenting
 } from '../controllers/recovery.js';
 
 const router = express.Router();
@@ -107,5 +108,20 @@ router.post("/updateSubstance/:admission_no/:date", updateSubstanceData);
 router.post("/updateSuicidal/:admission_no/:date", updateSuicidalData);
 
 router.get("/getallPsychiatric/:admission_no", getallPsychiatric);
+
+// router.get("/get_information/:id", getInformation);
+// router.get("/get_chiefComplaint/:id", getCheifComplaint);
+// router.get("/get_presentingData/:id",getPresentingData);
+// router.get("/get_psychiatric/:admission_no", getPsychiatricData);
+// router.get("/get_medicalHistory/:admission_no/:date", getMedicalHistory);
+// router.get("/get_familyHistory/:admission_no/:date", getFamilyHistory);
+// router.get("/get_socialHistory/:admission_no/:date", getSocialHistory);
+// router.get("/get_DevelopmentalHistory/:admission_no/:date", getDevelopmentalHistory);
+// router.get("/get_substance/:admission_no/:date", getSubstanceUse);
+// router.get("/get_suicidal/:admission_no/:date", getSuicidialData);
+
+// router.get("/get_info", getBasicDetail);
+// router.get("/get_chief", getCheif);
+// router.get("/get_presenting", getPresenting);
 
 export default router;

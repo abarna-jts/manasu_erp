@@ -1752,6 +1752,18 @@ function Psychiatrics_form() {
         window.open(pdfUrl, '_blank');
     };
 
+    // const handleBasicNavigate = () =>{
+    //     navigate("/basic_detail");
+    // }
+
+    // const handleCheifNavigate = () =>{
+    //     navigate("/cheif_complaint");
+    // }
+
+    // const handlePresentingNavigate = () =>{
+    //     navigate("/presenting_problem");
+    // }
+
     return (
         <>
             <div className="d-xl-flex justify-content-between align-items-center flex-wrap flex-md-nowrap text-start py-2">
@@ -1900,6 +1912,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
+                                            {/* <Button className='btn btn-success' type='button' onClick={handleBasicNavigate}>View All</Button> */}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2126,6 +2139,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleCheifComplaintShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
+                                            {/* <Button className='btn btn-success' type='button' onClick={handleCheifNavigate}>View All</Button> */}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2294,6 +2308,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handlePresentingShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
+                                            {/* <Button className='btn btn-success' type='button' onClick={handlePresentingNavigate}>View All</Button> */}
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>

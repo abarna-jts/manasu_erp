@@ -1,5 +1,7 @@
 import db from '../db.js';
 import { recoveryAsync } from '../util/recoveryMulter.js';
+import {checkMSECompletion} from '../util/checkMSECompletion.js';
+import transporter from '../config/mailer.js';
 
 const createMSEForm = async (req, res) => {
   try {
@@ -335,6 +337,37 @@ const createInsight = async (req, res) => {
     ];
 
     const [result] = await db.query(query, values);
+    // ✅ Check if all MSE parts are submitted
+    const isComplete = await checkMSECompletion(admission_no);
+
+    if (isComplete) {
+      // ✅ Check if email already sent
+      const [sent] = await db.query(
+        'SELECT * FROM mse_email_status WHERE admission_no = ?',
+        [admission_no]
+      );
+
+      if (sent.length === 0) {
+        // ✅ Send email
+        const mailOptions = {
+          from: 'yourgmail@gmail.com',
+          to: 'abarnadevi.jorimts@gmail.com',
+          subject: 'MSE Form Completed',
+          html: `
+            <h3>MSE Form Completed</h3>
+            <p>The Mental Status Examination for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>
+          `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        // ✅ Record email status
+        await db.query(
+          'INSERT INTO mse_email_status (admission_no, sent_at) VALUES (?, NOW())',
+          [admission_no]
+        );
+      }
+    }
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
@@ -447,6 +480,7 @@ const createCognition = async (req, res) => {
     ];
 
     const [result] = await db.query(query, values);
+    
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
@@ -2095,6 +2129,37 @@ const createSuicidalData = async (req, res) => {
       hospital_required
     ];
     const [result] = await db.query(query, values);
+    // ✅ Check if all MSE parts are submitted
+    const isComplete = await checkMSECompletion(admission_no);
+
+    if (isComplete) {
+      // ✅ Check if email already sent
+      const [sent] = await db.query(
+        'SELECT * FROM psychiatric_email_status WHERE admission_no = ?',
+        [admission_no]
+      );
+
+      if (sent.length === 0) {
+        // ✅ Send email
+        const mailOptions = {
+          from: 'yourgmail@gmail.com',
+          to: 'abarnadevi.jorimts@gmail.com',
+          subject: 'Psychiatric Case History Form Completed',
+          html: `
+            <h3>Psychiatric Case History Form Completed</h3>
+            <p>The Psychiatric Case History for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>
+          `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        // ✅ Record email status
+        await db.query(
+          'INSERT INTO psychiatric_email_status (admission_no, sent_at) VALUES (?, NOW())',
+          [admission_no]
+        );
+      }
+    }
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record inserted" });
     }
@@ -2107,10 +2172,10 @@ const createSuicidalData = async (req, res) => {
 }
 
 const getInformation = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM basic_detail WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM basic_detail WHERE id = ? ';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Demographic Information Form not found' });
     }
@@ -2122,10 +2187,10 @@ const getInformation = async (req, res) => {
 }
 
 const getCheifComplaint = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM cheif_complaint WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM cheif_complaint WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Cheif Complaint Form not found' });
     }
@@ -2137,10 +2202,10 @@ const getCheifComplaint = async (req, res) => {
 }
 
 const getPresentingData = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM presenting_problems WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM presenting_problems WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Presenting Problems Form not found' });
     }
@@ -2345,7 +2410,47 @@ const getallPsychiatric = async (req, res) => {
   }
 };
 
+// const getBasicDetail = async(req, res) =>{
+//   const query = "Select * from basic_detail";
+//   try {
+//     const [result] = await db.query(query);
+//     if (result.length === 0) {
+//       res.status(404).json({ message: "basic_detail is not found" });
+//     }
+//     return res.status(200).json({ message: "basic_detail form Get Successfully", data: result });
+//   } catch (err) {
+//     console.log("Error fetching basic_detail:", err);
+//     res.status(500).json({ message: "Database Error", error: err });
+//   }
+// }
 
+// const getCheif = async(req, res) =>{
+//   const query = "Select * from cheif_complaint";
+//   try {
+//     const [result] = await db.query(query);
+//     if (result.length === 0) {
+//       res.status(404).json({ message: "Cheif Complaint is not found" });
+//     }
+//     return res.status(200).json({ message: "Cheif Complaint form Get Successfully", data: result });
+//   } catch (err) {
+//     console.log("Error fetching Cheif Complaint:", err);
+//     res.status(500).json({ message: "Database Error", error: err });
+//   }
+// }
+
+// const getPresenting = async(req, res) =>{
+//   const query = "Select * from presenting_problems";
+//   try {
+//     const [result] = await db.query(query);
+//     if (result.length === 0) {
+//       res.status(404).json({ message: "Presenting Problems is not found" });
+//     }
+//     return res.status(200).json({ message: "Presenting Problems form Get Successfully", data: result });
+//   } catch (err) {
+//     console.log("Error fetching Presenting Problems:", err);
+//     res.status(500).json({ message: "Database Error", error: err });
+//   }
+// }
 
 export {
   createMSEForm,
@@ -2368,4 +2473,5 @@ export {
   getDevelopmentalHistory, getSubstanceUse, getSuicidialData, getallPsychiatric,
   updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData,
   updateFamilyHistoryData, updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData
+  // getBasicDetail, getCheif, getPresenting
 };

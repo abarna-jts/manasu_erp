@@ -54,6 +54,9 @@ import StaffPrograms_report from './Components/pages/Admin_Formality/StaffProgra
 import User_permission from './Components/pages/Admin_Formality/User_permission';
 import ResetPassword from './Components/authentication/ResetPassword';
 import ProtectedRoute from './Components/pages/ProtectedRoute';
+import Basic_detail from './Components/pages/Recovery/Basic_detail';
+import Cheif_complaint from './Components/pages/Recovery/Cheif_complaint';
+import Presenting_problems from './Components/pages/Recovery/Presenting_problems';
 
 function App() {
 
@@ -456,6 +459,39 @@ function App() {
                   <MainLayout><Psychiatrics_form /></MainLayout>
                 ) : (
                   <MainLayout><Psychiatrics_form /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/basic_detail'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Basic_detail /></MainLayout>
+                ) : (
+                  <MainLayout><Basic_detail /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/cheif_complaint'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Cheif_complaint /></MainLayout>
+                ) : (
+                  <MainLayout><Cheif_complaint /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/presenting_problem'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Presenting_problems /></MainLayout>
+                ) : (
+                  <MainLayout><Presenting_problems /></MainLayout>
                 )
               }
             />

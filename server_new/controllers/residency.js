@@ -750,17 +750,16 @@ const createPrescription = async (req, res) => {
 
 
 const getPrescription = async (req, res) => {
-  const query = `SELECT * from prescription_medicines;`;
-
   try {
-    const [data] = await db.query(query);
-    if (data.length === 0) {
-      return res.status(404).json({ message: "No Prescription Records found" });
-    }
-    res.status(200).json({ message: "Prescription Records Retrieved Successfully", data: data });
-  } catch (err) {
-    console.error('Error fetching prescription records:', err);
-    res.status(500).json({ message: "Database Error", error: err });
+    const [rows] = await db.query("SELECT * FROM basic_detail");
+
+    res.status(200).json({
+      message: "Basic Details Record Retrieved Successfully",
+      data: rows, // ✅ THIS is what your frontend expects
+    });
+  } catch (error) {
+    console.error("Error fetching visit details:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 }
 
