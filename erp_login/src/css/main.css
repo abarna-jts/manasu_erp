@@ -1895,6 +1895,16 @@ body {
 	}
 }
 
+.table td{
+	max-width: 250px;
+	word-wrap: break-word;
+  	white-space: normal;
+}
+.wrap-textarea {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 .form_2A_breadcrumb {
 	padding: 0rem 1rem;
 }

@@ -7,8 +7,9 @@ import  { createMSEForm, createSpeech, createMood, createThough, createJudgement
     createSocialHistoryData, createDevelopmentalData, createSubstanceData, createSuicidalData,
     getInformation, getCheifComplaint, getPresentingData, getPsychiatricData, getMedicalHistory, getFamilyHistory, getSocialHistory, getDevelopmentalHistory, getSubstanceUse,getSuicidialData,
     updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData, updateFamilyHistoryData, 
-    updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData, getallPsychiatric
-    // getBasicDetail, getCheif, getPresenting
+    updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData, getallPsychiatric,
+    getBasicDetail, getCheif, getPresenting, getPsyHistory, getMedHis, getFamHistory, getSocialHis, getDevHistory, getSubUseHistory, getSuicidalUse,
+    getGenAppearance
 } from '../controllers/recovery.js';
 
 const router = express.Router();
@@ -31,7 +32,7 @@ router.post("/create_cognition", createCognition); //completed
 
 //get all mse form data
 //get all appearance_behaviour form in MSE
-router.get('/getappearance/:admission_no/:date',getallappearance);//completed
+router.get('/getappearance/:id',getallappearance);//completed
 //get all speech form in MSE
 router.get("/getSpeech/:admission_no/:date",getallspeech); //completed
 //get all mood form in MSE
@@ -85,16 +86,16 @@ router.post("/create_developmentalData", createDevelopmentalData);
 router.post("/create_substanceData", createSubstanceData);
 router.post("/create_suicidalData", createSuicidalData);
 
-router.get("/get_information/:admission_no/:date", getInformation);
-router.get("/get_chiefComplaint/:admission_no/:date", getCheifComplaint);
-router.get("/get_presentingData/:admission_no/:date",getPresentingData);
-router.get("/get_psychiatric/:admission_no/:date", getPsychiatricData);
-router.get("/get_medicalHistory/:admission_no/:date", getMedicalHistory);
-router.get("/get_familyHistory/:admission_no/:date", getFamilyHistory);
-router.get("/get_socialHistory/:admission_no/:date", getSocialHistory);
-router.get("/get_DevelopmentalHistory/:admission_no/:date", getDevelopmentalHistory);
-router.get("/get_substance/:admission_no/:date", getSubstanceUse);
-router.get("/get_suicidal/:admission_no/:date", getSuicidialData);
+// router.get("/get_information/:admission_no/:date", getInformation);
+// router.get("/get_chiefComplaint/:admission_no/:date", getCheifComplaint);
+// router.get("/get_presentingData/:admission_no/:date",getPresentingData);
+// router.get("/get_psychiatric/:admission_no/:date", getPsychiatricData);
+// router.get("/get_medicalHistory/:admission_no/:date", getMedicalHistory);
+// router.get("/get_familyHistory/:admission_no/:date", getFamilyHistory);
+// router.get("/get_socialHistory/:admission_no/:date", getSocialHistory);
+// router.get("/get_DevelopmentalHistory/:admission_no/:date", getDevelopmentalHistory);
+// router.get("/get_substance/:admission_no/:date", getSubstanceUse);
+// router.get("/get_suicidal/:admission_no/:date", getSuicidialData);
 
 router.post("/updateInformation/:admission_no/:date", updateInformation);
 router.post("/updateCheifComplaint/:admission_no/:date", updateCheifComplaint);
@@ -109,19 +110,28 @@ router.post("/updateSuicidal/:admission_no/:date", updateSuicidalData);
 
 router.get("/getallPsychiatric/:admission_no", getallPsychiatric);
 
-// router.get("/get_information/:id", getInformation);
-// router.get("/get_chiefComplaint/:id", getCheifComplaint);
-// router.get("/get_presentingData/:id",getPresentingData);
-// router.get("/get_psychiatric/:admission_no", getPsychiatricData);
-// router.get("/get_medicalHistory/:admission_no/:date", getMedicalHistory);
-// router.get("/get_familyHistory/:admission_no/:date", getFamilyHistory);
-// router.get("/get_socialHistory/:admission_no/:date", getSocialHistory);
-// router.get("/get_DevelopmentalHistory/:admission_no/:date", getDevelopmentalHistory);
-// router.get("/get_substance/:admission_no/:date", getSubstanceUse);
-// router.get("/get_suicidal/:admission_no/:date", getSuicidialData);
+router.get("/get_information/:id", getInformation);
+router.get("/get_chiefComplaint/:id", getCheifComplaint);
+router.get("/get_presentingData/:id",getPresentingData);
+router.get("/get_psychiatric/:id", getPsychiatricData);
+router.get("/get_medicalHistory/:id", getMedicalHistory);
+router.get("/get_familyHistory/:id", getFamilyHistory);
+router.get("/get_socialHistory/:id", getSocialHistory);
+router.get("/get_DevelopmentalHistory/:id", getDevelopmentalHistory);
+router.get("/get_substance/:id", getSubstanceUse);
+router.get("/get_suicidal/:id", getSuicidialData);
 
-// router.get("/get_info", getBasicDetail);
-// router.get("/get_chief", getCheif);
-// router.get("/get_presenting", getPresenting);
+router.get("/get_info", getBasicDetail);
+router.get("/get_chief", getCheif);
+router.get("/get_presenting", getPresenting);
+router.get("/get_psy", getPsyHistory);
+router.get("/get_medical", getMedHis);
+router.get("/get_family", getFamHistory);
+router.get("/get_social", getSocialHis);
+router.get("/get_developmental", getDevHistory);
+router.get("/get_subUse", getSubUseHistory);
+router.get("/get_suicidalUse", getSuicidalUse);
+
+router.get("/get_genAppearance", getGenAppearance);
 
 export default router;

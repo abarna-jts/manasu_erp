@@ -57,6 +57,14 @@ import ProtectedRoute from './Components/pages/ProtectedRoute';
 import Basic_detail from './Components/pages/Recovery/Basic_detail';
 import Cheif_complaint from './Components/pages/Recovery/Cheif_complaint';
 import Presenting_problems from './Components/pages/Recovery/Presenting_problems';
+import Psy_history from './Components/pages/Recovery/Psy_history';
+import Medical_History from './Components/pages/Recovery/Medical_History';
+import Family_History from './Components/pages/Recovery/Family_History';
+import Social_HIstory from './Components/pages/Recovery/Social_HIstory';
+import Developmental_History from './Components/pages/Recovery/Developmental_History';
+import Substance_History from './Components/pages/Recovery/Substance_History';
+import Suicidal_Data from './Components/pages/Recovery/Suicidal_Data';
+import General_Appearance from './Components/pages/Recovery/General_Appearance';
 
 function App() {
 
@@ -492,6 +500,93 @@ function App() {
                   <MainLayout><Presenting_problems /></MainLayout>
                 ) : (
                   <MainLayout><Presenting_problems /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/psy_history'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Psy_history /></MainLayout>
+                ) : (
+                  <MainLayout><Psy_history /></MainLayout>
+                )
+              }
+            />
+            <Route
+              path='/medical_history'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Medical_History /></MainLayout>
+                ) : (
+                  <MainLayout><Medical_History /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/family_history'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Family_History /></MainLayout>
+                ) : (
+                  <MainLayout><Family_History /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/social_history'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Social_HIstory /></MainLayout>
+                ) : (
+                  <MainLayout><Social_HIstory /></MainLayout>
+                )
+              }
+            />
+            
+            <Route
+              path='/developmental_history'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Developmental_History /></MainLayout>
+                ) : (
+                  <MainLayout><Developmental_History /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/substance_history'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Substance_History /></MainLayout>
+                ) : (
+                  <MainLayout><Substance_History /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/suicidal_data'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Suicidal_Data /></MainLayout>
+                ) : (
+                  <MainLayout><Suicidal_Data /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/general_appearance'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><General_Appearance /></MainLayout>
+                ) : (
+                  <MainLayout><General_Appearance /></MainLayout>
                 )
               }
             />

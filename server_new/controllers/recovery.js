@@ -1484,11 +1484,11 @@ const updateCognition = async (req, res) => {
 
 
 const getallappearance = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM general_appearance WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM general_appearance WHERE id = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'No form found for this Admission Number and Date' });
     }
@@ -2217,10 +2217,10 @@ const getPresentingData = async (req, res) => {
 }
 
 const getPsychiatricData = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM psy_history WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM psy_history WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Psychiatric History Form not found' });
     }
@@ -2232,10 +2232,10 @@ const getPsychiatricData = async (req, res) => {
 }
 
 const getMedicalHistory = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM medical_history WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM medical_history WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Medical History Form not found' });
     }
@@ -2247,10 +2247,10 @@ const getMedicalHistory = async (req, res) => {
 }
 
 const getFamilyHistory = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM familyhis_data WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM familyhis_data WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Family History Form not found' });
     }
@@ -2262,10 +2262,10 @@ const getFamilyHistory = async (req, res) => {
 }
 
 const getSocialHistory = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM social_history WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM social_history WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Social History Form not found' });
     }
@@ -2277,10 +2277,10 @@ const getSocialHistory = async (req, res) => {
 }
 
 const getDevelopmentalHistory = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM development_history WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM development_history WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Developmental History Form not found' });
     }
@@ -2292,10 +2292,10 @@ const getDevelopmentalHistory = async (req, res) => {
 }
 
 const getSubstanceUse = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM substance_use WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM substance_use WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Substance Use History Form not found' });
     }
@@ -2307,10 +2307,10 @@ const getSubstanceUse = async (req, res) => {
 }
 
 const getSuicidialData = async (req, res) => {
-  const {admission_no, date} = req.params;
-  const query = 'SELECT * FROM suicidal_data WHERE admission_no = ? AND date = ?';
+  const {id} = req.params;
+  const query = 'SELECT * FROM suicidal_data WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Suicidal and Homicidal Ideation Form not found' });
     }
@@ -2410,47 +2410,159 @@ const getallPsychiatric = async (req, res) => {
   }
 };
 
-// const getBasicDetail = async(req, res) =>{
-//   const query = "Select * from basic_detail";
-//   try {
-//     const [result] = await db.query(query);
-//     if (result.length === 0) {
-//       res.status(404).json({ message: "basic_detail is not found" });
-//     }
-//     return res.status(200).json({ message: "basic_detail form Get Successfully", data: result });
-//   } catch (err) {
-//     console.log("Error fetching basic_detail:", err);
-//     res.status(500).json({ message: "Database Error", error: err });
-//   }
-// }
+const getBasicDetail = async(req, res) =>{
+  const query = "Select * from basic_detail";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "basic_detail is not found" });
+    }
+    return res.status(200).json({ message: "basic_detail form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching basic_detail:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
 
-// const getCheif = async(req, res) =>{
-//   const query = "Select * from cheif_complaint";
-//   try {
-//     const [result] = await db.query(query);
-//     if (result.length === 0) {
-//       res.status(404).json({ message: "Cheif Complaint is not found" });
-//     }
-//     return res.status(200).json({ message: "Cheif Complaint form Get Successfully", data: result });
-//   } catch (err) {
-//     console.log("Error fetching Cheif Complaint:", err);
-//     res.status(500).json({ message: "Database Error", error: err });
-//   }
-// }
+const getCheif = async(req, res) =>{
+  const query = "Select * from cheif_complaint";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Cheif Complaint is not found" });
+    }
+    return res.status(200).json({ message: "Cheif Complaint form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Cheif Complaint:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
 
-// const getPresenting = async(req, res) =>{
-//   const query = "Select * from presenting_problems";
-//   try {
-//     const [result] = await db.query(query);
-//     if (result.length === 0) {
-//       res.status(404).json({ message: "Presenting Problems is not found" });
-//     }
-//     return res.status(200).json({ message: "Presenting Problems form Get Successfully", data: result });
-//   } catch (err) {
-//     console.log("Error fetching Presenting Problems:", err);
-//     res.status(500).json({ message: "Database Error", error: err });
-//   }
-// }
+const getPresenting = async(req, res) =>{
+  const query = "Select * from presenting_problems";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Presenting Problems is not found" });
+    }
+    return res.status(200).json({ message: "Presenting Problems form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Presenting Problems:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getPsyHistory = async(req, res) =>{
+  const query = "Select * from psy_history";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Psychatrics History is not found" });
+    }
+    return res.status(200).json({ message: "Psychatrics History form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Psychatrics History:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getMedHis = async(req, res) =>{
+  const query = "Select * from medical_history";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Medical History is not found" });
+    }
+    return res.status(200).json({ message: "Medical History form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Medical History:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getFamHistory = async(req, res) =>{
+  const query = "Select * from familyhis_data";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Family History is not found" });
+    }
+    return res.status(200).json({ message: "Family History form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Family History:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getSocialHis = async(req, res) =>{
+  const query = "Select * from social_history";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Social History is not found" });
+    }
+    return res.status(200).json({ message: "Social History form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Social History:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getDevHistory = async(req, res) =>{
+  const query = "Select * from development_history";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Developmental History is not found" });
+    }
+    return res.status(200).json({ message: "Developmental History form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Developmental History:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getSubUseHistory = async(req, res) =>{
+  const query = "Select * from substance_use";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Substance Use History is not found" });
+    }
+    return res.status(200).json({ message: "Substance Use History form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Substance Use History:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getSuicidalUse = async(req, res) =>{
+  const query = "Select * from suicidal_data";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Suicidal Data is not found" });
+    }
+    return res.status(200).json({ message: "Suicidal Data form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Suicidal Data:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getGenAppearance = async(req, res) =>{
+  const query = "Select * from general_appearance";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "General Appearance is not found" });
+    }
+    return res.status(200).json({ message: "General Appearance form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching General Appearance:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
 
 export {
   createMSEForm,
@@ -2464,14 +2576,14 @@ export {
   createInsight,
   createPerception,
   createCognition,
-  getallappearance,
-  getallmood, getallspeech, getallcognition, getallperception, getMseAllForm, getallThough, getalljudgement, getallInsight,
+  getallappearance,getallmood, getallspeech, getallcognition, getallperception, getMseAllForm, getallThough, getalljudgement, getallInsight,
   updateAppearance, UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition,
   createBasicInformation, createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData,
   createSocialHistoryData, createDevelopmentalData, createSubstanceData, createSuicidalData,
   getInformation, getCheifComplaint, getPresentingData, getPsychiatricData, getMedicalHistory, getFamilyHistory, getSocialHistory,
   getDevelopmentalHistory, getSubstanceUse, getSuicidialData, getallPsychiatric,
   updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData,
-  updateFamilyHistoryData, updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData
-  // getBasicDetail, getCheif, getPresenting
+  updateFamilyHistoryData, updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData,
+  getBasicDetail, getCheif, getPresenting, getPsyHistory, getMedHis, getFamHistory, getSocialHis, getDevHistory, getSubUseHistory, getSuicidalUse,
+  getGenAppearance
 };

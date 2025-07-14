@@ -10,6 +10,7 @@ import axios from 'axios';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
 function MSE_form() {
   const [rescue_image, setRescueImage] = useState(null);
@@ -1200,7 +1201,7 @@ function MSE_form() {
       alert("Please enter admission number.");
       return;
     }
-     if (!date || date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Please enter Date of your updation admission_no.");
       return;
     }
@@ -1244,7 +1245,7 @@ function MSE_form() {
       return;
     }
 
-     if (!date || date.trim() === '') {
+    if (!date || date.trim() === '') {
       alert("Please enter Date of your updation admission_no.");
       return;
     }
@@ -1765,6 +1766,11 @@ function MSE_form() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const handleAppearanceNavigate = () => {
+    navigate("/general_appearance");
+  }
 
   return (
     <>
@@ -1907,6 +1913,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handleAppearanceNavigate}>View All</Button>
                     </div>
 
                     <ul>

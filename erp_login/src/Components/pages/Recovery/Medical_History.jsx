@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import { Breadcrumb, Form, InputGroup, Container, Row, Col, Table, Button } from '@themesberg/react-bootstrap';
 import { useState, useEffect } from "react";
 import axios from 'axios';
@@ -7,8 +7,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
 
-
-function Cheif_complaint() {
+function Medical_History() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
@@ -21,32 +20,31 @@ function Cheif_complaint() {
             String(item.living_arrangement).toLowerCase().includes(searchTerm)
         );
     });
-    const [chiefData, setChiefData] = useState({
-        chief_complaint: '',
-        onset_duration: '',
-        nature_symptoms: '',
-        severity: '',
-        course_type: '',
-        nature_illness: '',
-        identify_trigger: '',
-        life_changes: '',
-        biological: '',
-        psychological: '',
-        social_environment: '',
-        date: '',
+
+    const [medicalData, setMedicalData] = useState({
         admission_no: '',
-    });
+        date: '',
+        disability_status: '',
+        chronic_medical: '',
+        acute_health: '',
+        medication: '',
+        medication_allergies: '',
+        other_allergy: [],
+        significant_medical: [],
+        traumatic_injuries: '',
+        sexual_health: []
+    })
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
     const getVisitDetails = async () => {
         try {
-            const response = await apiRoute.get('/recovery/get_chief');
+            const response = await apiRoute.get('/recovery/get_medical');
             console.log(response.data);
             setVisitDetails(response.data.data); // Should be an array
         } catch (error) {
-            console.error("Error fetching Chief Complaint:", error);
+            console.error("Error fetching Basic Details:", error);
         }
     };
     useEffect(() => {
@@ -66,24 +64,22 @@ function Cheif_complaint() {
 
     const fetchFormData = async (id) => {
         try {
-            const response = await apiRoute.get(`/recovery/get_chiefComplaint/${id}`);
+            const response = await apiRoute.get(`/recovery/get_medicalHistory/${id}`);
             const data = response.data;
 
-            setChiefData((chiefData) => ({
-                ...chiefData,
+            setMedicalData((medicalData) => ({
+                ...medicalData,
                 admission_no: data.admission_no || '',
                 date: data.date || '',
-                chief_complaint: data.chief_complaint || '',
-                onset_duration: data.onset_duration || '',
-                nature_symptoms: data.nature_symptoms || '',
-                severity: data.severity || '',
-                course_type: data.course_type || '',
-                nature_illness: data.nature_illness || '',
-                identify_trigger: data.identify_trigger || '',
-                life_changes: data.life_changes || '',
-                biological: data.biological || '',
-                psychological: data.psychological || '',
-                social_environment: data.social_environment || ''
+                disability_status: data.disability_status || '',
+                chronic_medical: data.chronic_medical || '',
+                acute_health: data.acute_health || '',
+                medication: data.medication || '',
+                medication_allergies: data.medication_allergies || '',
+                other_allergy: data.other_allergy?.split(',') || ["NULL"],
+                significant_medical: data.significant_medical?.split(',') || ["NULL"],
+                traumatic_injuries: data.traumatic_injuries || '',
+                sexual_health: data.sexual_health?.split(',') || ["NULL"]
             }));
 
             setPreviewRequested(true); // trigger the effect after state updates
@@ -145,10 +141,11 @@ function Cheif_complaint() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setChiefData((prev) => ({ ...prev, [name]: value }));
+        setMedicalData((prev) => ({ ...prev, [name]: value }));
     };
+
     return (
-        <div>
+        <>
             <Container fluid>
                 <Row className='d-flex align-items-center justify-content-between'>
                     <Col md={2} className='text-start'>
@@ -160,7 +157,7 @@ function Cheif_complaint() {
                         <h6 className="breadcrumb_title">Psychiatric Case History</h6>
                     </Col>
                     <Col md={8} className="text-start mb-4">
-                        <h3 className="section_title text-center">The Chief Complaint</h3>
+                        <h3 className="section_title text-center">Medical History</h3>
                     </Col>
                     <Col md={2}>
                         <div className="d-flex align-items-center px-3">
@@ -183,11 +180,9 @@ function Cheif_complaint() {
 
                 </Row>
             </Container>
-
             <Col md={3}>
                 <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
             </Col>
-
             <Container>
                 <Row>
                     <Table responsive="sm">
@@ -196,11 +191,10 @@ function Cheif_complaint() {
                                 <th>S.No</th>
                                 <th>Admission Number</th>
                                 <th>Date</th>
-                                <th>Chief Complaint</th>
-                                <th>Onset and Duration</th>
-                                <th>Course Type</th>
-                                <th>Identify Triggers</th>
-                                <th>Biological</th>
+                                <th>Disability Status</th>
+                                <th>Medication</th>
+                                <th>Acute Health Concerns</th>
+                                <th>Medication Allergies</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -211,11 +205,10 @@ function Cheif_complaint() {
                                         <td>{index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
                                         <td>{formatDateTime(item.date) || "Null"}</td>
-                                        <td>{item.chief_complaint || "Null"}</td>
-                                        <td>{item.onset_duration || "Null"}</td>
-                                        <td>{item.course_type || "Null"}</td>
-                                        <td>{item.identify_trigger || "Null"}</td>
-                                        <td>{item.biological || "Null"}</td>
+                                        <td>{item.disability_status || "Null"}</td>
+                                        <td>{item.medication || "Null"}</td>
+                                        <td>{item.acute_health || "Null"}</td>
+                                        <td>{item.medication_allergies || "Null"}</td>
                                         <td>
                                             <button className="btn btn-success icon_details"
                                                 onClick={() => {
@@ -225,10 +218,10 @@ function Cheif_complaint() {
                                                 <i className="fas fa-eye"></i>
                                             </button>
                                             {/* <button className="btn btn-primary icon_details"
-                                                onClick={() => {
-                                                    handleEditform(item.id);
-                                                }}
-                                            ><i className="fas fa-edit"></i> </button> */}
+                                                            onClick={() => {
+                                                                handleEditform(item.id);
+                                                            }}
+                                                        ><i className="fas fa-edit"></i> </button> */}
                                             {/* {userType === "2" && (
                                                             <button className="btn btn-danger icon_details"
                                                                 onClick={() => handleDelete(item.id)}
@@ -254,158 +247,169 @@ function Cheif_complaint() {
 
                     </Col>
                     <Col md={9}>
-                        <h4 className="text-center">THE CHIEF COMPLAINT</h4>
+                        <h4 className="text-center">MEDICAL HISTORY </h4>
                     </Col>
                 </Row>
                 <Form className='mt-4'>
-                    <li className='icon-li'>
-                        <h4 className='text-start'>The Chief Complaint:</h4>
-                    </li>
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Chief Complaint:  </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='chief_complaint'
-                                value={chiefData.chief_complaint}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Disability Status (Physical or Psychological): </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='disability_status'
+                                value={medicalData.disability_status}
                                 onChange={handleInputChange}
-                                required />
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Onset and Duration:  </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='onset_duration'
-                                value={chiefData.onset_duration}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Chronic Medical Conditions: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='chronic_medical'
+                                value={medicalData.chronic_medical}
                                 onChange={handleInputChange}
-                                required />
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Nature of Symptoms:  </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='nature_symptoms'
-                                value={chiefData.nature_symptoms}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Acute Health Concerns: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='acute_health'
+                                value={medicalData.acute_health}
                                 onChange={handleInputChange}
-                                required />
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Severity: </Form.Label>
-                        <Col sm="8">
-                            <Form.Select name="severity"
-                                value={chiefData.severity}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Medication (Duration and Outcomes): </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='medication'
+                                value={medicalData.medication}
                                 onChange={handleInputChange}
-                                required>
-                                <option>Select</option>
-                                <option value="Mild">Mild</option>
-                                <option value="Moderate">Moderate</option>
-                                <option value="Severe">Severe</option>
-                            </Form.Select>
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Course Type:  </Form.Label>
-                        <Col sm="8">
-                            <Form.Select name="course_type"
-                                value={chiefData.course_type}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Medication Allergies: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='medication_allergies'
+                                value={medicalData.medication_allergies}
                                 onChange={handleInputChange}
-                                required>
-                                <option>Select</option>
-                                <option value="Continuous">Continuous</option>
-                                <option value="Episodic">Episodic</option>
-                                <option value="Fluctuating">Fluctuating</option>
-                            </Form.Select>
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Nature of Illness: </Form.Label>
-                        <Col sm="8">
-                            <Form.Select name="nature_illness"
-                                value={chiefData.nature_illness}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Other Allergies or Sensitivities: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='other_allergy'
+                                value={medicalData.other_allergy}
                                 onChange={handleInputChange}
-                                required>
-                                <option>Select</option>
-                                <option value="Progressive">Progressive</option>
-                                <option value="Static">Static</option>
-                                <option value="Improving">Improving</option>
-                            </Form.Select>
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <li className='icon-li'>
-                        <h4 className='text-start'>Precipitating Factors:</h4>
-                    </li>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Identify Triggers: </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='identify_trigger'
-                                value={chiefData.identify_trigger}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Significant Medical Events: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='significant_medical'
+                                value={medicalData.significant_medical}
                                 onChange={handleInputChange}
-                                required />
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Life Changes and Stressors: </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='life_changes'
-                                value={chiefData.life_changes}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Traumatic Injuries: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='traumatic_injuries'
+                                value={medicalData.traumatic_injuries}
                                 onChange={handleInputChange}
-                                required />
+                                required
+                            />
                         </Col>
                     </Form.Group>
-
-                    <li className='icon-li'>
-                        <h4 className='text-start'>Predisposing Factors:</h4>
-                    </li>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Biological:</Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='biological'
-                                value={chiefData.biological}
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Sexual Health: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='sexual_health'
+                                value={medicalData.sexual_health}
                                 onChange={handleInputChange}
-                                required />
-                        </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Psychological:  </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='psychological'
-                                value={chiefData.psychological}
-                                onChange={handleInputChange}
-                                required />
-                        </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-2 text-start" >
-                        <Form.Label column sm="4">Social / Environmental: </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='social_environment'
-                                value={chiefData.social_environment}
-                                onChange={handleInputChange}
-                                required />
+                                required
+                            />
                         </Col>
                     </Form.Group>
                 </Form>
 
             </div>
-        </div>
+
+        </>
     )
 }
 
-export default Cheif_complaint
+export default Medical_History
