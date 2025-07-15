@@ -65,6 +65,13 @@ import Developmental_History from './Components/pages/Recovery/Developmental_His
 import Substance_History from './Components/pages/Recovery/Substance_History';
 import Suicidal_Data from './Components/pages/Recovery/Suicidal_Data';
 import General_Appearance from './Components/pages/Recovery/General_Appearance';
+import Speech from './Components/pages/Recovery/Speech';
+import Mood_Affect from './Components/pages/Recovery/Mood_Affect';
+import Though_Form from './Components/pages/Recovery/Though_Form';
+import Perception from './Components/pages/Recovery/Perception';
+import Cognition from './Components/pages/Recovery/Cognition';
+import Judgement from './Components/pages/Recovery/Judgement';
+import Insight from './Components/pages/Recovery/Insight';
 
 function App() {
 
@@ -546,7 +553,7 @@ function App() {
                 )
               }
             />
-            
+
             <Route
               path='/developmental_history'
               element={
@@ -591,6 +598,82 @@ function App() {
               }
             />
 
+            <Route
+              path='/speech'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Speech /></MainLayout>
+                ) : (
+                  <MainLayout><Speech /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/mood_affect'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Mood_Affect /></MainLayout>
+                ) : (
+                  <MainLayout><Mood_Affect /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/though'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Though_Form /></MainLayout>
+                ) : (
+                  <MainLayout><Though_Form /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/perception'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Perception /></MainLayout>
+                ) : (
+                  <MainLayout><Perception /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/cognition'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Cognition /></MainLayout>
+                ) : (
+                  <MainLayout><Cognition /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/judgement'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Judgement /></MainLayout>
+                ) : (
+                  <MainLayout><Judgement /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/insight'
+              element={
+                userType === '1' || userType === '2' || userType === '4' ? (
+                  <MainLayout><Insight /></MainLayout>
+                ) : (
+                  <MainLayout><Insight /></MainLayout>
+                )
+              }
+            />
 
             {(userType === '1' || userType === '2') && (
               <>

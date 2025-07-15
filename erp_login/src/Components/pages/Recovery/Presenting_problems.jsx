@@ -251,13 +251,35 @@ function Presenting_problems() {
                 </Row>
             </Container>
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                <Row className="d-flex align-items-center justify-content-center mb-2">
-                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                <Row className="d-flex align-items-center justify-content-start mb-2">
+                    <Col md={2} className='d-flex align-items-center pdf_logo'>
                         <img src={manasu_logo} className="pdf_logo" alt="" />
 
                     </Col>
-                    <Col md={9}>
+                    <Col md={8}>
                         <h4 className="text-center">PRESENTING PROBLEMS </h4>
+                    </Col>
+                </Row>
+                <Row className='d-flex align-items-center justify-content-center'>
+                    <Col md={5}>
+                        <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
+                            <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
+                            <Col md={6}>
+                                <div className='text-start'>
+                                    {presentingData.admission_no}
+                                </div>
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                    <Col md={4}>
+                        <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
+                            <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
+                            <Col md={6}>
+                                <div className='text-start'>
+                                    {formatDateTime(presentingData.date)}
+                                </div>
+                            </Col>
+                        </Form.Group>
                     </Col>
                 </Row>
                 <Form className='mt-4'>
@@ -385,22 +407,22 @@ function Presenting_problems() {
                     <Form.Group className="mb-3" as={Row}>
                         <Form.Label column sm="4" className='text-start'>Occupational or Academic Functioning: </Form.Label>
                         <Col md={8}>
-                        <Form.Control as="textarea" rows={2}
-                            name='occupation_academic'
-                            value={presentingData.occupation_academic}
-                            onChange={handleInputChange}
-                            required />
+                            <Form.Control as="textarea" rows={2}
+                                name='occupation_academic'
+                                value={presentingData.occupation_academic}
+                                onChange={handleInputChange}
+                                required />
                         </Col>
                     </Form.Group>
 
                     <Form.Group className="mb-3" as={Row} >
                         <Form.Label column sm="4" className='text-start'>Interpersonal Relationships: </Form.Label>
                         <Col md={8}>
-                        <Form.Control as="textarea" rows={2}
-                            name='interpersonal_relationship'
-                            value={presentingData.interpersonal_relationship}
-                            onChange={handleInputChange}
-                            required />
+                            <Form.Control as="textarea" rows={2}
+                                name='interpersonal_relationship'
+                                value={presentingData.interpersonal_relationship}
+                                onChange={handleInputChange}
+                                required />
                         </Col>
                     </Form.Group>
 
@@ -408,22 +430,22 @@ function Presenting_problems() {
                         <Form.Label column sm="4" className='text-start'>Self-Care and Activities of Daily Living: </Form.Label>
                         <Col md={8}>
                             <Form.Control as="textarea" rows={2}
-                            name='selfCare_activity'
-                            value={presentingData.selfCare_activity}
-                            onChange={handleInputChange}
-                            required />
+                                name='selfCare_activity'
+                                value={presentingData.selfCare_activity}
+                                onChange={handleInputChange}
+                                required />
                         </Col>
                     </Form.Group>
 
                     <Form.Group className="mb-3" as={Row} >
                         <Form.Label column sm="4" className='text-start'>Recreational Activities: </Form.Label>
                         <Col md={8}>
-                        <Form.Control as="textarea" rows={2}
-                            name='recreation_activity'
-                            value={presentingData.recreation_activity}
-                            onChange={handleInputChange}
-                            required />
-                        
+                            <Form.Control as="textarea" rows={2}
+                                name='recreation_activity'
+                                value={presentingData.recreation_activity}
+                                onChange={handleInputChange}
+                                required />
+
                         </Col>
                     </Form.Group>
                 </Form>

@@ -1771,6 +1771,27 @@ function MSE_form() {
   const handleAppearanceNavigate = () => {
     navigate("/general_appearance");
   }
+  const handleSpeechNavigate = () =>{
+    navigate("/speech");
+  }
+  const handleMoodAffectNavigate = () =>{
+    navigate("/mood_affect");
+  }
+  const handleThoughNavigate = () =>{
+    navigate("/though");
+  }
+  const handlePerceptionNavigate = () =>{
+    navigate("/perception");
+  }
+  const handleCognitionNavigate = () =>{
+    navigate("/cognition");
+  }
+  const handleJudgementNavigate = () =>{
+    navigate("/judgement");
+  }
+  const handleInsightNavigate = () =>{
+    navigate("/insight");
+  }
 
   return (
     <>
@@ -2088,6 +2109,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handleSpeechShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handleSpeechNavigate}>View All</Button>
                     </div>
 
                     <ul>
@@ -2156,6 +2178,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handleMoodShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handleMoodAffectNavigate}>View All</Button>
                     </div>
 
                     <ul>
@@ -2264,6 +2287,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handleThoughShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handleThoughNavigate}>View All</Button>
                     </div>
 
                     <Form onSubmit={handlethoughSubmit}>
@@ -2334,6 +2358,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handlePerceptionShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handlePerceptionNavigate}>View All</Button>
                     </div>
                     <Form onSubmit={handlePerceptionSubmit}>
                       <ul>
@@ -2466,6 +2491,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handleCognitionShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handleCognitionNavigate}>View All</Button>
                     </div>
 
                     <Form onSubmit={handleCognitionSubmit}>
@@ -2835,6 +2861,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handleJudgementShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handleJudgementNavigate}>View All</Button>
                     </div>
                     <ul>
                       <Form onSubmit={handleJudgementSubmit}>
@@ -2910,6 +2937,7 @@ function MSE_form() {
                         <button type="button" className="btn btn-success mx-3" onClick={handleInsightShow}>
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
+                      <Button className='btn btn-success' type='button' onClick={handleInsightNavigate}>View All</Button>
                     </div>
                     <p>The patient's level of awareness and insight into their illness. </p>
                     <ul>

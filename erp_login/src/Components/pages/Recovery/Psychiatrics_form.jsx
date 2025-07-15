@@ -1934,7 +1934,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleBasicNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleBasicNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2161,7 +2161,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleCheifComplaintShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleCheifNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleCheifNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2330,7 +2330,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handlePresentingShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handlePresentingNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handlePresentingNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2512,7 +2512,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handlePsychiatricShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handlepsyHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handlepsyHistoryNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2716,7 +2716,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleMedicalShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleMedicalNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleMedicalNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2847,7 +2847,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleFamilyShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleFamHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleFamHistoryNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2956,7 +2956,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleSocialShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleSocHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleSocHistoryNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -3098,7 +3098,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleDevelopmentalShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleDevHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleDevHistoryNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -3253,7 +3253,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleSubstanceShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleSubstanceNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleSubstanceNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -3420,7 +3420,7 @@ function Psychiatrics_form() {
                                                 <button type="button" className="btn btn-success mx-3" onClick={handleSuicidalShow}>
                                                     <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                                             )}
-                                            <Button className='btn btn-success' type='button' onClick={handleSuicidalNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleSuicidalNavigate}>View All</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>

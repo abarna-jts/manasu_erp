@@ -9,7 +9,7 @@ import  { createMSEForm, createSpeech, createMood, createThough, createJudgement
     updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData, updateFamilyHistoryData, 
     updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData, getallPsychiatric,
     getBasicDetail, getCheif, getPresenting, getPsyHistory, getMedHis, getFamHistory, getSocialHis, getDevHistory, getSubUseHistory, getSuicidalUse,
-    getGenAppearance
+    getGenAppearance, getSpeech, getMoodAffect, getThough, getPerception, getCognition, getJudgement, getInsight
 } from '../controllers/recovery.js';
 
 const router = express.Router();
@@ -34,19 +34,19 @@ router.post("/create_cognition", createCognition); //completed
 //get all appearance_behaviour form in MSE
 router.get('/getappearance/:id',getallappearance);//completed
 //get all speech form in MSE
-router.get("/getSpeech/:admission_no/:date",getallspeech); //completed
+router.get("/getSpeech/:id",getallspeech); //completed
 //get all mood form in MSE
-router.get("/getMood/:admission_no/:date",getallmood); //completed
+router.get("/getMood/:id",getallmood); //completed
 //get all though form in MSE
-router.get("/getThough/:admission_no/:date",getallThough); //completed
+router.get("/getThough/:id",getallThough); //completed
 //get all perception form in MSE
-router.get("/getPerception/:admission_no/:date",getallperception); //completed
+router.get("/getPerception/:id",getallperception); //completed
 //get all judgement form in MSE
-router.get("/getJudgement/:admission_no/:date",getalljudgement); //completed
+router.get("/getJudgement/:id",getalljudgement); //completed
 //get all insight form in MSE
-router.get("/getInsight/:admission_no/:date",getallInsight); //completed
+router.get("/getInsight/:id",getallInsight); //completed
 //get all cognition form in MSE
-router.get("/getCognition/:admission_no/:date",getallcognition); //completed
+router.get("/getCognition/:id",getallcognition); //completed
 
 //update functionality for mse
 //update appearance_behaviour form in MSE
@@ -133,5 +133,12 @@ router.get("/get_subUse", getSubUseHistory);
 router.get("/get_suicidalUse", getSuicidalUse);
 
 router.get("/get_genAppearance", getGenAppearance);
+router.get("/get_speech", getSpeech);
+router.get("/get_moodAffect", getMoodAffect);
+router.get("/get_though", getThough);
+router.get("/get_perception", getPerception);
+router.get("/get_cognition", getCognition);
+router.get("/get_judgement", getJudgement);
+router.get("/get_insight", getInsight);
 
 export default router;

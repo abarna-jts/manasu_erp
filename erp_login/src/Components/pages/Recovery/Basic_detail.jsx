@@ -15,9 +15,12 @@ function Basic_detail() {
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.patient_name).toLowerCase().includes(searchTerm) ||
+            String(item.patient_age).toLowerCase().includes(searchTerm) ||
+            String(item.marital_status).toLowerCase().includes(searchTerm) ||
+            String(item.living_arrangements).toLowerCase().includes(searchTerm) ||
+            String(item.family_structure).toLowerCase().includes(searchTerm)
         );
     });
     const [formData, setFormData] = useState({
@@ -248,24 +251,44 @@ function Basic_detail() {
                                         </td>
                                     </tr>
                                 ))
-                            ) : (
+                                ) : (
                                 <tr>
                                     <td colSpan="10" className="text-center text-danger">No data found</td>
                                 </tr>
                             )}
                         </tbody>
-
                     </Table>
                 </Row>
             </Container>
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
-                <Row className="d-flex align-items-center justify-content-center mb-2">
-                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                <Row className="d-flex align-items-center justify-content-start mb-2">
+                    <Col md={2} className='d-flex align-items-center pdf_logo'>
                         <img src={manasu_logo} className="pdf_logo" alt="" />
-                        
                     </Col>
-                    <Col md={9}>
+                    <Col md={8}>
                         <h4 className="text-center">DEMOGRAPHIC IDENTIFICATION </h4>
+                    </Col>
+                </Row>
+                <Row className='d-flex align-items-center justify-content-center'>
+                    <Col md={5}>
+                        <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
+                            <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
+                            <Col md={6}>
+                                <div className='text-start'>
+                                    {familyData.admission_no}
+                                </div>
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                    <Col md={4}>
+                        <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
+                            <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
+                            <Col md={6}>
+                                <div className='text-start'>
+                                    {formatDateTime(familyData.date)}
+                                </div>
+                            </Col>
+                        </Form.Group>
                     </Col>
                 </Row>
                 <Form className='mt-4'>

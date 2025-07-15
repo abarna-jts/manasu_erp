@@ -7,7 +7,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
 
-function Suicidal_Data() {
+function Mood_Affect() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
@@ -15,34 +15,36 @@ function Suicidal_Data() {
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.mood_description).toLowerCase().includes(searchTerm) ||
+            String(item.general_feeling).toLowerCase().includes(searchTerm) ||
+            String(item.resident_look).toLowerCase().includes(searchTerm) ||
+            String(item.resident_feeling).toLowerCase().includes(searchTerm)
         );
     });
 
-    const [suicidalData, setSuicidalData] = useState({
-        admission_no: '',
+    const [moodFormData, setMoodFormData] = useState({
+        mood_description: [],
+        appearance: "",
+        resident_feeling: "",
+        general_feeling: "",
+        mood_like: "",
+        resident_general_feeling: "",
+        resident_look: [],
+        admission_no: "",
         date: '',
-        suicide_history: '',
-        triggers_stressors: '',
-        homicidal_ideation: '',
-        target_method: '',
-        immediate_threat: '',
-        emergency_response: '',
-        hospital_required: '',
-    })
+    });
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
     const getVisitDetails = async () => {
         try {
-            const response = await apiRoute.get('/recovery/get_suicidalUse');
+            const response = await apiRoute.get('/recovery/get_moodAffect');
             console.log(response.data);
             setVisitDetails(response.data.data); // Should be an array
         } catch (error) {
-            console.error("Error fetching Basic Details:", error);
+            console.error("Error fetching Mood and Affect Details:", error);
         }
     };
     useEffect(() => {
@@ -62,26 +64,26 @@ function Suicidal_Data() {
 
     const fetchFormData = async (id) => {
         try {
-            const response = await apiRoute.get(`/recovery/get_suicidal/${id}`);
+            const response = await apiRoute.get(`/recovery/getMood/${id}`);
             const data = response.data;
 
-            setSuicidalData((suicidalData) => ({
-                ...suicidalData,
+            setMoodFormData((moodFormData) => ({
+                ...moodFormData,
                 admission_no: data.admission_no || 'NULL',
                 date: data.date || 'NULL',
-                suicide_history: data.suicide_history || 'NULL',
-                triggers_stressors: data.triggers_stressors || 'NULL',
-                homicidal_ideation: data.homicidal_ideation || 'NULL',
-                target_method: data.target_method || 'NULL',
-                immediate_threat: data.immediate_threat || 'NULL',
-                emergency_response: data.emergency_response || "NULL",
-                hospital_required: data.hospital_required || "NULL",
+                mood_description: data.mood_description?.split(',') || ["NULL"],
+                appearance: data.appearance || 'NULL',
+                resident_feeling: data.resident_feeling || 'NULL',
+                general_feeling: data.general_feeling || 'NULL',
+                mood_like: data.mood_like || 'NULL',
+                resident_general_feeling: data.resident_general_feeling || 'NULL',
+                resident_look: data.resident_look?.split(',') || ["NULL"],
             }));
 
             setPreviewRequested(true); // trigger the effect after state updates
         } catch (error) {
             console.error("Error fetching form data:", error);
-            alert("Suicidal Data is not found");
+            alert("Mood and Affect ID is not found");
         }
     };
 
@@ -98,6 +100,9 @@ function Suicidal_Data() {
     const formRef = useRef();
 
     const generatePDF = async () => {
+
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Wait for DOM to update
+
         const input = formRef.current;
         if (!input) {
             console.error("Form reference is not defined");
@@ -118,27 +123,24 @@ function Suicidal_Data() {
         let heightLeft = imgHeight;
         let position = 0;
 
-        // First page
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pdfHeight;
 
-        // Additional pages if needed
         while (heightLeft > 0) {
             position = heightLeft - imgHeight;
             pdf.addPage();
             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
             heightLeft -= pdfHeight;
         }
-
         const pdfBlob = pdf.output('blob');
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = () => {
         const { name, value } = e.target;
-        setSuicidalData((prev) => ({ ...prev, [name]: value }));
-    };
+        setMoodFormData((prev) => ({ ...prev, [name]: value }));
+    }
     return (
         <>
             <Container fluid>
@@ -147,12 +149,12 @@ function Suicidal_Data() {
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
                             <Breadcrumb.Item>Home</Breadcrumb.Item>
-                            <Breadcrumb.Item active>Psychiatric Form</Breadcrumb.Item>
+                            <Breadcrumb.Item active>MSE Form</Breadcrumb.Item>
                         </Breadcrumb>
-                        <h6 className="breadcrumb_title">Psychiatric Case History</h6>
+                        <h6 className="breadcrumb_title">Mental Status Examination</h6>
                     </Col>
                     <Col md={8} className="text-start mb-4">
-                        <h3 className="section_title text-center">Suicidal and Homicidal Ideation</h3>
+                        <h3 className="section_title text-center">Mood and Affect </h3>
                     </Col>
                     <Col md={2}>
                         <div className="d-flex align-items-center px-3">
@@ -186,10 +188,10 @@ function Suicidal_Data() {
                                 <th>S.No</th>
                                 <th>Admission Number</th>
                                 <th>Date</th>
-                                <th>History of Suicide Attempts</th>
-                                <th>Triggers and Stressors</th>
-                                <th>History of Homicidal Ideation</th>
-                                <th>Target and Method</th>
+                                <th>Mood Description</th>
+                                <th>General Feel</th>
+                                <th>Resident's Looks Like</th>
+                                <th>Resident's Feels</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -200,10 +202,10 @@ function Suicidal_Data() {
                                         <td>{index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
                                         <td>{formatDateTime(item.date) || "Null"}</td>
-                                        <td>{item.suicide_history || "Null"}</td>
-                                        <td>{item.triggers_stressors || "Null"}</td>
-                                        <td>{item.homicidal_ideation || "Null"}</td>
-                                        <td>{item.target_method || "Null"}</td>
+                                        <td>{item.mood_description || "Null"}</td>
+                                        <td>{item.general_feeling || "Null"}</td>
+                                        <td>{item.resident_look || "Null"}</td>
+                                        <td>{item.resident_feeling || "Null"}</td>
                                         <td>
                                             <button className="btn btn-success icon_details"
                                                 onClick={() => {
@@ -213,15 +215,15 @@ function Suicidal_Data() {
                                                 <i className="fas fa-eye"></i>
                                             </button>
                                             {/* <button className="btn btn-primary icon_details"
-                                                                            onClick={() => {
-                                                                                handleEditform(item.id);
-                                                                            }}
-                                                                        ><i className="fas fa-edit"></i> </button> */}
+                                                                                    onClick={() => {
+                                                                                        handleEditform(item.id);
+                                                                                    }}
+                                                                                ><i className="fas fa-edit"></i> </button> */}
                                             {/* {userType === "2" && (
-                                                                            <button className="btn btn-danger icon_details"
-                                                                                onClick={() => handleDelete(item.id)}
-                                                                            ><i className="fas fa-trash"></i></button>
-                                                                        )} */}
+                                                                                    <button className="btn btn-danger icon_details"
+                                                                                        onClick={() => handleDelete(item.id)}
+                                                                                    ><i className="fas fa-trash"></i></button>
+                                                                                )} */}
                                         </td>
                                     </tr>
                                 ))
@@ -234,6 +236,7 @@ function Suicidal_Data() {
 
                     </Table>
                 </Row>
+
             </Container>
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
                 <Row className="d-flex align-items-center justify-content-start mb-2">
@@ -242,7 +245,7 @@ function Suicidal_Data() {
 
                     </Col>
                     <Col md={8}>
-                        <h4 className="text-center">SUICIDAL AND HOMICIDAL IDEATION </h4>
+                        <h4 className="text-center">MOOD AND AFFECT</h4>
                     </Col>
                 </Row>
                 <Row className='d-flex align-items-center justify-content-center'>
@@ -251,7 +254,7 @@ function Suicidal_Data() {
                             <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {familyData.admission_no}
+                                    {moodFormData.admission_no}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -261,130 +264,187 @@ function Suicidal_Data() {
                             <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {formatDateTime(familyData.date)}
+                                    {formatDateTime(moodFormData.date)}
                                 </div>
                             </Col>
                         </Form.Group>
                     </Col>
                 </Row>
                 <Form className='mt-4'>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>History of Suicide Attempts: </h5>
+                                <h5>Mood Described as: </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='suicide_history'
-                                value={suicidalData.suicide_history}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <div
+                                className="wrap-textarea"
+                                style={{
+                                    border: '1px solid #ccc',
+                                    padding: '8px',
+                                    borderRadius: "5px",
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {moodFormData.mood_description.join(', ')}
+                            </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Triggers and Stressors: </h5>
+                                <h5>How do they appear to you? : </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='triggers_stressors'
-                                value={suicidalData.triggers_stressors}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <div
+                                className="wrap-textarea"
+                                style={{
+                                    border: '1px solid #ccc',
+                                    padding: '8px',
+                                    borderRadius: "5px",
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {moodFormData.appearance}
+                            </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>History of Homicidal Ideation: </h5>
+                                <h5>Ask the Resident directly how he/she feels : </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='homicidal_ideation'
-                                value={suicidalData.homicidal_ideation}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <div
+                                className="wrap-textarea"
+                                style={{
+                                    border: '1px solid #ccc',
+                                    padding: '8px',
+                                    borderRadius: "5px",
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {moodFormData.resident_feeling}
+                            </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <h5 className='text-start'>Question to ask about Mood: </h5>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Target and Method: </h5>
+                                <h5>How do you generally feel most of the time? : </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='target_method'
-                                value={suicidalData.target_method}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <div
+                                className="wrap-textarea"
+                                style={{
+                                    border: '1px solid #ccc',
+                                    padding: '8px',
+                                    borderRadius: "5px",
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {moodFormData.general_feeling}
+                            </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Immediate Threat: </h5>
+                                <h5>What's your mood like? : </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='immediate_threat'
-                                value={suicidalData.immediate_threat}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <div
+                                className="wrap-textarea"
+                                style={{
+                                    border: '1px solid #ccc',
+                                    padding: '8px',
+                                    borderRadius: "5px",
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {moodFormData.mood_like}
+                            </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Necessity of Emergency Response: </h5>
+                                <h5>How would you say you feel generally - happy, sad, frightened, angry ? : </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='emergency_response'
-                                value={suicidalData.emergency_response}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <div
+                                className="wrap-textarea"
+                                style={{
+                                    border: '1px solid #ccc',
+                                    padding: '8px',
+                                    borderRadius: "5px",
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {moodFormData.resident_general_feeling}
+                            </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Hospitalization Required: </h5>
+                                <h5>Resident's Looks like : </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='hospital_required'
-                                value={suicidalData.hospital_required}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <div
+                                className="wrap-textarea"
+                                style={{
+                                    border: '1px solid #ccc',
+                                    padding: '8px',
+                                    borderRadius: "5px",
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {moodFormData.resident_look.join(', ')}
+                            </div>
+
                         </Col>
                     </Form.Group>
                 </Form>
@@ -393,4 +453,4 @@ function Suicidal_Data() {
     )
 }
 
-export default Suicidal_Data
+export default Mood_Affect

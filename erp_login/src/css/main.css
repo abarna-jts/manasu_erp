@@ -1894,6 +1894,9 @@ body {
 		font-size: 1.4rem;
 	}
 }
+.cognition_style h5{
+	font-size: 18px;
+}
 
 .table td{
 	max-width: 250px;
@@ -1901,9 +1904,12 @@ body {
   	white-space: normal;
 }
 .wrap-textarea {
-  white-space: pre-wrap;
+  white-space: pre-wrap !important;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: visible !important;
 }
+
 
 .form_2A_breadcrumb {
 	padding: 0rem 1rem;

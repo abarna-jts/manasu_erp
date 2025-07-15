@@ -1501,11 +1501,11 @@ const getallappearance = async (req, res) => {
 
 
 const getallmood = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM mood_affect WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM mood_affect WHERE id = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Mood and Affect Form not found' });
     }
@@ -1517,10 +1517,10 @@ const getallmood = async (req, res) => {
 }
 
 const getallspeech = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM speech WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM speech WHERE id = ?';
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'No form found for this Admission Number and Date' });
     }
@@ -1532,11 +1532,11 @@ const getallspeech = async (req, res) => {
 }
 
 const getallThough = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM though_form WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM though_form WHERE id = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Though Form not found' });
     }
@@ -1548,11 +1548,11 @@ const getallThough = async (req, res) => {
 }
 
 const getallperception = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM perception WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM perception WHERE id = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Perception Form not found' });
     }
@@ -1564,11 +1564,11 @@ const getallperception = async (req, res) => {
 }
 
 const getalljudgement = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM judgement WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM judgement WHERE id = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Judgement Form not found' });
     }
@@ -1580,11 +1580,11 @@ const getalljudgement = async (req, res) => {
 }
 
 const getallInsight = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM insight WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM insight WHERE id = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Insight Form not found' });
     }
@@ -1596,11 +1596,11 @@ const getallInsight = async (req, res) => {
 }
 
 const getallcognition = async (req, res) => {
-  const { admission_no, date } = req.params;
-  const query = 'SELECT * FROM conginition WHERE admission_no = ? AND date = ?';
+  const { id } = req.params;
+  const query = 'SELECT * FROM conginition WHERE id = ?';
 
   try {
-    const [results] = await db.query(query, [admission_no, date]);
+    const [results] = await db.query(query, [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Cognition Form not found' });
     }
@@ -2564,6 +2564,104 @@ const getGenAppearance = async(req, res) =>{
   }
 }
 
+const getSpeech = async(req, res) =>{
+  const query = "Select * from speech";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Speech is not found" });
+    }
+    return res.status(200).json({ message: "Speech form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Speech:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getMoodAffect = async(req, res) =>{
+  const query = "Select * from mood_affect";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Mood Affect is not found" });
+    }
+    return res.status(200).json({ message: "Mood Affect form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Mood Affect:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getThough = async(req, res) =>{
+  const query = "Select * from though_form";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Though Form is not found" });
+    }
+    return res.status(200).json({ message: "Though Form Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Though Form:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getPerception = async(req, res) =>{
+  const query = "Select * from perception";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Perception is not found" });
+    }
+    return res.status(200).json({ message: "Perception Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Perception:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getCognition = async(req, res) =>{
+  const query = "Select * from conginition";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Conginition is not found" });
+    }
+    return res.status(200).json({ message: "Conginition Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Conginition:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getJudgement = async(req, res) =>{
+  const query = "Select * from judgement";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Judgement is not found" });
+    }
+    return res.status(200).json({ message: "Judgement Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Judgement:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getInsight = async(req, res) =>{
+  const query = "Select * from insight";
+  try {
+    const [result] = await db.query(query);
+    if (result.length === 0) {
+      res.status(404).json({ message: "Insight is not found" });
+    }
+    return res.status(200).json({ message: "Insight Get Successfully", data: result });
+  } catch (err) {
+    console.log("Error fetching Insight:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
 export {
   createMSEForm,
   createSpeech,
@@ -2585,5 +2683,5 @@ export {
   updateInformation, updateCheifComplaint, updatePresentingData, updatePsychiatricData, updateMedicalHistoryData,
   updateFamilyHistoryData, updateSocialHistoryData, updateDevelopmentalData, updateSubstanceData, updateSuicidalData,
   getBasicDetail, getCheif, getPresenting, getPsyHistory, getMedHis, getFamHistory, getSocialHis, getDevHistory, getSubUseHistory, getSuicidalUse,
-  getGenAppearance
+  getGenAppearance, getSpeech, getMoodAffect, getThough, getPerception, getCognition, getJudgement, getInsight
 };

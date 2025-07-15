@@ -7,7 +7,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
 
-function General_Appearance() {
+function Perception() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
@@ -16,38 +16,37 @@ function General_Appearance() {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
-            String(item.general_appearance).toLowerCase().includes(searchTerm) || 
-            String(item.comprehension).toLowerCase().includes(searchTerm) || 
-            String(item.gait_posture).toLowerCase().includes(searchTerm) || 
-            String(item.motor_activity).toLowerCase().includes(searchTerm) 
+            String(item.hallucination_type).toLowerCase().includes(searchTerm) ||
+            String(item.illusion).toLowerCase().includes(searchTerm) ||
+            String(item.perception_changes).toLowerCase().includes(searchTerm)
         );
     });
 
-    const [formData, setFormData] = useState({
+    const [perceptionData, setPerceptionData] = useState({
+        hallucination_type: [],
+        heard: '',
+        voices_heard: '',
+        part_of_day: '',
+        female_male_voices: '',
+        interpreted_person: '',
+        illusion: [],
+        perception_changes: [],
+        somatic: [],
+        others: [],
         admission_no: '',
         date: '',
-        general_appearance: [],
-        attitude: [],
-        comprehension: [],
-        gait_posture: [],
-        motor_activity: [],
-        catatonic_sign: [],
-        conversion_dissociative: [],
-        social_manner: [],
-        rapport: [],
-        hallucinatory_behaviour: []
-    });
+    })
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
     const getVisitDetails = async () => {
         try {
-            const response = await apiRoute.get('/recovery/get_genAppearance');
+            const response = await apiRoute.get('/recovery/get_perception');
             console.log(response.data);
             setVisitDetails(response.data.data); // Should be an array
         } catch (error) {
-            console.error("Error fetching General Appearance Details:", error);
+            console.error("Error fetching Speech Details:", error);
         }
     };
     useEffect(() => {
@@ -67,29 +66,30 @@ function General_Appearance() {
 
     const fetchFormData = async (id) => {
         try {
-            const response = await apiRoute.get(`/recovery/getappearance/${id}`);
+            const response = await apiRoute.get(`/recovery/getPerception/${id}`);
             const data = response.data;
 
-            setFormData((formData) => ({
-                ...formData,
+            setPerceptionData((perceptionData) => ({
+                ...perceptionData,
                 admission_no: data.admission_no || 'NULL',
                 date: data.date || 'NULL',
-                general_appearance: data.general_appearance?.split(',') || ["NULL"],
-                attitude: data.attitude?.split(',') || ["NULL"],
-                comprehension: data.comprehension?.split(',') || ["NULL"],
-                gait_posture: data.gait_posture?.split(',') || ["NULL"],
-                motor_activity: data.motor_activity?.split(',') || ["NULL"],
-                catatonic_sign: data.catatonic_sign?.split(',') || ["NULL"],
-                conversion_dissociative: data.conversion_dissociative?.split(',') || ["NULL"],
-                social_manner: data.social_manner?.split(',') || ["NULL"],
-                rapport: data.rapport?.split(',') || ["NULL"],
-                hallucinatory_behaviour: data.hallucinatory_behaviour?.split(',') || ["NULL"],
+                hallucination_type: data.hallucination_type?.split(',') || ["NULL"],
+                heard: data.heard || 'NULL',
+                voices_heard: data.voices_heard || 'NULL',
+                part_of_day: data.part_of_day || 'NULL',
+                female_male_voices: data.female_male_voices || 'NULL',
+                interpreted_person: data.interpreted_person || 'NULL',
+                illusion: data.illusion?.split(',') || ["NULL"],
+                perception_changes: data.perception_changes?.split(',') || ["NULL"],
+                somatic: data.somatic?.split(',') || ["NULL"],
+                others: data.others?.split(',') || ["NULL"],
+
             }));
 
             setPreviewRequested(true); // trigger the effect after state updates
         } catch (error) {
             console.error("Error fetching form data:", error);
-            alert("General Appearance ID is not found");
+            alert("Speech ID is not found");
         }
     };
 
@@ -142,12 +142,6 @@ function General_Appearance() {
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
     };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
     return (
         <>
             <Container fluid>
@@ -156,12 +150,12 @@ function General_Appearance() {
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
                             <Breadcrumb.Item>Home</Breadcrumb.Item>
-                            <Breadcrumb.Item active>Psychiatric Form</Breadcrumb.Item>
+                            <Breadcrumb.Item active>MSE Form</Breadcrumb.Item>
                         </Breadcrumb>
-                        <h6 className="breadcrumb_title">Psychiatric Case History</h6>
+                        <h6 className="breadcrumb_title">Mental Status Examination</h6>
                     </Col>
                     <Col md={8} className="text-start mb-4">
-                        <h3 className="section_title text-center">General Appearance and Behaviour</h3>
+                        <h3 className="section_title text-center">PERCEPTION </h3>
                     </Col>
                     <Col md={2}>
                         <div className="d-flex align-items-center px-3">
@@ -181,7 +175,6 @@ function General_Appearance() {
                             </Form>
                         </div>
                     </Col>
-
                 </Row>
             </Container>
             <Col md={3}>
@@ -195,10 +188,9 @@ function General_Appearance() {
                                 <th>S.No</th>
                                 <th>Admission Number</th>
                                 <th>Date</th>
-                                <th>General Appearance</th>
-                                <th>Comprehension</th>
-                                <th>Gait and posture</th>
-                                <th>Motor activity</th>
+                                <th>Hallucinations</th>
+                                <th>Illusions and misinterpretations</th>
+                                <th>Perception Changes</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -209,10 +201,9 @@ function General_Appearance() {
                                         <td>{index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
                                         <td>{formatDateTime(item.date) || "Null"}</td>
-                                        <td>{item.general_appearance || "Null"}</td>
-                                        <td>{item.comprehension || "Null"}</td>
-                                        <td>{item.gait_posture || "Null"}</td>
-                                        <td>{item.motor_activity || "Null"}</td>
+                                        <td>{item.hallucination_type || "Null"}</td>
+                                        <td>{item.illusion || "Null"}</td>
+                                        <td>{item.perception_changes || "Null"}</td>
                                         <td>
                                             <button className="btn btn-success icon_details"
                                                 onClick={() => {
@@ -221,16 +212,7 @@ function General_Appearance() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                    onClick={() => {
-                                                                        handleEditform(item.id);
-                                                                    }}
-                                                                ><i className="fas fa-edit"></i> </button> */}
-                                            {/* {userType === "2" && (
-                                                                    <button className="btn btn-danger icon_details"
-                                                                        onClick={() => handleDelete(item.id)}
-                                                                    ><i className="fas fa-trash"></i></button>
-                                                                )} */}
+
                                         </td>
                                     </tr>
                                 ))
@@ -243,6 +225,7 @@ function General_Appearance() {
 
                     </Table>
                 </Row>
+
             </Container>
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
                 <Row className="d-flex align-items-center justify-content-start mb-2">
@@ -251,7 +234,7 @@ function General_Appearance() {
 
                     </Col>
                     <Col md={8}>
-                        <h4 className="text-center">GENERAL APPEARANCE AND BEHAVIOUR</h4>
+                        <h4 className="text-center">PERCEPTION</h4>
                     </Col>
                 </Row>
                 <Row className='d-flex align-items-center justify-content-center'>
@@ -260,7 +243,7 @@ function General_Appearance() {
                             <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {formData.admission_no}
+                                    {perceptionData.admission_no}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -270,17 +253,17 @@ function General_Appearance() {
                             <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {formatDateTime(formData.date)}
+                                    {formatDateTime(perceptionData.date)}
                                 </div>
                             </Col>
                         </Form.Group>
                     </Col>
                 </Row>
                 <Form className='mt-4'>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>General Appearance: </h5>
+                                <h5>Hallucinations: </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
@@ -297,16 +280,14 @@ function General_Appearance() {
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.general_appearance.join(', ')}
+                                {perceptionData.hallucination_type.join(', ')}
                             </div>
 
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
-                            <li className='icon-li'>
-                                <h5>Attitude towards the examiner : </h5>
-                            </li>
+                            <h5>1. What was heard?  </h5>
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -315,23 +296,21 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.attitude.join(', ')}
+                                {perceptionData.heard}
                             </div>
 
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
-                            <li className='icon-li'>
-                                <h5>Comprehension : </h5>
-                            </li>
+                            <h5>2. How many voices were heard? </h5>
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -340,23 +319,21 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.comprehension.join(', ')}
+                                {perceptionData.voices_heard}
                             </div>
 
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
-                            <li className='icon-li'>
-                                <h5>Gait and posture : </h5>
-                            </li>
+                            <h5>3. In which part of the day? </h5>
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -365,23 +342,21 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.gait_posture.join(', ')}
+                                {perceptionData.part_of_day}
                             </div>
 
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
-                            <li className='icon-li'>
-                                <h5>Motor activity : </h5>
-                            </li>
+                            <h5>4. Male or Female voices? </h5>
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -390,23 +365,21 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.motor_activity.join(', ')}
+                                {perceptionData.female_male_voices}
                             </div>
 
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
-                            <li className='icon-li'>
-                                <h5>Catatonic signs : </h5>
-                            </li>
+                            <h5>5. How interpreted and whether second person or third person hallucinations? </h5>
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -415,21 +388,22 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.catatonic_sign.join(', ')}
+                                {perceptionData.interpreted_person}
                             </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Conversion and dissociative signs : </h5>
+                                <h5>Illusions and misinterpretations : </h5>
                             </li>
                         </Form.Label>
                         <Col md={6}>
@@ -439,22 +413,24 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.conversion_dissociative.join(', ')}
+                                {perceptionData.illusion.join(', ')}
                             </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Social manner : </h5>
+                                <h5>Perception Changes : </h5>
                             </li>
+                            
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -463,22 +439,24 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.social_manner.join(', ')}
+                                {perceptionData.perception_changes.join(', ')}
                             </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Rapport : </h5>
+                                <h5>Somatic passivity phenomenon : </h5>
                             </li>
+                            
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -487,22 +465,24 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.rapport.join(', ')}
+                                {perceptionData.somatic.join(', ')}
                             </div>
+
                         </Col>
                     </Form.Group>
-                    <Form.Group className="mb-3" as={Row}>
+                    <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
-                                <h5>Hallucinatory behaviour : </h5>
+                                <h5>Others : </h5>
                             </li>
+
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -511,21 +491,23 @@ function General_Appearance() {
                                     border: '1px solid #ccc',
                                     padding: '8px',
                                     borderRadius: "5px",
-                                    minHeight: '38px',
+                                    minHeight: '40px',
                                     whiteSpace: 'pre-wrap',
                                     wordWrap: 'break-word',
                                     overflowWrap: 'break-word',
                                     textAlign: "justify"
                                 }}
                             >
-                                {formData.hallucinatory_behaviour.join(', ')}
+                                {perceptionData.others.join(', ')}
                             </div>
+
                         </Col>
                     </Form.Group>
                 </Form>
             </div>
+
         </>
     )
 }
 
-export default General_Appearance
+export default Perception
