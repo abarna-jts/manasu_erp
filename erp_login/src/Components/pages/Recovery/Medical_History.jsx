@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Medical_History() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.disability_status).toLowerCase().includes(searchTerm) ||
+            String(item.medication).toLowerCase().includes(searchTerm) ||
+            String(item.acute_health).toLowerCase().includes(searchTerm) ||
+            String(item.medication_allergies).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -144,6 +152,82 @@ function Medical_History() {
         setMedicalData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_medicalHistory/${id}`);
+            const data = response.data;
+
+            setMedicalData((medicalData) => ({
+                ...medicalData,
+                id: data.id ||'',
+                admission_no: data.admission_no || '',
+                date: data.date || '',
+                disability_status: data.disability_status || '',
+                chronic_medical: data.chronic_medical || '',
+                acute_health: data.acute_health || '',
+                medication: data.medication || '',
+                medication_allergies: data.medication_allergies || '',
+                other_allergy: data.other_allergy?.split(',') || ["NULL"],
+                significant_medical: data.significant_medical?.split(',') || ["NULL"],
+                traumatic_injuries: data.traumatic_injuries || '',
+                sexual_health: data.sexual_health?.split(',') || ["NULL"]
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleMedicalUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateMedicalHistory/${id}`, medicalData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Medical History Form updated successfully!');
+            setMedicalData({
+                disability_status: '',
+                chronic_medical: '',
+                acute_health: '',
+                medication: '',
+                medication_allergies: '',
+                other_allergy: [],
+                significant_medical: [],
+                traumatic_injuries: '',
+                sexual_health: []
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
+
+    const renderMedCheckbox = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={medicalData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...medicalData[field], label]
+                    : medicalData[field].filter(item => item !== label);
+
+                setMedicalData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
     return (
         <>
             <Container fluid>
@@ -217,11 +301,13 @@ function Medical_History() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                            onClick={() => {
-                                                                handleEditform(item.id);
-                                                            }}
-                                                        ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
+                                                onClick={() => {
+                                                    handleEditform(item.id);
+                                                }}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                             <button className="btn btn-danger icon_details"
                                                                 onClick={() => handleDelete(item.id)}
@@ -428,6 +514,126 @@ function Medical_History() {
                 </Form>
 
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Medical History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h6>Disability Status (Physical or Psychological):</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={2}
+                                name='disability_status'
+                                value={medicalData.disability_status}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Chronic Medical Conditions:</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={2}
+                                name='chronic_medical'
+                                value={medicalData.chronic_medical}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Acute Health Concerns:</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={2}
+                                name='acute_health'
+                                value={medicalData.acute_health}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Medication (Duration and Outcomes):</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={2}
+                                name='medication'
+                                value={medicalData.medication}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Medication Allergies:</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={2}
+                                name='medication_allergies'
+                                value={medicalData.medication_allergies}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Other Allergies or Sensitivities: </h6>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Foods", "Foods"],
+                                    ["Environmental Factors", "Environmental Factors"],
+                                    ["Substances ", "Substances"]
+                                ].map(([id, label]) => renderMedCheckbox("other_allergy", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Significant Medical Events: </h6>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Surgeries", "Surgeries"],
+                                    ["Hospitalizations", "Hospitalizations"],
+                                    ["Major Illnesses ", "Major Illnesses"]
+
+                                ].map(([id, label]) => renderMedCheckbox("significant_medical", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Traumatic Injuries: </h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={2}
+                                name='traumatic_injuries'
+                                value={medicalData.traumatic_injuries}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Sexual Health: </h6>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Any concerns", "Any concerns"],
+                                    ["Conditions", "Conditions"],
+                                    ["Treatments ", "Treatments"]
+
+                                ].map(([id, label]) => renderMedCheckbox("sexual_health", id, label))}
+                            </div>
+                        </Form.Group>
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleMedicalUpdate(e, medicalData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
 
         </>
     )

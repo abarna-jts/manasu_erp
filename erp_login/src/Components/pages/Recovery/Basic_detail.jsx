@@ -6,11 +6,17 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Basic_detail() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
@@ -24,6 +30,7 @@ function Basic_detail() {
         );
     });
     const [formData, setFormData] = useState({
+        id:'',
         admission_no: '',
         date: '',
         patient_name: '',
@@ -101,7 +108,43 @@ function Basic_detail() {
             setPreviewRequested(true); // trigger the effect after state updates
         } catch (error) {
             console.error("Error fetching form data:", error);
-            alert("Doctor ID is not found");
+            alert("Basic Details ID is not found");
+        }
+    };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_information/${id}`);
+            const data = response.data;
+
+            setFormData((formData) => ({
+                ...formData,
+                admission_no: data.admission_no || '',
+                id: data.id || '',
+                date: data.date || '',
+                patient_name: data.patient_name || '',
+                patient_age: data.patient_age || '',
+                patient_gender: data.patient_gender || '',
+                sexual_orientation: data.sexual_orientation || '',
+                education_bg: data.education_bg || '',
+                occupation: data.occupation || '',
+                marital_status: data.marital_status || '',
+                economic_status: data.economic_status || '',
+                religion: data.religion || '',
+                informant: data.informant || '',
+                residential_address: data.residential_address || '',
+                living_arrangements: data.living_arrangements || '',
+                family_structure: data.family_structure || '',
+                cultural_identity: data.cultural_identity || '',
+                language1: data.language1 || '',
+                language2: data.language2 || '',
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
         }
     };
 
@@ -158,6 +201,44 @@ function Basic_detail() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleUpdate = async (e, id) => {
+        e.preventDefault();
+
+        try {
+            const res = await apiRoute.post(`/recovery/updateInformation/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            alert('Demographic Information Form updated successfully!');
+            // window.location.reload();
+            setFormData({
+                patient_name: '',
+                patient_age: '',
+                patient_gender: 'Male',
+                sexual_orientation: '',
+                education_bg: '',
+                occupation: '',
+                marital_status: '',
+                economic_status: '',
+                religion: '',
+                informant: '',
+                residential_address: '',
+                living_arrangements: '',
+                family_structure: '',
+                cultural_identity: '',
+                language1: '',
+                language2: '',
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
     };
 
 
@@ -238,11 +319,13 @@ function Basic_detail() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
                                                 onClick={() => {
                                                     handleEditform(item.id);
                                                 }}
-                                            ><i className="fas fa-edit"></i> </button> */}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                 <button className="btn btn-danger icon_details"
                                                     onClick={() => handleDelete(item.id)}
@@ -251,7 +334,7 @@ function Basic_detail() {
                                         </td>
                                     </tr>
                                 ))
-                                ) : (
+                            ) : (
                                 <tr>
                                     <td colSpan="10" className="text-center text-danger">No data found</td>
                                 </tr>
@@ -275,7 +358,7 @@ function Basic_detail() {
                             <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {familyData.admission_no}
+                                    {formData.admission_no}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -285,7 +368,7 @@ function Basic_detail() {
                             <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {formatDateTime(familyData.date)}
+                                    {formatDateTime(formData.date)}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -483,7 +566,213 @@ function Basic_detail() {
 
                 </Form>
             </div>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Demographic Information</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Name: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='patient_name'
+                                        value={formData.patient_name}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Age: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='patient_age'
+                                        value={formData.patient_age}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Gender: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='patient_gender'
+                                        value={formData.patient_gender}
+                                        onChange={handleInputChange}
+                                        readOnly
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Sexual Orientation:</Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='sexual_orientation'
+                                        value={formData.sexual_orientation}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Educational Background: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='education_bg'
+                                        value={formData.education_bg}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Occupation and Employment Status: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='occupation'
+                                        value={formData.occupation}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Marital Status: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='marital_status'
+                                        value={formData.marital_status}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Socio Economic Status: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type='text'
+                                        name='economic_status'
+                                        value={formData.economic_status}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Religion: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type="text"
+                                        name='religion'
+                                        value={formData.religion}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Informant: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type="text"
+                                        name='informant'
+                                        value={formData.informant}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Residential Address (current address):  </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type="text"
+                                        name='residential_address'
+                                        value={formData.residential_address}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Living Arrangements: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Select name="living_arrangements"
+                                        value={formData.living_arrangements}
+                                        onChange={handleInputChange}
+                                        required>
+                                        <option>Select</option>
+                                        <option value="Family">Family</option>
+                                        <option value="Parents">Parents</option>
+                                        <option value="Roommates">Roommates</option>
+                                        <option value="Alone">Alone</option>
+                                    </Form.Select>
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Family Structure: </Form.Label>
+                                <Col sm="8">
+                                    <Form.Select name="family_structure"
+                                        value={formData.family_structure}
+                                        onChange={handleInputChange}
+                                        required>
+                                        <option>Select</option>
+                                        <option value="Nuclear">Nuclear</option>
+                                        <option value="Joint">Joint</option>
+                                        <option value="Alone">Alone</option>
+                                    </Form.Select>
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Cultural Identity:  </Form.Label>
+                                <Col sm="8">
+                                    <Form.Control type="text"
+                                        name='cultural_identity'
+                                        value={formData.cultural_identity}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-2 text-start d-flex align-items-center justify-content-center" >
+                                <Form.Label column sm="4">Language Preferences:  </Form.Label>
+                                <Col sm="4">
+                                    <Form.Control type="text"
+                                        name='language1'
+                                        value={formData.language1}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Col>
+                                <Col sm="4">
+                                    <Form.Control type="text"
+                                        name='language2'
+                                        value={formData.language2}
+                                        onChange={handleInputChange} />
+                                </Col>
+                            </Form.Group>
+
+                            <div className="mt-3">
+                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, formData.id)}>Update</Button>
+                                <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                            </div>
+
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
         </div>
+
+
     )
 }
 

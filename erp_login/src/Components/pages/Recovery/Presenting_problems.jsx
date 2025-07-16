@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Presenting_problems() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.history_presenting).toLowerCase().includes(searchTerm) ||
+            String(item.appetite_weight).toLowerCase().includes(searchTerm) ||
+            String(item.energy_level).toLowerCase().includes(searchTerm) ||
+            String(item.interpersonal_relationship).toLowerCase().includes(searchTerm) 
         );
     });
 
@@ -152,6 +160,91 @@ function Presenting_problems() {
         setPresentingData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const renderCheckbox = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={presentingData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...presentingData[field], label]
+                    : presentingData[field].filter(item => item !== label);
+
+                setPresentingData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_presentingData/${id}`);
+            const data = response.data;
+
+            setPresentingData((presentingData) => ({
+                ...presentingData,
+                id: data.id || '',
+                admission_no: data.admission_no || '',
+                date: data.date || '',
+                history_presenting: data.history_presenting || '',
+                mood_affect: data.mood_affect?.split(',') || ["NULL"],
+                though_content: data.though_content?.split(',') || ["NULL"],
+                though_process: data.though_process?.split(',') || ["NULL"],
+                perception: data.perception?.split(',') || ["NULL"],
+                behavioural_changes: data.behavioural_changes?.split(',') || ["NULL"],
+                sleep_patterns: data.sleep_patterns?.split(',') || ["NULL"],
+                energy_level: data.energy_level || '',
+                appetite_weight: data.appetite_weight || '',
+                occupation_academic: data.occupation_academic || '',
+                interpersonal_relationship: data.interpersonal_relationship || '',
+                selfCare_activity: data.selfCare_activity || '',
+                recreation_activity: data.recreation_activity || ''
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Presenting Problems ID is not found");
+        }
+    };
+
+    const handlePresentingUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updatePresentingData/${id}`, presentingData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log(res);
+            alert('Presenting Problems Form updated successfully!');
+            setPresentingData({
+                history_presenting: '',
+                mood_affect: [],
+                though_content: [],
+                though_process: [],
+                perception: [],
+                behavioural_changes: [],
+                sleep_patterns: [],
+                energy_level: '',
+                appetite_weight: '',
+                occupation_academic: '',
+                interpersonal_relationship: '',
+                selfCare_activity: '',
+                recreation_activity: '',
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
+
     return (
         <div>
             <Container fluid>
@@ -227,11 +320,13 @@ function Presenting_problems() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
                                                 onClick={() => {
                                                     handleEditform(item.id);
                                                 }}
-                                            ><i className="fas fa-edit"></i> </button> */}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                 <button className="btn btn-danger icon_details"
                                                     onClick={() => handleDelete(item.id)}
@@ -450,6 +545,177 @@ function Presenting_problems() {
                     </Form.Group>
                 </Form>
             </div>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Presenting Problems</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h4>Introduction to Presenting Problems:</h4>
+                        </li>
+                        <Form.Group className="mb-3" >
+                            <Form.Label>History of Presenting Illness: </Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                                name='history_presenting'
+                                value={presentingData.history_presenting}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h4>Detailed Exploration of Symptoms:</h4>
+                        </li>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label>a.	Mood and Affect: </Form.Label>
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Predominant mood", "Predominant mood"],
+                                    ["Appropriateness of Affect", "Appropriateness of Affect"],
+
+                                ].map(([id, label]) => renderCheckbox("mood_affect", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label>b.	Thought Content: </Form.Label>
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Recurrent", "Recurrent"],
+                                    ["Intrusive", "Intrusive"],
+                                    ["obsessive", "obsessive"],
+                                    ["Cognitive Distortions", "Cognitive Distortions"],
+
+                                ].map(([id, label]) => renderCheckbox("though_content", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label>c.	Thought Process: </Form.Label>
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Speed of thoughts", "Speed of thoughts"],
+                                    ["Coherence", "Coherence"],
+                                    ["Organization", "Organization"],
+                                    ["Signs of Racing thoughts", "Signs of Racing thoughts"],
+                                    ["Tangentiality", "Tangentiality"],
+                                    ["Thought Blocking", "Thought Blocking"],
+
+                                ].map(([id, label]) => renderCheckbox("though_process", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label>d.	Perceptions: </Form.Label>
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Hallucinations", "Hallucinations"],
+                                    ["Perceptual Disturbances", "Perceptual Disturbances"],
+                                    ["Unusual Experiences related to Hearing", "Unusual Experiences related to Hearing"],
+                                    ["Seeing", "Seeing"],
+                                    ["Interpreting Stimuli", "Interpreting Stimuli"],
+
+                                ].map(([id, label]) => renderCheckbox("perception", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label>e.	Behavioural Changes: </Form.Label>
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Activity level", "Activity level"],
+                                    ["Social Withdrawal", "Social Withdrawal"],
+                                    ["Impulsivity", "Impulsivity"],
+                                    ["Engagement in Risky Behaviours", "Engagement in Risky Behaviours"],
+                                    ["Disruptions in Daily Routines", "Disruptions in Daily Routines"],
+                                    ["Self-Care Activities", "Self-Care Activities"]
+
+                                ].map(([id, label]) => renderCheckbox("behavioural_changes", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label>f.	Sleep Patterns: </Form.Label>
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Difficulties falling asleep", "Difficulties falling asleep"],
+                                    ["Staying asleep", "Staying asleep"],
+                                    ["Experiencing Nightmares", "Experiencing Nightmares"]
+
+                                ].map(([id, label]) => renderCheckbox("sleep_patterns", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" >
+                            <Form.Label>Appetite and Weight Changes: </Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='appetite_weight'
+                                value={presentingData.appetite_weight}
+                                onChange={handleInputChange}
+                                required
+                            />
+
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" >
+                            <Form.Label>Energy Level: </Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                                name='energy_level'
+                                value={presentingData.energy_level}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h4>Impact on Daily Functioning:</h4>
+                        </li>
+
+                        <Form.Group className="mb-3" >
+                            <Form.Label>Occupational or Academic Functioning: </Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                                name='occupation_academic'
+                                value={presentingData.occupation_academic}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" >
+                            <Form.Label>Interpersonal Relationships: </Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                                name='interpersonal_relationship'
+                                value={presentingData.interpersonal_relationship}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" >
+                            <Form.Label>Self-Care and Activities of Daily Living: </Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                                name='selfCare_activity'
+                                value={presentingData.selfCare_activity}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" >
+                            <Form.Label>Recreational Activities: </Form.Label>
+                            <Form.Control as="textarea" rows={2}
+                                name='recreation_activity'
+                                value={presentingData.recreation_activity}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePresentingUpdate(e, presentingData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </div>
     )
 }

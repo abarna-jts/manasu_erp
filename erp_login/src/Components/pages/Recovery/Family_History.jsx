@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Family_History() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.family_composition).toLowerCase().includes(searchTerm) ||
+            String(item.family_dynamics).toLowerCase().includes(searchTerm) ||
+            String(item.marriage_type).toLowerCase().includes(searchTerm) ||
+            String(item.genetic_predisposition).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -139,6 +147,79 @@ function Family_History() {
         const { name, value } = e.target;
         setFamilyData((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_familyHistory/${id}`);
+            const data = response.data;
+
+            setFamilyData((familyData) => ({
+                ...familyData,
+                id:data.id || '',
+                admission_no: data.admission_no || 'NULL',
+                date: data.date || 'NULL',
+                family_composition: data.family_composition?.split(',') || ["NULL"],
+                family_dynamics: data.family_dynamics?.split(',') || ["NULL"],
+                marriage_type: data.marriage_type || 'NULL',
+                family_history: data.family_history || 'NULL',
+                genetic_predisposition: data.genetic_predisposition || 'NULL',
+                family_changes: data.family_changes?.split(',') || ["NULL"],
+                family_substance: data.family_substance || "NULL"
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleFamilyUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateFamilyHistory/${id}`, familyData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Family History Form updated successfully!');
+            setFamilyData({
+                family_composition: [],
+                family_dynamics: [],
+                marriage_type: '',
+                family_history: '',
+                genetic_predisposition: '',
+                family_changes: [],
+                family_substance: ''
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
+
+    const renderFamCheckbox = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={familyData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...familyData[field], label]
+                    : familyData[field].filter(item => item !== label);
+
+                setFamilyData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
     return (
         <>
             <Container fluid>
@@ -212,11 +293,13 @@ function Family_History() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                            onClick={() => {
-                                                                handleEditform(item.id);
-                                                            }}
-                                                        ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
+                                                onClick={() => {
+                                                    handleEditform(item.id);
+                                                }}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                             <button className="btn btn-danger icon_details"
                                                                 onClick={() => handleDelete(item.id)}
@@ -389,6 +472,105 @@ function Family_History() {
                     </Form.Group>
                 </Form>
             </div>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Family History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h5>Family Composition:</h5>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Parents", "Parents"],
+                                    ["Siblings", "Siblings"],
+                                    ["Extended Family Members ", "Extended Family Members"]
+                                ].map(([id, label]) => renderFamCheckbox("family_composition", id, label))}
+                            </div>
+                        </Form.Group>
+                        <li className='icon-li'>
+                            <h5>Family Dynamics:</h5>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Communication Patterns", "Communication Patterns"],
+                                    ["Roles", "Roles"],
+                                    ["Relationships ", "Relationships"]
+                                ].map(([id, label]) => renderFamCheckbox("family_dynamics", id, label))}
+                            </div>
+                        </Form.Group>
+                        <li className='icon-li'>
+                            <h5>Type of Marriage: </h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='marriage_type'
+                                value={familyData.marriage_type}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Family History of Psychiatric Disorders: <span>(any hereditary conditions)</span></h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='family_history'
+                                value={familyData.family_history}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Genetic Predispositions: <span>(genetic conditions or predispositions)</span></h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='genetic_predisposition'
+                                value={familyData.genetic_predisposition}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Family Changes or Transitions: </h5>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Moves", "Moves"],
+                                    ["Divorces", "Divorces"],
+                                    ["Births ", "Births"],
+                                    ["Deaths", "Deaths"]
+
+                                ].map(([id, label]) => renderFamCheckbox("family_changes", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Substance Use within the Family</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='family_substance'
+                                value={familyData.family_substance}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleFamilyUpdate(e, familyData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
 
     // ✅ Generate JWT token with 1-hour expiry
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: '1h' // or '7d' for 7 days
+      expiresIn: '4h' // or '7d' for 7 days
     });
 
     // ✅ Store token in DB

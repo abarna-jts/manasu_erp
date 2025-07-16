@@ -6,11 +6,17 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Mood_Affect() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
@@ -137,10 +143,85 @@ function Mood_Affect() {
         window.open(pdfUrl, '_blank');
     };
 
-    const handleInputChange = () => {
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
         setMoodFormData((prev) => ({ ...prev, [name]: value }));
     }
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/getMood/${id}`);
+            const data = response.data;
+
+            setMoodFormData(prev => ({
+                ...prev,
+                id: data.id || '',
+                admission_no: data.admission_no || '',
+                date: data.date || '',
+                mood_description: data.mood_description?.split(',').map(i => i.trim()) || [],
+                appearance: data.appearance,
+                resident_feeling: data.resident_feeling,
+                general_feeling: data.general_feeling,
+                mood_like: data.mood_like,
+                resident_general_feeling: data.resident_general_feeling,
+                resident_look: data.resident_look?.split(',').map(i => i.trim()) || []
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleMoodUpdate = async (e, id) => {
+        e.preventDefault();
+
+        try {
+            const res = await apiRoute.post(`/recovery/updateMood/${id}`, moodFormData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            alert('Mood and Affect Form updated successfully!');
+            setMoodFormData({
+                mood_description: [],
+                appearance: "",
+                resident_feeling: "",
+                general_feeling: "",
+                mood_like: "",
+                resident_general_feeling: "",
+                resident_look: [],
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
+    const rendermoodCheckbox = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={moodFormData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...moodFormData[field], label]
+                    : moodFormData[field].filter(item => item !== label);
+
+                setMoodFormData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
     return (
         <>
             <Container fluid>
@@ -214,11 +295,13 @@ function Mood_Affect() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                                    onClick={() => {
-                                                                                        handleEditform(item.id);
-                                                                                    }}
-                                                                                ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                                                     <button className="btn btn-danger icon_details"
                                                                                         onClick={() => handleDelete(item.id)}
@@ -449,6 +532,110 @@ function Mood_Affect() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Mood and Affect </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Mood Described as:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["Relaxed", "Relaxed"],
+                                        ["Happy", "Happy"],
+                                        ["Anxious", "Anxious"],
+                                        ["Angry", "Angry"],
+                                        ["Depressed", "Depressed"],
+                                        ["Hopeless", "Hopeless"],
+                                        ["Hopeful", "Hopeful"],
+                                        ["Apathetic", "Apathetic"],
+                                        ["Euphoric", "Euphoric"],
+                                        ["Euthymic", "Euthymic"],
+                                        ["Elated", "Elated"],
+                                        ["Irritable", "Irritable"],
+                                        ["Fearful", "Fearful"],
+                                        ["Silly", "Silly"]
+                                    ].map(([id, label]) => rendermoodCheckbox("mood_description", id, label))}
+                                </div>
+                            </li>
+                            <li className="icon-li">
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Label>How do they appear to you?</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='appearance'
+                                        value={moodFormData.appearance}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+                            <li className="icon-li">
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Label>Ask the Resident directly how he/she feels</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='resident_feeling'
+                                        value={moodFormData.resident_feeling}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+                            <h4 style={{ display: "inline" }}>Question to ask about Mood:</h4>
+                            <li className="icon-li">
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Label>How do you generally feel most of the time?</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='general_feeling'
+                                        value={moodFormData.general_feeling}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+                            <li className="icon-li">
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Label>What's your mood like?</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='mood_like'
+                                        value={moodFormData.mood_like}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+                            <li className="icon-li">
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Label>How would you say you feel generally - happy, sad, frightened, angry ?</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='resident_general_feeling'
+                                        value={moodFormData.resident_general_feeling}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Resident's Looks like:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["depressed mood", "Depressed Mood"],
+                                        ["irritable mood", "Irritable Mood"],
+                                        ["blut affect", "Blunt Affect"],
+                                        ["flat affect", "Flat Affect"],
+                                    ].map(([id, label]) =>
+                                        rendermoodCheckbox("resident_look", id, label)
+                                    )}
+                                </div>
+
+                            </li>
+
+                            <div className="mt-3">
+                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleMoodUpdate(e, moodFormData.id)}>Update</Button>
+                                <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                            </div>
+
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

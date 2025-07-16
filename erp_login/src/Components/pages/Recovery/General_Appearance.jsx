@@ -6,24 +6,31 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function General_Appearance() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
-            String(item.general_appearance).toLowerCase().includes(searchTerm) || 
-            String(item.comprehension).toLowerCase().includes(searchTerm) || 
-            String(item.gait_posture).toLowerCase().includes(searchTerm) || 
-            String(item.motor_activity).toLowerCase().includes(searchTerm) 
+            String(item.general_appearance).toLowerCase().includes(searchTerm) ||
+            String(item.comprehension).toLowerCase().includes(searchTerm) ||
+            String(item.gait_posture).toLowerCase().includes(searchTerm) ||
+            String(item.motor_activity).toLowerCase().includes(searchTerm)
         );
     });
 
     const [formData, setFormData] = useState({
+        id:'',
         admission_no: '',
         date: '',
         general_appearance: [],
@@ -148,6 +155,86 @@ function General_Appearance() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const renderCheckbox = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={formData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...formData[field], label]
+                    : formData[field].filter(item => item !== label);
+
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/getappearance/${id}`);
+            const data = response.data;
+
+            setFormData(formData => ({
+                ...formData,
+                id:data.id || '',
+                admission_no: String(data.admission_no || ''),
+                date: data.date || '',
+                general_appearance: data.general_appearance?.split(',').map(i => i.trim()) || [],
+                attitude: data.attitude?.split(',').map(i => i.trim()) || [],
+                comprehension: data.comprehension?.split(',').map(i => i.trim()) || [],
+                gait_posture: data.gait_posture?.split(',').map(i => i.trim()) || [],
+                motor_activity: data.motor_activity?.split(',').map(i => i.trim()) || [],
+                catatonic_sign: data.catatonic_sign?.split(',').map(i => i.trim()) || [],
+                conversion_dissociative: data.conversion_dissociative?.split(',').map(i => i.trim()) || [],
+                social_manner: data.social_manner?.split(',').map(i => i.trim()) || [],
+                rapport: data.rapport?.split(',').map(i => i.trim()) || [],
+                hallucinatory_behaviour: data.hallucinatory_behaviour?.split(',').map(i => i.trim()) || [],
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleUpdate = async (e, id) => {
+        e.preventDefault();
+
+        try {
+            const res = await apiRoute.post(`/recovery/updateAppearance/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            alert('General Appearance Form updated successfully!');
+            setFormData({
+                general_appearance: [],
+                attitude: [],
+                comprehension: [],
+                gait_posture: [],
+                motor_activity: [],
+                catatonic_sign: [],
+                conversion_dissociative: [],
+                social_manner: [],
+                rapport: [],
+                hallucinatory_behaviour: []
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
     return (
         <>
             <Container fluid>
@@ -208,24 +295,34 @@ function General_Appearance() {
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
-                                        <td>{formatDateTime(item.date) || "Null"}</td>
+                                        <td style={{ width: "8%" }}>{formatDateTime(item.date) || "Null"}</td>
                                         <td>{item.general_appearance || "Null"}</td>
                                         <td>{item.comprehension || "Null"}</td>
                                         <td>{item.gait_posture || "Null"}</td>
                                         <td>{item.motor_activity || "Null"}</td>
                                         <td>
-                                            <button className="btn btn-success icon_details"
-                                                onClick={() => {
-                                                    fetchFormData(item.id);
-                                                }}
-                                            >
-                                                <i className="fas fa-eye"></i>
-                                            </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                    onClick={() => {
-                                                                        handleEditform(item.id);
-                                                                    }}
-                                                                ><i className="fas fa-edit"></i> </button> */}
+                                            <Row className='d-flex align-items-center justify-content-center'>
+                                                <Col md={5}>
+                                                    <button className="btn btn-success icon_details"
+                                                        onClick={() => {
+                                                            fetchFormData(item.id);
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-eye"></i>
+                                                    </button>
+                                                </Col>
+
+                                                <Col md={5}>
+                                                    {userType === "4" && (
+                                                        <button className="btn btn-primary icon_details"
+                                                            onClick={() => {
+                                                                handleEditform(item.id);
+                                                            }}
+                                                        ><i className="fas fa-edit"></i> </button>
+                                                    )}
+                                                </Col>
+                                            </Row>
+
                                             {/* {userType === "2" && (
                                                                     <button className="btn btn-danger icon_details"
                                                                         onClick={() => handleDelete(item.id)}
@@ -524,6 +621,176 @@ function General_Appearance() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit General Appearance and Behaviour </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            {/* General Appearance */}
+                            <Form.Group controlId="general_appearance" className="icon-li" required>
+                                <h4>General Appearance:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["Approximate height", "Approximate height"],
+                                        ["Approximate weight", "Approximate weight"],
+                                        ["Looks comfortable", "Looks comfortable"],
+                                        ["Looks uncomfortable", "Looks uncomfortable"],
+                                        ["Physical health", "Physical health"],
+                                        ["Grooming", "Grooming"],
+                                        ["Hygiene", "Hygiene"],
+                                        ["Self-Care", "Self-Care"],
+                                        ["Proper Dressing", "Proper Dressing"],
+                                        ["Dressing Neatly", "Dressing Neatly"],
+                                        ["Facial Expression", "Facial Expression"],
+                                    ].map(([id, label]) => renderCheckbox("general_appearance", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Attitude */}
+                            <Form.Group controlId="attitude" className="icon-li" required>
+                                <h4>Attitude towards the examiner:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["cooperation", "Cooperation"],
+                                        ["guardedness", "Guardedness"],
+                                        ["evasiveness", "Evasiveness"],
+                                        ["hostility", "Hostility"],
+                                        ["attentiveness", "Attentiveness"],
+                                        ["Shows Interest", "Shows Interest"],
+                                        ["Lacks Interest", "Lacks Interest"],
+                                    ].map(([id, label]) => renderCheckbox("attitude", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Comprehension */}
+                            <Form.Group controlId="comprehension" className="icon-li" required>
+                                <h4>Comprehension:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["intact", "Intact"],
+                                        ["partially-impaired", "Partially Impaired"],
+                                        ["fully-impaired", "Fully Impaired"],
+                                    ].map(([id, label]) => renderCheckbox("comprehension", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Gait and Posture */}
+                            <Form.Group controlId="gait_posture" className="icon-li" required>
+                                <h4>Gait and posture:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["sitting-normal", "Normal Sitting"],
+                                        ["sitting-abnormal", "Abnormal Sitting"],
+                                        ["standing-normal", "Normal Standing"],
+                                        ["standing-abnormal", "Abnormal Standing"],
+                                        ["walking-normal", "Normal Walking Pattern"],
+                                        ["walking-abnormal", "Abnormal Walking Pattern"],
+                                        ["lying-normal", "Normal Lying Position"],
+                                        ["lying-abnormal", "Abnormal Lying Position"],
+                                    ].map(([id, label]) => renderCheckbox("gait_posture", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Motor Activity */}
+                            <Form.Group controlId="motor_activity" className="icon-li" required>
+                                <h4>Motor activity:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["increased", "Increased"],
+                                        ["decreased", "Decreased"],
+                                        ["excitement", "Excitement"],
+                                        ["stupor", "Stupor"],
+                                        ["AIMS", "Abnormal involuntary movements (AIMS) tics"],
+                                        ["tremors", "Tremors"],
+                                        ["restlessness", "Restlessness"],
+                                        ["akathisia", "Skathisia"],
+                                        ["social withdrawal", "Social Withdrawal"],
+                                        ["autism", "Autism"],
+                                    ].map(([id, label]) => renderCheckbox("motor_activity", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Catatonic Signs */}
+                            <Form.Group controlId="catatonic_sign" className="icon-li" required>
+                                <h4>Catatonic signs:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["mannerisms", "Mannerisms"],
+                                        ["stereotypes", "Stereotypes"],
+                                        ["posturing", "Posturing"],
+                                        ["waxy flexibility", "Waxy Flexibility"],
+                                        ["negativism", "Negativism"],
+                                        ["ambitendency", "Ambitendency"],
+                                        ["automatic obedience", "Automatic Obedience"],
+                                        ["Echo- Praxia", "Echo- Praxia"],
+                                        ["psychological-pillow", "Psychological-Pillow"],
+                                    ].map(([id, label]) => renderCheckbox("catatonic_sign", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Conversion and Dissociative Signs */}
+                            <Form.Group controlId="conversion_dissociative" className="icon-li" required>
+                                <h4>Conversion and dissociative signs:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["pseudo seizures", "Pseudo Seizures"],
+                                        ["possession states", "possession States"],
+                                    ].map(([id, label]) => renderCheckbox("conversion_dissociative", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Social Manner */}
+                            <Form.Group controlId="social_manner" className="icon-li" required>
+                                <h4>Social manner:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["social-increased", "Increased"],
+                                        ["social-decreased", "Decreased"],
+                                        ["inappropriate", "Inappropriate"],
+                                    ].map(([id, label]) => renderCheckbox("social_manner", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Rapport */}
+                            <Form.Group controlId="rapport" className="icon-li" required>
+                                <h4>Rapport:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        [
+                                            "relationship_patient",
+                                            "Whether a working empathic relationship can be established with the patient, should mentioned.",
+                                        ],
+                                    ].map(([id, label]) => renderCheckbox("rapport", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            {/* Hallucinatory Behaviour */}
+                            <Form.Group controlId="hallucinatory_behaviour" className="icon-li" required>
+                                <h4>Hallucinatory behaviour:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["Smiling without reason", "Smiling without reason"],
+                                        ["Crying without reason", "Crying without reason"],
+                                        ["Muttering to self", "Muttering to self"],
+                                        ["Talking to self audibly", "Talking to self audibly"],
+                                        ["Engages in non-social speech", "Engages in non-social speech"],
+                                        ["Odd gesturing in response to auditory", "Odd gesturing in response to auditory"],
+                                        ["visual hallucinations", "Visual Hallucinations"],
+                                    ].map(([id, label]) => renderCheckbox("hallucinatory_behaviour", id, label))}
+                                </div>
+                            </Form.Group>
+
+                            <div className="mt-3">
+                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleUpdate(e, formData.id)}>Update</Button>
+                                <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                            </div>
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

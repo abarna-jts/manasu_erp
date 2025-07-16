@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Substance_History() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.substance_use).toLowerCase().includes(searchTerm) ||
+            String(item.frequency).toLowerCase().includes(searchTerm) ||
+            String(item.quantity).toLowerCase().includes(searchTerm) ||
+            String(item.motivation_use).toLowerCase().includes(searchTerm) 
         );
     });
 
@@ -149,6 +157,71 @@ function Substance_History() {
         const { name, value } = e.target;
         setSubstanceData((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_substance/${id}`);
+            const data = response.data;
+
+            setSubstanceData((substanceData) => ({
+                ...substanceData,
+                id:data.id || '',
+                admission_no: data.admission_no || 'NULL',
+                date: data.date || 'NULL',
+                substance_use: data.substance_use || 'NULL',
+                age_onset: data.age_onset || 'NULL',
+                frequency: data.frequency || 'NULL',
+                quantity: data.quantity || 'NULL',
+                motivation_use: data.motivation_use || 'NULL',
+                environmental_trigger: data.environmental_trigger || "NULL",
+                impact_occupation: data.impact_occupation || "NULL",
+                impact_interpersonal: data.impact_interpersonal || 'NULL',
+                financial_consequences: data.financial_consequences || 'NULL',
+                craving_intensity: data.craving_intensity || 'NULL',
+                previous_treatment: data.previous_treatment || 'NULL',
+                relapse_history: data.relapse_history || 'NULL',
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleSubstanceUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateSubstance/${id}`, substanceData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Substance Use History Form updated successfully!');
+            setSubstanceData({
+                substance_use: '',
+                age_onset: '',
+                frequency: '',
+                quantity: '',
+                motivation_use: '',
+                environmental_trigger: '',
+                impact_occupation: '',
+                impact_interpersonal: '',
+                financial_consequences: '',
+                craving_intensity: '',
+                previous_treatment: '',
+                relapse_history: '',
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
+
+
     return (
         <>
             <Container fluid>
@@ -222,11 +295,13 @@ function Substance_History() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                            onClick={() => {
-                                                                                handleEditform(item.id);
-                                                                            }}
-                                                                        ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
+                                                onClick={() => {
+                                                    handleEditform(item.id);
+                                                }}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                                             <button className="btn btn-danger icon_details"
                                                                                 onClick={() => handleDelete(item.id)}
@@ -260,7 +335,7 @@ function Substance_History() {
                             <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {familyData.admission_no}
+                                    {substanceData.admission_no}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -270,7 +345,7 @@ function Substance_History() {
                             <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {formatDateTime(familyData.date)}
+                                    {formatDateTime(substanceData.date)}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -483,6 +558,165 @@ function Substance_History() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Substance Use History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h5>Types of Substances Used:</h5>
+                            <p className='text-muted small' style={{ marginTop: "5px" }}>(Mother's health during pregnancy, exposure to toxins, and any complications)</p>
+                        </li>
+                        <Form.Select name="substance_use"
+                            value={substanceData.substance_use}
+                            onChange={handleInputChange}
+                            required>
+                            <option>Select</option>
+                            <option value="Alcohol">Alcohol </option>
+                            <option value="Illicit Drugs">Illicit Drugs</option>
+                            <option value="Prescription Drugs">Prescription Drugs</option>
+                        </Form.Select>
+
+                        <li className='icon-li'>
+                            <h5>Age of Onset :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='age_onset'
+                                value={substanceData.age_onset}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Frequency :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='frequency'
+                                value={substanceData.frequency}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Quantity :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='quantity'
+                                value={substanceData.quantity}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Motivations for Use :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='motivation_use'
+                                value={substanceData.motivation_use}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Environmental Triggers :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='environmental_trigger'
+                                value={substanceData.environmental_trigger}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Impact on Occupational or Academic Functioning :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='impact_occupation'
+                                value={substanceData.impact_occupation}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Impact on Interpersonal Relationships :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='impact_interpersonal'
+                                value={substanceData.impact_interpersonal}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Legal or Financial Consequences :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='financial_consequences'
+                                value={substanceData.financial_consequences}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Craving intensity :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='craving_intensity'
+                                value={substanceData.craving_intensity}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Previous Treatment Attempts :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='previous_treatment'
+                                value={substanceData.previous_treatment}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Relapse History :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='relapse_history'
+                                value={substanceData.relapse_history}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSubstanceUpdate(e, substanceData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
 
         </>
     )

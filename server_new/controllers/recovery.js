@@ -1,6 +1,6 @@
 import db from '../db.js';
 import { recoveryAsync } from '../util/recoveryMulter.js';
-import {checkMSECompletion} from '../util/checkMSECompletion.js';
+import { checkMSECompletion } from '../util/checkMSECompletion.js';
 import transporter from '../config/mailer.js';
 
 const createMSEForm = async (req, res) => {
@@ -53,7 +53,7 @@ const createMSEForm = async (req, res) => {
     ];
 
     const [result] = await db.query(query, values);
-    
+
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
@@ -351,7 +351,7 @@ const createInsight = async (req, res) => {
         // ✅ Send email
         const mailOptions = {
           from: 'yourgmail@gmail.com',
-          to: 'abarnadevi.jorimts@gmail.com',
+          to: 'manasucmf@gmail.com',
           subject: 'MSE Form Completed',
           html: `
             <h3>MSE Form Completed</h3>
@@ -480,7 +480,7 @@ const createCognition = async (req, res) => {
     ];
 
     const [result] = await db.query(query, values);
-    
+
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
@@ -598,7 +598,7 @@ const updateAppearance = async (req, res) => {
       social_manner, rapport, hallucinatory_behaviour
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE general_appearance SET 
                     general_appearance = ?, 
@@ -611,7 +611,7 @@ const updateAppearance = async (req, res) => {
                     social_manner = ?,
                     rapport = ?,
                     hallucinatory_behaviour = ?
-                    WHERE date = ? AND admission_no = ?`;
+                    WHERE id = ? `;
 
     const values = [
       general_appearance.join(", "),
@@ -624,8 +624,7 @@ const updateAppearance = async (req, res) => {
       social_manner.join(", "),
       rapport.join(", "),
       hallucinatory_behaviour.join(", "),
-      date,
-      admission_no
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -660,7 +659,7 @@ const updateInformation = async (req, res) => {
 
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE basic_detail SET
                     patient_name = ?,
@@ -679,7 +678,7 @@ const updateInformation = async (req, res) => {
                     cultural_identity = ?,
                     language1 = ?,
                     language2 = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
     const values = [
       patient_name,
       patient_age,
@@ -696,7 +695,7 @@ const updateInformation = async (req, res) => {
       family_structure,
       cultural_identity,
       language1,
-      language2, admission_no, date
+      language2, id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -726,7 +725,7 @@ const updateCheifComplaint = async (req, res) => {
 
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE cheif_complaint SET
                     chief_complaint = ?,
@@ -740,7 +739,7 @@ const updateCheifComplaint = async (req, res) => {
                     biological = ?,
                     psychological = ?,
                     social_environment = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
     const values = [
       chief_complaint,
       onset_duration,
@@ -752,7 +751,7 @@ const updateCheifComplaint = async (req, res) => {
       life_changes,
       biological,
       psychological,
-      social_environment, admission_no, date
+      social_environment, id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -783,7 +782,7 @@ const updatePresentingData = async (req, res) => {
       recreation_activity,
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE presenting_problems SET
                     history_presenting = ?,
@@ -799,22 +798,22 @@ const updatePresentingData = async (req, res) => {
                     interpersonal_relationship = ?,
                     selfCare_activity = ?,
                     recreation_activity = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
 
     const values = [
       history_presenting,
-      mood_affect.join(", "),
-      though_content.join(", "),
-      though_process.join(", "),
-      perception.join(", "),
-      behavioural_changes.join(", "),
-      sleep_patterns.join(", "),
+      Array.isArray(mood_affect) ? mood_affect.join(", ") : mood_affect || '',
+      Array.isArray(though_content) ? though_content.join(", ") : though_content || '',
+      Array.isArray(though_process) ? though_process.join(", ") : though_process || '',
+      Array.isArray(perception) ? perception.join(", ") : perception || '',
+      Array.isArray(behavioural_changes) ? behavioural_changes.join(", ") : behavioural_changes || '',
+      Array.isArray(sleep_patterns) ? sleep_patterns.join(", ") : sleep_patterns || '',
       energy_level,
       appetite_weight,
       occupation_academic,
       interpersonal_relationship,
       selfCare_activity,
-      recreation_activity, admission_no, date
+      recreation_activity, id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -846,7 +845,7 @@ const updatePsychiatricData = async (req, res) => {
       trauma_exploration,
       legal_environment
     } = req.body;
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE psy_history SET
                     psychiatric_diagnoses = ?,
@@ -864,7 +863,7 @@ const updatePsychiatricData = async (req, res) => {
                     chronic_stressors = ?,
                     trauma_exploration = ?,
                     legal_environment = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
     const values = [
       psychiatric_diagnoses,
       treatment_history,
@@ -880,7 +879,7 @@ const updatePsychiatricData = async (req, res) => {
       significant_life,
       chronic_stressors,
       trauma_exploration.join(", "),
-      legal_environment.join(", "), admission_no, date
+      legal_environment.join(", "), id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -907,7 +906,7 @@ const updateMedicalHistoryData = async (req, res) => {
       sexual_health
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const query = `UPDATE medical_history SET
                   disability_status = ?,
@@ -919,7 +918,7 @@ const updateMedicalHistoryData = async (req, res) => {
                   significant_medical = ?,
                   traumatic_injuries = ?,
                   sexual_health = ?
-                  WHERE admission_no = ? AND date = ?`;
+                  WHERE id = ?`;
 
     const values = [
       disability_status,
@@ -931,7 +930,7 @@ const updateMedicalHistoryData = async (req, res) => {
       significant_medical.join(", "),
       traumatic_injuries,
       sexual_health.join(", "),
-      admission_no, date
+      id
     ];
     const [result] = await db.query(query, values);
     if (result.affectedRows === 0) {
@@ -956,7 +955,7 @@ const updateFamilyHistoryData = async (req, res) => {
       family_substance
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE familyhis_data SET
                     family_composition = ?,
@@ -966,7 +965,7 @@ const updateFamilyHistoryData = async (req, res) => {
                     genetic_predisposition = ?,
                     family_changes = ?,
                     family_substance = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ? `;
 
     const values = [
       family_composition.join(", "),
@@ -975,7 +974,7 @@ const updateFamilyHistoryData = async (req, res) => {
       family_history,
       genetic_predisposition,
       family_changes.join(", "),
-      family_substance, admission_no, date
+      family_substance, id
     ];
 
     const [result] = await db.query(uquery, values);
@@ -1004,7 +1003,7 @@ const updateSocialHistoryData = async (req, res) => {
       technology_related,
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE social_history SET
                     family_relationship = ?,
@@ -1017,7 +1016,7 @@ const updateSocialHistoryData = async (req, res) => {
                     social_outlets = ?,
                     socialMed_engagement = ?,
                     technology_related = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
 
     const values = [
       family_relationship,
@@ -1030,7 +1029,7 @@ const updateSocialHistoryData = async (req, res) => {
       social_outlets,
       socialMed_engagement,
       technology_related,
-      admission_no, date
+      id
     ];
 
     const [result] = await db.query(uquery, values);
@@ -1060,7 +1059,7 @@ const updateDevelopmentalData = async (req, res) => {
       pubertal_development
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE development_history SET
                     prenatal_factors = ?,
@@ -1074,7 +1073,7 @@ const updateDevelopmentalData = async (req, res) => {
                     parenting_style = ?,
                     learning_challenge = ?,
                     pubertal_development = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
 
     const values = [
       prenatal_factors,
@@ -1087,7 +1086,7 @@ const updateDevelopmentalData = async (req, res) => {
       siblings_relationship,
       parenting_style,
       learning_challenge,
-      pubertal_development, admission_no, date
+      pubertal_development, id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1117,7 +1116,7 @@ const updateSubstanceData = async (req, res) => {
       relapse_history,
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE substance_use SET
                     substance_use = ?,
@@ -1132,7 +1131,7 @@ const updateSubstanceData = async (req, res) => {
                     craving_intensity = ?,
                     previous_treatment = ?,
                     relapse_history = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
 
     const values = [
       substance_use,
@@ -1147,7 +1146,7 @@ const updateSubstanceData = async (req, res) => {
       craving_intensity,
       previous_treatment,
       relapse_history,
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1172,7 +1171,7 @@ const updateSuicidalData = async (req, res) => {
       hospital_required,
     } = req.body;
 
-    const {admission_no, date} = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE suicidal_data SET
                     suicide_history = ?,
@@ -1182,7 +1181,7 @@ const updateSuicidalData = async (req, res) => {
                     immediate_threat = ?,
                     emergency_response = ?,
                     hospital_required = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ? `;
 
     const values = [
       suicide_history,
@@ -1192,7 +1191,7 @@ const updateSuicidalData = async (req, res) => {
       immediate_threat,
       emergency_response,
       hospital_required,
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1211,19 +1210,19 @@ const UpdateSpeech = async (req, res) => {
       rate_quantity, volume_tone, flow_rhythm
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE speech SET 
                     rate_quantity = ?, 
                     volume_tone = ?, 
                     flow_rhythm = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
 
     const values = [
       rate_quantity.join(", "),
       volume_tone.join(", "),
       flow_rhythm.join(", "),
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1243,7 +1242,7 @@ const UpdateMood = async (req, res) => {
       mood_like, resident_general_feeling, resident_look
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE mood_affect SET 
                     mood_description = ?, 
@@ -1253,7 +1252,7 @@ const UpdateMood = async (req, res) => {
                     mood_like = ?,
                     resident_general_feeling = ?,
                     resident_look = ?
-                    WHERE admission_no = ? AND date =?`;
+                    WHERE id = ? `;
 
     const values = [
       mood_description.join(", "),
@@ -1263,7 +1262,7 @@ const UpdateMood = async (req, res) => {
       mood_like,
       resident_general_feeling,
       resident_look.join(", "),
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1283,17 +1282,17 @@ const updateThough = async (req, res) => {
       stream_form_though, content_though
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE though_form SET 
                     stream_form_though = ?, 
                     content_though = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ? `;
 
     const values = [
       stream_form_though.join(", "),
       content_though.join(", "),
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1313,7 +1312,7 @@ const updatePerception = async (req, res) => {
       interpreted_person, illusion, perception_changes, somatic, others
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE perception SET 
                     hallucination_type = ?, 
@@ -1326,7 +1325,7 @@ const updatePerception = async (req, res) => {
                     perception_changes = ?,
                     somatic = ?,
                     others = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ? `;
 
     const values = [
       hallucination_type.join(", "),
@@ -1339,7 +1338,7 @@ const updatePerception = async (req, res) => {
       perception_changes.join(", "),
       somatic.join(", "),
       others.join(", "),
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1358,21 +1357,21 @@ const updateJudgement = async (req, res) => {
       personal_judgement, social_judgement, test_judgement, judgement
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE judgement SET 
                     personal_judgement = ?, 
                     social_judgement = ?,
                     test_judgement = ?,
                     judgement = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
 
     const values = [
       personal_judgement,
       social_judgement,
       test_judgement,
       judgement,
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1391,7 +1390,7 @@ const updateInsight = async (req, res) => {
       denail_illness, slight_awareness, awarness_sick, awarness_illness, intellectual_insight, true_emotion,
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE insight SET 
                     denail_illness = ?, 
@@ -1400,7 +1399,7 @@ const updateInsight = async (req, res) => {
                     awarness_illness = ?,
                     intellectual_insight = ?,
                     true_emotion = ?
-                    WHERE admission_no = ? AND date = ?`;
+                    WHERE id = ?`;
 
     const values = [
       denail_illness,
@@ -1409,7 +1408,7 @@ const updateInsight = async (req, res) => {
       awarness_illness,
       intellectual_insight,
       true_emotion,
-      admission_no, date
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1432,7 +1431,7 @@ const updateCognition = async (req, res) => {
       familiar_object
     } = req.body;
 
-    const { admission_no, date } = req.params;
+    const { id } = req.params;
 
     const uquery = `UPDATE conginition SET 
   consciousness = ?, 
@@ -1462,14 +1461,14 @@ const updateCognition = async (req, res) => {
   calculation_test = ?,
   proverb_testing = ?,
   familiar_object = ?
-  WHERE admission_no = ? AND date = ?`;
+  WHERE id = ? `;
 
     const values = [
       consciousness.join(', '), orientation_time, orientation_place, orientation_person, consciousnessState.join(', '), canConcentrate,
       distractibility, asking_test, names_months, test_performance, immediate_retention,
       recall, patient_place, dinner_ate, date_ofMrg, birthdays_children, person_past, amnesia,
       live_growing, person_school, breakfast_ques, do_yesterday, general_info, test_red_wri, calculation_test, proverb_testing,
-      familiar_object, admission_no, date
+      familiar_object, id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -2143,7 +2142,7 @@ const createSuicidalData = async (req, res) => {
         // ✅ Send email
         const mailOptions = {
           from: 'yourgmail@gmail.com',
-          to: 'abarnadevi.jorimts@gmail.com',
+          to: 'manasucmf@gmail.com',
           subject: 'Psychiatric Case History Form Completed',
           html: `
             <h3>Psychiatric Case History Form Completed</h3>
@@ -2172,7 +2171,7 @@ const createSuicidalData = async (req, res) => {
 }
 
 const getInformation = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM basic_detail WHERE id = ? ';
   try {
     const [results] = await db.query(query, [id]);
@@ -2187,7 +2186,7 @@ const getInformation = async (req, res) => {
 }
 
 const getCheifComplaint = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM cheif_complaint WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2202,7 +2201,7 @@ const getCheifComplaint = async (req, res) => {
 }
 
 const getPresentingData = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM presenting_problems WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2217,7 +2216,7 @@ const getPresentingData = async (req, res) => {
 }
 
 const getPsychiatricData = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM psy_history WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2232,7 +2231,7 @@ const getPsychiatricData = async (req, res) => {
 }
 
 const getMedicalHistory = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM medical_history WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2247,7 +2246,7 @@ const getMedicalHistory = async (req, res) => {
 }
 
 const getFamilyHistory = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM familyhis_data WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2262,7 +2261,7 @@ const getFamilyHistory = async (req, res) => {
 }
 
 const getSocialHistory = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM social_history WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2277,7 +2276,7 @@ const getSocialHistory = async (req, res) => {
 }
 
 const getDevelopmentalHistory = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM development_history WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2292,7 +2291,7 @@ const getDevelopmentalHistory = async (req, res) => {
 }
 
 const getSubstanceUse = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM substance_use WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2307,7 +2306,7 @@ const getSubstanceUse = async (req, res) => {
 }
 
 const getSuicidialData = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = 'SELECT * FROM suicidal_data WHERE id = ?';
   try {
     const [results] = await db.query(query, [id]);
@@ -2410,7 +2409,7 @@ const getallPsychiatric = async (req, res) => {
   }
 };
 
-const getBasicDetail = async(req, res) =>{
+const getBasicDetail = async (req, res) => {
   const query = "Select * from basic_detail";
   try {
     const [result] = await db.query(query);
@@ -2424,7 +2423,7 @@ const getBasicDetail = async(req, res) =>{
   }
 }
 
-const getCheif = async(req, res) =>{
+const getCheif = async (req, res) => {
   const query = "Select * from cheif_complaint";
   try {
     const [result] = await db.query(query);
@@ -2438,7 +2437,7 @@ const getCheif = async(req, res) =>{
   }
 }
 
-const getPresenting = async(req, res) =>{
+const getPresenting = async (req, res) => {
   const query = "Select * from presenting_problems";
   try {
     const [result] = await db.query(query);
@@ -2452,7 +2451,7 @@ const getPresenting = async(req, res) =>{
   }
 }
 
-const getPsyHistory = async(req, res) =>{
+const getPsyHistory = async (req, res) => {
   const query = "Select * from psy_history";
   try {
     const [result] = await db.query(query);
@@ -2466,7 +2465,7 @@ const getPsyHistory = async(req, res) =>{
   }
 }
 
-const getMedHis = async(req, res) =>{
+const getMedHis = async (req, res) => {
   const query = "Select * from medical_history";
   try {
     const [result] = await db.query(query);
@@ -2480,7 +2479,7 @@ const getMedHis = async(req, res) =>{
   }
 }
 
-const getFamHistory = async(req, res) =>{
+const getFamHistory = async (req, res) => {
   const query = "Select * from familyhis_data";
   try {
     const [result] = await db.query(query);
@@ -2494,7 +2493,7 @@ const getFamHistory = async(req, res) =>{
   }
 }
 
-const getSocialHis = async(req, res) =>{
+const getSocialHis = async (req, res) => {
   const query = "Select * from social_history";
   try {
     const [result] = await db.query(query);
@@ -2508,7 +2507,7 @@ const getSocialHis = async(req, res) =>{
   }
 }
 
-const getDevHistory = async(req, res) =>{
+const getDevHistory = async (req, res) => {
   const query = "Select * from development_history";
   try {
     const [result] = await db.query(query);
@@ -2522,7 +2521,7 @@ const getDevHistory = async(req, res) =>{
   }
 }
 
-const getSubUseHistory = async(req, res) =>{
+const getSubUseHistory = async (req, res) => {
   const query = "Select * from substance_use";
   try {
     const [result] = await db.query(query);
@@ -2536,7 +2535,7 @@ const getSubUseHistory = async(req, res) =>{
   }
 }
 
-const getSuicidalUse = async(req, res) =>{
+const getSuicidalUse = async (req, res) => {
   const query = "Select * from suicidal_data";
   try {
     const [result] = await db.query(query);
@@ -2550,7 +2549,7 @@ const getSuicidalUse = async(req, res) =>{
   }
 }
 
-const getGenAppearance = async(req, res) =>{
+const getGenAppearance = async (req, res) => {
   const query = "Select * from general_appearance";
   try {
     const [result] = await db.query(query);
@@ -2564,7 +2563,7 @@ const getGenAppearance = async(req, res) =>{
   }
 }
 
-const getSpeech = async(req, res) =>{
+const getSpeech = async (req, res) => {
   const query = "Select * from speech";
   try {
     const [result] = await db.query(query);
@@ -2578,7 +2577,7 @@ const getSpeech = async(req, res) =>{
   }
 }
 
-const getMoodAffect = async(req, res) =>{
+const getMoodAffect = async (req, res) => {
   const query = "Select * from mood_affect";
   try {
     const [result] = await db.query(query);
@@ -2592,7 +2591,7 @@ const getMoodAffect = async(req, res) =>{
   }
 }
 
-const getThough = async(req, res) =>{
+const getThough = async (req, res) => {
   const query = "Select * from though_form";
   try {
     const [result] = await db.query(query);
@@ -2606,7 +2605,7 @@ const getThough = async(req, res) =>{
   }
 }
 
-const getPerception = async(req, res) =>{
+const getPerception = async (req, res) => {
   const query = "Select * from perception";
   try {
     const [result] = await db.query(query);
@@ -2620,7 +2619,7 @@ const getPerception = async(req, res) =>{
   }
 }
 
-const getCognition = async(req, res) =>{
+const getCognition = async (req, res) => {
   const query = "Select * from conginition";
   try {
     const [result] = await db.query(query);
@@ -2634,7 +2633,7 @@ const getCognition = async(req, res) =>{
   }
 }
 
-const getJudgement = async(req, res) =>{
+const getJudgement = async (req, res) => {
   const query = "Select * from judgement";
   try {
     const [result] = await db.query(query);
@@ -2648,7 +2647,7 @@ const getJudgement = async(req, res) =>{
   }
 }
 
-const getInsight = async(req, res) =>{
+const getInsight = async (req, res) => {
   const query = "Select * from insight";
   try {
     const [result] = await db.query(query);
@@ -2674,7 +2673,7 @@ export {
   createInsight,
   createPerception,
   createCognition,
-  getallappearance,getallmood, getallspeech, getallcognition, getallperception, getMseAllForm, getallThough, getalljudgement, getallInsight,
+  getallappearance, getallmood, getallspeech, getallcognition, getallperception, getMseAllForm, getallThough, getalljudgement, getallInsight,
   updateAppearance, UpdateSpeech, UpdateMood, updateThough, updatePerception, updateJudgement, updateInsight, updateCognition,
   createBasicInformation, createChiefComplaint, createPresenting, createPsyHistory, createMedicalData, createFamilyHistoryData,
   createSocialHistoryData, createDevelopmentalData, createSubstanceData, createSuicidalData,

@@ -50,21 +50,21 @@ router.get("/getCognition/:id",getallcognition); //completed
 
 //update functionality for mse
 //update appearance_behaviour form in MSE
-router.post("/updateAppearance/:admission_no/:date", updateAppearance); //completed
+router.post("/updateAppearance/:id", updateAppearance); //completed
 //update speech form in MSE
-router.post("/updateSpeech/:admission_no/:date", UpdateSpeech); //completed
+router.post("/updateSpeech/:id", UpdateSpeech); //completed
 //update mood form in MSE
-router.post("/updateMood/:admission_no/:date", UpdateMood); //completed
+router.post("/updateMood/:id", UpdateMood); //completed
 //update though form in MSE
-router.post("/updateThough/:admission_no/:date", updateThough); //completed
+router.post("/updateThough/:id", updateThough); //completed
 //update perception form in MSE
-router.post("/updatePerception/:admission_no/:date", updatePerception); //completed
+router.post("/updatePerception/:id", updatePerception); //completed
 //update judgement form in MSE
-router.post("/updateJudgement/:admission_no/:date", updateJudgement); //completed
+router.post("/updateJudgement/:id", updateJudgement); //completed
 //update insight form in MSE
-router.post("/updateInsight/:admission_no/:date", updateInsight); //completed
+router.post("/updateInsight/:id", updateInsight); //completed
 //update cognition form in MSE
-router.post("/updateCognition/:admission_no/:date", updateCognition); //completed
+router.post("/updateCognition/:id", updateCognition); //completed
 
 //all mse form data
 router.get("/mseAllForm/:admission_no",getMseAllForm); //completed
@@ -97,16 +97,16 @@ router.post("/create_suicidalData", createSuicidalData);
 // router.get("/get_substance/:admission_no/:date", getSubstanceUse);
 // router.get("/get_suicidal/:admission_no/:date", getSuicidialData);
 
-router.post("/updateInformation/:admission_no/:date", updateInformation);
-router.post("/updateCheifComplaint/:admission_no/:date", updateCheifComplaint);
-router.post("/updatePresentingData/:admission_no/:date", updatePresentingData);
-router.post("/updatePsychiatricData/:admission_no/:date", updatePsychiatricData);
-router.post("/updateMedicalHistory/:admission_no/:date", updateMedicalHistoryData);
-router.post("/updateFamilyHistory/:admission_no/:date", updateFamilyHistoryData);
-router.post("/updateSocialHistory/:admission_no/:date", updateSocialHistoryData);
-router.post("/updateDevelopmentalHistory/:admission_no/:date", updateDevelopmentalData);
-router.post("/updateSubstance/:admission_no/:date", updateSubstanceData);
-router.post("/updateSuicidal/:admission_no/:date", updateSuicidalData);
+router.post("/updateInformation/:id", updateInformation);
+router.post("/updateCheifComplaint/:id", updateCheifComplaint);
+router.post("/updatePresentingData/:id", updatePresentingData);
+router.post("/updatePsychiatricData/:id", updatePsychiatricData);
+router.post("/updateMedicalHistory/:id", updateMedicalHistoryData);
+router.post("/updateFamilyHistory/:id", updateFamilyHistoryData);
+router.post("/updateSocialHistory/:id", updateSocialHistoryData);
+router.post("/updateDevelopmentalHistory/:id", updateDevelopmentalData);
+router.post("/updateSubstance/:id", updateSubstanceData);
+router.post("/updateSuicidal/:id", updateSuicidalData);
 
 router.get("/getallPsychiatric/:admission_no", getallPsychiatric);
 

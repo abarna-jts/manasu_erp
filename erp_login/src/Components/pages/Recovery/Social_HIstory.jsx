@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Social_HIstory() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.family_relationship).toLowerCase().includes(searchTerm) ||
+            String(item.living_arrangements).toLowerCase().includes(searchTerm) ||
+            String(item.education_bg).toLowerCase().includes(searchTerm) ||
+            String(item.currentEmp_status).toLowerCase().includes(searchTerm) 
         );
     });
 
@@ -143,8 +151,68 @@ function Social_HIstory() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFamilyData((prev) => ({ ...prev, [name]: value }));
+        setSocialData((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_socialHistory/${id}`);
+            const data = response.data;
+
+            setSocialData((socialData) => ({
+                ...socialData,
+                id:data.id ||'',
+                admission_no: data.admission_no || 'NULL',
+                date: data.date || 'NULL',
+                family_relationship: data.family_relationship || 'NULL',
+                socialCircle_relationship: data.socialCircle_relationship || 'NULL',
+                relationship_significant: data.relationship_significant || 'NULL',
+                living_arrangements: data.living_arrangements || 'NULL',
+                education_bg: data.education_bg || "NULL",
+                currentEmp_status: data.currentEmp_status || "NULL",
+                socialRecreation_activity: data.socialRecreation_activity || "NULL",
+                social_outlets: data.social_outlets || "NULL",
+                socialMed_engagement: data.socialMed_engagement || "NULL",
+                technology_related: data.technology_related || "NULL"
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleSocialUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateSocialHistory/${id}`, socialData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Social History Form updated successfully!');
+            setSocialData({
+                family_relationship: '',
+                socialCircle_relationship: '',
+                relationship_significant: '',
+                living_arrangements: '',
+                education_bg: '',
+                currentEmp_status: '',
+                socialRecreation_activity: '',
+                social_outlets: '',
+                socialMed_engagement: '',
+                technology_related: '',
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
+
     return (
         <>
             <Container fluid>
@@ -218,11 +286,13 @@ function Social_HIstory() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                    onClick={() => {
-                                                                        handleEditform(item.id);
-                                                                    }}
-                                                                ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
+                                                onClick={() => {
+                                                    handleEditform(item.id);
+                                                }}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                                     <button className="btn btn-danger icon_details"
                                                                         onClick={() => handleDelete(item.id)}
@@ -257,7 +327,7 @@ function Social_HIstory() {
                             <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {familyData.admission_no}
+                                    {socialData.admission_no}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -267,7 +337,7 @@ function Social_HIstory() {
                             <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {formatDateTime(familyData.date)}
+                                    {formatDateTime(socialData.date)}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -446,6 +516,138 @@ function Social_HIstory() {
                     </Form.Group>
                 </Form>
             </div>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Social History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h6>Relationship with Family:</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='family_relationship'
+                                value={socialData.family_relationship}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Relationship with Friends and Social Circles:</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='socialCircle_relationship'
+                                value={socialData.socialCircle_relationship}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Relationship with Significant Others:</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='relationship_significant'
+                                value={socialData.relationship_significant}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Current Living Arrangements:</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='living_arrangements'
+                                value={socialData.living_arrangements}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Educational Background :</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='education_bg'
+                                value={socialData.education_bg}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Current Employment Status :</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='currentEmp_status'
+                                value={socialData.currentEmp_status}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Recreational Activities :</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='socialRecreation_activity'
+                                value={socialData.socialRecreation_activity}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Social Outlets :</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='social_outlets'
+                                value={socialData.social_outlets}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Social Media Engagement :</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='socialMed_engagement'
+                                value={socialData.socialMed_engagement}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h6>Technology-related Stressors :</h6>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='technology_related'
+                                value={socialData.technology_related}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSocialUpdate(e, socialData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

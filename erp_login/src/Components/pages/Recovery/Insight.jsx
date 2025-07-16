@@ -6,19 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Insight() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
-            String(item.rate_quantity).toLowerCase().includes(searchTerm) ||
-            String(item.volume_tone).toLowerCase().includes(searchTerm) ||
-            String(item.flow_rhythm).toLowerCase().includes(searchTerm)
+            String(item.denail_illness).toLowerCase().includes(searchTerm) ||
+            String(item.slight_awareness).toLowerCase().includes(searchTerm) ||
+            String(item.intellectual_insight).toLowerCase().includes(searchTerm) ||
+            String(item.true_emotion).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -133,6 +140,65 @@ function Insight() {
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/getInsight/${id}`);
+            const data = response.data;
+
+            setInsightData(insightData => ({
+                ...insightData,
+                admission_no: data.admission_no || '',
+                id: data.id || '',
+                date: data.date || '',
+                denail_illness: data.denail_illness || '',
+                slight_awareness: data.slight_awareness || '',
+                awarness_sick: data.awarness_sick || '',
+                awarness_illness: data.awarness_illness || '',
+                intellectual_insight: data.intellectual_insight || '',
+                true_emotion: data.true_emotion || ''
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Insight ID is not found");
+        }
+    };
+
+    const handleInsightUpdate = async (e, id) => {
+        e.preventDefault();
+
+        try {
+            const res = await apiRoute.post(`/recovery/updateInsight/${id}`, insightData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            alert('Insight Form updated successfully!');
+            setInsightData({
+                denail_illness: '',
+                slight_awareness: '',
+                awarness_sick: '',
+                awarness_illness: '',
+                intellectual_insight: '',
+                true_emotion: ''
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setInsightData((prev) => ({ ...prev, [name]: value }));
+    };
+
     return (
         <>
             <Container fluid>
@@ -206,6 +272,13 @@ function Insight() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
+                                            {userType === "4" && (
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
@@ -396,6 +469,77 @@ function Insight() {
                 </Form>
             </div>
 
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Insight Form </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>LEVELS OF INSIGHT:</h4>
+                                <p>Insight is assessed using a six-point scale ranging from one to six.</p>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>1. Complete denial of illness</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='denail_illness'
+                                        value={insightData.denail_illness}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>2. Slight awareness of being sick & needing help but denying it at the same time</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='slight_awareness'
+                                        value={insightData.slight_awareness}
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>3. Awareness of being sick but blaming it on others, on external factors, or on organic factors.</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='awarness_sick'
+                                        value={insightData.awarness_sick}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>4. Awareness that illness is due to something unknown in the patient</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='awarness_illness'
+                                        value={insightData.awarness_illness}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>5. Intellectual insight</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='intellectual_insight'
+                                        value={insightData.intellectual_insight}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>6. True emotional insight</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='true_emotion'
+                                        value={insightData.true_emotion}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+
+
+                            <div className="mt-3">
+                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleInsightUpdate(e, insightData.id)}>Update</Button>
+                                <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                            </div>
+
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

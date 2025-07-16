@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Psy_history() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.psychiatric_diagnoses).toLowerCase().includes(searchTerm) ||
+            String(item.treatment_history).toLowerCase().includes(searchTerm) ||
+            String(item.medications).toLowerCase().includes(searchTerm) ||
+            String(item.hospitalisation_reason).toLowerCase().includes(searchTerm) 
         );
     });
 
@@ -154,8 +162,97 @@ function Psy_history() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setPresentingData((prev) => ({ ...prev, [name]: value }));
+        setPsyHistoryData((prev) => ({ ...prev, [name]: value }));
     };
+
+    const renderpsyCheckbox = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={psyHistoryData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...psyHistoryData[field], label]
+                    : psyHistoryData[field].filter(item => item !== label);
+
+                setPsyHistoryData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_psychiatric/${id}`);
+            const data = response.data;
+
+            setPsyHistoryData((psyHistoryData) => ({
+                ...psyHistoryData,
+                id:data.id ||'',
+                admission_no: data.admission_no || '',
+                date: data.date || '',
+                psychiatric_diagnoses: data.psychiatric_diagnoses || '',
+                treatment_history: data.treatment_history || '',
+                medications: data.medications || '',
+                dosage: data.dosage || '',
+                adherence: data.adherence || '',
+                sideEffect: data.sideEffect || '',
+                experience_reaction: data.experience_reaction || '',
+                hospitalisation_reason: data.hospitalisation_reason || '',
+                duration: data.duration || '',
+                crisis_episodes: data.crisis_episodes || '',
+                fm_mentalHealth: data.fm_mentalHealth || '',
+                significant_life: data.significant_life || '',
+                chronic_stressors: data.chronic_stressors || '',
+                trauma_exploration: data.trauma_exploration?.split(',') || ["NULL"],
+                legal_environment: data.legal_environment?.split(',') || ["NULL"]
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handlePsyciatricUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updatePsychiatricData/${id}`, psyHistoryData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Psychiatric History Form updated successfully!');
+            setPsyHistoryData({
+                psychiatric_diagnoses: '',
+                treatment_history: '',
+                medications: '',
+                dosage: '',
+                adherence: '',
+                sideEffect: '',
+                experience_reaction: '',
+                hospitalisation_reason: '',
+                duration: '',
+                crisis_episodes: '',
+                fm_mentalHealth: '',
+                significant_life: '',
+                chronic_stressors: '',
+                trauma_exploration: [],
+                legal_environment: []
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
+
     return (
         <>
             <Container fluid>
@@ -231,11 +328,13 @@ function Psy_history() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
                                                 onClick={() => {
                                                     handleEditform(item.id);
                                                 }}
-                                            ><i className="fas fa-edit"></i> </button> */}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                 <button className="btn btn-danger icon_details"
                                                     onClick={() => handleDelete(item.id)}
@@ -542,6 +641,202 @@ function Psy_history() {
 
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Psychiatric History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form className='mt-4'>
+                        <li className='icon-li'>
+                            <h5>Previous Psychiatric Diagnoses:</h5>
+                        </li>
+                        <Form.Group className="mb-3" >
+                            <Form.Control as="textarea" rows={2}
+                                name='psychiatric_diagnoses'
+                                value={psyHistoryData.psychiatric_diagnoses}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+                        <li className='icon-li'>
+                            <h5>Treatment History:</h5>
+                        </li>
+                        <Form.Group className="mb-3" >
+                            <Form.Control as="textarea" rows={2}
+                                name='treatment_history'
+                                value={psyHistoryData.treatment_history}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Medication History:</h5>
+                        </li>
+                        <Row>
+                            <Col md={4}>
+                                <Form.Group className="mb-3" >
+                                    <Form.Label>Medications:  </Form.Label>
+                                    <Form.Control
+                                        name='medications'
+                                        type='text'
+                                        value={psyHistoryData.medications}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Form.Group>
+                            </Col>
+                            <Col md={4}>
+                                <Form.Group className="mb-3" >
+                                    <Form.Label>Dosage:  </Form.Label>
+                                    <Form.Control
+                                        name='dosage'
+                                        type='text'
+                                        value={psyHistoryData.dosage}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Form.Group>
+                            </Col>
+                            <Col md={4}>
+                                <Form.Group className="mb-3" >
+                                    <Form.Label>Adherence:  </Form.Label>
+                                    <Form.Control
+                                        name='adherence'
+                                        type='text'
+                                        value={psyHistoryData.adherence}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Form.Group>
+                            </Col>
+                            <Col md={4}>
+                                <Form.Group className="mb-3" >
+                                    <Form.Label>Any side effects :  </Form.Label>
+                                    <Form.Control
+                                        name='sideEffect'
+                                        type='text'
+                                        value={psyHistoryData.sideEffect}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" >
+                                    <Form.Label>Experienced Reactions :  </Form.Label>
+                                    <Form.Control
+                                        name='experience_reaction'
+                                        type='text'
+                                        value={psyHistoryData.experience_reaction}
+                                        onChange={handleInputChange}
+                                        required />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <li className='icon-li'>
+                            <h5>Psychiatric Hospitalizations:</h5>
+                        </li>
+                        <Row>
+                            <Col md={4}>
+                                <Form.Label>Reasons</Form.Label>
+                                <Form.Control as="textarea" rows={1}
+                                    name='hospitalisation_reason'
+                                    value={psyHistoryData.hospitalisation_reason}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group>
+                                    <Form.Label>Duration and the Outcomes</Form.Label>
+                                    <Form.Control
+                                        name='duration'
+                                        text="text"
+                                        value={psyHistoryData.duration}
+                                        onChange={handleInputChange}
+                                        required />
+
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <li className='icon-li'>
+                            <h5>Crisis Episodes:</h5>
+                        </li>
+                        <Form.Group className="mb-3" >
+                            <Form.Control as="textarea" rows={2}
+                                name='crisis_episodes'
+                                value={psyHistoryData.crisis_episodes}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Family Members with Mental Health Diagnoses:</h5>
+                        </li>
+                        <Form.Group className="mb-3" >
+                            <Form.Control as="textarea" rows={2}
+                                name='fm_mentalHealth'
+                                value={psyHistoryData.fm_mentalHealth}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Significant Life Events and Stressors:</h5>
+                        </li>
+                        <Form.Group className="mb-3" >
+                            <Form.Control as="textarea" rows={2}
+                                name='significant_life'
+                                value={psyHistoryData.significant_life}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Chronic Stressors:</h5>
+                        </li>
+                        <Form.Group className="mb-3" >
+                            <Form.Control as="textarea" rows={2}
+                                name='chronic_stressors'
+                                value={psyHistoryData.chronic_stressors}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Exploration of Trauma:</h5>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Physical", "Physical"],
+                                    ["Emotional", "Emotional"],
+                                    ["Sexual abuse ", "Sexual abuse"],
+                                    ["Coping mechanisms", "Coping mechanisms"]
+
+                                ].map(([id, label]) => renderpsyCheckbox("trauma_exploration", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Legal Involvement:</h5>
+                        </li>
+                        <Form.Group as={Row} className="mb-3">
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                                {[
+                                    ["Involuntary Hospitalizations", "Involuntary Hospitalizations"],
+                                    ["Legal conflicts", "Legal conflicts"],
+                                    ["Involvement with the criminal justice system ", "Involvement with the criminal justice system"]
+
+                                ].map(([id, label]) => renderpsyCheckbox("legal_environment", id, label))}
+                            </div>
+                        </Form.Group>
+
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePsyciatricUpdate(e, psyHistoryData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

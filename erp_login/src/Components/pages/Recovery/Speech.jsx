@@ -6,19 +6,25 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Speech() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
-            String(item.rate_quantity).toLowerCase().includes(searchTerm) || 
-            String(item.volume_tone).toLowerCase().includes(searchTerm) || 
-            String(item.flow_rhythm).toLowerCase().includes(searchTerm) 
+            String(item.rate_quantity).toLowerCase().includes(searchTerm) ||
+            String(item.volume_tone).toLowerCase().includes(searchTerm) ||
+            String(item.flow_rhythm).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -129,7 +135,70 @@ function Speech() {
         window.open(pdfUrl, '_blank');
     };
 
-    
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/getSpeech/${id}`);
+            const data = response.data;
+
+            setSpeechFormData(speechFormData => ({
+                ...speechFormData,
+                id: data.id || '',
+                admission_no: String(data.admission_no || ''),
+                date: data.date || '',
+                rate_quantity: data.rate_quantity?.split(',').map(i => i.trim()) || [],
+                volume_tone: data.volume_tone?.split(',').map(i => i.trim()) || [],
+                flow_rhythm: data.flow_rhythm?.split(',').map(i => i.trim()) || [],
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleSpeechUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateSpeech/${id}`, speechFormData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Speech Form updated successfully!');
+            setSpeechFormData({
+                rate_quantity: [],
+                volume_tone: [],
+                flow_rhythm: []
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
+    const renderspeechCheckbox = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={speechFormData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...speechFormData[field], label]
+                    : speechFormData[field].filter(item => item !== label);
+
+                setSpeechFormData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
     return (
         <>
             <Container fluid>
@@ -201,11 +270,13 @@ function Speech() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                            onClick={() => {
-                                                                                handleEditform(item.id);
-                                                                            }}
-                                                                        ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                                             <button className="btn btn-danger icon_details"
                                                                                 onClick={() => handleDelete(item.id)}
@@ -223,7 +294,7 @@ function Speech() {
 
                     </Table>
                 </Row>
-                
+
             </Container>
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
                 <Row className="d-flex align-items-center justify-content-start mb-2">
@@ -240,9 +311,9 @@ function Speech() {
                         <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                             <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
                             <Col md={6}>
-                            <div className='text-start'>
-                                {speechFormData.admission_no}
-                            </div>
+                                <div className='text-start'>
+                                    {speechFormData.admission_no}
+                                </div>
                             </Col>
                         </Form.Group>
                     </Col>
@@ -250,9 +321,9 @@ function Speech() {
                         <Form.Group className="mb-3 d-flex align-items-center" as={Row}>
                             <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
                             <Col md={6}>
-                            <div className='text-start'>
-                                {formatDateTime(speechFormData.date)}
-                            </div>
+                                <div className='text-start'>
+                                    {formatDateTime(speechFormData.date)}
+                                </div>
                             </Col>
                         </Form.Group>
                     </Col>
@@ -335,6 +406,69 @@ function Speech() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Speech </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Rate and quantity of speech:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["present", "Speech is present"],
+                                        ["absent", "Speech is Absent"],
+                                        ["spontaneous", "If present whether it is spontaneous"],
+                                        ["productivity_increase", "Productivity is increased"],
+                                        ["productivity_decreased", "Productivity is Decreased"],
+                                        ["rapid", "Rate is rapid"],
+                                        ["slow", "Rate is slow"],
+                                        ["pressure_of_speech", "Pressure of speech"],
+                                        ["poverty_of_speech", "Poverty of Speech"],
+                                    ].map(([id, label]) => renderspeechCheckbox("rate_quantity", id, label))}
+                                </div>
+                            </li>
+
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Volume and tone of speech:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["volume_increase", "Increased"],
+                                        ["volume_decrease", "Decreased"],
+                                    ].map(([id, label]) => renderspeechCheckbox("volume_tone", id, label))}
+                                </div>
+                            </li>
+
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Flow and rhythm of speech:</h4>
+                                <div className="d-flex flex-wrap gap-3 mt-2">
+                                    {[
+                                        ["smooth", "Smooth"],
+                                        ["hesitant", "Hesitant"],
+                                        ["dysprosody", "Dysprosody"],
+                                        ["blocking", "Blocking (sudden)"],
+                                        ["circumstantiality", "Circumstantiality"],
+                                        ["tangentiality", "Tangentiality"],
+                                        ["loosening", "Loosening of associations"],
+                                        ["verbigeration", "Verbigeration"],
+                                        ["perseveration", "Perseveration"],
+                                        ["stereotypies", "Stereotypies (verbal)"],
+                                        ["flight", "Flight of ideas"],
+                                        ["clang", "Clang associations"],
+                                    ].map(([id, label]) => renderspeechCheckbox("flow_rhythm", id, label))}
+                                </div>
+                            </li>
+
+                            <div className="mt-3">
+                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSpeechUpdate(e, speechFormData.id)}>Update</Button>
+                                <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                            </div>
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

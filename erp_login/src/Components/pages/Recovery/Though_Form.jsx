@@ -6,11 +6,17 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Though_Form() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
@@ -126,6 +132,70 @@ function Though_Form() {
         window.open(pdfUrl, '_blank');
     };
 
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/getThough/${id}`);
+            const data = response.data;
+
+            setThoughFormData(thoughFormData => ({
+                ...thoughFormData,
+                id: data.id || '',
+                admission_no: data.admission_no || '',
+                date: data.date || '',
+                stream_form_though: data.stream_form_though?.split(',').map(i => i.trim()) || [],
+                content_though: data.content_though?.split(',').map(i => i.trim()) || []
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleThoughUpdate = async (e, id) => {
+        e.preventDefault();
+
+        try {
+            const res = await apiRoute.post(`/recovery/updateThough/${id}`, thoughFormData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            alert('Though Form updated successfully!');
+            setThoughFormData({
+                stream_form_though: [],
+                content_though: [],
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
+    const renderthoughCheckbox = (field, id, label) => (
+        <Form.Check
+          type="checkbox"
+          id={id}
+          label={label}
+          checked={thoughFormData[field]?.includes(label)}
+          onChange={(e) => {
+            const updated = e.target.checked
+              ? [...thoughFormData[field], label]
+              : thoughFormData[field].filter(item => item !== label);
+    
+            setThoughFormData(prev => ({
+              ...prev,
+              [field]: updated
+            }));
+          }}
+        />
+      );
+
     return (
         <>
             <Container fluid>
@@ -194,11 +264,13 @@ function Though_Form() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                                    onClick={() => {
-                                                                                        handleEditform(item.id);
-                                                                                    }}
-                                                                                ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                                                     <button className="btn btn-danger icon_details"
                                                                                         onClick={() => handleDelete(item.id)}
@@ -302,8 +374,75 @@ function Though_Form() {
                         </Col>
                     </Form.Group>
                 </Form>
-                
+
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Though Form </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <ul>
+                                <li className='icon-li'>
+                                    <h4 style={{ display: "inline" }}>Stream and form of thought:</h4>
+                                    <div className="d-flex flex-wrap gap-3 mt-2">
+                                        {[
+                                            ["Spontaneity", "Spontaneity"],
+                                            ["productivity", "Productivity"],
+                                            ["flight of ideas", "Flight of Ideas"],
+                                            ["poverty of content of speech", "Poverty of content of speech"],
+                                            ["thought block", "thought block"],
+                                            ["thought is assessed", "Continuity of thought is assessed"],
+                                            ["questions asked", "Whether the thought processes are relevant to the questions asked."],
+                                            ["loosening of associations", "Loose of associations"],
+                                            ["loosening of tangentiality", "Loose of tangentiality"],
+                                            ["loosening of circumstantiality", "Loose of circumstantiality"],
+                                            ["Illogical thinking", "Illogical thinking"],
+                                            ["perseveration", "Perseveration"],
+                                            ["verbigeration is noted", "Verbigeration is noted"]
+                                        ].map(([id, label]) => renderthoughCheckbox("stream_form_though", id, label))}
+                                    </div>
+
+                                </li>
+
+                                <li className='icon-li'>
+                                    <h4 style={{ display: "inline" }}>Content of thought:</h4>
+                                    <div className="d-flex flex-wrap gap-3 mt-2">
+                                        {[
+                                            ["obession", "Obsessions and contents of phobias"],
+                                            ["ideas and delusions", "Ideas and delusions of persecution"],
+                                            ["reference", "Reference"],
+                                            ["grandeur", "Grandeur"],
+                                            ["love", "Love"],
+                                            ["jealousy", "Jealousy (infidelity)"],
+                                            ["guilt", "Guilt"],
+                                            ["nihilism", "Nihilism"],
+                                            ["poverty", "Poverty"],
+                                            ["Hypochondriacal symptoms", "Hypochondriacal symptoms"],
+                                            ["hopelessness", "Hopelessness"],
+                                            ["helplessness", "Helplessness"],
+                                            ["worthlessness", "Worthlessness"],
+                                            ["suicidal ideation", "suicide should be explored"],
+                                            ["Delusions of control", "Delusions of control"],
+                                            ["thought insertion", "thought insertion"],
+                                            ["thought withdrawal", "thought withdrawal"],
+                                            ["thought broadcasting", "thought broadcasting"],
+                                            ["Neologisms", "Neologisms"]
+                                        ].map(([id, label]) => renderthoughCheckbox("content_though", id, label))}
+                                    </div>
+
+                                    <div className="mt-3">
+                                        <Button variant="success" className="m-1" type="submit" onClick={(e) => handleThoughUpdate(e, thoughFormData.id)}>Update</Button>
+                                        <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
 
         </>
     )

@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Developmental_History() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.prenatal_factors).toLowerCase().includes(searchTerm) ||
+            String(item.birth_details).toLowerCase().includes(searchTerm) ||
+            String(item.siblings_number).toLowerCase().includes(searchTerm) ||
+            String(item.milestones_development).toLowerCase().includes(searchTerm) 
         );
     });
 
@@ -147,6 +155,75 @@ function Developmental_History() {
         const { name, value } = e.target;
         setDeveleopmentData((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_DevelopmentalHistory/${id}`);
+            const data = response.data;
+
+            setDeveleopmentData((developmentalData) => ({
+                ...developmentalData,
+                id: data.id || 'NULL',
+                admission_no: data.admission_no || 'NULL',
+                date: data.date || 'NULL',
+                prenatal_factors: data.prenatal_factors || 'NULL',
+                birth_details: data.birth_details || 'NULL',
+                birth_order: data.birth_order || 'NULL',
+                siblings_number: data.siblings_number || 'NULL',
+                bonding_attachment: data.bonding_attachment || 'NULL',
+                milestones_development: data.milestones_development || "NULL",
+                childhood_illness: data.childhood_illness || "NULL",
+                siblings_relationship: data.siblings_relationship || 'NULL',
+                parenting_style: data.parenting_style || 'NULL',
+                learning_challenge: data.learning_challenge || 'NULL',
+                pubertal_development: data.pubertal_development || 'NULL',
+            }));
+            setShow(true);
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleDevelopmentalUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateDevelopmentalHistory/${id}`, developmentalData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Developmental History Form updated successfully!');
+            setDeveleopmentData({
+                prenatal_factors: '',
+                birth_details: '',
+                birth_order: '',
+                siblings_number: '',
+                bonding_attachment: '',
+                milestones_development: '',
+                childhood_illness: '',
+                siblings_relationship: '',
+                parenting_style: '',
+                learning_challenge: '',
+                prenatal_factors: '',
+                birth_details: '',
+                birth_order: '',
+                siblings_number: '',
+                bonding_attachment: '',
+                milestones_development: '',
+                childhood_illness: '',
+                siblings_relationship: '',
+                parenting_style: '',
+                learning_challenge: '',
+                pubertal_development: '',
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
     return (
         <>
             <Container fluid>
@@ -220,11 +297,13 @@ function Developmental_History() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                    onClick={() => {
-                                                                        handleEditform(item.id);
-                                                                    }}
-                                                                ><i className="fas fa-edit"></i> </button> */}
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
+                                                onClick={() => {
+                                                    handleEditform(item.id);
+                                                }}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                                     <button className="btn btn-danger icon_details"
                                                                         onClick={() => handleDelete(item.id)}
@@ -464,6 +543,153 @@ function Developmental_History() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Developmental History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h5>Prenatal Factors:</h5>
+                            <p className='text-muted small' style={{ marginTop: "5px" }}>(Mother's health during pregnancy, exposure to toxins, and any complications)</p>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                as="textarea" rows={2}
+                                name='prenatal_factors'
+                                value={developmentalData.prenatal_factors}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Birth Details:</h5>
+                            <p className='text-muted small' style={{ marginTop: "5px" }}>(any complications, premature birth, or medical interventions)</p>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                as="textarea" rows={2}
+                                name='birth_details'
+                                value={developmentalData.birth_details}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Birth Order:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='birth_order'
+                                value={developmentalData.birth_order}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Number of Siblings:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='siblings_number'
+                                value={developmentalData.siblings_number}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Attachment and Bonding:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='bonding_attachment'
+                                value={developmentalData.bonding_attachment}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Developmental Milestones:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='milestones_development'
+                                value={developmentalData.milestones_development}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Childhood Illnesses and Injuries:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='childhood_illness'
+                                value={developmentalData.childhood_illness}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Siblings and Relationships:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='siblings_relationship'
+                                value={developmentalData.siblings_relationship}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Parenting Styles:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='parenting_style'
+                                value={developmentalData.parenting_style}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Learning Challenges:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='learning_challenge'
+                                value={developmentalData.learning_challenge}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Pubertal Development:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='pubertal_development'
+                                value={developmentalData.pubertal_development}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleDevelopmentalUpdate(e, developmentalData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

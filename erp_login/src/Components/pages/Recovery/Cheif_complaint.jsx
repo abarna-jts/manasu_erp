@@ -6,21 +6,30 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
-
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Cheif_complaint() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.chief_complaint).toLowerCase().includes(searchTerm) ||
+            String(item.onset_duration).toLowerCase().includes(searchTerm) ||
+            String(item.course_type).toLowerCase().includes(searchTerm) ||
+            String(item.identify_trigger).toLowerCase().includes(searchTerm) ||
+            String(item.biological).toLowerCase().includes(searchTerm)
         );
     });
+    
     const [chiefData, setChiefData] = useState({
         chief_complaint: '',
         onset_duration: '',
@@ -89,7 +98,7 @@ function Cheif_complaint() {
             setPreviewRequested(true); // trigger the effect after state updates
         } catch (error) {
             console.error("Error fetching form data:", error);
-            alert("Doctor ID is not found");
+            alert("Cheif Complaint ID is not found");
         }
     };
 
@@ -147,6 +156,68 @@ function Cheif_complaint() {
         const { name, value } = e.target;
         setChiefData((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_chiefComplaint/${id}`);
+            const data = response.data;
+
+            setChiefData((chiefData) => ({
+                ...chiefData,
+                id: data.id || '',
+                admission_no: data.admission_no || '',
+                date: data.date || '',
+                chief_complaint: data.chief_complaint || '',
+                onset_duration: data.onset_duration || '',
+                nature_symptoms: data.nature_symptoms || '',
+                severity: data.severity || '',
+                course_type: data.course_type || '',
+                nature_illness: data.nature_illness || '',
+                identify_trigger: data.identify_trigger || '',
+                life_changes: data.life_changes || '',
+                biological: data.biological || '',
+                psychological: data.psychological || '',
+                social_environment: data.social_environment || ''
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handleCheifUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateCheifComplaint/${id}`, chiefData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Cheif Complaint Form updated successfully!');
+            setChiefData({
+                chief_complaint: '',
+                onset_duration: '',
+                nature_symptoms: '',
+                severity: '',
+                course_type: '',
+                nature_illness: '',
+                identify_trigger: '',
+                life_changes: '',
+                biological: '',
+                psychological: '',
+                social_environment: '',
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
+
     return (
         <div>
             <Container fluid>
@@ -224,11 +295,13 @@ function Cheif_complaint() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
                                                 onClick={() => {
                                                     handleEditform(item.id);
                                                 }}
-                                            ><i className="fas fa-edit"></i> </button> */}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
                                             {/* {userType === "2" && (
                                                             <button className="btn btn-danger icon_details"
                                                                 onClick={() => handleDelete(item.id)}
@@ -426,6 +499,163 @@ function Cheif_complaint() {
                 </Form>
 
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Chief Complaint</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h5>The Chief Complaint:</h5>
+                        </li>
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Chief Complaint:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='chief_complaint'
+                                    value={chiefData.chief_complaint}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Onset and Duration:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='onset_duration'
+                                    value={chiefData.onset_duration}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Nature of Symptoms:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='nature_symptoms'
+                                    value={chiefData.nature_symptoms}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Severity:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Select name="severity"
+                                    value={chiefData.severity}
+                                    onChange={handleInputChange}
+                                    required>
+                                    <option>Select</option>
+                                    <option value="Mild">Mild</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="Severe">Severe</option>
+                                </Form.Select>
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Course Type:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Select name="course_type"
+                                    value={chiefData.course_type}
+                                    onChange={handleInputChange}
+                                    required>
+                                    <option>Select</option>
+                                    <option value="Continuous">Continuous</option>
+                                    <option value="Episodic">Episodic</option>
+                                    <option value="Fluctuating">Fluctuating</option>
+                                </Form.Select>
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Nature of Illness:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Select name="nature_illness"
+                                    value={chiefData.nature_illness}
+                                    onChange={handleInputChange}
+                                    required>
+                                    <option>Select</option>
+                                    <option value="Progressive">Progressive</option>
+                                    <option value="Static">Static</option>
+                                    <option value="Improving">Improving</option>
+                                </Form.Select>
+                            </Col>
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Precipitating Factors:</h5>
+                        </li>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Identify Triggers:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='identify_trigger'
+                                    value={chiefData.identify_trigger}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Life Changes and Stressors:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='life_changes'
+                                    value={chiefData.life_changes}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Predisposing Factors:</h5>
+                        </li>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Biological:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='biological'
+                                    value={chiefData.biological}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Psychological:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='psychological'
+                                    value={chiefData.psychological}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-2 text-start" >
+                            <Form.Label column sm="4">Social / Environmental:  </Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text"
+                                    name='social_environment'
+                                    value={chiefData.social_environment}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleCheifUpdate(e, chiefData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </div>
     )
 }

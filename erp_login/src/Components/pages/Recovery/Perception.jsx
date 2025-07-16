@@ -6,11 +6,17 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Perception() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
@@ -83,7 +89,6 @@ function Perception() {
                 perception_changes: data.perception_changes?.split(',') || ["NULL"],
                 somatic: data.somatic?.split(',') || ["NULL"],
                 others: data.others?.split(',') || ["NULL"],
-
             }));
 
             setPreviewRequested(true); // trigger the effect after state updates
@@ -142,6 +147,167 @@ function Perception() {
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/getPerception/${id}`);
+            const data = response.data;
+
+            setPerceptionData(perceptionData => ({
+                ...perceptionData,
+                id:data.id || '',
+                admission_no: data.admission_no || '',
+                date: data.date || '',
+                hallucination_type: data.hallucination_type?.split(',').map(i => i.trim()) || [],
+                heard: data.heard || '',
+                voices_heard: data.voices_heard || '',
+                part_of_day: data.part_of_day || '',
+                female_male_voices: data.female_male_voices || '',
+                interpreted_person: data.interpreted_person || '',
+                illusion: data.illusion?.split(',').map(i => i.trim()) || [],
+                perception_changes: data.perception_changes?.split(',').map(i => i.trim()) || [],
+                somatic: data.somatic?.split(',').map(i => i.trim()) || [],
+                others: data.others?.split(',').map(i => i.trim()) || [],
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Basic Detail is not found");
+        }
+    };
+
+    const handlePerceptionUpdate = async (e, id) => {
+        e.preventDefault();
+
+        try {
+            const res = await apiRoute.post(`/recovery/updatePerception/${id}`, perceptionData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            alert('Perception Form updated successfully!');
+            setPerceptionData({
+                hallucination_type: [],
+                heard: '',
+                voices_heard: '',
+                part_of_day: '',
+                female_male_voices: '',
+                interpreted_person: '',
+                illusion: [],
+                perception_changes: [],
+                somatic: [],
+                others: [],
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setPerceptionData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const renderhallucinationCheck = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={perceptionData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...perceptionData[field], label]
+                    : perceptionData[field].filter(item => item !== label);
+
+                setPerceptionData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+    const renderillusion = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={perceptionData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...perceptionData[field], label]
+                    : perceptionData[field].filter(item => item !== label);
+
+                setPerceptionData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
+    const renderPerceptionChanges = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={perceptionData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...perceptionData[field], label]
+                    : perceptionData[field].filter(item => item !== label);
+
+                setPerceptionData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
+    const rendersomatic = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={perceptionData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...perceptionData[field], label]
+                    : perceptionData[field].filter(item => item !== label);
+
+                setPerceptionData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
+    const renderothers = (field, id, label) => (
+        <Form.Check
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={perceptionData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...perceptionData[field], label]
+                    : perceptionData[field].filter(item => item !== label);
+
+                setPerceptionData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
+        />
+    );
+
     return (
         <>
             <Container fluid>
@@ -212,6 +378,13 @@ function Perception() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
+                                            {userType === "4" && (
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
+                                            )}
 
                                         </td>
                                     </tr>
@@ -430,7 +603,7 @@ function Perception() {
                             <li className='icon-li'>
                                 <h5>Perception Changes : </h5>
                             </li>
-                            
+
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -456,7 +629,7 @@ function Perception() {
                             <li className='icon-li'>
                                 <h5>Somatic passivity phenomenon : </h5>
                             </li>
-                            
+
                         </Form.Label>
                         <Col md={6}>
                             <div
@@ -505,6 +678,136 @@ function Perception() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Perception Form </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <ul>
+                                <li className='icon-li'>
+                                    <h4 style={{ display: "inline" }}>Hallucinations:</h4>
+                                    <div className="d-flex flex-wrap gap-3 mt-2">
+                                        {[
+                                            ["auditory", "Auditory"],
+                                            ["visual", "Visual"],
+                                            ["olfactory", "Olfactory"],
+                                            ["gustatory", "Gustatory"],
+                                            ["tactile", "Tactile"],
+                                        ].map(([id, label]) => renderhallucinationCheck("hallucination_type", id, label))}
+                                    </div>
+
+                                    <div className='d-flex flex-wrap gap-3 mt-2'>
+                                        <Col md={4}>
+                                            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                                <Form.Label>What was heard?</Form.Label>
+                                                <Form.Control as="textarea" rows={2}
+                                                    name='heard'
+                                                    value={perceptionData.heard}
+                                                    onChange={handleInputChange} />
+                                            </Form.Group>
+                                            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                                <Form.Label>How many voices were heard?</Form.Label>
+                                                <Form.Control as="textarea" rows={2}
+                                                    name='voices_heard'
+                                                    value={perceptionData.voices_heard}
+                                                    onChange={handleInputChange} />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={4}>
+
+                                            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                                <Form.Label>in which part of the day?</Form.Label>
+                                                <Form.Control as="textarea" rows={2}
+                                                    name='part_of_day'
+                                                    value={perceptionData.part_of_day}
+                                                    onChange={handleInputChange} />
+                                            </Form.Group>
+                                            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                                <Form.Label>Male or Female voices?</Form.Label>
+                                                <Form.Control as="textarea" rows={2}
+                                                    name='female_male_voices'
+                                                    value={perceptionData.female_male_voices}
+                                                    onChange={handleInputChange} />
+                                            </Form.Group>
+                                        </Col>
+
+                                        <Col md={4}>
+
+                                            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                                <Form.Label>How interpreted and whether second person or third person hallucinations? (i.e., whether the voices are addressing the patient or are discussing him in third person)</Form.Label>
+                                                <Form.Control as="textarea" rows={2}
+                                                    name='interpreted_person'
+                                                    value={perceptionData.interpreted_person}
+                                                    onChange={handleInputChange} />
+                                            </Form.Group>
+                                        </Col>
+
+
+                                    </div>
+                                </li>
+
+                                <li className='icon-li'>
+                                    <h4 style={{ display: "inline" }}>Illusions and misinterpretations:</h4>
+                                    <div className="d-flex flex-wrap gap-3 mt-2">
+                                        {[
+                                            ["Illusions_visual", "Visual"],
+                                            ["Illusions_auditory", "Auditory"],
+                                            ["other_sensory_fields", "Other Sensory Fields"],
+                                            ["clearConsciousness", "Occur in clear consciousness"],
+                                            ["unclearConsciousness", "Occur in unclear consciousness"],
+                                        ].map(([id, label]) => renderillusion("illusion", id, label))}
+                                    </div>
+
+
+
+                                </li>
+
+                                <li className='icon-li'>
+                                    <h4 style={{ display: "inline" }}>Perception Changes :</h4>
+                                    <div className="d-flex flex-wrap gap-3 mt-2">
+                                        {[
+                                            ["Depersonalization", "Depersonalization"],
+                                            ["derealization", "derealization"],
+                                        ].map(([id, label]) => renderPerceptionChanges("perception_changes", id, label))}
+                                    </div>
+                                </li>
+
+                                <li className='icon-li'>
+                                    <h4 style={{ display: "inline" }}>Somatic passivity phenomenon :</h4>
+                                    <div className="d-flex flex-wrap gap-3 mt-2">
+                                        {[
+                                            ["strangeSensations", "Strange sensations imposed by 'somebody'"]
+                                        ].map(([id, label]) => rendersomatic("somatic", id, label))}
+                                    </div>
+
+                                </li>
+
+                                <li className='icon-li'>
+                                    <h4 style={{ display: "inline" }}>Others :</h4>
+                                    <div className="d-flex flex-wrap gap-3 mt-2">
+                                        {[
+                                            ["autoscopy", "Autoscopy"],
+                                            ["abnormalVestibular", "Abnormal vestibular sensations"],
+                                            ["senseOfPresence", "Sense of presence"],
+                                        ].map(([id, label]) => renderothers("others", id, label))}
+                                    </div>
+
+                                    <div className="mt-3">
+                                        <Button variant="success" className="m-1" type="submit" onClick={(e) => handlePerceptionUpdate(e, perceptionData.id)}>Update</Button>
+                                        <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                                    </div>
+
+                                </li>
+
+
+                            </ul>
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
 
         </>
     )

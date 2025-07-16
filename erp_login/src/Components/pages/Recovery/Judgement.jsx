@@ -6,11 +6,17 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Judgement() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
@@ -132,6 +138,66 @@ function Judgement() {
         window.open(pdfUrl, '_blank');
     };
 
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/getJudgement/${id}`);
+            const data = response.data;
+
+            setJudgementFormData(judgementData => ({
+                ...judgementData,
+                admission_no: data.admission_no || '',
+                id: data.id || '',
+                date: data.date || '',
+                personal_judgement: data.personal_judgement || '',
+                social_judgement: data.social_judgement || '',
+                test_judgement: data.test_judgement || '',
+                judgement: data.judgement || '',
+            }));
+            setShow(true);
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Judgement ID is not found");
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setJudgementFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setJudgementFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleJudgementUpdate = async (e, id) => {
+        e.preventDefault();
+
+        try {
+            const res = await apiRoute.post(`/recovery/updateJudgement/${id}`, judgementData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            alert('Judgement Form updated successfully!');
+            setJudgementFormData({
+                personal_judgement: '',
+                social_judgement: '',
+                test_judgement: '',
+                judgement: ''
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    };
+
     return (
         <>
             <Container fluid>
@@ -205,6 +271,13 @@ function Judgement() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
+                                            {userType === "4" && (
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
@@ -354,6 +427,78 @@ function Judgement() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Judgement Form </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Col md={12}>
+                        <Form>
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Personal judgement:</h4>
+                                <Form.Group className="mb-3">
+                                    <Form.Control as="textarea" rows={2}
+                                        name='personal_judgement'
+                                        value={judgementData.personal_judgement}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Social judgement:</h4>
+                                <Form.Group className="mb-3">
+                                    <Form.Control as="textarea" rows={2}
+                                        name='social_judgement'
+                                        value={judgementData.social_judgement}
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+                            </li>
+
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Test judgement:</h4>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Please explain what actions you would take in the following situations: a house on fire, a man lying on the road, and a sealed, stamped envelope on the street.</Form.Label>
+                                    <Form.Control as="textarea" rows={2}
+                                        name='test_judgement'
+                                        value={judgementData.test_judgement}
+                                        onChange={handleInputChange} />
+                                </Form.Group>
+                            </li>
+
+                            <li className="icon-li">
+                                <h4 style={{ display: "inline" }}>Judgement:</h4>
+                                <Form.Group>
+                                    <div>
+                                        {["Good", "Intact", "Normal", "Poor", "Impaired", "Abnormal"].map((value) => (
+                                            <Form.Check
+                                                key={value}
+                                                type="radio"
+                                                id={`judgement-${value.toLowerCase()}`}
+                                                label={value}
+                                                name="judgement"
+                                                value={value}
+                                                checked={judgementData.judgement === value}
+                                                onChange={handleChange}
+                                            />
+                                        ))}
+                                    </div>
+                                </Form.Group>
+
+
+
+                            </li>
+
+                            <div className="mt-3">
+                                <Button variant="success" className="m-1" type="submit" onClick={(e) => handleJudgementUpdate(e, judgementData.id)}>Update</Button>
+                                <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                            </div>
+
+                        </Form>
+                    </Col>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

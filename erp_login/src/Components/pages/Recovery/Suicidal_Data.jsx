@@ -6,18 +6,26 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
+import Modal from 'react-bootstrap/Modal';
+import Cookies from 'js-cookie';
 
 function Suicidal_Data() {
     const [visitDetails, setVisitDetails] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const userType = Cookies.get('usertype');
 
     const filteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
-            String(item.name).toLowerCase().includes(searchTerm) ||
-            String(item.date).toLowerCase().includes(searchTerm) ||
-            String(item.living_arrangement).toLowerCase().includes(searchTerm)
+            String(item.admission_no).toLowerCase().includes(searchTerm) ||
+            String(item.suicide_history).toLowerCase().includes(searchTerm) ||
+            String(item.triggers_stressors).toLowerCase().includes(searchTerm) ||
+            String(item.homicidal_ideation).toLowerCase().includes(searchTerm) ||
+            String(item.target_method).toLowerCase().includes(searchTerm) 
         );
     });
 
@@ -139,6 +147,59 @@ function Suicidal_Data() {
         const { name, value } = e.target;
         setSuicidalData((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleEditform = async (id) => {
+        try {
+            const response = await apiRoute.get(`/recovery/get_suicidal/${id}`);
+            const data = response.data;
+
+            setSuicidalData((suicidalData) => ({
+                ...suicidalData,
+                id: data.id || '',
+                admission_no: data.admission_no || 'NULL',
+                date: data.date || 'NULL',
+                suicide_history: data.suicide_history || 'NULL',
+                triggers_stressors: data.triggers_stressors || 'NULL',
+                homicidal_ideation: data.homicidal_ideation || 'NULL',
+                target_method: data.target_method || 'NULL',
+                immediate_threat: data.immediate_threat || 'NULL',
+                emergency_response: data.emergency_response || "NULL",
+                hospital_required: data.hospital_required || "NULL",
+            }));
+
+            setShow(true);
+
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Suicidal Data ID is not found");
+        }
+    };
+
+    const handleSuicidalUpdate = async (e, id) => {
+        e.preventDefault();
+        try {
+            const res = await apiRoute.post(`/recovery/updateSuicidal/${id}`, suicidalData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            alert('Suicidal and Homicidal Ideation Form updated successfully!');
+            setSuicidalData({
+                suicide_history: '',
+                triggers_stressors: '',
+                homicidal_ideation: '',
+                target_method: '',
+                immediate_threat: '',
+                emergency_response: '',
+                hospital_required: '',
+            })
+            handleClose(true);
+            getVisitDetails();
+        } catch (err) {
+            console.error(err);
+            alert('Update failed.');
+        }
+    }
     return (
         <>
             <Container fluid>
@@ -156,11 +217,9 @@ function Suicidal_Data() {
                     </Col>
                     <Col md={2}>
                         <div className="d-flex align-items-center px-3">
-
                             <Form className="navbar-search">
                                 <Form.Group id="topbarSearch">
                                     <InputGroup className="input-group-merge search-bar">
-
                                         <Form.Control
                                             type="text"
                                             placeholder="Search"
@@ -172,7 +231,6 @@ function Suicidal_Data() {
                             </Form>
                         </div>
                     </Col>
-
                 </Row>
             </Container>
             <Col md={3}>
@@ -212,16 +270,14 @@ function Suicidal_Data() {
                                             >
                                                 <i className="fas fa-eye"></i>
                                             </button>
-                                            {/* <button className="btn btn-primary icon_details"
-                                                                            onClick={() => {
-                                                                                handleEditform(item.id);
-                                                                            }}
-                                                                        ><i className="fas fa-edit"></i> </button> */}
-                                            {/* {userType === "2" && (
-                                                                            <button className="btn btn-danger icon_details"
-                                                                                onClick={() => handleDelete(item.id)}
-                                                                            ><i className="fas fa-trash"></i></button>
-                                                                        )} */}
+                                            {userType === "4" && (
+                                            <button className="btn btn-primary icon_details"
+                                                onClick={() => {
+                                                    handleEditform(item.id);
+                                                }}
+                                            ><i className="fas fa-edit"></i> </button>
+                                            )}
+                                            
                                         </td>
                                     </tr>
                                 ))
@@ -231,7 +287,6 @@ function Suicidal_Data() {
                                 </tr>
                             )}
                         </tbody>
-
                     </Table>
                 </Row>
             </Container>
@@ -239,7 +294,6 @@ function Suicidal_Data() {
                 <Row className="d-flex align-items-center justify-content-start mb-2">
                     <Col md={2} className='d-flex align-items-center pdf_logo'>
                         <img src={manasu_logo} className="pdf_logo" alt="" />
-
                     </Col>
                     <Col md={8}>
                         <h4 className="text-center">SUICIDAL AND HOMICIDAL IDEATION </h4>
@@ -251,7 +305,7 @@ function Suicidal_Data() {
                             <Form.Label column sm="6" className='text-start'>Admission No. :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {familyData.admission_no}
+                                    {suicidalData.admission_no}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -261,7 +315,7 @@ function Suicidal_Data() {
                             <Form.Label column sm="6" className='text-start'>Date :</Form.Label>
                             <Col md={6}>
                                 <div className='text-start'>
-                                    {formatDateTime(familyData.date)}
+                                    {formatDateTime(suicidalData.date)}
                                 </div>
                             </Col>
                         </Form.Group>
@@ -389,6 +443,128 @@ function Suicidal_Data() {
                     </Form.Group>
                 </Form>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Suicidal and Homicidal Ideation</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <li className='icon-li'>
+                            <h5>History of Suicide Attempts :</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='suicide_history'
+                                value={suicidalData.suicide_history}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Triggers and Stressors:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='triggers_stressors'
+                                value={suicidalData.triggers_stressors}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>History of Homicidal Ideation:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='homicidal_ideation'
+                                value={suicidalData.homicidal_ideation}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Target and Method:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='target_method'
+                                value={suicidalData.target_method}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Immediate Threat:</h5>
+                            <p className='text-muted small' style={{ marginTop: "5px" }}>(assessed by history taker)</p>
+                        </li>
+                        <Form.Group>
+                            <Form.Control
+                                type='text'
+                                name='immediate_threat'
+                                value={suicidalData.immediate_threat}
+                                onChange={handleInputChange}
+                                required />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Necessity of Emergency Response:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Check
+                                type='radio'
+                                label='Yes'
+                                name='emergency_response'
+                                value='Yes'
+                                checked={suicidalData.emergency_response === 'Yes'}
+                                onChange={handleInputChange}
+                                required
+                            />
+                            <Form.Check
+                                type='radio'
+                                label='No'
+                                name='emergency_response'
+                                value='No'
+                                checked={suicidalData.emergency_response === 'No'}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Form.Group>
+
+                        <li className='icon-li'>
+                            <h5>Hospitalization Required:</h5>
+                        </li>
+                        <Form.Group>
+                            <Form.Check
+                                type='radio'
+                                label='Yes'
+                                name='hospital_required'
+                                value='Yes'
+                                checked={suicidalData.hospital_required === 'Yes'}
+                                onChange={handleInputChange}
+                                required
+                            />
+                            <Form.Check
+                                type='radio'
+                                label='No'
+                                name='hospital_required'
+                                value='No'
+                                checked={suicidalData.hospital_required === 'No'}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Form.Group>
+                        <div className="mt-3">
+                            <Button variant="success" className="m-1" type="submit" onClick={(e) => handleSuicidalUpdate(e, suicidalData.id)}>Update</Button>
+                            <Button variant="secondary" className="m-1" onClick={handleClose}>Close</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }
