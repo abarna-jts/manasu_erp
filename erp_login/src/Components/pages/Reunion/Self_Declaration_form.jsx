@@ -193,6 +193,7 @@ function Self_Declaration_form() {
                 age: '',
                 description: '',
             })
+            setAdmissionNumber("");
             if (handwritten_documentRef.current) handwritten_documentRef.current.value = "";
             if (signatureRef.current) signatureRef.current.value = "";
             if (photoRef.current) photoRef.current.value = "";

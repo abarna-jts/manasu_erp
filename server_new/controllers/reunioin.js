@@ -21,22 +21,42 @@ const createFamilyLetter = async (req, res) => {
         } = req.body;
 
         // File paths
-        const aadharCardPath = req.files['f_aadhar_card'] ? `uploads/Reunion/Family_Details/${req.files['f_aadhar_card'][0].filename}` : null;
-        const rationCardPath = req.files['f_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['f_ration_card'][0].filename}` : null;
-        const resaadharCardPath = req.files['r_aadhar_card'] ? `uploads/Reunion/Family_Details/${req.files['r_aadhar_card'][0].filename}` : null;
-        const resrationCardPath = req.files['r_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['r_ration_card'][0].filename}` : null;
-        const govt_idPath = req.files['govt_id'] ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
+        const aadharCardPath = req.files?.['f_aadhar_card']
+            ? req.files['f_aadhar_card'].map(file => `uploads/Reunion/Family_Details/${file.filename}`)
+            : [];
+
+        const rationCardPath = req.files?.['f_ration_card']
+            ? req.files['f_ration_card'].map(file => `uploads/Reunion/Family_Details/${file.filename}`)
+            : [];
+
+        const resaadharCardPath = req.files?.['r_aadhar_card']
+            ? req.files['r_aadhar_card'].map(file => `uploads/Reunion/Family_Details/${file.filename}`)
+            : [];
+
+        const resrationCardPath = req.files?.['r_ration_card']
+            ? req.files['r_ration_card'].map(file => `uploads/Reunion/Family_Details/${file.filename}`)
+            : [];
+
+        const govt_idPath = req.files?.['govt_id']
+            ? req.files['govt_id'].map(file => `uploads/Reunion/Family_Details/${file.filename}`)
+            : [];
+
+        // const aadharCardPath = req.files['f_aadhar_card'] ? `uploads/Reunion/Family_Details/${req.files['f_aadhar_card'][0].filename}` : null;
+        // const rationCardPath = req.files['f_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['f_ration_card'][0].filename}` : null;
+        // const resaadharCardPath = req.files['r_aadhar_card'] ? `uploads/Reunion/Family_Details/${req.files['r_aadhar_card'][0].filename}` : null;
+        // const resrationCardPath = req.files['r_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['r_ration_card'][0].filename}` : null;
+        // const govt_idPath = req.files['govt_id'] ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
 
         const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,r_aadhar_card,r_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address,f_aadhar_card_no, f_ration_card_no,r_aadhar_card_no, r_ration_card_no, any_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         const values = [
             admissionNumber,
             f_member_age,
-            aadharCardPath,
-            rationCardPath,
-            resaadharCardPath || null,
-            resrationCardPath || null,
-            govt_idPath || null,
+            JSON.stringify(aadharCardPath),
+            JSON.stringify(rationCardPath),
+            JSON.stringify(resaadharCardPath) || null,
+            JSON.stringify(resrationCardPath) || null,
+            JSON.stringify(govt_idPath) || null,
             description,
             rescue_name,
             rescue_relationship,

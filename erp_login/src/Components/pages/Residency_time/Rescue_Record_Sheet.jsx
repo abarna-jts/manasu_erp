@@ -78,7 +78,7 @@ function Rescue_Record_Sheet() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-            alert('Rescue Condition submitted successfully!');
+            alert('Consultation Report Form submitted successfully!');
             setFormData({
                 admission_no: '',
                 resident_name: '',

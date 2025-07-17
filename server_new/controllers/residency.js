@@ -749,12 +749,12 @@ const createPrescription = async (req, res) => {
 };
 
 
-const getPrescription = async (req, res) => {
+const getPrescriptionALL = async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM basic_detail");
+    const [rows] = await db.query("SELECT * FROM prescription_medicines");
 
     res.status(200).json({
-      message: "Basic Details Record Retrieved Successfully",
+      message: "Perscription Medicines Record Retrieved Successfully",
       data: rows, // ✅ THIS is what your frontend expects
     });
   } catch (error) {
@@ -1325,7 +1325,7 @@ export {
   showRescueCondition,
   updateRescueCondition,
   createPrescription,
-  getPrescription,
+  getPrescriptionALL,
   getPrescriptionbyID,
   updatePrescription,
   createDrVisit,

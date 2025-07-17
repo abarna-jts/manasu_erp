@@ -249,6 +249,35 @@ function Family_Request_form() {
         data.append('r_ration_card_no', storeData.r_ration_card_no);
         data.append('any_other', storeData.any_other);
 
+        if (files.f_aadhar_card && files.f_aadhar_card.length > 0) {
+            files.f_aadhar_card.forEach(file => {
+                data.append('f_aadhar_card', file); // ✅ no []
+            });
+        }
+
+        if (files.f_ration_card && files.f_ration_card.length > 0) {
+            files.f_ration_card.forEach(file => {
+                data.append('f_ration_card', file); // ✅ no []
+            });
+        }
+
+        if (files.r_aadhar_card && files.r_aadhar_card.length > 0) {
+            files.r_aadhar_card.forEach(file => {
+                data.append('r_aadhar_card', file); // ✅ no []
+            });
+        }
+
+        if (files.r_ration_card && files.r_ration_card.length > 0) {
+            files.r_ration_card.forEach(file => {
+                data.append('r_ration_card', file); // ✅ no []
+            });
+        }
+
+        if (files.govt_id && files.govt_id.length > 0) {
+            files.govt_id.forEach(file => {
+                data.append('govt_id', file); // ✅ no []
+            });
+        }
 
         try {
             const res = await apiRoute.post('/reunion/create_family_letter', data, {
@@ -355,20 +384,101 @@ function Family_Request_form() {
             }));
             console.log("Fetched Data:", data);
 
+            // Parse form7_attach image array
+            let f_aadhar_cardPaths = [];
+            if (data.f_aadhar_card) {
+                try {
+                    const parsed = JSON.parse(data.f_aadhar_card);
+                    if (Array.isArray(parsed)) {
+                        f_aadhar_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse form7_attach:', err);
+                    // Fallback: comma-separated string
+                    f_aadhar_cardPaths = data.f_aadhar_card
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let f_ration_cardPaths = [];
+            if (data.f_ration_card) {
+                try {
+                    const parsed = JSON.parse(data.f_ration_card);
+                    if (Array.isArray(parsed)) {
+                        f_ration_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse form7_attach:', err);
+                    // Fallback: comma-separated string
+                    f_ration_cardPaths = data.f_ration_card
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let r_aadhar_cardPaths = [];
+            if (data.r_aadhar_card) {
+                try {
+                    const parsed = JSON.parse(data.r_aadhar_card);
+                    if (Array.isArray(parsed)) {
+                        r_aadhar_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse form7_attach:', err);
+                    // Fallback: comma-separated string
+                    r_aadhar_cardPaths = data.r_aadhar_card
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let r_ration_cardPaths = [];
+            if (data.r_ration_card) {
+                try {
+                    const parsed = JSON.parse(data.r_ration_card);
+                    if (Array.isArray(parsed)) {
+                        r_ration_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse form7_attach:', err);
+                    // Fallback: comma-separated string
+                    r_ration_cardPaths = data.r_ration_card
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let govt_idPaths = [];
+            if (data.govt_id) {
+                try {
+                    const parsed = JSON.parse(data.govt_id);
+                    if (Array.isArray(parsed)) {
+                        govt_idPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse form7_attach:', err);
+                    // Fallback: comma-separated string
+                    govt_idPaths = data.govt_id
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
             // Handle old and new photo paths correctly
-            const aadharCardPath = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
-            const rationCardPath = data.f_ration_card ? `https://www.pahrultours.com/app2/${data.f_ration_card}` : null;
-            const residentaadharCardPath = data.r_aadhar_card ? `https://www.pahrultours.com/app2/${data.r_aadhar_card}` : null;
-            const residentrationCardPath = data.r_ration_card ? `https://www.pahrultours.com/app2/${data.r_ration_card}` : null;
-            const govt_idPath = data.govt_id ? `https://www.pahrultours.com/app2/${data.govt_id}` : null;
+            // const aadharCardPath = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
+            // const rationCardPath = data.f_ration_card ? `https://www.pahrultours.com/app2/${data.f_ration_card}` : null;
+            // const residentaadharCardPath = data.r_aadhar_card ? `https://www.pahrultours.com/app2/${data.r_aadhar_card}` : null;
+            // const residentrationCardPath = data.r_ration_card ? `https://www.pahrultours.com/app2/${data.r_ration_card}` : null;
+            // const govt_idPath = data.govt_id ? `https://www.pahrultours.com/app2/${data.govt_id}` : null;
             // Set files state
             setFiles((files) => ({
                 ...files,
-                f_aadhar_card: aadharCardPath,
-                f_ration_card: rationCardPath,
-                r_aadhar_card: residentaadharCardPath,
-                r_ration_card: residentrationCardPath,
-                govt_id: govt_idPath,
+                f_aadhar_card: f_aadhar_cardPaths,
+                f_ration_card: f_ration_cardPaths,
+                r_aadhar_card: r_aadhar_cardPaths,
+                r_ration_card: r_ration_cardPaths,
+                govt_id: govt_idPaths,
             }));
 
             setPreviewRequested(true);
@@ -510,10 +620,10 @@ function Family_Request_form() {
                     description: '',
                 })
                 setStoreData({
-                    rescue_name:'',
-                    age:'',
-                    gender:'',
-                    phone_no:'',
+                    rescue_name: '',
+                    age: '',
+                    gender: '',
+                    phone_no: '',
                 })
                 setAdmissionNumber("");
                 if (f_aadhar_cardRef.current) f_aadhar_cardRef.current.value = "";
@@ -862,7 +972,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Aadhar Card  (Relation): <span style={{ color: 'red' }}>*</span>
+                                    Aadhar Card  (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -870,6 +980,7 @@ function Family_Request_form() {
                                         accept=".jpg,.jpeg,.png"
                                         name='f_aadhar_card'
                                         ref={f_aadhar_cardRef}
+                                        multiple
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
@@ -893,13 +1004,14 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Ration Card  (Relation): <span style={{ color: 'red' }}>*</span>
+                                    Ration Card  (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name="f_ration_card"
+                                        multiple
                                         ref={f_ration_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
@@ -933,6 +1045,7 @@ function Family_Request_form() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name='r_aadhar_card'
+                                        multiple
                                         ref={r_aadhar_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
@@ -947,7 +1060,7 @@ function Family_Request_form() {
                                         name="r_ration_card_no"
                                         value={storeData.r_ration_card_no}
                                         // isInvalid={!!formErrors.r_aadhar_card_no}
-                                        onChange={handleInputChange1} required />
+                                        onChange={handleInputChange1} />
                                     {/* {formErrors.r_ration_card_no && (
                                         <div className="text-danger small mt-1">
                                             {formErrors.r_ration_card_no}
@@ -964,6 +1077,7 @@ function Family_Request_form() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name="r_ration_card"
+                                        multiple
                                         ref={r_ration_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
@@ -991,6 +1105,7 @@ function Family_Request_form() {
                                         accept=".jpg,.jpeg,.png"
                                         name="govt_id"
                                         ref={govt_idRef}
+                                        multiple
                                         onChange={handleFileChange} />
                                 </Col>
                             </Form.Group>
@@ -1201,17 +1316,24 @@ function Family_Request_form() {
                                         Aadhar Card (Relation) :
                                     </Form.Label>
                                     <Col sm="8">
-                                        {files.f_aadhar_card ? (
-                                            <>
+                                        {Array.isArray(files.f_aadhar_card) &&
+                                            files.f_aadhar_card.map((imgUrl, index) => (
                                                 <img
-                                                    src={files.f_aadhar_card}
-                                                    alt="New"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`f_aadhar_card - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png";
+                                                    }}
                                                 />
-                                            </>
-                                        ) : (
-                                            <p>Unknown</p> // Display if no photo
-                                        )}
+                                            ))}
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -1232,17 +1354,25 @@ function Family_Request_form() {
                                         Ration Card (Relation):
                                     </Form.Label>
                                     <Col sm="8">
-                                        {files.f_ration_card ? (
-                                            <>
+                                         {Array.isArray(files.f_ration_card) &&
+                                            files.f_ration_card.map((imgUrl, index) => (
                                                 <img
-                                                    src={files.f_ration_card}
-                                                    alt="New"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`f_ration_card - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png";
+                                                    }}
                                                 />
-                                            </>
-                                        ) : (
-                                            <p>Unknown</p> // Display if no photo
-                                        )}
+                                            ))}
+
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-4 text-start" controlId="formPoliceMemo">
@@ -1263,17 +1393,24 @@ function Family_Request_form() {
                                         Aadhar Card (Resident):
                                     </Form.Label>
                                     <Col sm="8">
-                                        {files.r_aadhar_card ? (
-                                            <>
+                                        {Array.isArray(files.r_aadhar_card) &&
+                                            files.r_aadhar_card.map((imgUrl, index) => (
                                                 <img
-                                                    src={files.r_aadhar_card}
-                                                    alt="New"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`r_aadhar_card - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png";
+                                                    }}
                                                 />
-                                            </>
-                                        ) : (
-                                            <p>Unknown</p> // Display if no photo
-                                        )}
+                                            ))}
                                     </Col>
                                 </Form.Group>
 
@@ -1295,17 +1432,24 @@ function Family_Request_form() {
                                         Ration Card (Resident):
                                     </Form.Label>
                                     <Col sm="8">
-                                        {files.r_ration_card ? (
-                                            <>
+                                        {Array.isArray(files.r_ration_card) &&
+                                            files.r_ration_card.map((imgUrl, index) => (
                                                 <img
-                                                    src={files.r_ration_card}
-                                                    alt="New"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`r_ration_card - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png";
+                                                    }}
                                                 />
-                                            </>
-                                        ) : (
-                                            <p>Unknown</p> // Display if no photo
-                                        )}
+                                            ))}
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -1325,17 +1469,24 @@ function Family_Request_form() {
                                         Any other Government ID :
                                     </Form.Label>
                                     <Col sm="8">
-                                        {files.govt_id ? (
-                                            <>
+                                        {Array.isArray(files.govt_id) &&
+                                            files.govt_id.map((imgUrl, index) => (
                                                 <img
-                                                    src={files.govt_id}
-                                                    alt="New"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`govt_id - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png";
+                                                    }}
                                                 />
-                                            </>
-                                        ) : (
-                                            <p>Unknown</p> // Display if no photo
-                                        )}
+                                            ))}
                                     </Col>
                                 </Form.Group>
 

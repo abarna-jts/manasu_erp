@@ -29,7 +29,7 @@ function Prescription_form() {
         op_no: '',
         hospital_name: '',
         department: '',
-        diagnosis:'',
+        diagnosis: '',
         masterHealthCheckup: '',
         medical_type: '',
         instruction: '',
@@ -59,7 +59,7 @@ function Prescription_form() {
         op_no: '',
         hospital_name: '',
         department: '',
-        diagnosis:'',
+        diagnosis: '',
         masterHealthCheckup: '',
         instruction: '',
         medical_type: '',
@@ -294,7 +294,7 @@ function Prescription_form() {
                 op_no: '',
                 hospital_name: '',
                 department: '',
-                diagnosis:'',
+                diagnosis: '',
                 masterHealthCheckup: '',
                 medical_type: '',
                 instruction: '',
@@ -314,7 +314,7 @@ function Prescription_form() {
     //fetching prescription details
     const getPrescriptionDetails = async () => {
         try {
-            const response = await apiRoute.get('/residency/getPrescription');
+            const response = await apiRoute.get('/residency/getPrescriptionALL');
             console.log("API response:", response.data);
             setPrescriptionDetails(response.data.data);
         } catch (error) {
@@ -461,7 +461,7 @@ function Prescription_form() {
                 ) {
                     console.log("Detected row-wise medicine format.");
                     setViewData({
-                        ...data.prescription,
+                        ...data,
                         prescription_medicines: meds,
                     });
                 } else {
@@ -494,7 +494,7 @@ function Prescription_form() {
                     console.log("Parsed intake values:", intakes);
 
                     setViewData({
-                        ...data.prescription,
+                        ...data,
                         prescription_medicines: formattedMeds,
                     });
                 }
@@ -808,7 +808,7 @@ function Prescription_form() {
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="5" style={{ paddingRight: "5px" }}>
-                                        Diagnosis:
+                                        Diagnosis: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control
@@ -850,7 +850,7 @@ function Prescription_form() {
                             </Col>
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="6" style={{ paddingRight: "5px" , textAlign:"end"}}>
+                                    <Form.Label column sm="6" style={{ paddingRight: "5px", textAlign: "end" }}>
                                         Medicine Type: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
@@ -935,9 +935,15 @@ function Prescription_form() {
                                 {rows.map((_, i) => (
                                     <tr key={i}>
                                         <td>
-                                            <button type="button" id="meadd" className="btn btn-sm btn-primary add" onClick={handleAddRow}>+</button>
-                                            {' '}
-                                            <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow(i)}>-</button>
+                                            <Row>
+                                                <Col md={5}>
+                                                    <button type="button" id="meadd" className="btn btn-sm btn-primary add" onClick={handleAddRow}>+</button>
+                                                </Col>
+                                                <Col md={7}>
+                                                    {' '}
+                                                    <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow(i)}>-</button>
+                                                </Col>
+                                            </Row>
                                         </td>
 
                                         <td>
@@ -1157,7 +1163,7 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
-                                    
+
                                 </Row>
                                 <Row>
                                     <Col md={6}>
@@ -1176,7 +1182,7 @@ function Prescription_form() {
                                             </Col>
                                         </Form.Group>
                                     </Col>
-                                    
+
                                 </Row>
                                 <Row>
                                     <Col md={6}>
@@ -1385,7 +1391,7 @@ function Prescription_form() {
                             </Col>
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm="6" style={{ paddingRight: "5px" , textAlign:"end"}}>
+                                    <Form.Label column sm="6" style={{ paddingRight: "5px", textAlign: "end" }}>
                                         Medicine Type:
                                     </Form.Label>
                                     <Col sm="6">
@@ -1402,7 +1408,7 @@ function Prescription_form() {
                                     </Col>
                                 </Form.Group>
                             </Col>
-                            
+
 
                         </Row>
                         <Row className='d-flex align-items-center justify-content-center'>
@@ -1469,8 +1475,15 @@ function Prescription_form() {
                                     return (
                                         <tr key={med.id}>
                                             <td>
-                                                <button type="button" className="btn btn-sm btn-primary add" onClick={handleAddRow1}>+</button>{' '}
-                                                <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow1(index)}>-</button>
+                                                <Row>
+                                                    <Col md={5}>
+                                                        <button type="button" id="meadd" className="btn btn-sm btn-primary add" onClick={handleAddRow}>+</button>
+                                                    </Col>
+                                                    <Col md={7}>
+                                                        {' '}
+                                                        <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow(i)}>-</button>
+                                                    </Col>
+                                                </Row>
                                             </td>
 
                                             <td>

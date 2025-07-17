@@ -33,11 +33,11 @@ const storage = multer.diskStorage({
 
 // Define upload fields
 const upload = multer({ storage: storage }).fields([
-    { name: 'f_aadhar_card', maxCount: 1 },
-    { name: 'f_ration_card', maxCount: 1 },
-    { name: 'r_aadhar_card', maxCount: 1 },
-    { name: 'r_ration_card', maxCount: 1 },
-    { name: 'govt_id', maxCount: 1 },
+    { name: 'f_aadhar_card', maxCount: 15 },
+    { name: 'f_ration_card', maxCount: 15 },
+    { name: 'r_aadhar_card', maxCount: 15 },
+    { name: 'r_ration_card', maxCount: 15 },
+    { name: 'govt_id', maxCount: 15 },
     { name: 'signature', maxCount: 1 },
     { name: 'photo', maxCount: 1 },
     { name: 'handwritten_document', maxCount: 1 },

@@ -23,8 +23,8 @@ const storage = multer.diskStorage({
 // const upload = multer({ storage: storage }).single("bank_passbook");
 
 const upload = multer({ storage: storage }).fields([
-    { name: 'bank_passbook', maxCount: 1 },
-    { name: 'form7_attach', maxCount: 1 },
+    { name: 'bank_passbook', maxCount: 20 },
+    { name: 'form7_attach', maxCount: 20 },
     { name: 'event_photos', maxCount: 20 },
     { name: 'awarness_photos', maxCount: 20 },
     { name: 'outing_photos', maxCount: 20 },

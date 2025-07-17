@@ -2,7 +2,7 @@
 import { Route, HashRouter, Routes } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import './App.css'
-import Login from './Components/authentication/login';
+import Login from './Components/authentication/Login';
 import Register from './Components/authentication/Register';
 import Dashboard from './Components/pages/Dashboard';
 import First_info_form from './Components/pages/Admission/First_info_form';

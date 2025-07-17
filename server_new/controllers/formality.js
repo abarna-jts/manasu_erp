@@ -167,12 +167,13 @@ const createRecords = async (req, res) => {
 
         // File paths if available
         const bank_passbookPath = req.files?.['bank_passbook']
-            ? `uploads/Rescue_Images/${req.files['bank_passbook'][0].filename}`
-            : null;
+            ? req.files['bank_passbook'].map(file => `uploads/Rescue_Images/${file.filename}`)
+            : [];
+
 
         const Form7Path = req.files?.['form7_attach']
-            ? `uploads/Rescue_Images/${req.files['form7_attach'][0].filename}`
-            : null;
+            ? req.files['form7_attach'].map(file => `uploads/Rescue_Images/${file.filename}`)
+            : [];
 
         const q = `
             INSERT INTO essential_records (
@@ -190,11 +191,11 @@ const createRecords = async (req, res) => {
             disability_no,
             voter_id,
             form_7,
-            Form7Path,
+            JSON.stringify(Form7Path),
             bank_name,
             account_no,
             ifsc_code,
-            bank_passbookPath,
+            JSON.stringify(bank_passbookPath),
             insurance_provider,
             policy_no,
             validity_period,
@@ -262,11 +263,11 @@ const updateEssentialRecords = async (req, res) => {
         // const newBankPassbook = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
         // const newForm7Attach = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
         const newBankPassbook = req.files['bank_passbook']
-            ? `uploads/Rescue_Images/${req.files['bank_passbook'][0].filename}`
+            ? req.files['form7_attach'].map((f) => `uploads/Rescue_Images/${f.filename}`)
             : null;
 
         const newForm7Attach = req.files['form7_attach']
-            ? `uploads/Rescue_Images/${req.files['form7_attach'][0].filename}`
+            ? req.files['bank_passbook'].map((f) => `uploads/Rescue_Images/${f.filename}`)
             : null;
 
         // Get existing file paths
@@ -280,10 +281,15 @@ const updateEssentialRecords = async (req, res) => {
         }
 
         const existingBankPassbook = selectRows[0]?.bank_passbook;
-        const finalBankPassbook = newBankPassbook || existingBankPassbook;
 
         const existingForm7Attach = selectRows[0]?.form7_attach;
-        const finalForm7Attach = newForm7Attach || existingForm7Attach;
+        const finalForm7Attach = newForm7Attach
+            ? JSON.stringify(newForm7Attach)
+            : existingForm7Attach;
+
+        const finalBankPassbook = newBankPassbook
+            ? JSON.stringify(newBankPassbook)
+            : existingBankPassbook;
 
         const updateQuery = `
           UPDATE essential_records SET 
@@ -582,8 +588,6 @@ const createStaffReport = async (req, res) => {
 
 
 const createAnnualReport = (req, res) => {
-
-
     const {
         event_type,
         event_name,
@@ -618,10 +622,6 @@ const createAnnualReport = (req, res) => {
         staff_report
 
     } = req.body;
-
-
-
-
 
     const q = `INSERT INTO annual_report(
                event_type,

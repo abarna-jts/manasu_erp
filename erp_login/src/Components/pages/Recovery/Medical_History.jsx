@@ -167,10 +167,10 @@ function Medical_History() {
                 acute_health: data.acute_health || '',
                 medication: data.medication || '',
                 medication_allergies: data.medication_allergies || '',
-                other_allergy: data.other_allergy?.split(',') || ["NULL"],
-                significant_medical: data.significant_medical?.split(',') || ["NULL"],
+                other_allergy: data.other_allergy?.split(',').map(i => i.trim()) || [],
+                significant_medical: data.significant_medical?.split(',').map(i => i.trim()) || [],
                 traumatic_injuries: data.traumatic_injuries || '',
-                sexual_health: data.sexual_health?.split(',') || ["NULL"]
+                sexual_health: data.sexual_health?.split(',').map(i => i.trim()) || []
             }));
 
             setShow(true);

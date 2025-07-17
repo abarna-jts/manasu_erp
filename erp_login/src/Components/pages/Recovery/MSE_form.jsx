@@ -13,10 +13,10 @@ import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
 function MSE_form() {
-  const [rescue_image, setRescueImage] = useState(null);
+  const [rescueImage, setRescueImage] = useState(null);
+  const [rescueName, setRescueName] = useState("");
   const [error, setError] = useState("");
   const [admission_no, setAdmissionNumber] = useState('');
-  const [rescue_name, setRescueName] = useState("");
   const [canConcentrate, setCanConcentrate] = useState('');
   const [selectedStates, setSelectedStates] = useState([]);
   const [shouldGeneratePDF, setShouldGeneratePDF] = useState(false);
@@ -1147,27 +1147,63 @@ function MSE_form() {
   const handleAppearanceNavigate = () => {
     navigate("/general_appearance");
   }
-  const handleSpeechNavigate = () =>{
+  const handleSpeechNavigate = () => {
     navigate("/speech");
   }
-  const handleMoodAffectNavigate = () =>{
+  const handleMoodAffectNavigate = () => {
     navigate("/mood_affect");
   }
-  const handleThoughNavigate = () =>{
+  const handleThoughNavigate = () => {
     navigate("/though");
   }
-  const handlePerceptionNavigate = () =>{
+  const handlePerceptionNavigate = () => {
     navigate("/perception");
   }
-  const handleCognitionNavigate = () =>{
+  const handleCognitionNavigate = () => {
     navigate("/cognition");
   }
-  const handleJudgementNavigate = () =>{
+  const handleJudgementNavigate = () => {
     navigate("/judgement");
   }
-  const handleInsightNavigate = () =>{
+  const handleInsightNavigate = () => {
     navigate("/insight");
   }
+
+  const fetchRescueDetails = async (admission_no) => {
+    try {
+      const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+      const result = response.data.data[0];
+      console.log("API Result:", result);
+
+      if (result && result.rescue_image) {
+        const imagePath = result.rescue_image.startsWith("http")
+          ? result.rescue_image
+          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+
+        setRescueImage(imagePath);
+        setRescueName(result.rescue_name || "");
+        setError(""); // clear any previous error
+      } else {
+        setRescueImage(null);
+
+        setError("Image not found for this admission number");
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+      setRescueImage(null);
+      setRescueName("");
+      setError("Admission Number Not found");
+    }
+  };
+  useEffect(() => {
+          if (admission_no.trim() !== "") {
+              fetchRescueDetails(admission_no);
+          } else {
+              setRescueImage(null);
+              setRescueName("");
+              setError("");
+          }
+      }, [admission_no]);
 
   return (
     <>
@@ -1186,24 +1222,20 @@ function MSE_form() {
           <h4 className="section_title_1">Mental Status Examination (MSE)</h4>
         </Col>
 
-        {/* {error && <div className="text-danger mb-2">{error}</div>}
-        <Col md={1} className="d-flex align-items-center flex-column justify-content-end">
-          {rescue_image ? (
-            <>
+        <Col md={1} className='d-flex flex-column align-items-end'>
+          {error && <div className="text-danger mt-2">{error}</div>}
+          {/* Rescue Name and Image */}
+          {rescueImage && (
+            <div>
               <img
-                src={rescue_image}
-                alt="Admission"
-                className="img-fluid rounded"
-                style={{ width: "100px", height: "100px" }}
+                alt={rescueName || "Rescue Image"}
+                style={{ width: "100px", height: "120px" }}
+                src={rescueImage}
               />
-              <p className="mt-2 text-start">{rescue_name || "No name available"}</p>
-            </>
-          ) : (
-            <p>{error || "No image to display"}</p>
+              {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+            </div>
           )}
-        </Col> */}
-
-
+        </Col>
       </div>
 
       <Container>
@@ -1307,7 +1339,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>1. GENERAL APPEARANCE AND BEHAVIOUR:</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handleShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handleAppearanceNavigate}>View All</Button>
@@ -1482,7 +1514,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>2. SPEECH</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handleSpeechShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handleSpeechNavigate}>View All</Button>
@@ -1551,7 +1583,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>3. MOOD AND AFFECT</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handleMoodShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handleMoodAffectNavigate}>View All</Button>
@@ -1660,7 +1692,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>4. THOUGHT</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handleThoughShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handleThoughNavigate}>View All</Button>
@@ -1731,7 +1763,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>5. PERCEPTION</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handlePerceptionShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handlePerceptionNavigate}>View All</Button>
@@ -1864,7 +1896,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handleCognitionShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handleCognitionNavigate}>View All</Button>
@@ -2222,7 +2254,6 @@ function MSE_form() {
                         <Col md={12} className="text-center mt-3">
                           <Button type='submit' className='btn btn-success'>Save</Button>
                         </Col>
-
                       </ul>
                     </Form>
 
@@ -2234,7 +2265,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>7. JUDGEMENT</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handleJudgementShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handleJudgementNavigate}>View All</Button>
@@ -2310,7 +2341,7 @@ function MSE_form() {
                     <div className="update_class d-flex align-items-center">
                       <h1>8. INSIGHT</h1>
                       {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3" onClick={handleInsightShow}>
+                        <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )}
                       <Button className='btn btn-success' type='button' onClick={handleInsightNavigate}>View All</Button>
@@ -2749,7 +2780,7 @@ function MSE_form() {
 
       </div>
 
-      
+
     </>
   )
 }

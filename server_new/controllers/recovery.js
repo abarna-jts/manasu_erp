@@ -2389,15 +2389,15 @@ const getallPsychiatric = async (req, res) => {
       fullForms.push({
         date: basic.date,
         basic_detail: basic || null,
-        cheif_complaint: cheif_complaint[0] || null,
-        presenting_problems: presenting_problems[0] || null,
-        psy_history: psy_history[0] || null,
-        medical_history: medical_history[0] || null,
-        familyhis_data: familyhis_data[0] || null,
-        social_history: social_history[0] || null,
-        development_history: development_history[0] || null,
-        substance_use: substance_use[0] || null,
-        suicidal_data: suicidal_data[0] || null
+        cheif_complaint: cheif_complaint || null,
+        presenting_problems: presenting_problems || null,
+        psy_history: psy_history || null,
+        medical_history: medical_history || null,
+        familyhis_data: familyhis_data || null,
+        social_history: social_history || null,
+        development_history: development_history || null,
+        substance_use: substance_use || null,
+        suicidal_data: suicidal_data || null
       });
     }
 

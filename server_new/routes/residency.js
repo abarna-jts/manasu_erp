@@ -17,7 +17,7 @@ import { createRescueCondition,
      updateRescueCondition,
      getNurseRecordbyID,
      createPrescription,
-     getPrescription,
+     getPrescriptionALL,
      getPrescriptionbyID,
      updatePrescription,
      createDrVisit,
@@ -43,7 +43,7 @@ router.put("/updateRecords/:id",updateNurseRecords); //completed
 
 //prescription 
 router.post("/createPrescription",createPrescription); //completed
-router.get('/getPrescription',getPrescription); //completed
+router.get('/getPrescriptionALL',getPrescriptionALL); //completed
 router.get("/getPrescription/:id",getPrescriptionbyID); //completed
 router.put("/updatePrescription/:id",updatePrescription);
 

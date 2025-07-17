@@ -56,11 +56,10 @@ function Essential_record() {
     });
 
     const handleFileChange = (e) => {
-        const { name, files } = e.target;
-        setFiles(prev => ({
-            ...prev,
-            [name]: files[0]
-        }));
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
     const apiRoute = axios.create({
@@ -242,6 +241,18 @@ function Essential_record() {
         data.append('other_gvt_scheme', formData.other_gvt_scheme);
         data.append('any_other', formData.any_other);
 
+        if (files.form7_attach && files.form7_attach.length > 0) {
+            files.form7_attach.forEach(file => {
+                data.append('form7_attach', file); // ✅ no []
+            });
+        }
+
+        if (files.bank_passbook && files.bank_passbook.length > 0) {
+            files.bank_passbook.forEach(file => {
+                data.append('bank_passbook', file); // ✅ no []
+            });
+        }
+
         try {
             const res = await apiRoute.post('/formality/createRecords', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -275,13 +286,11 @@ function Essential_record() {
                 if (bankPassbookRef.current) bankPassbookRef.current.value = "";
                 if (form7AttachRef.current) form7AttachRef.current.value = "";
             } else {
-                setSubmissionMessage("Submission failed.");
-                setMessageType("danger");
+                alert("Submission failed.");
             }
         } catch (error) {
             console.error("Error submitting form", error);
-            setSubmissionMessage("Something went wrong.");
-            setMessageType("danger");
+            alert("Something went wrong.");
         }
     };
 
@@ -309,28 +318,58 @@ function Essential_record() {
                 any_other: data.any_other || '',
             }));
 
-            const passbookPath = data.bank_passbook ? `https://www.pahrultours.com/app2/${data.bank_passbook}` : null;
-            const Form7Path = data.form7_attach ? `https://www.pahrultours.com/app2/${data.form7_attach}` : null;
+            // Parse bank passbook image
+            const passbookPath = data.bank_passbook
+                ? [`http://localhost:5002/${data.bank_passbook}`]
+                : [];
 
-            console.log("bank_passbook path:", data.bank_passbook);
-            console.log("Full URL:", passbookPath);
+            // Parse form7_attach image array
+            let form7Paths = [];
+            if (data.form7_attach) {
+                try {
+                    const parsed = JSON.parse(data.form7_attach);
+                    if (Array.isArray(parsed)) {
+                        form7Paths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse form7_attach:', err);
+                    // Fallback: comma-separated string
+                    form7Paths = data.form7_attach
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
 
-            console.log("Form 7 path:", data.form7_attach);
-            console.log("Full URL:", Form7Path);
+            let bank_passbookPath = [];
+            if (data.bank_passbook) {
+                try {
+                    const parsed = JSON.parse(data.bank_passbook);
+                    if (Array.isArray(parsed)) {
+                        bank_passbookPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse bank passbook:', err);
+                    // Fallback: comma-separated string
+                    bank_passbookPath = data.bank_passbook
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
 
-            // Set files state
             setFiles((files) => ({
                 ...files,
-                bank_passbook: passbookPath,
-                form7_attach: Form7Path
+                bank_passbook: bank_passbookPath,
+                form7_attach: form7Paths,
             }));
 
-            setPreviewRequested(true); // trigger the effect after state updates
+            setPreviewRequested(true);
         } catch (error) {
-            console.error("Error fetching form data:", error);
+            console.error("Error fetching data:", error);
             alert("Admission Number not found");
         }
     };
+
+
 
     useEffect(() => {
         if (previewRequested) {
@@ -388,6 +427,7 @@ function Essential_record() {
             const response = await apiRoute.get(`/formality/getEssentialRecord/${admission_no}`);
             const data = response.data;
 
+            // Set formData
             setFormData((formData) => ({
                 ...formData,
                 admission_no: data.admission_no || '',
@@ -407,19 +447,38 @@ function Essential_record() {
                 any_other: data.any_other || '',
             }));
 
+            // Helper function to parse image paths
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
 
-            // Handle old and new photo paths correctly
-            const bankPassbookPath = data.bank_passbook ? `https://www.pahrultours.com/app2/${data.bank_passbook}` : null;
-            const Form7Path = data.form7_attach ? `https://www.pahrultours.com/app2/${data.form7_attach}` : null;
+            const form7Paths = parseImageField(data.form7_attach);
+            const bankPassbookPaths = parseImageField(data.bank_passbook);
 
-
-            // Set files state
+            // Set image files
             setFiles((files) => ({
                 ...files,
-                bank_passbook: bankPassbookPath,
-                form7_attach: Form7Path,
+                form7_attach: form7Paths,
+                bank_passbook: bankPassbookPaths,
             }));
-
 
             setShow(true);
         } catch (error) {
@@ -427,6 +486,7 @@ function Essential_record() {
             alert("Admission Number not found");
         }
     };
+
 
     // const handleUpdate = async (e, admission_no) => {
     //     e.preventDefault();
@@ -501,6 +561,20 @@ function Essential_record() {
         data.append('validity_period', formData.validity_period);
         data.append('other_gvt_scheme', formData.other_gvt_scheme);
         data.append('any_other', formData.any_other);
+
+        // Append multiple images for form7_attach
+        if (files.form7_attach && files.form7_attach.length > 0) {
+            for (let i = 0; i < files.form7_attach.length; i++) {
+                data.append('form7_attach', files.form7_attach[i]);
+            }
+        }
+
+        // Append multiple images for bank_passbook
+        if (files.bank_passbook && files.bank_passbook.length > 0) {
+            for (let i = 0; i < files.bank_passbook.length; i++) {
+                data.append('bank_passbook', files.bank_passbook[i]);
+            }
+        }
 
         try {
             const res = await apiRoute.put(`/formality/updateEssentialRecords/${admission_no}`, data, {
@@ -772,6 +846,7 @@ function Essential_record() {
                                                 name="form7_attach"
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
+                                                multiple
                                                 ref={form7AttachRef}
                                                 required
                                             />
@@ -825,6 +900,8 @@ function Essential_record() {
                                                 accept=".jpg,.jpeg,.png"
                                                 name="bank_passbook"
                                                 onChange={handleFileChange}
+                                                required
+                                                multiple
                                                 ref={bankPassbookRef}
                                             />
                                         </Col>
@@ -990,11 +1067,28 @@ function Essential_record() {
                                 />
 
                                 <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
-                                <img
-                                    src={files.form7_attach}
-                                    alt="Form 7"
-                                    style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
-                                />
+                                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                    {files.form7_attach &&
+                                        files.form7_attach.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`Form 7 - ${index}`}
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                }}
+                                            />
+                                        ))}
+                                </div>
+
+
                             </Col>
                         </Form.Group>
 
@@ -1010,7 +1104,7 @@ function Essential_record() {
                                     name="bank_name"
                                     value={formData.bank_name}
                                     onChange={handleInputChange}
-                                    className="mb-2"
+                                    className="mb-3"
                                 />
 
                                 {/* UDID */}
@@ -1020,7 +1114,7 @@ function Essential_record() {
                                     name="account_no"
                                     value={formData.account_no}
                                     onChange={handleInputChange}
-                                    className="mb-2"
+                                    className="mb-3"
                                 />
 
                                 {/* Disability Passport */}
@@ -1030,19 +1124,31 @@ function Essential_record() {
                                     name="ifsc_code"
                                     value={formData.ifsc_code}
                                     onChange={handleInputChange}
-                                    className="mb-2"
+                                    className="mb-5"
                                 />
 
-                                <Form.Label className="mb-1">Copy of Bank Passbook (attach)</Form.Label>
-                                {files?.bank_passbook ? (
-                                    <img
-                                        src={files.bank_passbook}
-                                        alt="Bank Passbook"
-                                        style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
-                                    />
-                                ) : (
-                                    <p style={{ marginTop: "10px" }}>No new photo available</p>
-                                )}
+                                <Form.Label className="mb-1 mt-5">Copy of Bank Passbook (attach)</Form.Label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                    {files.bank_passbook &&
+                                        files.bank_passbook.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`Bank Passbook - ${index}`}
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                }}
+                                            />
+                                        ))}
+                                </div>
+
                             </Col>
                         </Form.Group>
 
@@ -1201,19 +1307,28 @@ function Essential_record() {
                                     )}
                                 </Form.Group>
 
-                                <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                                    <Form.Label column sm="6" className='text-start'>
-                                        Form 7 : <span style={{ color: 'red' }}>*</span>
-                                    </Form.Label>
-                                    <Col sm="6" className='d-flex align-items-center'>
-                                        <Form.Control
-                                            type="text"
-                                            name="form_7"
-                                            value={formData.form_7}
-                                            onChange={handleInputChange}
-                                            required />
-                                    </Col>
-                                </Form.Group>
+                                <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                    {files.form7_attach &&
+                                        files.form7_attach.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`Form 7 - ${index}`}
+                                                data-bank-passbook="true"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png";
+                                                }}
+                                            />
+                                        ))}
+                                </div>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
@@ -1225,19 +1340,10 @@ function Essential_record() {
                                             name="form7_attach"
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
+                                            bank_passbook
+                                            multiple
                                             required
                                         />
-
-                                        {/* Preview Image Below File Input */}
-                                        {files?.form7_attach ? (
-                                            <img
-                                                src={files.form7_attach}
-                                                alt="form7_attach"
-                                                style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
-                                            />
-                                        ) : (
-                                            <p style={{ marginTop: "10px" }}>No new photo available</p>
-                                        )}
                                     </Col>
                                 </Form.Group>
 
@@ -1289,6 +1395,29 @@ function Essential_record() {
                                     )}
                                 </Form.Group>
 
+                                <Form.Label className="mb-1">Copy of Bank Passbook</Form.Label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                    {files.bank_passbook &&
+                                        files.bank_passbook.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`Bank Passbook - ${index}`}
+                                                data-bank-passbook="true"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png";
+                                                }}
+                                            />
+                                        ))}
+                                </div>
+
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
                                         Copy of Bank Passbook (attach):
@@ -1299,18 +1428,10 @@ function Essential_record() {
                                             name="bank_passbook"
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
+                                            multiple
                                         />
 
-                                        {/* Preview Image Below File Input */}
-                                        {files?.bank_passbook ? (
-                                            <img
-                                                src={files.bank_passbook}
-                                                alt="Bank Passbook"
-                                                style={{ width: "100px", height: "100px", marginTop: "10px", border: "1px solid #ccc" }}
-                                            />
-                                        ) : (
-                                            <p style={{ marginTop: "10px" }}>No new photo available</p>
-                                        )}
+
                                     </Col>
                                 </Form.Group>
 

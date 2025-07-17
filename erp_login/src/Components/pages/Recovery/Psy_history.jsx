@@ -207,8 +207,8 @@ function Psy_history() {
                 fm_mentalHealth: data.fm_mentalHealth || '',
                 significant_life: data.significant_life || '',
                 chronic_stressors: data.chronic_stressors || '',
-                trauma_exploration: data.trauma_exploration?.split(',') || ["NULL"],
-                legal_environment: data.legal_environment?.split(',') || ["NULL"]
+                trauma_exploration: data.trauma_exploration?.split(',').map(i => i.trim()) || [],
+                legal_environment: data.legal_environment?.split(',').map(i => i.trim()) || []
             }));
 
             setShow(true);

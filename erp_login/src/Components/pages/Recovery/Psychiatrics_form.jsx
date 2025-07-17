@@ -19,26 +19,6 @@ function Psychiatrics_form() {
     const [rescueImage, setRescueImage] = useState(null);
     const [rescueName, setRescueName] = useState("");
     const [error, setError] = useState("");
-    const [show, setShow] = useState(false);
-    const [cheifShow, setCheifShow] = useState(false);
-    const [presentingShow, setPresentingShow] = useState(false);
-    const [psychiatricShow, setPsychiatricShow] = useState(false);
-    const [medicalShow, setMedicalShow] = useState(false);
-    const [familyShow, setFamilyShow] = useState(false);
-    const [socialShow, setSocialShow] = useState(false);
-    const [developmentalShow, setDevelopmentalShow] = useState(false);
-    const [substanceShow, setSubstanceShow] = useState(false);
-    const [suicidalShow, setSuicidalShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleChiefClose = () => setCheifShow(false);
-    const handlePresentingClose = () => setPresentingShow(false);
-    const handlePsychiatriClose = () => setPsychiatricShow(false);
-    const handleMedicalClose = () => setMedicalShow(false);
-    const handleFamilyClose = () => setFamilyShow(false);
-    const handleSocialClose = () => setSocialShow(false);
-    const handleDevelopmentalClose = () => setDevelopmentalShow(false);
-    const handleSubstanceClose = () => setSubstanceShow(false);
-    const handleSuicideClose = () => setSuicidalShow(false);
     const [shouldGeneratePDF, setShouldGeneratePDF] = useState(false);
     const [allFormEntries, setAllFormEntries] = useState([]);
 
@@ -1215,7 +1195,6 @@ function Psychiatrics_form() {
                 <Row>
                     <Col>
                         <div className="page">
-
                             {/* tabs */}
                             <div className="pcss3t pcss3t-effect-scale pcss3t-theme-1 psychiatrics_tab">
                                 <input type="radio" name="pcss3t" defaultChecked id="tab1" className="tab-content-first" />

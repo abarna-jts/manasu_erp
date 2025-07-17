@@ -158,12 +158,12 @@ function Family_History() {
                 id:data.id || '',
                 admission_no: data.admission_no || 'NULL',
                 date: data.date || 'NULL',
-                family_composition: data.family_composition?.split(',') || ["NULL"],
-                family_dynamics: data.family_dynamics?.split(',') || ["NULL"],
-                marriage_type: data.marriage_type || 'NULL',
-                family_history: data.family_history || 'NULL',
-                genetic_predisposition: data.genetic_predisposition || 'NULL',
-                family_changes: data.family_changes?.split(',') || ["NULL"],
+                family_composition: data.family_composition?.split(',').map(i => i.trim()) || [],
+                family_dynamics: data.family_dynamics?.split(',').map(i => i.trim()) || [],
+                marriage_type: data.marriage_type?.split(',').map(i => i.trim()) || [],
+                family_history: data.family_history?.split(',').map(i => i.trim()) || [],
+                genetic_predisposition: data.genetic_predispositionv,
+                family_changes: data.family_changes?.split(',').map(i => i.trim()) || [],
                 family_substance: data.family_substance || "NULL"
             }));
 

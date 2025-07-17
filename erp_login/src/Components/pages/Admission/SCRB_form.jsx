@@ -201,7 +201,7 @@ function SCRB_form() {
                     seal: null,
                 })
                 setAdmissionNumber("");
-                 // Clear the file input elements in the DOM
+                // Clear the file input elements in the DOM
                 if (old_photoRef.current) old_photoRef.current.value = "";
                 if (new_photoRef.current) new_photoRef.current.value = "";
                 if (signatureRef.current) signatureRef.current.value = "";
@@ -561,7 +561,21 @@ function SCRB_form() {
                                                 <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
                                                     <label>PHOTO AT TIME YOU FOUND</label>
                                                     <h5 className="label_tamil">மீட்டகப்பட்டபொழுது எடுக்கப்பட்ட புகைப்படம்</h5>
-
+                                                    {rescue_image && (
+                                                        <div className="mt-3">
+                                                            <img
+                                                                src={rescue_image.startsWith("http") ? rescue_image : `${baseURL}${rescue_image}`}
+                                                                alt="Rescue"
+                                                                style={{
+                                                                    width: "100px",
+                                                                    height: "100px",
+                                                                    objectFit: "cover",
+                                                                    border: "1px solid #ccc",
+                                                                    marginTop: "10px",
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
                                                     <input
                                                         type="file"
                                                         name="new_photo"
@@ -569,8 +583,7 @@ function SCRB_form() {
                                                         className="form-control"
                                                         onChange={handleFileChange}
                                                         ref={new_photoRef}
-                                                        style={{ width: '331px', height: '100px' }}
-                                                        required
+                                                        
                                                     />
                                                 </div>
                                             </div>

@@ -619,7 +619,7 @@ function First_info_form() {
             if (response.data.message === "First Form Created Successfully") {
                 setSubmissionMessage("Form submitted successfully!");
                 setMessageType("success");
-
+                window.location.reload();
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
