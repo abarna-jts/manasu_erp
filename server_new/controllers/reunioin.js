@@ -100,10 +100,9 @@ const getFamilyRequestForm = async (req, res) => {
 
 const UpdateFamilyRequestForm = async (req, res) => {
     try {
-        await ReunionAsync(req, res); // your custom middleware
+        await ReunionAsync(req, res); // your middleware
 
         const admission_no = req.params.admission_no;
-
         if (!admission_no) {
             return res.status(400).json({ message: "Admission number is required" });
         }
@@ -123,37 +122,41 @@ const UpdateFamilyRequestForm = async (req, res) => {
             any_other
         } = req.body;
 
-        // Safely get uploaded file paths
-        const aadharCardPath = req.files['f_aadhar_card']
-            ? `uploads/Reunion/Family_Details/${req.files['f_aadhar_card'][0].filename}` : null;
+        // Parse uploaded files (support multiple images)
+        const fAadharCardFiles = req.files['f_aadhar_card']
+            ? req.files['f_aadhar_card'].map(f => `uploads/Reunion/Family_Details/${f.filename}`)
+            : null;
 
-        const rationCardPath = req.files['f_ration_card']
-            ? `uploads/Reunion/Family_Details/${req.files['f_ration_card'][0].filename}` : null;
+        const fRationCardFiles = req.files['f_ration_card']
+            ? req.files['f_ration_card'].map(f => `uploads/Reunion/Family_Details/${f.filename}`)
+            : null;
 
-        const resaadharCardPath = req.files['r_aadhar_card']
-            ? `uploads/Reunion/Family_Details/${req.files['r_aadhar_card'][0].filename}` : null;
+        const rAadharCardFiles = req.files['r_aadhar_card']
+            ? req.files['r_aadhar_card'].map(f => `uploads/Reunion/Family_Details/${f.filename}`)
+            : null;
 
-        const resrationCardPath = req.files['r_ration_card']
-            ? `uploads/Reunion/Family_Details/${req.files['r_ration_card'][0].filename}` : null;
+        const rRationCardFiles = req.files['r_ration_card']
+            ? req.files['r_ration_card'].map(f => `uploads/Reunion/Family_Details/${f.filename}`)
+            : null;
 
-        const govtIDCardPath = req.files['govt_id']
-            ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
+        const govtIDFiles = req.files['govt_id']
+            ? req.files['govt_id'].map(f => `uploads/Reunion/Family_Details/${f.filename}`)
+            : null;
 
-        // Get existing file paths
-        const selectQuery = `
+        // Get existing file paths from DB
+        const [existingRows] = await db.query(`
             SELECT f_aadhar_card, f_ration_card, r_aadhar_card, r_ration_card, govt_id 
-            FROM family_request_form 
-            WHERE admission_no = ?
-        `;
-        const [selectData] = await db.query(selectQuery, [admission_no]);
-        const existing = selectData[0] || {};
+            FROM family_request_form WHERE admission_no = ?
+        `, [admission_no]);
 
-        // Merge new uploads with existing files
-        const finalAadharCard = aadharCardPath || existing.f_aadhar_card;
-        const finalRationCard = rationCardPath || existing.f_ration_card;
-        const finalResAadharCard = resaadharCardPath || existing.r_aadhar_card;
-        const finalResRationCard = resrationCardPath || existing.r_ration_card;
-        const finalGovtID = govtIDCardPath || existing.govt_id;
+        const existing = existingRows[0] || {};
+
+        // Merge or retain old data if no new uploads
+        const finalFAadharCard = fAadharCardFiles ? JSON.stringify(fAadharCardFiles) : existing.f_aadhar_card;
+        const finalFRationCard = fRationCardFiles ? JSON.stringify(fRationCardFiles) : existing.f_ration_card;
+        const finalRAadharCard = rAadharCardFiles ? JSON.stringify(rAadharCardFiles) : existing.r_aadhar_card;
+        const finalRRationCard = rRationCardFiles ? JSON.stringify(rRationCardFiles) : existing.r_ration_card;
+        const finalGovtID = govtIDFiles ? JSON.stringify(govtIDFiles) : existing.govt_id;
 
         // Update query
         const updateQuery = `
@@ -181,10 +184,10 @@ const UpdateFamilyRequestForm = async (req, res) => {
         const values = [
             rescue_name,
             f_member_age,
-            finalAadharCard,
-            finalRationCard,
-            finalResAadharCard,
-            finalResRationCard,
+            finalFAadharCard,
+            finalFRationCard,
+            finalRAadharCard,
+            finalRRationCard,
             finalGovtID,
             description,
             family_relationship,
@@ -201,13 +204,14 @@ const UpdateFamilyRequestForm = async (req, res) => {
 
         await db.query(updateQuery, values);
 
-        return res.status(200).json({ message: "Family Request Letter updated successfully!" });
+        return res.status(200).json({ message: "Family Request Form updated successfully!" });
 
     } catch (err) {
         console.error("Error updating Family Request Form:", err);
         return res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
+
 
 
 // const deleteFamilyRequest = (req, res) => {
@@ -257,9 +261,18 @@ const createSelfDeclaration = async (req, res) => {
         } = req.body;
 
         // File paths
-        const handWrittenPath = req.files['handwritten_document'] ? `uploads/Self_Declaration/${req.files['handwritten_document'][0].filename}` : null;
-        const signaturePath = req.files['signature'] ? `uploads/Self_Declaration/${req.files['signature'][0].filename}` : null;
-        const PhotoPath = req.files['photo'] ? `uploads/Self_Declaration/${req.files['photo'][0].filename}` : null;
+        const handWrittenPath = req.files?.['handwritten_document']
+            ? req.files['handwritten_document'].map(file => `uploads/Self_Declaration/${file.filename}`)
+            : [];
+        const signaturePath = req.files?.['signature']
+            ? req.files['signature'].map(file => `uploads/Self_Declaration/${file.filename}`)
+            : [];
+        const PhotoPath = req.files?.['photo']
+            ? req.files['photo'].map(file => `uploads/Self_Declaration/${file.filename}`)
+            : [];
+        // const handWrittenPath = req.files['handwritten_document'] ? `uploads/Self_Declaration/${req.files['handwritten_document'][0].filename}` : null;
+        // const signaturePath = req.files['signature'] ? `uploads/Self_Declaration/${req.files['signature'][0].filename}` : null;
+        // const PhotoPath = req.files['photo'] ? `uploads/Self_Declaration/${req.files['photo'][0].filename}` : null;
 
         const q = `INSERT INTO self_declaration(admission_no,rescue_name,age,description,handwritten_document,signature,photo)
                 VALUES(?,?,?,?,?,?,?)`;
@@ -269,9 +282,9 @@ const createSelfDeclaration = async (req, res) => {
             rescue_name,
             age,
             description,
-            handWrittenPath,
-            signaturePath,
-            PhotoPath
+            JSON.stringify(handWrittenPath),
+            JSON.stringify(signaturePath),
+            JSON.stringify(PhotoPath)
         ]
 
         const [result] = await db.query(q, values);
@@ -309,53 +322,55 @@ const getSelfDeclaration = async (req, res) => {
 
 const UpdateSelfDeclaration = async (req, res) => {
     try {
-        // 1. Upload files
-        await ReunionAsync(req, res);
-
-        const {
-            rescue_name,
-            age,
-            description,
-        } = req.body;
+        await ReunionAsync(req, res); // Middleware for file upload
 
         const admission_no = req.params.admission_no;
-
         if (!admission_no) {
             return res.status(400).json({ message: "Admission number is required" });
         }
 
-        // 2. Get new file paths
-        const signaturePath = req.files['signature']
-            ? `uploads/Self_Declaration/${req.files['signature'][0].filename}`
+        const { rescue_name, age, description } = req.body;
+
+        // Parse uploaded files (support multiple images per field)
+        const signatureFiles = req.files['signature']
+            ? req.files['signature'].map(f => `uploads/Self_Declaration/${f.filename}`)
             : null;
 
-        const photoPath = req.files['photo']
-            ? `uploads/Self_Declaration/${req.files['photo'][0].filename}`
+        const photoFiles = req.files['photo']
+            ? req.files['photo'].map(f => `uploads/Self_Declaration/${f.filename}`)
             : null;
 
-        // 3. Get existing files from DB
-        const selectQuery = "SELECT signature, photo FROM self_declaration WHERE admission_no = ?";
-        const [selectData] = await db.query(selectQuery, [admission_no]);
+        const handwrittenFiles = req.files['handwritten_document']
+            ? req.files['handwritten_document'].map(f => `uploads/Self_Declaration/${f.filename}`)
+            : null;
 
-        if (selectData.length === 0) {
-            return res.status(404).json({ message: "Record not found for the given admission number" });
+        // Fetch existing data from DB
+        const [existingRows] = await db.query(`
+            SELECT signature, photo, handwritten_document 
+            FROM self_declaration 
+            WHERE admission_no = ?
+        `, [admission_no]);
+
+        if (existingRows.length === 0) {
+            return res.status(404).json({ message: "No record found for given admission number" });
         }
 
-        const existingSignature = selectData[0]?.signature;
-        const existingPhoto = selectData[0]?.photo;
+        const existing = existingRows[0] || {};
 
-        // 4. Use uploaded file or keep existing
-        const finalSignature = signaturePath || existingSignature;
-        const finalPhoto = photoPath || existingPhoto;
+        // Merge or retain old data if no new uploads
+        const finalSignature = signatureFiles ? JSON.stringify(signatureFiles) : existing.signature;
+        const finalPhoto = photoFiles ? JSON.stringify(photoFiles) : existing.photo;
+        const finalHandwritten = handwrittenFiles ? JSON.stringify(handwrittenFiles) : existing.handwritten_document;
 
-        // 5. Update query
+        // Update query
         const updateQuery = `
             UPDATE self_declaration SET 
                 rescue_name = ?, 
                 age = ?, 
                 description = ?, 
                 signature = ?, 
-                photo = ?
+                photo = ?, 
+                handwritten_document = ?
             WHERE admission_no = ?
         `;
 
@@ -365,6 +380,7 @@ const UpdateSelfDeclaration = async (req, res) => {
             description,
             finalSignature,
             finalPhoto,
+            finalHandwritten,
             admission_no
         ];
 
@@ -377,6 +393,7 @@ const UpdateSelfDeclaration = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
+
 
 
 // const deleteSelfDeclaration = (req, res) => {
@@ -407,14 +424,17 @@ const createMediaConsent = async (req, res) => {
             description
         } = req.body;
         // File paths
-        const scanReportPath = req.files['scan_report'] ? `uploads/MediaConsent/${req.files['scan_report'][0].filename}` : null;
+        const scanReportPath = req.files?.['scan_report']
+            ? req.files['scan_report'].map(file => `uploads/MediaConsent/${file.filename}`)
+            : [];
+        // const scanReportPath = req.files['scan_report'] ? `uploads/MediaConsent/${req.files['scan_report'][0].filename}` : null;
         const q = `INSERT INTO media_consent(admission_no,rescue_name,social_media_consent,scan_report,description)
                 VALUES(?,?,?,?,?)`;
         const values = [
             admission_no,
             rescue_name,
             social_media_consent,
-            scanReportPath,
+            JSON.stringify(scanReportPath),
             description
         ];
         const [result] = await db.query(q, values);
@@ -459,24 +479,29 @@ const UpdateMediaConsent = async (req, res) => {
         if (!admission_no) {
             return res.status(400).json({ message: "Admission number is required" });
         }
+
         const scanReportPath = req.files['scan_report']
-            ? `uploads/MediaConsent/${req.files['scan_report'][0].filename}`
+            ? req.files['scan_report'].map(f => `uploads/MediaConsent/${f.filename}`)
             : null;
 
+        // const scanReportPath = req.files['scan_report']
+        //     ? `uploads/MediaConsent/${req.files['scan_report'][0].filename}`
+        //     : null;
+
         const updateQuery = `
-    UPDATE media_consent SET 
-    rescue_name = ?, 
-    social_media_consent = ?, 
-    description = ?,
-    scan_report = ?
-    WHERE admission_no = ?
-  `;
+            UPDATE media_consent SET 
+            rescue_name = ?, 
+            social_media_consent = ?, 
+            description = ?,
+            scan_report = ?
+            WHERE admission_no = ?
+        `;
 
         const values = [
             rescue_name,
             social_media_consent,
             description,
-            scanReportPath,
+            JSON.stringify(scanReportPath),
             admission_no
         ];
 

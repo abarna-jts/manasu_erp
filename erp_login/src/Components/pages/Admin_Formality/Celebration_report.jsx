@@ -37,7 +37,6 @@ function Celebration_report() {
 
     }, []);
 
-
     const userType = Cookies.get('usertype');
 
     const [celebrationData, setCelebrationData] = useState({
@@ -119,11 +118,24 @@ function Celebration_report() {
 
             }));
 
-            // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/Event_Photos";
-            const CelebrationImage = data.celebration_photos ? `https://www.pahrultours.com/app2/${data.celebration_photos}` : null;
+            let CelebrationImage = [];
+            if (data.celebration_photos) {
+                try {
+                    const parsed = JSON.parse(data.celebration_photos);
+                    if (Array.isArray(parsed)) {
+                        CelebrationImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    CelebrationImage = data.celebration_photos
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
 
-            console.log("Celebration Image Path", CelebrationImage);
+            console.log(CelebrationImage);
+
             setFiles((files) => ({
                 ...files,
                 celebration_photos: CelebrationImage,
@@ -131,7 +143,7 @@ function Celebration_report() {
 
             setTimeout(() => {
                 generatePDF();
-            }, 500);
+            }, 50);
 
         } catch (error) {
             console.error("Error fetching form data:", error);
@@ -193,8 +205,36 @@ function Celebration_report() {
                 celebration_rescue_count: data.celebration_rescue_count || 'NULL'
             });
 
-            setShow(true);
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
 
+            const celebrationPath = parseImageField(data.celebration_photos);
+
+            setFiles((files) => ({
+                ...files,
+                celebration_photos: celebrationPath,
+            }));
+
+            setShow(true);
         } catch (error) {
             console.error("Error fetching form data:", error);
         }
@@ -208,13 +248,34 @@ function Celebration_report() {
             alert("ID not found.");
             return;
         }
+        const data = new FormData();
+        data.append('celebration_name', celebrationData.celebration_name);
+        data.append('celebration_date', celebrationData.celebration_date);
+        data.append('celebration_place', celebrationData.celebration_place);
+        data.append('celebration_report', celebrationData.celebration_report);
+        data.append('celebration_rescue_count', celebrationData.celebration_rescue_count);
+
+        if (files.celebration_photos && files.celebration_photos.length > 0) {
+            files.celebration_photos.forEach(file => {
+                data.append('celebration_photos', file); // ✅ no []
+            });
+        }
         try {
-            const response = await apiRoute.put(`/formality/updateCelebrationDetail/${id}`, celebrationData);
+            const response = await apiRoute.put(`/formality/updateCelebrationDetail/${id}`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
 
             console.log(response.data);
             if (response.status === 200 || response.status === 201) {
                 alert('Form Updated successfully!');
-                window.location.reload();
+                handleClose(true);
+                setCelebrationData({
+                    celebration_date: '',
+                    celebration_name: '',
+                    celebration_place: '',
+                    celebration_report: '',
+                    celebration_rescue_count: ''
+                })
             } else {
                 alert('Error Updating form.');
             }
@@ -409,8 +470,33 @@ function Celebration_report() {
                                     required />
                             </Col>
                         </Form.Group>
+                        <Form.Group as={Row} className='mb-3'>
+                            <Form.Label column sm="5" className='text-start'>Celebration Photos :</Form.Label>
+                            <Col sm="7">
+                                {Array.isArray(files.celebration_photos) &&
+                                    files.celebration_photos.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`celebration_photos - ${index}`}
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                e.target.src = "/fallback-image.png";
+                                            }}
+                                        />
+                                    ))}
+                            </Col>
+                        </Form.Group>
+
+
                         <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="5" className='text-start'>Celebration Report:</Form.Label>
+                            <Form.Label column sm="5" className='text-start'>Celebration Report :</Form.Label>
                             <Col sm="7">
                                 <Form.Control
                                     as="textarea"
@@ -500,6 +586,42 @@ function Celebration_report() {
                                         value={celebrationData.celebration_rescue_count}
                                         onChange={handleInputChange1}
                                         required />
+                                </Col>
+                            </Form.Group>
+                            {Array.isArray(files.celebration_photos) &&
+                                files.celebration_photos.map((imgUrl, index) => (
+                                    <img
+                                        key={index}
+                                        src={imgUrl}
+                                        alt={`celebration_photos - ${index}`}
+                                        loading="lazy"
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            objectFit: "cover",
+                                            margin: "10px",
+                                            border: "1px solid #ccc",
+                                        }}
+                                        onError={(e) => {
+                                            if (!e.target.dataset.errorHandled) {
+                                                e.target.src = "/fallback-image.png";
+                                                e.target.dataset.errorHandled = "true";
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            <Form.Group as={Row} className="mb-3 mt-3">
+                                <Form.Label column sm="6" className='text-start'>
+                                    Celebration Photos : 
+                                </Form.Label>
+                                <Col sm="6">
+                                    <Form.Control
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png"
+                                        name="celebration_photos"
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3">

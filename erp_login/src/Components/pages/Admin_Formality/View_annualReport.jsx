@@ -113,6 +113,39 @@ function View_annualReport() {
                 outing_report: data.outing_report || '',
             });
 
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const EventPath = parseImageField(data.event_photos);
+            const AwarnessPath = parseImageField(data.awarness_photos);
+            const OutingPath = parseImageField(data.outing_photos);
+
+            setFiles((files) => ({
+                ...files,
+                event_photos: EventPath,
+                awarness_photos: AwarnessPath,
+                outing_photos: OutingPath,
+            }));
+
             setShow(true);
 
         } catch (error) {
@@ -128,13 +161,68 @@ function View_annualReport() {
             alert("ID not found.");
             return;
         }
+        const data = new FormData();
+        data.append('event_type', eventData.event_type);
+        data.append('event_name', eventData.event_name);
+        data.append('event_date', eventData.event_date);
+        data.append('event_place', eventData.event_place);
+        data.append('event_report', eventData.event_report);
+        data.append('event_rescue_count', eventData.event_rescue_count);
+        data.append('awareness_name', eventData.awareness_name);
+        data.append('awarness_date', eventData.awarness_date);
+        data.append('awarness_place', eventData.awarness_place);
+        data.append('awarness_report', eventData.awarness_report);
+        data.append('awarness_rescue_count', eventData.awarness_rescue_count);
+        data.append('outing_name', eventData.outing_name);
+        data.append('outing_date', eventData.outing_date);
+        data.append('outing_place', eventData.outing_place);
+        data.append('outing_rescue_count', eventData.outing_rescue_count);
+        data.append('outing_report', eventData.outing_report);
+
+        if (files.event_photos && files.event_photos.length > 0) {
+            files.event_photos.forEach(file => {
+                data.append('event_photos', file); // ✅ no []
+            });
+        }
+
+        if (files.awarness_photos && files.awarness_photos.length > 0) {
+            files.awarness_photos.forEach(file => {
+                data.append('awarness_photos', file); // ✅ no []
+            });
+        }
+
+        if (files.outing_photos && files.outing_photos.length > 0) {
+            files.outing_photos.forEach(file => {
+                data.append('outing_photos', file); // ✅ no []
+            });
+        }
         try {
-            const response = await apiRoute.put(`/formality/updateEventDetail/${id}`, eventData);
+            const response = await apiRoute.put(`/formality/updateEventDetail/${id}`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
 
             console.log(response.data);
             if (response.status === 200 || response.status === 201) {
                 alert('Form Updated successfully!');
-                window.location.reload();
+                handleClose(true);
+                setEventData({
+                    event_type: '',
+                    event_name: '',
+                    event_date: '',
+                    event_place: '',
+                    event_report: '',
+                    event_rescue_count: '',
+                    awareness_name: '',
+                    awarness_date: '',
+                    awarness_place: '',
+                    awarness_report: '',
+                    awarness_rescue_count: '',
+                    outing_name: '',
+                    outing_date: '',
+                    outing_place: '',
+                    outing_rescue_count: '',
+                    outing_report: '',
+                });
             } else {
                 alert('Error Updating form.');
             }
@@ -183,11 +271,59 @@ function View_annualReport() {
 
             }));
 
+            let EventImage = [];
+            if (data.event_photos) {
+                try {
+                    const parsed = JSON.parse(data.event_photos);
+                    if (Array.isArray(parsed)) {
+                        EventImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    EventImage = data.event_photos
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let AwarnessPhoto = [];
+            if (data.awarness_photos) {
+                try {
+                    const parsed = JSON.parse(data.awarness_photos);
+                    if (Array.isArray(parsed)) {
+                        AwarnessPhoto = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    AwarnessPhoto = data.awarness_photos
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let OutingPhoto = [];
+            if (data.outing_photos) {
+                try {
+                    const parsed = JSON.parse(data.outing_photos);
+                    if (Array.isArray(parsed)) {
+                        OutingPhoto = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    OutingPhoto = data.outing_photos
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
             // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/Event_Photos";
-            const EventImage = data.event_photos ? `https://www.pahrultours.com/app2/${data.event_photos}` : null;
-            const AwarnessPhoto = data.awarness_photos ? `https://www.pahrultours.com/app2/${data.awarness_photos}` : null;
-            const OutingPhoto = data.outing_photos ? `https://www.pahrultours.com/app2/${data.outing_photos}` : null;
+            // const basePath = "https://www.pahrultours.com/app2/uploads/Event_Photos";
+            // const EventImage = data.event_photos ? `https://www.pahrultours.com/app2/${data.event_photos}` : null;
+            // const AwarnessPhoto = data.awarness_photos ? `https://www.pahrultours.com/app2/${data.awarness_photos}` : null;
+            // const OutingPhoto = data.outing_photos ? `https://www.pahrultours.com/app2/${data.outing_photos}` : null;
 
             console.log("Event Image Path", EventImage);
             console.log("Awarness Image Path", AwarnessPhoto);
@@ -434,15 +570,24 @@ function View_annualReport() {
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                         <Col sm="7">
-                            {files.event_photos ? (
-                                <img
-                                    src={files.event_photos}
-                                    alt="Rescue"
-                                    style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                />
-                            ) : (
-                                <div>No Image Available</div>
-                            )}
+                            {Array.isArray(files.event_photos) &&
+                                files.event_photos.map((imgUrl, index) => (
+                                    <img
+                                        key={index}
+                                        src={imgUrl}
+                                        alt={`event_photos - ${index}`}
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            objectFit: "cover",
+                                            margin: "10px",
+                                            border: "1px solid #ccc",
+                                        }}
+                                        onError={(e) => {
+                                            e.target.src = "/fallback-image.png";
+                                        }}
+                                    />
+                                ))}
                         </Col>
                     </Form.Group>
 
@@ -514,15 +659,24 @@ function View_annualReport() {
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                         <Col sm="7">
-                            {files.awarness_photos ? (
-                                <img
-                                    src={files.awarness_photos}
-                                    alt="Rescue"
-                                    style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                />
-                            ) : (
-                                <div>No Image Available</div>
-                            )}
+                            {Array.isArray(files.awarness_photos) &&
+                                files.awarness_photos.map((imgUrl, index) => (
+                                    <img
+                                        key={index}
+                                        src={imgUrl}
+                                        alt={`awarness_photos - ${index}`}
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            objectFit: "cover",
+                                            margin: "10px",
+                                            border: "1px solid #ccc",
+                                        }}
+                                        onError={(e) => {
+                                            e.target.src = "/fallback-image.png";
+                                        }}
+                                    />
+                                ))}
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="mb-3">
@@ -593,15 +747,24 @@ function View_annualReport() {
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                         <Col sm="7">
-                            {files.outing_photos ? (
-                                <img
-                                    src={files.outing_photos}
-                                    alt="Rescue"
-                                    style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                />
-                            ) : (
-                                <div>No Image Available</div>
-                            )}
+                            {Array.isArray(files.outing_photos) &&
+                                files.outing_photos.map((imgUrl, index) => (
+                                    <img
+                                        key={index}
+                                        src={imgUrl}
+                                        alt={`outing_photos - ${index}`}
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            objectFit: "cover",
+                                            margin: "10px",
+                                            border: "1px solid #ccc",
+                                        }}
+                                        onError={(e) => {
+                                            e.target.src = "/fallback-image.png";
+                                        }}
+                                    />
+                                ))}
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="mb-3">
@@ -696,15 +859,35 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                                 <Col sm="7">
-                                    {files.event_photos ? (
-                                        <img
-                                            src={files.event_photos}
-                                            alt="Rescue"
-                                            style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                        />
-                                    ) : (
-                                        <div>No Image Available</div>
-                                    )}
+                                    {Array.isArray(files.event_photos) &&
+                                        files.event_photos.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`event_photos - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
+                                            />
+                                        ))}
+                                    <Form.Control
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png"
+                                        name="event_photos"
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
                                 </Col>
                             </Form.Group>
 
@@ -776,15 +959,35 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                                 <Col sm="7">
-                                    {files.awarness_photos ? (
-                                        <img
-                                            src={files.awarness_photos}
-                                            alt="Rescue"
-                                            style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                        />
-                                    ) : (
-                                        <div>No Image Available</div>
-                                    )}
+                                    {Array.isArray(files.awarness_photos) &&
+                                        files.awarness_photos.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`awarness_photos - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
+                                            />
+                                        ))}
+                                    <Form.Control
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png"
+                                        name="awarness_photos"
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3">
@@ -855,15 +1058,35 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                                 <Col sm="7">
-                                    {files.outing_photos ? (
-                                        <img
-                                            src={files.outing_photos}
-                                            alt="Rescue"
-                                            style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                        />
-                                    ) : (
-                                        <div>No Image Available</div>
-                                    )}
+                                    {Array.isArray(files.outing_photos) &&
+                                        files.outing_photos.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`outing_photos - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
+                                            />
+                                        ))}
+                                    <Form.Control
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png"
+                                        name="outing_photos"
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3">

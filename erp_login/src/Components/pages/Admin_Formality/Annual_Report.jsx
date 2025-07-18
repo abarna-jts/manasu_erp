@@ -61,14 +61,14 @@ function Annual_Report() {
     })
 
     const [programData, setProgramData] = useState({
-        program_name: '',
+        community_name: '',
         clg_name: '',
         clg_dept: '',
         resource_person: '',
-        program_date: '',
-        program_place: '',
-        program_rescue_count: '',
-        program_report: '',
+        community_date: '',
+        community_place: '',
+        community_rescue_count: '',
+        community_report: ''
     })
 
     //alert box values
@@ -234,12 +234,15 @@ function Annual_Report() {
         event_photos: null,
         awarness_photos: null,
         outing_photos: null,
+        celebration_photos: null,
+        programms_photos: null,
+        staff_photos: null
     });
 
     const handleFileChange = (e) => {
         setFiles({
             ...files,
-            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+            [e.target.name]: Array.from(e.target.files)  
         });
     };
 
@@ -310,7 +313,6 @@ function Annual_Report() {
                 return;
             }
         }
-
 
         const data = new FormData();
         data.append('event_type', eventData.event_type);
@@ -410,8 +412,24 @@ function Annual_Report() {
             alert("Celebration Participants is required.");
             return;
         }
+
+        const data = new FormData();
+        data.append('celebration_name', celebrationData.celebration_name);
+        data.append('celebration_date', celebrationData.celebration_date);
+        data.append('celebration_place', celebrationData.celebration_place);
+        data.append('celebration_report', celebrationData.celebration_report);
+        data.append('celebration_rescue_count', celebrationData.celebration_rescue_count);
+
+        if (files.celebration_photos && files.celebration_photos.length > 0) {
+            files.celebration_photos.forEach(file => {
+                data.append('celebration_photos', file); // ✅ no []
+            });
+        }
+
         try {
-            const response = await apiRoute.post("/formality/createCelebrationReport", celebrationData);
+            const response = await apiRoute.post("/formality/createCelebrationReport", data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             console.log(response);
 
             if (response.data.message === "Celebration Report Form Created Successfully") {
@@ -468,8 +486,27 @@ function Annual_Report() {
             alert("Community Programs Participants is required.");
             return;
         }
+
+        const data = new FormData();
+        data.append('program_name', programData.program_name);
+        data.append('program_date', programData.program_date);
+        data.append('program_place', programData.program_place);
+        data.append('program_report', programData.program_report);
+        data.append('program_rescue_count', programData.program_rescue_count);
+        data.append('clg_dept', programData.clg_dept);
+        data.append('clg_name', programData.clg_name);
+        data.append('resource_person', programData.resource_person);
+
+        if (files.programms_photos && files.programms_photos.length > 0) {
+            files.programms_photos.forEach(file => {
+                data.append('programms_photos', file); // ✅ no []
+            });
+        }
+
         try {
-            const reponse = await apiRoute.post("/formality/createCommunityReport", programData);
+            const reponse = await apiRoute.post("/formality/createCommunityReport", data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             console.log(reponse);
             if (reponse.data.message === "Community Report Form Created Successfully") {
                 setSubmissionMessage("Form Submitted Successfully!");
@@ -522,9 +559,23 @@ function Annual_Report() {
             return;
         }
 
+        const data = new FormData();
+        data.append('staff_name', staffData.staff_name);
+        data.append('staff_date', staffData.staff_date);
+        data.append('staff_place', staffData.staff_place);
+        data.append('staff_report', staffData.staff_report);
+        data.append('staff_rescue_count', staffData.staff_rescue_count);
+
+        if (files.staff_photos && files.staff_photos.length > 0) {
+            files.staff_photos.forEach(file => {
+                data.append('staff_photos', file); // ✅ no []
+            });
+        }
 
         try {
-            const response = await apiRoute.post("/formality/createStaffReport", staffData);
+            const response = await apiRoute.post("/formality/createStaffReport", data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             console.log(response);
 
             if (response.data.message === "Staff Report Form Created Successfully") {
@@ -612,7 +663,7 @@ function Annual_Report() {
 
                     // Decide background color
                     let backgroundColor = '#ccc'; // default for upcoming
-                    
+
                     if (isActive) {
                         backgroundColor = '#84c342'; // brighter green for active
                     }
@@ -751,7 +802,6 @@ function Annual_Report() {
                                                     name="event_photos"
                                                     onChange={handleFileChange}
                                                     multiple
-                                                    required
                                                 />
                                             </Col>
                                         </Form.Group>
@@ -836,7 +886,6 @@ function Annual_Report() {
                                                     accept=".jpg,.jpeg,.png"
                                                     multiple
                                                     onChange={handleFileChange}
-                                                    required
                                                 />
                                             </Col>
                                         </Form.Group>
@@ -919,7 +968,6 @@ function Annual_Report() {
                                                     accept=".jpg,.jpeg,.png"
                                                     onChange={handleFileChange}
                                                     multiple
-                                                    required
                                                 />
                                             </Col>
                                         </Form.Group>
@@ -1048,6 +1096,18 @@ function Annual_Report() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                    <Col sm="7">
+                                        <Form.Control
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            name="celebration_photos"
+                                            onChange={handleFileChange}
+                                            multiple
+                                        />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm="5" className='text-start'>Celebration Report:</Form.Label>
                                     <Col sm="7">
                                         <Form.Control
@@ -1100,7 +1160,7 @@ function Annual_Report() {
                                     <Col sm="7">
                                         <Form.Control type="text"
                                             name="program_name"
-                                            value={programData.program_name}
+                                            value={programData.community_name}
                                             onChange={handleInputChange2}
                                             required />
                                     </Col>
@@ -1152,7 +1212,7 @@ function Annual_Report() {
                                     <Col sm="7">
                                         <Form.Control type="date"
                                             name="program_date"
-                                            value={programData.program_date}
+                                            value={programData.community_date}
                                             max="9999-12-31"
                                             onChange={handleInputChange2}
                                             required />
@@ -1165,7 +1225,7 @@ function Annual_Report() {
                                     <Col sm="7">
                                         <Form.Control type="text"
                                             name="program_place"
-                                            value={programData.program_place}
+                                            value={programData.community_place}
                                             onChange={handleInputChange2}
                                             required />
                                     </Col>
@@ -1177,9 +1237,21 @@ function Annual_Report() {
                                     <Col sm="7">
                                         <Form.Control type="text"
                                             name="program_rescue_count"
-                                            value={programData.program_rescue_count}
+                                            value={programData.community_rescue_count}
                                             onChange={handleInputChange2}
                                             required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                    <Col sm="7">
+                                        <Form.Control
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            name="programms_photos"
+                                            onChange={handleFileChange}
+                                            multiple
+                                        />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
@@ -1189,7 +1261,7 @@ function Annual_Report() {
                                             as="textarea"
                                             name="program_report"
                                             rows={3}
-                                            value={programData.program_report}
+                                            value={programData.community_report}
                                             onChange={handleInputChange2}
                                             required
                                         />
@@ -1274,6 +1346,18 @@ function Annual_Report() {
                                             value={staffData.staff_rescue_count}
                                             onChange={handleInputChange3}
                                             required />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                    <Col sm="7">
+                                        <Form.Control
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            name="staff_photos"
+                                            onChange={handleFileChange}
+                                            multiple
+                                        />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">

@@ -91,7 +91,7 @@ function StaffPrograms_report() {
 
 
     const [files, setFiles] = useState({
-        staffPrograms_photo: null,
+        staff_photos: null,
     });
 
     const handleFileChange = (e) => {
@@ -115,14 +115,27 @@ function StaffPrograms_report() {
                 staff_report: data.staff_report || 'NULL'
             }));
 
-            // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/Event_Photos";
-            const StaffProgramImage = data.staffPrograms_photo ? `https://www.pahrultours.com/app2/${data.staffPrograms_photo}` : null;
+            let StaffProgramImage = [];
+            if (data.staff_photos) {
+                try {
+                    const parsed = JSON.parse(data.staff_photos);
+                    if (Array.isArray(parsed)) {
+                        StaffProgramImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse staff_photos:', err);
+                    // Fallback: comma-separated string
+                    StaffProgramImage = data.staff_photos
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
 
-            console.log("StaffProgram Image Path", StaffProgramImage);
+            console.log(StaffProgramImage);
+
             setFiles((files) => ({
                 ...files,
-                staffPrograms_photo: StaffProgramImage,
+                staff_photos: StaffProgramImage,
             }));
 
             setTimeout(() => {
@@ -190,6 +203,35 @@ function StaffPrograms_report() {
                 community_report: data.community_report || "NULL"
             });
 
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const StaffPath = parseImageField(data.staff_photos);
+
+            setFiles((files) => ({
+                ...files,
+                staff_photos: StaffPath,
+            }));
+
             setShow(true);
 
         } catch (error) {
@@ -205,8 +247,22 @@ function StaffPrograms_report() {
             alert("ID not found.");
             return;
         }
+        const data = new FormData();
+        data.append('staff_name', staffProgramData.staff_name);
+        data.append('staff_date', staffProgramData.staff_date);
+        data.append('staff_place', staffProgramData.staff_place);
+        data.append('staff_report', staffProgramData.staff_report);
+        data.append('staff_rescue_count', staffProgramData.staff_rescue_count);
+
+        if (files.staff_photos && files.staff_photos.length > 0) {
+            files.staff_photos.forEach(file => {
+                data.append('staff_photos', file); // ✅ no []
+            });
+        }
         try {
-            const response = await apiRoute.put(`/formality/updateStaffProgrambyID/${id}`, staffProgramData);
+            const response = await apiRoute.put(`/formality/updateStaffProgrambyID/${id}`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
 
             console.log(response.data);
             if (response.status === 200 || response.status === 201) {
@@ -386,6 +442,29 @@ function StaffPrograms_report() {
                                     required />
                             </Col>
                         </Form.Group>
+                        <Form.Group as={Row} className='mb-3'>
+                            <Form.Label column sm="5" className='text-start'>Staff Photos :</Form.Label>
+                            <Col sm="7">
+                                {Array.isArray(files.staff_photos) &&
+                                    files.staff_photos.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`staff_photos - ${index}`}
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                e.target.src = "/fallback-image.png";
+                                            }}
+                                        />
+                                    ))}
+                            </Col>
+                        </Form.Group>
                         <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm="5" className='text-start'>Report:</Form.Label>
                             <Col sm="7">
@@ -395,7 +474,7 @@ function StaffPrograms_report() {
                                     rows={3}
                                     value={staffProgramData.staff_report}
                                     onChange={handleInputChange1}
-                                    required
+                                    
                                 />
                             </Col>
                         </Form.Group>
@@ -457,6 +536,42 @@ function StaffPrograms_report() {
                                         value={staffProgramData.staff_rescue_count}
                                         onChange={handleInputChange1}
                                         required />
+                                </Col>
+                            </Form.Group>
+                            {Array.isArray(files.staff_photos) &&
+                                files.staff_photos.map((imgUrl, index) => (
+                                    <img
+                                        key={index}
+                                        src={imgUrl}
+                                        alt={`staff_photos - ${index}`}
+                                        loading="lazy"
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            objectFit: "cover",
+                                            margin: "10px",
+                                            border: "1px solid #ccc",
+                                        }}
+                                        onError={(e) => {
+                                            if (!e.target.dataset.errorHandled) {
+                                                e.target.src = "/fallback-image.png";
+                                                e.target.dataset.errorHandled = "true";
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            <Form.Group as={Row} className="mb-3 mt-3">
+                                <Form.Label column sm="6" className='text-start'>
+                                    Staff Photos :
+                                </Form.Label>
+                                <Col sm="6">
+                                    <Form.Control
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png"
+                                        name="staff_photos"
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3">

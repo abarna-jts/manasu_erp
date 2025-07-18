@@ -412,17 +412,27 @@ const createEventReport = async (req, res) => {
             return `${year}-${month}-${day}`;
         };
 
-        const event_photosPath = req.files?.['event_photos']
-            ? `/uploads/Event_Photos/${req.files['event_photos'][0].filename}`
+        const event_photosPath = req.files['event_photos']
+            ? req.files['event_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : null;
+        const awarness_photosPath = req.files['awarness_photos']
+            ? req.files['awarness_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : null;
+        const outing_photosPath = req.files['outing_photos']
+            ? req.files['outing_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
             : null;
 
-        const awarness_photosPath = req.files?.['awarness_photos']
-            ? `/uploads/Event_Photos/${req.files['awarness_photos'][0].filename}`
-            : null;
+        // const event_photosPath = req.files?.['event_photos']
+        //     ? `/uploads/Event_Photos/${req.files['event_photos'][0].filename}`
+        //     : null;
 
-        const outing_photosPath = req.files?.['outing_photos']
-            ? `/uploads/Event_Photos/${req.files['outing_photos'][0].filename}`
-            : null;
+        // const awarness_photosPath = req.files?.['awarness_photos']
+        //     ? `/uploads/Event_Photos/${req.files['awarness_photos'][0].filename}`
+        //     : null;
+
+        // const outing_photosPath = req.files?.['outing_photos']
+        //     ? `/uploads/Event_Photos/${req.files['outing_photos'][0].filename}`
+        //     : null;
 
         const q = `
             INSERT INTO event_report (
@@ -439,21 +449,21 @@ const createEventReport = async (req, res) => {
             event_report || null,
             event_rescue_count || null,
             event_type,
-            event_photosPath || null,
+            JSON.stringify(event_photosPath || null),
 
             awareness_name || null,
             formatDate(awarness_date) || null,
             awarness_place || null,
             awarness_report || null,
             awarness_rescue_count || null,
-            awarness_photosPath || null,
+            JSON.stringify(awarness_photosPath || null),
 
             outing_name || null,
             formatDate(outing_date) || null,
             outing_place || null,
             outing_report || null,
             outing_rescue_count || null,
-            outing_photosPath || null
+            JSON.stringify(outing_photosPath || null)
         ];
 
         const [result] = await db.query(q, values);
@@ -474,6 +484,7 @@ const createEventReport = async (req, res) => {
 
 const createCelebrationReport = async (req, res) => {
     try {
+        await formalityAsync(req, res);
         const {
             celebration_name,
             celebration_date,
@@ -483,13 +494,18 @@ const createCelebrationReport = async (req, res) => {
             other_celebration
         } = req.body;
 
-        const q = `INSERT INTO celebration_report(celebration_name, other_celebration, celebration_date, celebration_place, celebration_rescue_count, celebration_report) 
-                VALUES (?,?,?,?,?,?)`;
+        const celebration_PhotoPath = req.files?.['celebration_photos']
+            ? req.files['celebration_photos'].map(file => `uploads/Event_Photos/${file.filename}`)
+            : [];
+
+        const q = `INSERT INTO celebration_report(celebration_name, other_celebration, celebration_date, celebration_photos, celebration_place, celebration_rescue_count, celebration_report) 
+                VALUES (?,?,?,?,?,?,?)`;
 
         const values = [
             celebration_name,
             other_celebration,
             celebration_date,
+            JSON.stringify(celebration_PhotoPath),
             celebration_place,
             celebration_rescue_count,
             celebration_report,
@@ -512,28 +528,34 @@ const createCelebrationReport = async (req, res) => {
 
 const createCommunityReport = async (req, res) => {
     try {
+        await formalityAsync(req, res);
         const {
-            program_name,
+            community_date,
+            community_name,
             clg_name,
             clg_dept,
             resource_person,
-            program_date,
-            program_place,
-            program_rescue_count,
-            program_report,
+            community_place,
+            community_rescue_count,
+            community_report,
         } = req.body;
 
-        const q = `INSERT INTO community_report(community_name, clg_name, clg_dept, resource_person, community_date, community_place, community_rescue_count, community_report)
-                VALUES (?,?,?,?,?,?,?,?)`;
+        const ProgrammsPhotoPath = req.files?.['programms_photos']
+            ? req.files['programms_photos'].map(file => `uploads/Event_Photos/${file.filename}`)
+            : [];
+
+        const q = `INSERT INTO community_report(community_name, clg_name, clg_dept, resource_person, community_date, community_place, programms_photos, community_rescue_count, community_report)
+                VALUES (?,?,?,?,?,?,?,?,?)`;
         const values = [
-            program_name,
+            community_date,
+            community_name,
             clg_name,
             clg_dept,
             resource_person,
-            program_date,
-            program_place,
-            program_rescue_count,
-            program_report,
+            community_place,
+            JSON.stringify(ProgrammsPhotoPath),
+            community_rescue_count,
+            community_report,
         ]
 
         const [result] = await db.query(q, values);
@@ -554,6 +576,7 @@ const createCommunityReport = async (req, res) => {
 
 const createStaffReport = async (req, res) => {
     try {
+        await formalityAsync(req, res);
         const {
             staff_name,
             staff_date,
@@ -562,12 +585,17 @@ const createStaffReport = async (req, res) => {
             staff_report,
         } = req.body;
 
-        const q = `INSERT INTO staff_report(staff_name, staff_date, staff_place, staff_rescue_count, staff_report)
-                VALUES (?,?,?,?,?)`;
+        const StaffPhotoPath = req.files?.['staff_photos']
+            ? req.files['staff_photos'].map(file => `uploads/Event_Photos/${file.filename}`)
+            : [];
+
+        const q = `INSERT INTO staff_report(staff_name, staff_date, staff_place, staff_photos, staff_rescue_count, staff_report)
+                VALUES (?,?,?,?,?, ?)`;
         const values = [
             staff_name,
             staff_date,
             staff_place,
+            JSON.stringify(StaffPhotoPath),
             staff_rescue_count,
             staff_report,
         ]
@@ -1047,16 +1075,20 @@ const createInternForm = async (req, res) => {
             choose_intern
         } = req.body;
 
-        const studentPhotoPath = req.files['stud_photo']
-            ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
-            : null;
+        const studentPhotoPath = req.files?.['stud_photo']
+            ? req.files['stud_photo'].map(file => `uploads/Internship_photos/${file.filename}`)
+            : [];
+
+        // const studentPhotoPath = req.files['stud_photo']
+        //     ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
+        //     : null;
 
         const insertQuery = `INSERT INTO internship_form(stud_name, stud_id, stud_photo, department, email, phone, secondary_phone, field, other_field, clg_name, duration,from_date, 
                         to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern)
                         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         const values = [
-            stud_name, stud_id, studentPhotoPath, department, email, phone, secondary_phone, field, other_field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
+            stud_name, stud_id,  JSON.stringify(studentPhotoPath), department, email, phone, secondary_phone, field, other_field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
         ];
 
         const [result] = await db.query(insertQuery, values);
@@ -1330,6 +1362,7 @@ const getStaffProgramsbyID = async (req, res) => {
 
 const updateEventDetail = async (req, res) => {
     try {
+        await formalityAsync(req, res);
         const {
             event_type, event_name, event_date, event_place, event_report, event_rescue_count,
             awareness_name, awarness_date, awarness_place, awarness_report, awarness_rescue_count,
@@ -1341,6 +1374,23 @@ const updateEventDetail = async (req, res) => {
         if (!id) {
             return res.status(400).json({ message: "Missing ID" });
         }
+
+        const [existing] = await db.query("SELECT event_photos, awarness_photos, outing_photos FROM event_report WHERE id = ?", [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: "No record found with provided ID" });
+        }
+
+        const EventPath = req.files['event_photos']
+            ? req.files['event_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : JSON.parse(existing[0].event_photos || "[]");
+
+        const AwarnessPath = req.files['awarness_photos']
+            ? req.files['awarness_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : JSON.parse(existing[0].awarness_photos || "[]");
+
+        const OutingPath = req.files['outing_photos']
+            ? req.files['outing_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : JSON.parse(existing[0].outing_photos || "[]");
 
         const formatDate = (isoDate) => {
             const d = new Date(isoDate);
@@ -1357,22 +1407,41 @@ const updateEventDetail = async (req, res) => {
                     event_date = ?,
                     event_place = ?,
                     event_report = ?,
+                    event_photos = ?,
                     event_rescue_count = ?,
                     awareness_name = ?,
                     awarness_date = ?,
                     awarness_place = ?,
                     awarness_report = ?,   
+                    awarness_photos = ?,
                     awarness_rescue_count = ?,
                     outing_name = ?, 
                     outing_date = ?, 
                     outing_place = ?, 
-                    outing_report = ?
+                    outing_report = ?,
+                    outing_photos = ?
                     WHERE id= ?`;
 
         const values = [
-            event_type, event_name, formatDate(event_date), event_place, event_report, event_rescue_count,
-            awareness_name, formatDate(awarness_date), awarness_place, awarness_report, awarness_rescue_count,
-            outing_name, formatDate(outing_date), outing_place, outing_report, id
+            event_type || null,
+            event_name || null,
+            formatDate(event_date),
+            event_place || null,
+            event_report || null,
+            EventPath ? JSON.stringify(EventPath) : null,
+            event_rescue_count || null,
+            awareness_name || null,
+            formatDate(awarness_date),
+            awarness_place || null,
+            awarness_report || null,
+            AwarnessPath ? JSON.stringify(AwarnessPath) : null,
+            awarness_rescue_count || null,
+            outing_name || null,
+            formatDate(outing_date),
+            outing_place || null,
+            outing_report || null,
+            OutingPath ? JSON.stringify(OutingPath) : null,
+            id
         ];
 
         const [result] = await db.query(usquery, values);
@@ -1390,6 +1459,7 @@ const updateEventDetail = async (req, res) => {
 
 const updateCelebrationDetail = async (req, res) => {
     try {
+        await formalityAsync(req, res);
         const {
             celebration_name, other_celebration, celebration_date, celebration_place, celebration_report, celebration_rescue_count
         } = req.body;
@@ -1400,17 +1470,29 @@ const updateCelebrationDetail = async (req, res) => {
             return res.status(400).json({ message: "Missing ID" });
         }
 
+        const celebrationPath = req.files['celebration_photos']
+            ? req.files['celebration_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : null;
+
         const usquery = `UPDATE celebration_report SET
                     celebration_name = ?,
                     other_celebration = ?,
                     celebration_date = ?,
                     celebration_place = ?,
+                    celebration_photos = ?,
                     celebration_report = ?,
                     celebration_rescue_count = ?
                     WHERE id= ?`;
 
         const values = [
-            celebration_name, other_celebration, celebration_date, celebration_place, celebration_report, celebration_rescue_count, id
+            celebration_name,
+            other_celebration,
+            celebration_date,
+            celebration_place,
+            JSON.stringify(celebrationPath),
+            celebration_report,
+            celebration_rescue_count,
+            id
         ];
 
         const [result] = await db.query(usquery, values);
@@ -1428,6 +1510,7 @@ const updateCelebrationDetail = async (req, res) => {
 
 const updateProgrambyID = async (req, res) => {
     try {
+        await formalityAsync(req, res);
         const {
             community_name, clg_name, clg_dept, resource_person, community_date,
             community_place, community_rescue_count, community_report
@@ -1439,6 +1522,10 @@ const updateProgrambyID = async (req, res) => {
             return res.status(400).json({ message: "Missing ID" });
         }
 
+        const CommunityPhotoPath = req.files['programms_photos']
+            ? req.files['programms_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : null;
+
         const usquery = `UPDATE community_report SET
                     community_name = ?,
                     clg_name = ?,
@@ -1447,12 +1534,19 @@ const updateProgrambyID = async (req, res) => {
                     community_date = ?,
                     community_place = ?,
                     community_rescue_count = ?,
+                    programms_photos = ?,
                     community_report = ?
                     WHERE id= ?`;
 
         const values = [
-            community_name, clg_name, clg_dept, resource_person, community_date,
-            community_place, community_rescue_count, community_report, id
+            community_name, clg_name, 
+            clg_dept, resource_person, 
+            community_date,
+            community_place, 
+            community_rescue_count,
+            JSON.stringify(CommunityPhotoPath), 
+            community_report, 
+            id
         ];
 
         const [result] = await db.query(usquery, values);
@@ -1470,6 +1564,7 @@ const updateProgrambyID = async (req, res) => {
 
 const updateStaffProgrambyID = async (req, res) => {
     try {
+        await formalityAsync(req, res);
         const {
             staff_name, staff_date, staff_place, staff_rescue_count, staff_report
         } = req.body;
@@ -1480,16 +1575,27 @@ const updateStaffProgrambyID = async (req, res) => {
             return res.status(400).json({ message: "Missing ID" });
         }
 
+        const StaffPhotoPath = req.files['staff_photos']
+            ? req.files['staff_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+            : null;
+
         const usquery = `UPDATE staff_report SET
                     staff_name = ?,
                     staff_date = ?,
                     staff_place = ?,
                     staff_rescue_count = ?,
+                    staff_photos = ?,
                     staff_report = ?
                     WHERE id= ?`;
 
         const values = [
-            staff_name, staff_date, staff_place, staff_rescue_count, staff_report, id
+            staff_name, 
+            staff_date, 
+            staff_place, 
+            staff_rescue_count, 
+            JSON.stringify(StaffPhotoPath),
+            staff_report,
+            id
         ];
 
         const [result] = await db.query(usquery, values);

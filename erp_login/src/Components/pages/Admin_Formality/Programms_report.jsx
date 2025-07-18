@@ -102,7 +102,7 @@ function Programms_report() {
 
 
     const [files, setFiles] = useState({
-        program_photos: null,
+        programms_photos: null,
     });
 
     const handleFileChange = (e) => {
@@ -129,14 +129,30 @@ function Programms_report() {
                 community_report: data.community_report || 'NULL'
             }));
 
-            // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/Event_Photos";
-            const ProgramImage = data.program_photos ? `https://www.pahrultours.com/app2/${data.program_photos}` : null;
+            let ProgrammsImage = [];
+            if (data.programms_photos) {
+                try {
+                    const parsed = JSON.parse(data.programms_photos);
+                    if (Array.isArray(parsed)) {
+                        ProgrammsImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    ProgrammsImage = data.programms_photos
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
 
-            console.log("Program Image Path", ProgramImage);
+            // Base path for images
+            // const basePath = "https://www.pahrultours.com/app2/uploads/Event_Photos";
+            // const ProgramImage = data.program_photos ? `https://www.pahrultours.com/app2/${data.program_photos}` : null;
+
+            console.log("Program Image Path", ProgrammsImage);
             setFiles((files) => ({
                 ...files,
-                program_photos: ProgramImage,
+                programms_photos: ProgrammsImage,
             }));
 
             setTimeout(() => {
@@ -205,6 +221,35 @@ function Programms_report() {
                 community_report: data.community_report || "NULL"
             });
 
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const ProgramsPath = parseImageField(data.programms_photos);
+
+            setFiles((files) => ({
+                ...files,
+                programms_photos: ProgramsPath,
+            }));
+
             setShow(true);
 
         } catch (error) {
@@ -220,13 +265,43 @@ function Programms_report() {
             alert("ID not found.");
             return;
         }
+        const data = new FormData();
+        data.append('community_name', programData.community_name);
+        data.append('clg_name', programData.clg_name);
+        data.append('clg_dept', programData.clg_dept);
+        data.append('resource_person', programData.resource_person);
+        data.append('community_date', programData.community_date);
+        data.append('community_place', programData.community_place);
+        data.append('community_report', programData.community_report);
+        data.append('community_rescue_count', programData.community_rescue_count);
+
+
+        if (files.programms_photos && files.programms_photos.length > 0) {
+            files.programms_photos.forEach(file => {
+                data.append('programms_photos', file); // ✅ no []
+            });
+        }
         try {
-            const response = await apiRoute.put(`/formality/updateProgrambyID/${id}`, programData);
+            const response = await apiRoute.put(`/formality/updateProgrambyID/${id}`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
 
             console.log(response.data);
             if (response.status === 200 || response.status === 201) {
                 alert('Form Updated successfully!');
-                window.location.reload();
+                handleClose(true);
+                setProgramData({
+                    community_name: '',
+                    clg_name: '',
+                    clg_dept: '',
+                    resource_person: '',
+                    community_date: '',
+                    community_place: '',
+                    community_rescue_count: '',
+                    community_report: ''
+                })
             } else {
                 alert('Error Updating form.');
             }
@@ -446,6 +521,31 @@ function Programms_report() {
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm="5" className='text-start'>
+                                Community Photos
+                            </Form.Label>
+                            <Col sm="7">
+                                {Array.isArray(files.programms_photos) &&
+                                    files.programms_photos.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`programms_photos - ${index}`}
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                e.target.src = "/fallback-image.png";
+                                            }}
+                                        />
+                                    ))}
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm="5" className='text-start'>Report:</Form.Label>
                             <Col sm="7">
                                 <Form.Control
@@ -557,6 +657,42 @@ function Programms_report() {
                                         value={programData.community_rescue_count}
                                         onChange={handleInputChange1}
                                         required />
+                                </Col>
+                            </Form.Group>
+                            {Array.isArray(files.programms_photos) &&
+                                files.programms_photos.map((imgUrl, index) => (
+                                    <img
+                                        key={index}
+                                        src={imgUrl}
+                                        alt={`programms_photos - ${index}`}
+                                        loading="lazy"
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            objectFit: "cover",
+                                            margin: "10px",
+                                            border: "1px solid #ccc",
+                                        }}
+                                        onError={(e) => {
+                                            if (!e.target.dataset.errorHandled) {
+                                                e.target.src = "/fallback-image.png";
+                                                e.target.dataset.errorHandled = "true";
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            <Form.Group as={Row} className="mb-3 mt-3">
+                                <Form.Label column sm="6" className='text-start'>
+                                    Community Photos : <span style={{ color: 'red' }}>*</span>
+                                </Form.Label>
+                                <Col sm="6">
+                                    <Form.Control
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png"
+                                        name="programms_photos"
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3">

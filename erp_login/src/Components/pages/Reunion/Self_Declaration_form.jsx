@@ -28,11 +28,10 @@ function Self_Declaration_form() {
     });
 
     const handleFileChange = (e) => {
-        const { name, files: selectedFiles } = e.target;
-        setFiles(prevFiles => ({
-            ...prevFiles,
-            [name]: selectedFiles[0]
-        }));
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
     const handleInputChange = (e) => {
@@ -123,11 +122,60 @@ function Self_Declaration_form() {
                 description: data.description || '',
             }));
 
+            let signaturePath = [];
+            if (data.signature) {
+                try {
+                    const parsed = JSON.parse(data.signature);
+                    if (Array.isArray(parsed)) {
+                        signaturePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    signaturePath = data.signature
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let photoPath = [];
+            if (data.photo) {
+                try {
+                    const parsed = JSON.parse(data.photo);
+                    if (Array.isArray(parsed)) {
+                        photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    photoPath = data.photo
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let handwritten_documentPath = [];
+            if (data.handwritten_document) {
+                try {
+                    const parsed = JSON.parse(data.handwritten_document);
+                    if (Array.isArray(parsed)) {
+                        handwritten_documentPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    handwritten_documentPath = data.handwritten_document
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
 
             // Handle old and new photo paths correctly
-            const signaturePath = data.signature ? `https://www.pahrultours.com/app2/${data.signature}` : null;
-            const photoPath = data.photo ? `https://www.pahrultours.com/app2/${data.photo}` : null;
-            const handwritten_documentPath = data.handwritten_document ? `https://www.pahrultours.com/app2/${data.handwritten_document}` : null;
+            // const signaturePath = data.signature ? `https://www.pahrultours.com/app2/${data.signature}` : null;
+            // const photoPath = data.photo ? `https://www.pahrultours.com/app2/${data.photo}` : null;
+            // const handwritten_documentPath = data.handwritten_document ? `https://www.pahrultours.com/app2/${data.handwritten_document}` : null;
+            console.log(signaturePath);
+            console.log(photoPath);
             console.log(handwritten_documentPath);
             // Set files state
             setFiles((files) => ({
@@ -183,6 +231,24 @@ function Self_Declaration_form() {
         data.append('signature', files.signature);
         data.append('photo', files.photo);
 
+        if (files.handwritten_document && files.handwritten_document.length > 0) {
+            files.handwritten_document.forEach(file => {
+                data.append('handwritten_document', file); // ✅ no []
+            });
+        }
+
+        if (files.signature && files.signature.length > 0) {
+            files.signature.forEach(file => {
+                data.append('signature', file); // ✅ no []
+            });
+        }
+
+        if (files.photo && files.photo.length > 0) {
+            files.photo.forEach(file => {
+                data.append('photo', file); // ✅ no []
+            });
+        }
+
         try {
             const res = await apiRoute.post('/reunion/create_selfDeclaration', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -216,10 +282,36 @@ function Self_Declaration_form() {
             }));
 
             // Handle old and new photo paths correctly
-            const signaturePath = data.signature ? `https://www.pahrultours.com/app2/${data.signature}` : null;
-            const photoPath = data.photo ? `https://www.pahrultours.com/app2/${data.photo}` : null;
-            const handwritten_documentPath = data.handwritten_document ? `https://www.pahrultours.com/app2/${data.handwritten_document}` : null;
+            // const signaturePath = data.signature ? `https://www.pahrultours.com/app2/${data.signature}` : null;
+            // const photoPath = data.photo ? `https://www.pahrultours.com/app2/${data.photo}` : null;
+            // const handwritten_documentPath = data.handwritten_document ? `https://www.pahrultours.com/app2/${data.handwritten_document}` : null;
 
+            // Helper function to parse image paths
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const signaturePath = parseImageField(data.signature);
+            const photoPath = parseImageField(data.photo);
+            const handwritten_documentPath = parseImageField(data.handwritten_document);
 
             // Set files state
             setFiles((files) => ({
@@ -246,6 +338,24 @@ function Self_Declaration_form() {
         data.append('signature', files.signature);
         data.append('handwritten_document', files.handwritten_document);
         data.append('photo', files.photo);
+
+        if (files.signature && files.signature.length > 0) {
+            files.signature.forEach(file => {
+                data.append('signature', file); // ✅ no []
+            });
+        }
+
+        if (files.photo && files.photo.length > 0) {
+            files.photo.forEach(file => {
+                data.append('photo', file); // ✅ no []
+            });
+        }
+
+        if (files.handwritten_document && files.handwritten_document.length > 0) {
+            files.handwritten_document.forEach(file => {
+                data.append('handwritten_document', file); // ✅ no []
+            });
+        }
 
         try {
             const res = await apiRoute.post(`/reunion/updateSelfDecl/${admission_no}`, data, {
@@ -446,6 +556,7 @@ function Self_Declaration_form() {
                                                 name='handwritten_document'
                                                 ref={handwritten_documentRef}
                                                 onChange={handleFileChange}
+                                                multiple
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -462,6 +573,7 @@ function Self_Declaration_form() {
                                                 ref={signatureRef}
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
+                                                multiple
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -477,6 +589,7 @@ function Self_Declaration_form() {
                                                 ref={photoRef}
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
+                                                multiple
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -568,17 +681,24 @@ function Self_Declaration_form() {
                                 HandWritten Document :
                             </Form.Label>
                             <Col sm="8">
-                                {files.handwritten_document ? (
-                                    <>
+                                {Array.isArray(files.handwritten_document) &&
+                                    files.handwritten_document.map((imgUrl, index) => (
                                         <img
-                                            src={files.handwritten_document}
-                                            alt="New"
-                                            style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`handwritten_document - ${index}`}
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                e.target.src = "/fallback-image.png";
+                                            }}
                                         />
-                                    </>
-                                ) : (
-                                    <p>No handwritten_document photo available</p> // Display if no photo
-                                )}
+                                    ))}
                             </Col>
                         </Form.Group>
 
@@ -587,17 +707,24 @@ function Self_Declaration_form() {
                                 Signation :
                             </Form.Label>
                             <Col sm="8">
-                                {files.signature ? (
-                                    <>
+                                {Array.isArray(files.signature) &&
+                                    files.signature.map((imgUrl, index) => (
                                         <img
-                                            src={files.signature}
-                                            alt="New"
-                                            style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`signature - ${index}`}
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                e.target.src = "/fallback-image.png";
+                                            }}
                                         />
-                                    </>
-                                ) : (
-                                    <p>No new photo available</p> // Display if no photo
-                                )}
+                                    ))}
                             </Col>
                         </Form.Group>
 
@@ -606,17 +733,24 @@ function Self_Declaration_form() {
                                 Photo :
                             </Form.Label>
                             <Col sm="8">
-                                {files.photo ? (
-                                    <>
+                                {Array.isArray(files.photo) &&
+                                    files.photo.map((imgUrl, index) => (
                                         <img
-                                            src={files.photo}
-                                            alt="New"
-                                            style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`photo - ${index}`}
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                e.target.src = "/fallback-image.png";
+                                            }}
                                         />
-                                    </>
-                                ) : (
-                                    <p>No new photo available</p> // Display if no photo
-                                )}
+                                    ))}
                             </Col>
                         </Form.Group>
 
@@ -669,82 +803,112 @@ function Self_Declaration_form() {
                                     </Col>
                                 </Form.Group>
 
-
+                                {Array.isArray(files.handwritten_document) &&
+                                    files.handwritten_document.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`handwritten_document - ${index}`}
+                                            loading="lazy"
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
+                                            }}
+                                        />
+                                    ))}
                                 <Form.Group as={Row} className="mb-3 mt-3">
                                     <Form.Label column sm="6" className='text-start'>
                                         HandWritten Document : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
-                                        {files.handwritten_document ? (
-                                            <>
-                                                <img
-                                                    src={files.handwritten_document}
-                                                    alt="Old"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
-                                                />
-                                            </>
-                                        ) : (
-                                            <p>No handwritten_document photo available</p> // Display if no photo
-                                        )}
-
                                         <Form.Control
                                             type="file"
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             name="handwritten_document"
+                                            multiple
                                         />
                                     </Col>
                                 </Form.Group>
 
-
+                                {Array.isArray(files.signature) &&
+                                    files.signature.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`signature - ${index}`}
+                                            loading="lazy"
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
+                                            }}
+                                        />
+                                    ))}
                                 <Form.Group as={Row} className="mb-3 mt-3">
                                     <Form.Label column sm="6" className='text-start'>
                                         Signation : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
-                                        {files.signature ? (
-                                            <>
-                                                <img
-                                                    src={files.signature}
-                                                    alt="Old"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
-                                                />
-                                            </>
-                                        ) : (
-                                            <p>No old photo available</p> // Display if no photo
-                                        )}
-
                                         <Form.Control
                                             type="file"
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             name="signature"
+                                            multiple
                                         />
                                     </Col>
                                 </Form.Group>
-
+                                {Array.isArray(files.photo) &&
+                                    files.photo.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`photo - ${index}`}
+                                            loading="lazy"
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
+                                            }}
+                                        />
+                                    ))}
                                 <Form.Group as={Row} className="mb-3 mt-3">
                                     <Form.Label column sm="6" className='text-start'>
                                         Photo : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
-                                        {files.photo ? (
-                                            <>
-                                                <img
-                                                    src={files.photo}
-                                                    alt="Old"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
-                                                />
-                                            </>
-                                        ) : (
-                                            <p>No old photo available</p> // Display if no photo
-                                        )}
-
                                         <Form.Control
                                             type="file"
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             name="photo"
+                                            multiple
                                         />
                                     </Col>
                                 </Form.Group>

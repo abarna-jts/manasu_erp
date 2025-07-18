@@ -85,10 +85,21 @@ function Media_consent_form() {
                 social_media_consent: data.social_media_consent || '',
                 description: data.description || '',
             }));
-
-
-            // Handle old and new photo paths correctly
-            const scanReportPath = data.scan_report ? `https://www.pahrultours.com/app2/${data.scan_report}` : null;
+            let scanReportPath = [];
+            if (data.scan_report) {
+                try {
+                    const parsed = JSON.parse(data.scan_report);
+                    if (Array.isArray(parsed)) {
+                        scanReportPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    scanReportPath = data.scan_report
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
 
             console.log(scanReportPath);
             // Set files state
@@ -183,8 +194,10 @@ function Media_consent_form() {
         data.append('social_media_consent', formData.social_media_consent);
         data.append('description', formData.description);
 
-        if (files.scan_report) {
-            data.append('scan_report', files.scan_report);
+        if (files.scan_report && files.scan_report.length > 0) {
+            files.scan_report.forEach(file => {
+                data.append('scan_report', file); // ✅ no []
+            });
         }
 
         try {
@@ -216,13 +229,10 @@ function Media_consent_form() {
 
 
     const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFiles((prev) => ({
-                ...prev,
-                scan_report: file,
-            }));
-        }
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
     // const handleShow = async (admission_no) => {
@@ -257,10 +267,29 @@ function Media_consent_form() {
                 description: data.description || '',
             }));
 
-            // Handle old and new photo paths correctly
-            const scanReportPath = data.scan_report ? `https://www.pahrultours.com/app2/${data.scan_report}` : null;
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
 
-
+            const scanReportPath = parseImageField(data.scan_report);
             // Set files state
             setFiles((files) => ({
                 ...files,
@@ -299,6 +328,12 @@ function Media_consent_form() {
         data.append('social_media_consent', formData.social_media_consent);
         data.append('description', formData.description);
         data.append('scan_report', files.scan_report);
+
+        if (files.scan_report && files.scan_report.length > 0) {
+            files.scan_report.forEach(file => {
+                data.append('scan_report', file); // ✅ no []
+            });
+        }
 
         try {
             const res = await apiRoute.post(`/reunion/updateMediaConsent/${admission_no}`, data, {
@@ -532,6 +567,7 @@ function Media_consent_form() {
                                                 ref={scan_reportRef}
                                                 onChange={handleImageUpload}
                                                 required
+                                                multiple
                                             />
                                         </Col>
                                     </Form.Group>
@@ -622,15 +658,24 @@ function Media_consent_form() {
                                 Scan The Report :
                             </Form.Label>
                             <Col sm="8">
-                                {files.scan_report ? (
-                                    <img
-                                        src={files.scan_report}
-                                        alt="Report"
-                                        style={{ width: "100px", height: "100px", marginTop: "10px" }}
-                                    />
-                                ) : (
-                                    <p>No scan_report photo available</p>
-                                )}
+                                {Array.isArray(files.scan_report) &&
+                                    files.scan_report.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`scan_report - ${index}`}
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                e.target.src = "/fallback-image.png";
+                                            }}
+                                        />
+                                    ))}
                             </Col>
                         </Form.Group>
 
@@ -706,30 +751,40 @@ function Media_consent_form() {
                                         />
                                     </Col>
                                 </Form.Group>
-
+                                {Array.isArray(files.scan_report) &&
+                                    files.scan_report.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`scan_report - ${index}`}
+                                            loading="lazy"
+                                            style={{
+                                                width: "100px",
+                                                height: "100px",
+                                                objectFit: "cover",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
+                                            }}
+                                        />
+                                ))}
                                 <Form.Group as={Row} className="mb-3 mt-3">
                                     <Form.Label column sm="6" className='text-start'>
                                         Scan The Report : <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
-                                        {files.scan_report ? (
-                                            <>
-                                                <img
-                                                    src={files.scan_report}
-                                                    alt="Old"
-                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
-                                                />
-                                            </>
-                                        ) : (
-                                            <p>No handwritten_document photo available</p> // Display if no photo
-                                        )}
-
                                         <Form.Control
                                             type="file"
                                             accept=".jpg,.jpeg,.png"
                                             name="scan_report"
                                             onChange={handleImageUpload}
                                             required
+                                            multiple
                                         />
                                     </Col>
                                 </Form.Group>

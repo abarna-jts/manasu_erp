@@ -97,6 +97,12 @@ function InternshipForm() {
             data.append("choose_intern", formData.choose_intern);
             // Add other fields as needed
 
+            if (files.stud_photo && files.stud_photo.length > 0) {
+                files.stud_photo.forEach(file => {
+                    data.append('stud_photo', file); // ✅ no []
+                });
+            }
+
             const response = await apiRoute.post("/formality/createInternForm", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -216,6 +222,7 @@ function InternshipForm() {
                                         onChange={handleFileChange}
                                         ref={stud_photRef}
                                         required
+                                        multiple
                                     />
                                 </Col>
                             </Form.Group>

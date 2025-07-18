@@ -26,9 +26,12 @@ const upload = multer({ storage: storage }).fields([
     { name: 'bank_passbook', maxCount: 20 },
     { name: 'form7_attach', maxCount: 20 },
     { name: 'event_photos', maxCount: 20 },
+    { name: 'celebration_photos', maxCount: 20},
+    { name: 'programms_photos', maxCount: 20},
+    { name: 'staff_photos', maxCount: 20},
     { name: 'awarness_photos', maxCount: 20 },
     { name: 'outing_photos', maxCount: 20 },
-    { name: 'stud_photo', maxCount: 1 }
+    { name: 'stud_photo', maxCount: 10 }
 ]);
 
 const formalityAsync = util.promisify(upload);
