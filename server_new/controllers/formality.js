@@ -1088,7 +1088,7 @@ const createInternForm = async (req, res) => {
                         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         const values = [
-            stud_name, stud_id,  JSON.stringify(studentPhotoPath), department, email, phone, secondary_phone, field, other_field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
+            stud_name, stud_id, JSON.stringify(studentPhotoPath), department, email, phone, secondary_phone, field, other_field, clg_name, duration, from_date, to_date, supervisor_name, supervisor_email, supervisor_phone, choose_intern
         ];
 
         const [result] = await db.query(insertQuery, values);
@@ -1156,8 +1156,9 @@ const updateStudentDetail = async (req, res) => {
         const currentPhoto = existing[0]?.stud_photo || null;
 
         const studentPhotoPath = req.files?.['stud_photo']
-            ? `uploads/Internship_photos/${req.files['stud_photo'][0].filename}`
-            : currentPhoto;
+            ? req.files['stud_photo'].map(file => `uploads/Internship_photos/${file.filename}`)
+            : JSON.parse(currentPhoto || '[]');
+
 
         const usquery = `UPDATE internship_form SET
                     stud_name = ?,
@@ -1180,7 +1181,7 @@ const updateStudentDetail = async (req, res) => {
 
 
         const values = [
-            stud_name, stud_id, studentPhotoPath, email, phone, secondary_phone, field, other_field, supervisor_name,
+            stud_name, stud_id, JSON.stringify(studentPhotoPath), email, phone, secondary_phone, field, other_field, supervisor_name,
             supervisor_email, supervisor_phone, department, clg_name, duration, from_date, to_date, id
         ];
 
@@ -1539,13 +1540,13 @@ const updateProgrambyID = async (req, res) => {
                     WHERE id= ?`;
 
         const values = [
-            community_name, clg_name, 
-            clg_dept, resource_person, 
+            community_name, clg_name,
+            clg_dept, resource_person,
             community_date,
-            community_place, 
+            community_place,
             community_rescue_count,
-            JSON.stringify(CommunityPhotoPath), 
-            community_report, 
+            JSON.stringify(CommunityPhotoPath),
+            community_report,
             id
         ];
 
@@ -1589,10 +1590,10 @@ const updateStaffProgrambyID = async (req, res) => {
                     WHERE id= ?`;
 
         const values = [
-            staff_name, 
-            staff_date, 
-            staff_place, 
-            staff_rescue_count, 
+            staff_name,
+            staff_date,
+            staff_place,
+            staff_rescue_count,
             JSON.stringify(StaffPhotoPath),
             staff_report,
             id

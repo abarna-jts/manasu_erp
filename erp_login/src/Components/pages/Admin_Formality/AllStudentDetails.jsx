@@ -87,11 +87,8 @@ function AllStudentDetails() {
             const response = await apiRoute.get(`/formality/getStudentDet/${id}`);
             const student = response.data.data[0]; // Access the first object in the 'data' array
 
-            const photoUrl = student.stud_photo
-                ? `https://www.pahrultours.com/app2/${student.stud_photo}`
-                : ''; // fallback if photo not available
-
-            console.log(photoUrl);
+            const photoArray = JSON.parse(student.stud_photo || '[]');
+            const fullImageUrls = photoArray.map(path => `http://localhost:5002/${path}`);
 
             setFormData((formData) => ({
                 ...formData,
@@ -110,7 +107,30 @@ function AllStudentDetails() {
                 supervisor_email: student.supervisor_email || '',
                 supervisor_phone: student.supervisor_phone || '',
                 choose_intern: student.choose_intern || '',
-                stud_photo: photoUrl
+                stud_photo: fullImageUrls[0] || ''
+            }));
+
+            let StudPhotoAll = [];
+            if (student.stud_photo) {
+                try {
+                    const parsed = JSON.parse(student.stud_photo);
+                    if (Array.isArray(parsed)) {
+                        StudPhotoAll = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    StudPhotoAll = student.stud_photo
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            console.log("Event Image Path", StudPhotoAll);
+
+            setFiles((files) => ({
+                ...files,
+                stud_photo: StudPhotoAll
             }));
 
             setTimeout(() => {
@@ -187,9 +207,32 @@ function AllStudentDetails() {
                 supervisor_phone: student.supervisor_phone || '',
                 choose_intern: student.choose_intern || ''
             }));
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const StudPhoto = parseImageField(student.stud_photo);
             setFiles((files) => ({
                 ...files,
-                stud_photo: student.stud_photo ? `/uploads/Student_Photos/${student.stud_photo}` : null
+                stud_photo: StudPhoto
             }));
 
             setShow(true);
@@ -217,9 +260,17 @@ function AllStudentDetails() {
             }
 
             // Append the file (if selected)
-            if (files.stud_photo instanceof File) {
-                formDataToSend.append('stud_photo', files.stud_photo); // assuming files.stud_photo is File object
+            if (files.stud_photo) {
+                if (Array.isArray(files.stud_photo)) {
+                    files.stud_photo.forEach(file => {
+                        formDataToSend.append('stud_photo', file);
+                    });
+                } else {
+                    formDataToSend.append('stud_photo', files.stud_photo);
+                }
             }
+
+
 
             const response = await apiRoute.put(
                 `/formality/updateStudentDetail/${id}`,
@@ -265,13 +316,10 @@ function AllStudentDetails() {
 
 
     const handleFileChange = (e) => {
-        const { name, files: selectedFiles } = e.target;
-        if (selectedFiles.length > 0) {
-            setFiles(prev => ({
-                ...prev,
-                [name]: selectedFiles[0], // store File object
-            }));
-        }
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
 
@@ -425,6 +473,29 @@ function AllStudentDetails() {
                                         onChange={handleInputChange}
                                         required
                                     />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group as={Row} className="mb-3">
+                                <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                <Col sm="7">
+                                    {Array.isArray(files.stud_photo) &&
+                                        files.stud_photo.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`stud_photo - ${index}`}
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png";
+                                                }}
+                                            />
+                                        ))}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
@@ -688,29 +759,40 @@ function AllStudentDetails() {
                                             />
                                         </Col>
                                     </Form.Group>
-                                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                                        <Form.Label column sm="6">
-                                            Attach Student Photo :
-                                        </Form.Label>
-                                        <Col sm="6">
-                                            {files.stud_photo ? (
-                                                <img
-                                                    src={files.stud_photo}
-                                                    alt="Rescue"
-                                                    style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                                />
-                                            ) : (
-                                                <div>No Image Available</div>
-                                            )}
-                                            <Form.Control
-                                                name="stud_photo"
-                                                type="file"
-                                                accept=".jpg,.jpeg,.png"
-                                                value={formData.stud_photo}
-                                                onChange={handleFileChange}
-                                                required
-                                            />
+                                    <Form.Group className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                        <Col sm="7" className='d-flex'>
+                                            {Array.isArray(files.stud_photo) &&
+                                                files.stud_photo.map((imgUrl, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={imgUrl}
+                                                        alt={`stud_photo - ${index}`}
+                                                        loading="lazy"
+                                                        style={{
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            objectFit: "cover",
+                                                            margin: "10px",
+                                                            border: "1px solid #ccc",
+                                                        }}
+                                                        onError={(e) => {
+                                                            if (!e.target.dataset.errorHandled) {
+                                                                e.target.src = "/fallback-image.png";
+                                                                e.target.dataset.errorHandled = "true";
+                                                            }
+                                                        }}
+                                                    />
+                                                ))}
+
                                         </Col>
+                                        <Form.Control
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            name="stud_photo"
+                                            onChange={handleFileChange}
+                                            multiple
+                                        />
                                     </Form.Group>
                                     <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
                                         <Form.Label column sm="6">

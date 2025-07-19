@@ -563,7 +563,7 @@ const createDischargeList = async (req, res) => {
         } = req.body;
 
         const getFilePath = (fieldName) =>
-            req.files[fieldName] ? `uploads/Reunion/Discharge_Checklist/${req.files[fieldName][0].filename}` : null;
+            req.files[fieldName] ? req.files[fieldName].map(f => `uploads/Reunion/Discharge_Checklist/${f.filename}`).join(',') : null;
 
         const query = `
             INSERT INTO discharge_checklist (
@@ -713,7 +713,11 @@ const updateChecklist = async (req, res) => {
         }
 
         const getFilePath = (field) =>
-            req.files && req.files[field] ? `uploads/Reunion/Discharge_Checklist/${req.files[field][0].filename}` : '';
+            req.files && req.files[field]
+                ? req.files[field].map(f => `uploads/Reunion/Discharge_Checklist/${f.filename}`).join(',')
+                : '';
+
+
 
         const {
             familyRequestLetter,

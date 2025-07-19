@@ -56,11 +56,10 @@ function Reunion_summary() {
     };
 
     const handleFileChange = (e) => {
-        const { name, files: selectedFiles } = e.target;
-        setFiles(prevFiles => ({
-            ...prevFiles,
-            [name]: selectedFiles[0]
-        }));
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
 
@@ -142,6 +141,12 @@ function Reunion_summary() {
         data.append('summary_attach', files.summary_attach);
         data.append('report', formData.report);
 
+        if (files.summary_attach && files.summary_attach.length > 0) {
+            files.summary_attach.forEach(file => {
+                data.append('summary_attach', file); // ✅ no []
+            });
+        }
+
         try {
             const res = await apiRoute.post('/residency/createSummary', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -173,9 +178,27 @@ function Reunion_summary() {
                 report: data.report || '',
             }));
 
+            let summaryAttachPath = [];
+            if (data.summary_attach) {
+                try {
+                    const parsed = JSON.parse(data.summary_attach);
+                    if (Array.isArray(parsed)) {
+                        summaryAttachPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    summaryAttachPath = data.summary_attach
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            // console.log(scanReportPath);
+
 
             // Handle old and new photo paths correctly
-            const summaryAttachPath = data.summary_attach ? `https://www.pahrultours.com/app2/${data.summary_attach}` : null;
+            // const summaryAttachPath = data.summary_attach ? `https://www.pahrultours.com/app2/${data.summary_attach}` : null;
 
             console.log(summaryAttachPath);
             // Set files state
@@ -290,8 +313,32 @@ function Reunion_summary() {
                 report: data.report || '',
             }));
 
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const summaryAttachPath = parseImageField(data.summary_attach);
+
             // Handle old and new photo paths correctly
-            const summaryAttachPath = data.summary_attach ? `https://www.pahrultours.com/app2/${data.summary_attach}` : null;
+            // const summaryAttachPath = data.summary_attach ? `https://www.pahrultours.com/app2/${data.summary_attach}` : null;
 
             // Set files state
             setFiles((files) => ({
@@ -314,6 +361,13 @@ function Reunion_summary() {
         data.append('date', formData.date);
         data.append('report', formData.report);
         data.append('summary_attach', files.summary_attach);
+
+        // ✅ Only append summary_attach if it's a new file
+        if (files.summary_attach && files.summary_attach.length > 0) {
+            files.summary_attach.forEach(file => {
+                data.append('summary_attach', file); // ✅ no []
+            });
+        }
 
         try {
             const res = await apiRoute.put(`/residency/updateSummary/${admission_no}`, data, {
@@ -463,7 +517,7 @@ function Reunion_summary() {
                                                     name="summary_attach"
                                                     ref={summary_attachRef}
                                                     onChange={handleFileChange}
-                                                    required />
+                                                    multiple />
                                             </Col>
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3 mt-3" controlId="formRescueName">
@@ -499,9 +553,6 @@ function Reunion_summary() {
                 <Row className="d-flex align-items-center justify-content-center mb-2">
                     <Col md={3} className='d-flex align-items-center pdf_logo'>
                         <img src={manasu_logo} className="pdf_logo" alt="" />
-                        {/* <div className="logo_text">
-                                                                <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
-                                                            </div> */}
                     </Col>
                     <Col md={9}>
                         <h4 className="text-center">Reunion Summary</h4>
@@ -541,17 +592,24 @@ function Reunion_summary() {
                                     Summary Attach :
                                 </Form.Label>
                                 <Col sm="7">
-                                    {files.summary_attach ? (
-                                        <>
+                                    {Array.isArray(files.summary_attach) &&
+                                        files.summary_attach.map((imgUrl, index) => (
                                             <img
-                                                src={files.summary_attach}
-                                                alt="New"
-                                                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`summary_attach - ${index}`}
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png";
+                                                }}
                                             />
-                                        </>
-                                    ) : (
-                                        <p>No summary photo available</p> // Display if no photo
-                                    )}
+                                        ))}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3 mt-3" controlId="formRescueName">
@@ -613,28 +671,40 @@ function Reunion_summary() {
                                                 required />
                                         </Col>
                                     </Form.Group>
-                                    <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                                    <Form.Group className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="5" className='text-start'>
-                                            No. of Resident examinite :
+                                            Summary Attachment :
                                         </Form.Label>
-                                        <Col sm="7">
-                                            {files.summary_attach ? (
-                                                <>
+                                        <Col sm="12">
+                                            {Array.isArray(files.summary_attach) &&
+                                                files.summary_attach.map((imgUrl, index) => (
                                                     <img
-                                                        src={files.summary_attach}
-                                                        alt="Old"
-                                                        style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                        key={index}
+                                                        src={imgUrl}
+                                                        alt={`summary_attach - ${index}`}
+                                                        loading="lazy"
+                                                        style={{
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            objectFit: "cover",
+                                                            margin: "10px",
+                                                            border: "1px solid #ccc",
+                                                        }}
+                                                        onError={(e) => {
+                                                            if (!e.target.dataset.errorHandled) {
+                                                                e.target.src = "/fallback-image.png";
+                                                                e.target.dataset.errorHandled = "true";
+                                                            }
+                                                        }}
                                                     />
-                                                </>
-                                            ) : (
-                                                <p>No old photo available</p> // Display if no photo
-                                            )}
+                                                ))}
 
                                             <Form.Control
                                                 type="file"
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 name="summary_attach"
+                                                multiple
                                             />
                                         </Col>
                                     </Form.Group>

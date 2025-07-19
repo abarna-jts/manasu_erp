@@ -43,7 +43,10 @@ function InternshipForm() {
     };
 
     const handleFileChange = (e) => {
-        setFiles({ ...files, stud_photo: e.target.files[0] });
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
     const navigate = useNavigate();

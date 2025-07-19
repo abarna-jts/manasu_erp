@@ -37,9 +37,9 @@ const storage = multer.diskStorage({
 
 // const upload = multer({ storage: storage }).single("recovery_photo");
 const upload = multer({ storage: storage }).fields([
-  { name: 'recovery_photo', maxCount: 1 },
-  { name: 'rescue_recovery_photo', maxCount: 1 },
-  { name: 'summary_attach', maxCount: 1 },
+  { name: 'recovery_photo', maxCount: 10 },
+  { name: 'rescue_recovery_photo', maxCount: 10 },
+  { name: 'summary_attach', maxCount: 10 },
 ]);
 
 const residencyAsync = util.promisify(upload);

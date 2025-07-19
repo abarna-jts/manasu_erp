@@ -43,10 +43,10 @@ function Rescue_Record_Sheet() {
     };
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFiles({ ...files, rescue_recovery_photo: file });
-        }
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
 
@@ -72,6 +72,12 @@ function Rescue_Record_Sheet() {
         data.append('date', formData.date);
         data.append('rescue_recovery_photo', files.rescue_recovery_photo);
         data.append('follow_up', formData.follow_up);
+
+        if (files.rescue_recovery_photo && files.rescue_recovery_photo.length > 0) {
+            files.rescue_recovery_photo.forEach(file => {
+                data.append('rescue_recovery_photo', file); // ✅ no []
+            });
+        }
 
         try {
             const res = await apiRoute.post('/residency/rescue_condition', data, {
@@ -159,13 +165,37 @@ function Rescue_Record_Sheet() {
                 rescue_recovery_photo: data.rescue_recovery_photo,
             }));
 
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const ConsultantPhoto = parseImageField(data.rescue_recovery_photo);
+
             // Base path for images
-            const resrecovery_photoPath = data.rescue_recovery_photo ? `https://www.pahrultours.com/app2/${data.rescue_recovery_photo}` : null;
+            // const resrecovery_photoPath = data.rescue_recovery_photo ? `https://www.pahrultours.com/app2/${data.rescue_recovery_photo}` : null;
 
             // Set files state
             setFiles((files) => ({
                 ...files,
-                rescue_recovery_photo: resrecovery_photoPath,
+                rescue_recovery_photo: ConsultantPhoto,
             }));
 
 
@@ -187,10 +217,11 @@ function Rescue_Record_Sheet() {
         data.append('follow_up', formData.follow_up);
 
         // ✅ Only append recovery photo if it's a new file
-        if (files.rescue_recovery_photo instanceof File) {
-            data.append('rescue_recovery_photo', files.rescue_recovery_photo);
+        if (files.rescue_recovery_photo && files.rescue_recovery_photo.length > 0) {
+            files.rescue_recovery_photo.forEach(file => {
+                data.append('rescue_recovery_photo', file); // ✅ no []
+            });
         }
-
         try {
             const res = await apiRoute.post(`/residency/updateRescueCondition/${formData.admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -315,16 +346,45 @@ function Rescue_Record_Sheet() {
                                                 />
                                             </td> */}
                                             <td>
-                                                {item.rescue_recovery_photo ? (
-                                                    <img
-                                                        src={`https://www.pahrultours.com/app2/${item.rescue_recovery_photo}`}
-                                                        alt="Rescue Condition Photo"
-                                                        style={{ width: "70px", height: "70px", objectFit: "cover" }}
-                                                    />
+                                                {item.rescue_recovery_photo && item.rescue_recovery_photo !== "NULL" ? (
+                                                    (() => {
+                                                        let firstPhoto = null;
+
+                                                        if (Array.isArray(item.rescue_recovery_photo)) {
+                                                            // Already an array
+                                                            firstPhoto = item.rescue_recovery_photo[0];
+                                                        } else if (typeof item.rescue_recovery_photo === "string") {
+                                                            try {
+                                                                const parsed = JSON.parse(item.rescue_recovery_photo);
+                                                                if (Array.isArray(parsed)) {
+                                                                    firstPhoto = parsed[0];
+                                                                } else {
+                                                                    // Not an array, just use the string
+                                                                    firstPhoto = item.rescue_recovery_photo;
+                                                                }
+                                                            } catch (e) {
+                                                                // Not JSON, just use the string
+                                                                firstPhoto = item.rescue_recovery_photo;
+                                                            }
+                                                        }
+
+                                                        return firstPhoto ? (
+                                                            <img
+                                                                src={`http://localhost:5002/${firstPhoto}`}
+                                                                alt="Rescue Condition Photo"
+                                                                style={{ width: "70px", height: "70px", objectFit: "cover" }}
+                                                            />
+                                                        ) : (
+                                                            "NULL"
+                                                        );
+                                                    })()
                                                 ) : (
                                                     "NULL"
                                                 )}
                                             </td>
+
+
+
 
                                             <td>
                                                 <button className="btn btn-success icon_details" onClick={() => handleEdiShow(item.id)}>
@@ -394,6 +454,7 @@ function Rescue_Record_Sheet() {
                                     accept=".jpg,.jpeg,.png"
                                     onChange={handleFileChange}
                                     name="rescue_recovery_photo"
+                                    multiple
                                 />
                             </Form.Group>
 
@@ -466,30 +527,39 @@ function Rescue_Record_Sheet() {
                                 />
                             </Form.Group>
 
-                            <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
-                                <Form.Label>Rescue Recovery Photo Attachment</Form.Label>
-                                <div className="photorow d-flex align-items-center justify-content-between">
-                                    {files.rescue_recovery_photo ? (
-                                        <>
+                            <Form.Group className="mb-3">
+                                <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                <Col sm="12">
+                                    {Array.isArray(files.rescue_recovery_photo) &&
+                                        files.rescue_recovery_photo.map((imgUrl, index) => (
                                             <img
-                                                src={files.rescue_recovery_photo}
-                                                alt="Old"
-                                                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`rescue_recovery_photo - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
                                             />
-                                        </>
-                                    ) : (
-                                        <p>No old photo available</p> // Display if no photo
-                                    )}
-
+                                        ))}
                                     <Form.Control
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
-                                        onChange={handleFileChange}
                                         name="rescue_recovery_photo"
-                                    // required={!formData.rescue_recovery_photo}
+                                        onChange={handleFileChange}
+                                        multiple
                                     />
-                                </div>
-
+                                </Col>
                             </Form.Group>
 
 
@@ -501,7 +571,7 @@ function Rescue_Record_Sheet() {
                                     value={formData.follow_up}
                                     onChange={handleInputChange}
                                     name="follow_up"
-                                    required
+                                    multiple
 
                                 />
                             </Form.Group>

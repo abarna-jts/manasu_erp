@@ -67,20 +67,21 @@ function Reunion_Checklist() {
     });
 
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
+        const { name, files, value, type } = e.target;
 
-        if (files && files.length > 0) {
-            setFormData((prevState) => ({
-                ...prevState,
-                [name]: files[0], // store the file object
+        if (type === "file" && e.target.multiple) {
+            setFormData(prev => ({
+                ...prev,
+                [name]: files  // store as FileList
             }));
         } else {
-            setFormData((prevState) => ({
-                ...prevState,
-                [name]: value,
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === "file" ? files[0] : value
             }));
         }
     };
+
 
     const familyRequestLetterFileRef = useRef(null);
     const selfDeclarationFileRef = useRef(null);
@@ -203,10 +204,14 @@ function Reunion_Checklist() {
         const data = new FormData();
 
         for (const key in formData) {
-            if (formData[key] instanceof File) {
-                data.append(key, formData[key]); // file
+            const value = formData[key];
+
+            if (value instanceof FileList || Array.isArray(value)) {
+                for (let i = 0; i < value.length; i++) {
+                    data.append(key, value[i]); // multiple files
+                }
             } else {
-                data.append(key, formData[key]); // string/text
+                data.append(key, value); // text fields
             }
         }
 
@@ -584,6 +589,7 @@ function Reunion_Checklist() {
                                                         name='familyRequestLetterFile'
                                                         onChange={handleChange}
                                                         ref={familyRequestLetterFileRef}
+                                                        multiple
                                                         required={formData.familyRequestLetter === "Yes"} />
                                                 </Col>
                                             </Form.Group>

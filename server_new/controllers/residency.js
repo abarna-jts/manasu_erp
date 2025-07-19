@@ -18,9 +18,14 @@ const createRescueCondition = async (req, res) => {
     // const recovery_photo_path = req.file
     //   ? `uploads/Resque_Condition_Images/${req.file.filename}`
     //   : null;
-    const resrecovery_photo_path = req.files['rescue_recovery_photo']
-      ? `uploads/Resque_Condition_Images/${req.files['rescue_recovery_photo'][0].filename}`
-      : null;
+
+    const resrecovery_photo_path = req.files?.['rescue_recovery_photo']
+      ? req.files['rescue_recovery_photo'].map(file => `uploads/Resque_Condition_Images/${file.filename}`)
+      : [];
+
+    // const resrecovery_photo_path = req.files['rescue_recovery_photo']
+    //   ? `uploads/Resque_Condition_Images/${req.files['rescue_recovery_photo'][0].filename}`
+    //   : null;
 
     const formatDate = (isoDate) => {
       const d = new Date(isoDate);
@@ -40,7 +45,7 @@ const createRescueCondition = async (req, res) => {
       admission_no,
       resident_name,
       dateFormatted,
-      resrecovery_photo_path || "NULL",
+      JSON.stringify(resrecovery_photo_path || "NULL"),
       follow_up
     ];
 
@@ -48,7 +53,7 @@ const createRescueCondition = async (req, res) => {
     // ✅ Email the Director
     const mailOptions = {
       from: 'yourgmail@gmail.com',
-      to: 'manasucmf@gmail.com',
+      to: ['abarnadevi.jorimts@gmail.com','abarnadevi2705@gmail.com'],
       subject: `New First Consultation Report Submitted by Nurse`,
       html: `
         <h3>New First Consultation Report Submitted by Nurse</h3>
@@ -443,9 +448,14 @@ const createObservationReport = async (req, res) => {
       follow_up
     } = req.body;
 
-    const recovery_photo_path = req.files['recovery_photo']
-      ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
-      : null;
+    const recovery_photo_path = req.files?.['recovery_photo']
+      ? req.files['recovery_photo'].map(file => `uploads/Resque_Condition_Images/${file.filename}`)
+      : [];
+
+
+    // const recovery_photo_path = req.files['recovery_photo']
+    //   ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
+    //   : null;
 
     // Format date (dd-mm-yyyy)
     const formatDate = (isoDate) => {
@@ -466,7 +476,7 @@ const createObservationReport = async (req, res) => {
       admission_no,
       resident_name,
       obdateFormatted,
-      recovery_photo_path || "NULL",
+      JSON.stringify(recovery_photo_path || "NULL"),
       follow_up
     ];
 
@@ -475,7 +485,7 @@ const createObservationReport = async (req, res) => {
     // ✅ Email the Director
     const mailOptions = {
       from: 'yourgmail@gmail.com',
-      to: 'manasucmf@gmail.com',
+      to: ['abarnadevi.jorimts@gmail.com','abarnadevi2705@gmail.com'],
       subject: `New Resident Observation Report Submitted by Social Worker`,
       html: `
         <h3>Resident Observation & Progress Report – Social Worker</h3>
@@ -543,9 +553,14 @@ const updateObservationReport = async (req, res) => {
 
     const admission_no = req.params.admission_no;
 
-    const newRecoveryPhoto = req.files['recovery_photo']
-      ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
-      : null;
+    const newRecoveryPhoto = req.files?.['recovery_photo']
+      ? req.files['recovery_photo'].map(file => `uploads/Resque_Condition_Images/${file.filename}`)
+      : [];
+
+
+    // const newRecoveryPhoto = req.files['recovery_photo']
+    //   ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
+    //   : null;
 
     const [existingData] = await db.query(
       "SELECT recovery_photo FROM observation_report WHERE admission_no = ?",
@@ -575,7 +590,7 @@ const updateObservationReport = async (req, res) => {
     const values = [
       resident_name,
       obdateFormatted,
-      finalRecoveryPath || "NULL",
+      JSON.stringify(finalRecoveryPath || "NULL"),
       follow_up,
       admission_no
     ];
@@ -616,6 +631,7 @@ const showRescueCondition = async (req, res) => {
 const updateRescueCondition = async (req, res) => {
   try {
     await residencyAsync(req, res);
+
     const {
       resident_name,
       date,
@@ -624,61 +640,62 @@ const updateRescueCondition = async (req, res) => {
 
     const admission_no = req.params.admission_no;
 
-    const newRecoveryPhoto = req.files['rescue_recovery_photo']
-      ? `uploads/Resque_Condition_Images/${req.files['rescue_recovery_photo'][0].filename}`
-      : null;
-
+    // Step 1: Fetch existing photo array
     const [selectData] = await db.query("SELECT rescue_recovery_photo FROM rescue_condition WHERE admission_no = ?", [admission_no]);
     if (selectData.length === 0) {
       return res.status(404).json({ message: "Rescue Condition not found" });
     }
-    const existingRecoveryPath = selectData[0].rescue_recovery_photo;
-    const finalRecoveryPath = newRecoveryPhoto || existingRecoveryPath;
-    // if (!finalRecoveryPath) {
-    //   return res.status(400).json({ message: "No recovery photo provided" });
-    // }
+
+    let existingPhotos = [];
+    try {
+      existingPhotos = JSON.parse(selectData[0].rescue_recovery_photo || '[]');
+    } catch (e) {
+      existingPhotos = [];
+    }
+
+    // Step 2: Get new uploaded photos
+    const newPhotos = req.files?.['rescue_recovery_photo']
+      ? req.files['rescue_recovery_photo'].map(file => `uploads/Resque_Condition_Images/${file.filename}`)
+      : [];
+
+    // Step 3: Combine old and new photos
+    const finalPhotoArray = [...existingPhotos, ...newPhotos];
 
     const updateQuery = `
-        UPDATE rescue_condition SET
-        resident_name=?,
-        date = ?,
-        rescue_recovery_photo = ?,
-        follow_up = ?
-        WHERE admission_no = ?`;
+      UPDATE rescue_condition SET
+      resident_name = ?,
+      date = ?,
+      rescue_recovery_photo = ?,
+      follow_up = ?
+      WHERE admission_no = ?
+    `;
 
     const formatDate = (isoDate) => {
       const d = new Date(isoDate);
-      if (isNaN(d)) return 'Invalid';
-      return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+      return isNaN(d) ? 'Invalid' : `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
     };
-
-    const dateFormatted = formatDate(date);
 
     const values = [
       resident_name,
-      dateFormatted,
-      finalRecoveryPath || "NULL",
+      formatDate(date),
+      JSON.stringify(finalPhotoArray),
       follow_up,
       admission_no
-    ]
+    ];
 
     const [result] = await db.query(updateQuery, values);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "No rescue condition found with this admission number" });
     }
-    if (newRecoveryPhoto && existingRecoveryPath) {
-      // Delete the old logo file
-      fs.unlink(existingRecoveryPath, (fsErr) => {
-        if (fsErr) console.warn("Failed to delete old logo:", fsErr);
-      });
-    }
+
     res.status(200).json({ message: "Rescue Condition updated successfully" });
+
   } catch (err) {
     console.error('Error updating rescue condition:', err);
     res.status(500).json({ message: "Database Error", error: err });
   }
+};
 
-}
 
 const createPrescription = async (req, res) => {
   const {
@@ -1174,10 +1191,14 @@ const createSummary = async (req, res) => {
       report
     } = req.body;
 
-    // File path
     const SummaryAttachPath = req.files?.['summary_attach']
-      ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
-      : null;
+      ? req.files['summary_attach'].map(file => `uploads/SummaryAttach/${file.filename}`)
+      : [];
+
+    // File path
+    // const SummaryAttachPath = req.files?.['summary_attach']
+    //   ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
+    //   : null;
 
     const q = `
       INSERT INTO reunion_summary(admission_no, rescue_name, date, summary_attach, report)
@@ -1188,7 +1209,7 @@ const createSummary = async (req, res) => {
       admission_no,
       rescue_name,
       date,
-      SummaryAttachPath,
+      JSON.stringify(SummaryAttachPath),
       report
     ];
 
@@ -1197,7 +1218,7 @@ const createSummary = async (req, res) => {
     // ✅ Email the Director
     const mailOptions = {
       from: 'yourgmail@gmail.com',
-      to: 'manasucmf@gmail.com',
+      to: ['abarnadevi.jorimts@gmail.com','abarnadevi2705@gmail.com'],
       subject: `Reunion Summary Form Submitted by Nurse`,
       html: `
         <h3>Reunion Summary Form </h3>
@@ -1268,9 +1289,13 @@ const updateSummary = async (req, res) => {
 
     const admission_no = req.params.admission_no;
 
+
     const SummaryAttachPath = req.files?.['summary_attach']
-      ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
-      : null;
+      ? req.files['summary_attach'].map(file => `uploads/SummaryAttach/${file.filename}`)
+      : [];
+    // const SummaryAttachPath = req.files?.['summary_attach']
+    //   ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
+    //   : null;
 
     const selectQuery = "SELECT summary_attach FROM reunion_summary WHERE admission_no = ?";
     const [selectData] = await db.query(selectQuery, [admission_no]);
@@ -1290,7 +1315,7 @@ const updateSummary = async (req, res) => {
     const values = [
       rescue_name,
       formatDate(date),
-      finalSummaryAttach,
+      JSON.stringify(finalSummaryAttach),
       report,
       admission_no
     ];

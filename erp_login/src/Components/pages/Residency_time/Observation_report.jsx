@@ -50,7 +50,10 @@ function Observation_report() {
     };
 
     const handleFileChange = (e) => {
-        setFiles({ ...files, [e.target.name]: e.target.files[0] });
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -62,6 +65,12 @@ function Observation_report() {
         data.append('date', formData.date);
         data.append('recovery_photo', files.recovery_photo);
         data.append('follow_up', formData.follow_up);
+
+        if (files.recovery_photo && files.recovery_photo.length > 0) {
+            files.recovery_photo.forEach(file => {
+                data.append('recovery_photo', file); // ✅ no []
+            });
+        }
 
         try {
             const res = await apiRoute.post('/residency/create_observation_report', data, {
@@ -112,16 +121,35 @@ function Observation_report() {
                 recovery_photo: data.recovery_photo,
             }));
 
-            // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
-            const recovery_photoPath = data.recovery_photo ? `https://www.pahrultours.com/app2/${data.recovery_photo}` : null;
+            const parseImageField = (fieldData) => {
+                let paths = [];
+                if (fieldData) {
+                    try {
+                        const parsed = JSON.parse(fieldData);
+                        if (Array.isArray(parsed)) {
+                            paths = parsed.map((p) =>
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                            );
+                        }
+                    } catch (err) {
+                        // Fallback to comma-separated string
+                        paths = fieldData
+                            .split(',')
+                            .map((p) =>
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                            );
+                    }
+                }
+                return paths;
+            };
+
+            const RecoveryPhoto = parseImageField(data.recovery_photo);
 
             // Set files state
             setFiles((files) => ({
                 ...files,
-                recovery_photo: recovery_photoPath,
+                recovery_photo: RecoveryPhoto,
             }));
-
 
             setEditShow(true);
         } catch (error) {
@@ -139,8 +167,10 @@ function Observation_report() {
         data.append('date', formData.date);
         data.append('follow_up', formData.follow_up);
 
-        if (files.recovery_photo instanceof File) {
-            data.append('recovery_photo', files.recovery_photo);
+        if (files.recovery_photo && files.recovery_photo.length > 0) {
+            files.recovery_photo.forEach(file => {
+                data.append('recovery_photo', file); // ✅ no []
+            });
         }
 
         try {
@@ -320,12 +350,38 @@ function Observation_report() {
                                             <td>{item.resident_name}</td>
                                             <td className='text-justify'>{item.follow_up || "NULL"}</td>
                                             <td>
-                                                {item.recovery_photo ? (
-                                                    <img
-                                                        src={`https://www.pahrultours.com/app2/${item.recovery_photo}`}
-                                                        alt="Rescue Condition Photo"
-                                                        style={{ width: "70px", height: "70px", objectFit: "cover" }}
-                                                    />
+                                                {item.recovery_photo && item.recovery_photo !== "NULL" ? (
+                                                    (() => {
+                                                        let firstPhoto = null;
+
+                                                        if (Array.isArray(item.recovery_photo)) {
+                                                            // Already an array
+                                                            firstPhoto = item.recovery_photo[0];
+                                                        } else if (typeof item.recovery_photo === "string") {
+                                                            try {
+                                                                const parsed = JSON.parse(item.recovery_photo);
+                                                                if (Array.isArray(parsed)) {
+                                                                    firstPhoto = parsed[0];
+                                                                } else {
+                                                                    // Not an array, just use the string
+                                                                    firstPhoto = item.recovery_photo;
+                                                                }
+                                                            } catch (e) {
+                                                                // Not JSON, just use the string
+                                                                firstPhoto = item.recovery_photo;
+                                                            }
+                                                        }
+
+                                                        return firstPhoto ? (
+                                                            <img
+                                                                src={`http://localhost:5002/${firstPhoto}`}
+                                                                alt="Recovery Photo"
+                                                                style={{ width: "70px", height: "70px", objectFit: "cover" }}
+                                                            />
+                                                        ) : (
+                                                            "NULL"
+                                                        );
+                                                    })()
                                                 ) : (
                                                     "NULL"
                                                 )}
@@ -402,6 +458,7 @@ function Observation_report() {
                                     accept=".jpg,.jpeg,.png"
                                     onChange={handleFileChange}
                                     name="recovery_photo"
+                                    multiple
 
                                 />
                             </Form.Group>
@@ -475,30 +532,39 @@ function Observation_report() {
                                 />
                             </Form.Group>
 
-                            <Form.Group controlId="formFile" className="mb-3 d-flex flex-column">
-                                <Form.Label>Rescue Recovery Photo Attachment </Form.Label>
-                                <div className="photorow d-flex align-items-center justify-content-between">
-                                    {files.recovery_photo ? (
-                                        <>
+                            <Form.Group className="mb-3">
+                                <Form.Label column sm="5" className='text-start'>Resident Recovery Photo Attachment:</Form.Label>
+                                <Col sm="12">
+                                    {Array.isArray(files.recovery_photo) &&
+                                        files.recovery_photo.map((imgUrl, index) => (
                                             <img
-                                                src={files.recovery_photo}
-                                                alt="Old"
-                                                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`recovery_photo - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: "cover",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
                                             />
-                                        </>
-                                    ) : (
-                                        <p>No old photo available</p> // Display if no photo
-                                    )}
-
+                                        ))}
                                     <Form.Control
                                         type="file"
-                                        onChange={handleFileChange}
                                         accept=".jpg,.jpeg,.png"
                                         name="recovery_photo"
-                                    // required={!formData.recovery_photo} 
+                                        onChange={handleFileChange}
+                                        multiple
                                     />
-                                </div>
-
+                                </Col>
                             </Form.Group>
 
 
