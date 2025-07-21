@@ -180,6 +180,8 @@ function Rescue_details() {
 
     const [files, setFiles] = useState({
         rescue_image: null,
+        attach_policeMemo: null,
+        govIdFile: null,
     });
 
 
@@ -240,14 +242,62 @@ function Rescue_details() {
 
             }));
 
+            let policeMemoAttach = [];
+            if (data.attach_policeMemo) {
+                try {
+                    const parsed = JSON.parse(data.attach_policeMemo);
+                    if (Array.isArray(parsed)) {
+                        policeMemoAttach = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse attach_policeMemo:', err);
+                    // Fallback: comma-separated string
+                    policeMemoAttach = data.attach_policeMemo
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let RescueImage = [];
+            if (data.rescue_image) {
+                try {
+                    const parsed = JSON.parse(data.rescue_image);
+                    if (Array.isArray(parsed)) {
+                        RescueImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse attach_policeMemo:', err);
+                    // Fallback: comma-separated string
+                    RescueImage = data.rescue_image
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let govtFilePath = [];
+            if (data.govIdFile) {
+                try {
+                    const parsed = JSON.parse(data.govIdFile);
+                    if (Array.isArray(parsed)) {
+                        govtFilePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse govIdFile:', err);
+                    // Fallback: comma-separated string
+                    govtFilePath = data.govIdFile
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
             // Base path for images
             const basePath = "https://www.pahrultours.com/app2/uploads/Rescue_Images";
-            const RescueImage = data.rescue_image ? `https://www.pahrultours.com/app2/${data.rescue_image}` : null;
-            const govtFilePath = data.govIdFile ? `https://www.pahrultours.com/app2/${data.govIdFile}` : null;
+            // const RescueImage = data.rescue_image ? `https://www.pahrultours.com/app2/${data.rescue_image}` : null;
+            // const govtFilePath = data.govIdFile ? `https://www.pahrultours.com/app2/${data.govIdFile}` : null;
             // const FamilyAadharCard = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
             // const FamilyRationCard = data.f_ration_card ? `https://www.pahrultours.com/app2/${data.f_ration_card}` : null;
             // const RescueAadharCard = data.res_aadhar_card ? `https://www.pahrultours.com/app2/${data.res_aadhar_card}` : null;
-            const policeMemoAttach = data.attach_policeMemo ? `https://www.pahrultours.com/app2/${data.attach_policeMemo}` : null;
+            // const policeMemoAttach = data.attach_policeMemo ? `https://www.pahrultours.com/app2/${data.attach_policeMemo}` : null;
 
             console.log("Rescue Image Path", RescueImage);
             console.log("Police Memo Attachment", policeMemoAttach);
@@ -256,9 +306,6 @@ function Rescue_details() {
             setFiles((files) => ({
                 ...files,
                 rescue_image: RescueImage,
-                // f_aadhar_card: FamilyAadharCard,
-                // f_ration_card: FamilyRationCard,
-                // res_aadhar_card: RescueAadharCard,
                 attach_policeMemo: policeMemoAttach,
                 govIdFile: govtFilePath
             }));
@@ -288,7 +335,7 @@ function Rescue_details() {
 
     useEffect(() => {
         getRescueDetails();
-        
+
     }, []);
 
     // search function 
@@ -440,12 +487,25 @@ function Rescue_details() {
                                     <td>{indexOfFirstItem + index + 1}</td>
                                     <td>{item.admission_no}</td>
                                     <td>
-                                        <img
-                                            src={`https://www.pahrultours.com/app2/${item.rescue_image}`}
-                                            alt="Rescue Profile"
-                                            style={{ width: "70px", height: "70px", objectFit: "cover" }}
-                                        />
+                                        {
+                                            item.rescue_image.includes('[') ? (
+                                                // If it's a stringified array, parse and show the first image
+                                                <img
+                                                    src={`http://localhost:5002/${JSON.parse(item.rescue_image)[0]}`}
+                                                    alt="Rescue Profile"
+                                                    style={{ width: "70px", height: "70px", objectFit: "cover" }}
+                                                />
+                                            ) : (
+                                                // Else use the path directly
+                                                <img
+                                                    src={`http://localhost:5002/${item.rescue_image}`}
+                                                    alt="Rescue Profile"
+                                                    style={{ width: "70px", height: "70px", objectFit: "cover" }}
+                                                />
+                                            )
+                                        }
                                     </td>
+
                                     <td>{item.referred_by}</td>
                                     <td>{item.rescue_name}</td>
                                     <td>{item.from_place}</td>
@@ -582,15 +642,24 @@ function Rescue_details() {
                                         Attach Police Memo :
                                     </Form.Label>
                                     <Col sm="7">
-                                        {files.attach_policeMemo ? (
-                                            <img
-                                                src={files.attach_policeMemo}
-                                                alt="Rescue"
-                                                style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                            />
-                                        ) : (
-                                            <div>No Image Available</div>
-                                        )}
+                                        {Array.isArray(files.attach_policeMemo) &&
+                                            files.attach_policeMemo.map((imgUrl, index) => (
+                                                <img
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`attach_policeMemo - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png";
+                                                    }}
+                                                />
+                                            ))}
                                     </Col>
                                 </Form.Group>
 
@@ -625,15 +694,24 @@ function Rescue_details() {
                                         Profile:
                                     </Form.Label>
                                     <Col sm="8">
-                                        {files.rescue_image ? (
-                                            <img
-                                                src={files.rescue_image}
-                                                alt="Rescue"
-                                                style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                            />
-                                        ) : (
-                                            <div>No Image Available</div>
-                                        )}
+                                        {Array.isArray(files.rescue_image) &&
+                                            files.rescue_image.map((imgUrl, index) => (
+                                                <img
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`rescue_image - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png";
+                                                    }}
+                                                />
+                                            ))}
                                     </Col>
                                 </Form.Group>
                                 <Form.Group className="mb-1" controlId="formDate">
@@ -779,15 +857,24 @@ function Rescue_details() {
                                         <Form.Group className="mb-3 text-start d-flex">
                                             <Form.Label column sm={4}>{formData.govIdType} File:</Form.Label>
                                             <Col sm={7}>
-                                                {files.govIdFile ? (
-                                                    <img
-                                                        src={files.govIdFile}
-                                                        alt="Rescue"
-                                                        style={{ width: "100px", height: "auto", border: "1px solid #ccc" }}
-                                                    />
-                                                ) : (
-                                                    <div>No Governtment Id Available</div>
-                                                )}
+                                                {Array.isArray(files.govIdFile) &&
+                                                    files.govIdFile.map((imgUrl, index) => (
+                                                        <img
+                                                            key={index}
+                                                            src={imgUrl}
+                                                            alt={`govIdFile - ${index}`}
+                                                            style={{
+                                                                width: "100px",
+                                                                height: "100px",
+                                                                objectFit: "cover",
+                                                                margin: "10px",
+                                                                border: "1px solid #ccc",
+                                                            }}
+                                                            onError={(e) => {
+                                                                e.target.src = "/fallback-image.png";
+                                                            }}
+                                                        />
+                                                    ))}
                                             </Col>
                                         </Form.Group>
                                     </>
@@ -795,7 +882,7 @@ function Rescue_details() {
 
                             </Col>
                             <Col md={11}>
-                                <h5 className="pdfsub_heading">Family Details:</h5>
+                                <h5 className="pdfsub_heading mt-5">Family Details:</h5>
                                 <Form.Group as={Row} className="mb-1" controlId="formFather">
                                     <Form.Label column sm="4">
                                         Father :
@@ -1064,10 +1151,10 @@ function Rescue_details() {
                             </Col>
 
                             <Row className="d-flex align-items-center justify-content-center">
-                                <Col md={6} className="mt-3">
+                                <Col md={6} className="mt-5 mb-5">
                                     <h4 className="text-start sign_class">Signature / Thumbprint of Resident's</h4>
                                 </Col>
-                                <Col md={6} className="mt-3">
+                                <Col md={6} className="mt-5 mb-5">
                                     <h4 className="text-end sign_class">Manasu Seal</h4>
                                 </Col>
                             </Row>

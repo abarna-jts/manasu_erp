@@ -3,7 +3,6 @@ import { Breadcrumb, Col, Container, Form, Row, Button } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useRef } from 'react';
 
 function Edit_ReunionChecklist() {
     const [formData, setFormData] = useState({
@@ -11,84 +10,57 @@ function Edit_ReunionChecklist() {
         familyRequestLetter: '',
         selfDeclarationLetter: '',
         mediaConsentLetter: '',
-        familyRequestLetterFile: [],
-        selfDeclarationFile: [],
-        mediaConsentFile: [],
+        familyRequestLetterFile: null,
+        selfDeclarationFile: null,
+        mediaConsentFile: null,
         residentIDproof: '',
-        residentIDproofFile: [],
+        residentIDproofFile: null,
         familyIDproof: '',
-        familyIDproofFile: [],
+        familyIDproofFile: null,
         aadharCard: '',
-        aadharCardFile: [],
+        aadharCardFile: null,
         udidCard: '',
-        udidCardFile: [],
+        udidCardFile: null,
         disabilityCertificate: '',
-        disabilityCertificateFile: [],
+        disabilityCertificateFile: null,
         bankPassbook: '',
-        bankPassbookFile: [],
+        bankPassbookFile: null,
         healthInsurance: '',
-        healthInsuranceFile: [],
+        healthInsuranceFile: null,
         medicalReport: '',
-        medicalReportFile: [],
+        medicalReportFile: null,
         dischargeSummary: '',
-        dischargeSummaryFile: [],
+        dischargeSummaryFile: null,
         medications: '',
-        medicationsFile: [],
+        medicationsFile: null,
         Clothes: '',
-        ClothesFile: [],
+        ClothesFile: null,
         possessionsRecovered: '',
-        possessionsRecoveredFile: [],
+        possessionsRecoveredFile: null,
         dischargeAllowance: '',
-        dischargeAllowanceFile: [],
+        dischargeAllowanceFile: null,
         travelExpenses: '',
-        travelExpensesFile: [],
+        travelExpensesFile: null,
         copyOfdischargeSummary: '',
-        copyOfdischargeSummaryFile: [],
+        copyOfdischargeSummaryFile: null,
         travelSafetyLetter: '',
-        travelSafetyLetterFile: [],
+        travelSafetyLetterFile: null,
         reunionPhoto: '',
-        reunionPhotoFile: [],
+        reunionPhotoFile: null,
         witnessSignature: '',
-        witnessSignatureFile: [],
+        witnessSignatureFile: null,
         any_other: '',
 
     });
 
-    const familyRequestLetterFileRef = useRef(null);
-    const selfDeclarationLetterFileRef = useRef(null);
-
-    // const handleChange = (e) => {
-    //     const { name, files, value, type } = e.target;
-
-    //     if (type === 'file') {
-    //         setFormData(prev => ({
-    //             ...prev,
-    //             [name]: e.target.multiple ? files : files[0],
-    //         }));
-    //     } else {
-    //         setFormData(prev => ({
-    //             ...prev,
-    //             [name]: value
-    //         }));
-    //     }
-    // };
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
+        const { name, value, type, files } = e.target;
 
-        if (files) {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: files
-            }));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value
-            }));
-        }
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: type === 'file' ? Array.from(files) : value
+        }));
     };
-
-
 
 
     const { admission_no } = useParams();
@@ -100,24 +72,12 @@ function Edit_ReunionChecklist() {
     useEffect(() => {
         if (!admission_no) return; // prevent empty or undefined admission_no from calling API
 
-        const convertToArray = (value) => {
-            if (Array.isArray(value)) return value;
-            if (typeof value === 'string' && value.trim() !== '') {
-                return value.split(',').map(v => v.trim());
-            }
-            return []; // Return empty array for null/empty
-        };
-
-
-
-
-
         const fetchDetails = async () => {
             try {
                 const response = await apiRoute.get(`/reunion/get_allCheckList/${admission_no}`);
                 const data = response.data;
 
-                console.log('Checklist data:', data); // Debugging
+                console.log('Checklist data:', data); // Optional: for debugging
 
                 setFormData(prevFormData => ({
                     ...prevFormData,
@@ -143,196 +103,160 @@ function Edit_ReunionChecklist() {
                     reunionPhoto: data.reunionPhoto || '',
                     witnessSignature: data.witnessSignature || '',
                     any_other: data.any_other || '',
-
-                    familyRequestLetterFile: data?.familyRequestLetterFile || [],
-                    selfDeclarationLetterFile: data?.selfDeclarationLetterFile || [],
-                    mediaConsentFile: convertToArray(data.mediaConsentFile),
-                    residentIDproofFile: convertToArray(data.residentIDproofFile),
-                    familyIDproofFile: convertToArray(data.familyIDproofFile),
-                    aadharCardFile: convertToArray(data.aadharCardFile),
-                    udidCardFile: convertToArray(data.udidCardFile),
-                    disabilityCertificateFile: convertToArray(data.disabilityCertificateFile),
-                    bankPassbookFile: convertToArray(data.bankPassbookFile),
-                    healthInsuranceFile: convertToArray(data.healthInsuranceFile),
-                    medicalReportFile: convertToArray(data.medicalReportFile),
-                    dischargeSummaryFile: convertToArray(data.dischargeSummaryFile),
-                    medicationsFile: convertToArray(data.medicationsFile),
-                    ClothesFile: convertToArray(data.ClothesFile),
-                    possessionsRecoveredFile: convertToArray(data.possessionsRecoveredFile),
-                    travelExpensesFile: convertToArray(data.travelExpensesFile),
-                    copyOfdischargeSummaryFile: convertToArray(data.copyOfdischargeSummaryFile),
-                    travelSafetyLetterFile: convertToArray(data.travelSafetyLetterFile),
-                    reunionPhotoFile: convertToArray(data.reunionPhotoFile),
-                    witnessSignatureFile: convertToArray(data.witnessSignatureFile),
+                    familyRequestLetterFile: data.familyRequestLetterFile || null,
+                    selfDeclarationFile: data.selfDeclarationFile || null,
+                    mediaConsentFile: data.mediaConsentFile || null,
+                    residentIDproofFile: data.residentIDproofFile || null,
+                    familyIDproofFile: data.familyIDproofFile || null,
+                    aadharCardFile: data.aadharCardFile || null,
+                    udidCardFile: data.udidCardFile || null,
+                    disabilityCertificateFile: data.disabilityCertificateFile || null,
+                    bankPassbookFile: data.bankPassbookFile || null,
+                    healthInsuranceFile: data.healthInsuranceFile || null,
+                    medicalReportFile: data.medicalReportFile || null,
+                    dischargeSummaryFile: data.dischargeSummaryFile || null,
+                    medicationsFile: data.medicationsFile || null,
+                    ClothesFile: data.ClothesFile || null,
+                    possessionsRecoveredFile: data.possessionsRecoveredFile || null,
+                    dischargeAllowanceFile: data.dischargeAllowanceFile || null,
+                    travelExpensesFile: data.travelExpensesFile || null,
+                    copyOfdischargeSummaryFile: data.copyOfdischargeSummaryFile || null,
+                    travelSafetyLetterFile: data.travelSafetyLetterFile || null,
+                    reunionPhotoFile: data.reunionPhotoFile || null,
+                    witnessSignatureFile: data.witnessSignatureFile || null,
                 }));
-
                 console.log("Fetched file URL:", data.familyRequestLetterFile);
-
+                // console.log(mediaConsentFile);
             } catch (error) {
                 console.error('Failed to fetch checklist data:', error);
             }
         };
-
 
         fetchDetails();
     }, [admission_no]);
 
     const navigate = useNavigate();
 
-    // const updateFormData = async (e) => {
-    //     e.preventDefault();
-
-    //     if (!formData.familyRequestLetter || formData.familyRequestLetter.trim() === '') {
-    //         alert("Please select Family Request Letter field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.selfDeclarationLetter || formData.selfDeclarationLetter.trim() === '') {
-    //         alert("Please select Self-Declaration Letter field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.mediaConsentLetter || formData.mediaConsentLetter.trim() === '') {
-    //         alert("Please select Media Consent Letter field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.residentIDproof || formData.residentIDproof.trim() === '') {
-    //         alert("Please select Resident’s ID Proof field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.aadharCard || formData.aadharCard.trim() === '') {
-    //         alert("Please select Aadhaar Card field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.udidCard || formData.udidCard.trim() === '') {
-    //         alert("Please select UDID Card field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.disabilityCertificate || formData.disabilityCertificate.trim() === '') {
-    //         alert("Please select Disability Certificate field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.bankPassbook || formData.bankPassbook.trim() === '') {
-    //         alert("Please select Bank Passbook / ATM Card field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.healthInsurance || formData.healthInsurance.trim() === '') {
-    //         alert("Please select Health Insurance Document field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.medicalReport || formData.medicalReport.trim() === '') {
-    //         alert("Please select Medical Report field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.dischargeSummary || formData.familyRequestLetter.trim() === '') {
-    //         alert("Please select Discharge Summary Report field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.medications || formData.medications.trim() === '') {
-    //         alert("Please select One-Month Supply of Prescribed Medications field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.Clothes || formData.Clothes.trim() === '') {
-    //         alert("Please select Clothes field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.possessionsRecovered || formData.possessionsRecovered.trim() === '') {
-    //         alert("Please select Possessions Recovered field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.dischargeAllowance || formData.dischargeAllowance.trim() === '') {
-    //         alert("Please select Discharge Allowance field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.travelExpenses || formData.travelExpenses.trim() === '') {
-    //         alert("Please select Travel Expenses field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.copyOfdischargeSummary || formData.copyOfdischargeSummary.trim() === '') {
-    //         alert("Please select Copy of Discharge Summary field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.travelSafetyLetter || formData.travelSafetyLetter.trim() === '') {
-    //         alert("Please select Safety and Travel Arrangements field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.reunionPhoto || formData.reunionPhoto.trim() === '') {
-    //         alert("Please select Reunion Photo field Yes or No.");
-    //         return;
-    //     }
-    //     if (!formData.witnessSignature || formData.witnessSignature.trim() === '') {
-    //         alert("Please select Witness Signature field Yes or No.");
-    //         return;
-    //     }
-
-    //     const formPayload = new FormData();
-
-    //     for (const key in formData) {
-    //         const value = formData[key];
-
-    //         if (value instanceof FileList || Array.isArray(value)) {
-    //             for (let i = 0; i < value.length; i++) {
-    //                 formPayload.append(key, value[i]);
-    //             }
-    //         } else {
-    //             formPayload.append(key, value);
-    //         }
-    //     }
-
-
-    //     try {
-    //         const response = await apiRoute.post(`/reunion/updatechecklist/${admission_no}`, formPayload, {
-    //             headers: {
-    //                 'Content-Type': 'multipart/form-data'
-    //             }
-    //         });
-
-    //         if (response.status === 200) {
-    //             alert('Form updated successfully');
-    //             navigate("/reunion_checklist")
-    //             // reset or update state if needed
-    //         } else {
-    //             alert('Update failed');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error updating form:', error);
-    //         alert('Something went wrong. Please try again later.');
-    //     }
-    // };
-
     const updateFormData = async (e) => {
         e.preventDefault();
 
-        if (!formData.familyRequestLetter || !formData.selfDeclarationLetter) {
-            alert("Please fill both letter fields.");
+        if (!formData.familyRequestLetter || formData.familyRequestLetter.trim() === '') {
+            alert("Please select Family Request Letter field Yes or No.");
+            return;
+        }
+        if (!formData.selfDeclarationLetter || formData.selfDeclarationLetter.trim() === '') {
+            alert("Please select Self-Declaration Letter field Yes or No.");
+            return;
+        }
+        if (!formData.mediaConsentLetter || formData.mediaConsentLetter.trim() === '') {
+            alert("Please select Media Consent Letter field Yes or No.");
+            return;
+        }
+        if (!formData.residentIDproof || formData.residentIDproof.trim() === '') {
+            alert("Please select Resident’s ID Proof field Yes or No.");
+            return;
+        }
+        if (!formData.aadharCard || formData.aadharCard.trim() === '') {
+            alert("Please select Aadhaar Card field Yes or No.");
+            return;
+        }
+        if (!formData.udidCard || formData.udidCard.trim() === '') {
+            alert("Please select UDID Card field Yes or No.");
+            return;
+        }
+        if (!formData.disabilityCertificate || formData.disabilityCertificate.trim() === '') {
+            alert("Please select Disability Certificate field Yes or No.");
+            return;
+        }
+        if (!formData.bankPassbook || formData.bankPassbook.trim() === '') {
+            alert("Please select Bank Passbook / ATM Card field Yes or No.");
+            return;
+        }
+        if (!formData.healthInsurance || formData.healthInsurance.trim() === '') {
+            alert("Please select Health Insurance Document field Yes or No.");
+            return;
+        }
+        if (!formData.medicalReport || formData.medicalReport.trim() === '') {
+            alert("Please select Medical Report field Yes or No.");
+            return;
+        }
+        if (!formData.dischargeSummary || formData.familyRequestLetter.trim() === '') {
+            alert("Please select Discharge Summary Report field Yes or No.");
+            return;
+        }
+        if (!formData.medications || formData.medications.trim() === '') {
+            alert("Please select One-Month Supply of Prescribed Medications field Yes or No.");
+            return;
+        }
+        if (!formData.Clothes || formData.Clothes.trim() === '') {
+            alert("Please select Clothes field Yes or No.");
+            return;
+        }
+        if (!formData.possessionsRecovered || formData.possessionsRecovered.trim() === '') {
+            alert("Please select Possessions Recovered field Yes or No.");
+            return;
+        }
+        if (!formData.dischargeAllowance || formData.dischargeAllowance.trim() === '') {
+            alert("Please select Discharge Allowance field Yes or No.");
+            return;
+        }
+        if (!formData.travelExpenses || formData.travelExpenses.trim() === '') {
+            alert("Please select Travel Expenses field Yes or No.");
+            return;
+        }
+        if (!formData.copyOfdischargeSummary || formData.copyOfdischargeSummary.trim() === '') {
+            alert("Please select Copy of Discharge Summary field Yes or No.");
+            return;
+        }
+        if (!formData.travelSafetyLetter || formData.travelSafetyLetter.trim() === '') {
+            alert("Please select Safety and Travel Arrangements field Yes or No.");
+            return;
+        }
+        if (!formData.reunionPhoto || formData.reunionPhoto.trim() === '') {
+            alert("Please select Reunion Photo field Yes or No.");
+            return;
+        }
+        if (!formData.witnessSignature || formData.witnessSignature.trim() === '') {
+            alert("Please select Witness Signature field Yes or No.");
             return;
         }
 
         const formPayload = new FormData();
+
         for (const key in formData) {
-            const value = formData[key];
-            if (value instanceof FileList || Array.isArray(value)) {
-                for (let i = 0; i < value.length; i++) {
-                    formPayload.append(key, value[i]);
+            if (formData[key] !== null && formData[key] !== '') {
+                if (Array.isArray(formData[key])) {
+                    formData[key].forEach(file => {
+                        formPayload.append(`${key}[]`, file); // use `[]` to indicate array
+                    });
+                } else {
+                    formPayload.append(key, formData[key]);
                 }
-            } else {
-                formPayload.append(key, value);
             }
         }
 
+
         try {
             const response = await apiRoute.post(`/reunion/updatechecklist/${admission_no}`, formPayload, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
 
             if (response.status === 200) {
                 alert('Form updated successfully');
-                navigate("/reunion_checklist");
+                navigate("/reunion_checklist")
+                // reset or update state if needed
             } else {
                 alert('Update failed');
             }
-        } catch (err) {
-            console.error("Update error:", err);
+        } catch (error) {
+            console.error('Error updating form:', error);
+            alert('Something went wrong. Please try again later.');
         }
     };
+
+
 
     return (
         <>
@@ -390,29 +314,37 @@ function Edit_ReunionChecklist() {
                                         </Col>
 
                                         {/* File upload */}
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md={6}>
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="familyRequestLetterFile"
-                                                    ref={familyRequestLetterFileRef}
                                                     onChange={handleChange}
                                                     multiple
                                                     required={formData.familyRequestLetter === "Yes"}
                                                 />
                                             </Col>
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.familyRequestLetter) && formData.familyRequestLetter.map((fileUrl, idx) => (
-                                                    <div key={idx}>
-                                                        <a href={fileUrl} target="_blank" rel="noopener noreferrer">Existing File {idx + 1}</a>
-                                                    </div>
-                                                ))}
-
+                                            <Col md={6}>
+                                                {formData.familyRequestLetterFile && typeof formData.familyRequestLetterFile === "string" && (
+                                                    formData.familyRequestLetterFile.split(',').map((file, index) => (
+                                                        <a
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="ms-2"
+                                                        >
+                                                            View {index + 1}
+                                                        </a>
+                                                    ))
+                                                )}
                                             </Col>
+
+
 
                                         </Col>
 
@@ -450,27 +382,34 @@ function Edit_ReunionChecklist() {
                                         </Col>
 
                                         {/* File upload */}
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md={6}>
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="selfDeclarationFile"
                                                     onChange={handleChange}
-                                                    ref={selfDeclarationLetterFileRef}
                                                     multiple
                                                     required={formData.selfDeclarationFile === "Yes"}
                                                 />
                                             </Col>
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.selfDeclarationLetterFile) && formData.selfDeclarationLetterFile.map((fileUrl, idx) => (
-                                                    <div key={idx}>
-                                                        <a href={fileUrl} target="_blank" rel="noopener noreferrer">Existing File {idx + 1}</a>
-                                                    </div>
-                                                ))}
+                                            <Col md={6}>
+                                                {formData.selfDeclarationFile && typeof formData.selfDeclarationFile === "string" && (
+                                                    formData.selfDeclarationFile.split(',').map((file, index) => (
+                                                        <a
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="ms-2"
+                                                        >
+                                                            View {index + 1}
+                                                        </a>
+                                                    ))
+                                                )}
                                             </Col>
 
                                         </Col>
@@ -506,11 +445,11 @@ function Edit_ReunionChecklist() {
 
                                         </Col>
                                         {/* File upload */}
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md={6}>
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -520,25 +459,22 @@ function Edit_ReunionChecklist() {
                                                     required={formData.mediaConsentFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.mediaConsentFile) && formData.mediaConsentFile.length > 0 ? (
-                                                    formData.mediaConsentFile.map((filePath, idx) => (
+                                            <Col md={6}>
+                                                {formData.mediaConsentFile && typeof formData.mediaConsentFile === "string" && (
+                                                    formData.mediaConsentFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
                                 </li>
@@ -577,39 +513,36 @@ function Edit_ReunionChecklist() {
 
                                         </Col>
                                         {/* File upload */}
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col sm="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="familyIDproofFile"
-                                                    multiple
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.familyIDproofFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.familyIDproofFile) && formData.familyIDproofFile.length > 0 ? (
-                                                    formData.familyIDproofFile.map((filePath, idx) => (
+                                            <Col sm="6">
+                                                {formData.familyIDproofFile && typeof formData.familyIDproofFile === "string" && (
+                                                    formData.familyIDproofFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -641,39 +574,36 @@ function Edit_ReunionChecklist() {
                                             />
                                         </Col>
                                         {/* File upload */}
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col sm="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="residentIDproofFile"
-                                                    onChange={handleChange}
                                                     multiple
+                                                    onChange={handleChange}
                                                     required={formData.residentIDproofFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.residentIDproofFile) && formData.residentIDproofFile.length > 0 ? (
-                                                    formData.residentIDproofFile.map((filePath, idx) => (
+                                            <Col sm="6">
+                                                {formData.residentIDproofFile && typeof formData.residentIDproofFile === "string" && (
+                                                    formData.residentIDproofFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -704,40 +634,35 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col sm="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="aadharCardFile"
-                                                    onChange={handleChange}
                                                     multiple
+                                                    onChange={handleChange}
                                                     required={formData.aadharCardFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.aadharCardFile) && formData.aadharCardFile.length > 0 ? (
-                                                    formData.aadharCardFile.map((filePath, idx) => (
+                                            <Col sm="6">
+                                                {formData.aadharCardFile && typeof formData.aadharCardFile === "string" && (
+                                                    formData.aadharCardFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
-
                                         </Col>
                                     </Form.Group>
 
@@ -768,11 +693,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col sm="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -782,24 +707,20 @@ function Edit_ReunionChecklist() {
                                                     required={formData.udidCardFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.udidCardFile) && formData.udidCardFile.length > 0 ? (
-                                                    formData.udidCardFile.map((filePath, idx) => (
+                                            <Col sm="6">
+                                                {formData.udidCardFile && typeof formData.udidCardFile === "string" && (
+                                                    formData.udidCardFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
                                         </Col>
                                     </Form.Group>
@@ -831,11 +752,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col sm="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -845,24 +766,20 @@ function Edit_ReunionChecklist() {
                                                     required={formData.disabilityCertificateFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.disabilityCertificateFile) && formData.disabilityCertificateFile.length > 0 ? (
-                                                    formData.disabilityCertificateFile.map((filePath, idx) => (
+                                            <Col sm="6">
+                                                {formData.disabilityCertificateFile && typeof formData.disabilityCertificateFile === "string" && (
+                                                    formData.disabilityCertificateFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
                                         </Col>
                                     </Form.Group>
@@ -894,11 +811,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col sm="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -908,24 +825,20 @@ function Edit_ReunionChecklist() {
                                                     required={formData.bankPassbookFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.bankPassbookFile) && formData.bankPassbookFile.length > 0 ? (
-                                                    formData.bankPassbookFile.map((filePath, idx) => (
+                                            <Col sm="6">
+                                                {formData.bankPassbookFile && typeof formData.bankPassbookFile === "string" && (
+                                                    formData.bankPassbookFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
                                         </Col>
                                     </Form.Group>
@@ -957,11 +870,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col sm="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -971,24 +884,20 @@ function Edit_ReunionChecklist() {
                                                     required={formData.healthInsuranceFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.healthInsuranceFile) && formData.healthInsuranceFile.length > 0 ? (
-                                                    formData.healthInsuranceFile.map((filePath, idx) => (
+                                            <Col sm="6">
+                                                {formData.healthInsuranceFile && typeof formData.healthInsuranceFile === "string" && (
+                                                    formData.healthInsuranceFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
                                         </Col>
                                     </Form.Group>
@@ -1025,11 +934,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1039,24 +948,22 @@ function Edit_ReunionChecklist() {
                                                     required={formData.medicalReportFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.medicalReportFile) && formData.medicalReportFile.length > 0 ? (
-                                                    formData.medicalReportFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.medicalReportFile && typeof formData.medicalReportFile === "string" && (
+                                                    formData.medicalReportFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1087,11 +994,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1102,23 +1009,24 @@ function Edit_ReunionChecklist() {
                                                 />
                                             </Col>
 
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.dischargeSummaryFile) && formData.dischargeSummaryFile.length > 0 ? (
-                                                    formData.dischargeSummaryFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.dischargeSummaryFile && typeof formData.dischargeSummaryFile === "string" && (
+                                                    formData.dischargeSummaryFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
+
+
                                         </Col>
                                     </Form.Group>
 
@@ -1149,11 +1057,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1163,25 +1071,22 @@ function Edit_ReunionChecklist() {
                                                     required={formData.medicationsFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.medicationsFile) && formData.medicationsFile.length > 0 ? (
-                                                    formData.medicationsFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.medicationsFile && typeof formData.medicationsFile === "string" && (
+                                                    formData.medicationsFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1216,11 +1121,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1230,25 +1135,22 @@ function Edit_ReunionChecklist() {
                                                     required={formData.ClothesFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.ClothesFile) && formData.ClothesFile.length > 0 ? (
-                                                    formData.ClothesFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.ClothesFile && typeof formData.ClothesFile === "string" && (
+                                                    formData.ClothesFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
-
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1279,11 +1181,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1293,24 +1195,22 @@ function Edit_ReunionChecklist() {
                                                     required={formData.possessionsRecoveredFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.possessionsRecoveredFile) && formData.possessionsRecoveredFile.length > 0 ? (
-                                                    formData.possessionsRecoveredFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.possessionsRecoveredFile && typeof formData.possessionsRecoveredFile === "string" && (
+                                                    formData.possessionsRecoveredFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1341,11 +1241,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1356,23 +1256,22 @@ function Edit_ReunionChecklist() {
                                                 />
                                             </Col>
 
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.dischargeAllowanceFile) && formData.dischargeAllowanceFile.length > 0 ? (
-                                                    formData.dischargeAllowanceFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.dischargeAllowanceFile && typeof formData.dischargeAllowanceFile === "string" && (
+                                                    formData.dischargeAllowanceFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1403,38 +1302,36 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="travelExpensesFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.travelExpensesFile === "Yes"}
+                                                    // required={formData.travelExpenses === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.travelExpensesFile) && formData.travelExpensesFile.length > 0 ? (
-                                                    formData.travelExpensesFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.travelExpensesFile && typeof formData.travelExpensesFile === "string" && (
+                                                    formData.travelExpensesFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1465,11 +1362,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md={6}>
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1479,24 +1376,22 @@ function Edit_ReunionChecklist() {
                                                     required={formData.copyOfdischargeSummaryFile === "Yes"}
                                                 />
                                             </Col>
-
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.copyOfdischargeSummaryFile) && formData.copyOfdischargeSummaryFile.length > 0 ? (
-                                                    formData.copyOfdischargeSummaryFile.map((filePath, idx) => (
+                                            <Col md={6}>
+                                                {formData.copyOfdischargeSummaryFile && typeof formData.copyOfdischargeSummaryFile === "string" && (
+                                                    formData.copyOfdischargeSummaryFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1532,11 +1427,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1546,23 +1441,22 @@ function Edit_ReunionChecklist() {
                                                     required={formData.travelSafetyLetterFile === "Yes"}
                                                 />
                                             </Col>
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.travelSafetyLetterFile) && formData.travelSafetyLetterFile.length > 0 ? (
-                                                    formData.travelSafetyLetterFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.travelSafetyLetterFile && typeof formData.travelSafetyLetterFile === "string" && (
+                                                    formData.travelSafetyLetterFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1593,11 +1487,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1608,23 +1502,22 @@ function Edit_ReunionChecklist() {
                                                 />
                                             </Col>
 
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.reunionPhotoFile) && formData.reunionPhotoFile.length > 0 ? (
-                                                    formData.reunionPhotoFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.reunionPhotoFile && typeof formData.reunionPhotoFile === "string" && (
+                                                    formData.reunionPhotoFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
 
@@ -1660,11 +1553,11 @@ function Edit_ReunionChecklist() {
                                                 onChange={handleChange}
                                             />
                                         </Col>
-                                        <Col sm="7" className="d-flex align-items-center">
+                                        <Col sm="5" className="d-flex align-items-center">
                                             <Form.Label column sm="2">
                                                 Attach:
                                             </Form.Label>
-                                            <Col md={5}>
+                                            <Col md="6">
                                                 <Form.Control
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
@@ -1675,23 +1568,22 @@ function Edit_ReunionChecklist() {
                                                 />
                                             </Col>
 
-                                            <Col md={5} className='d-flex justify-content-between mx-3'>
-                                                {Array.isArray(formData.witnessSignatureFile) && formData.witnessSignatureFile.length > 0 ? (
-                                                    formData.witnessSignatureFile.map((filePath, idx) => (
+                                            <Col md="6">
+                                                {formData.witnessSignatureFile && typeof formData.witnessSignatureFile === "string" && (
+                                                    formData.witnessSignatureFile.split(',').map((file, index) => (
                                                         <a
-                                                            key={idx}
-                                                            href={`http://localhost:5002/${filePath}`}
+                                                            key={index}
+                                                            href={`http://localhost:5002/${file.trim()}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="me-2 d-flex"
+                                                            className="ms-2"
                                                         >
-                                                            View {idx + 1}
+                                                            View {index + 1}
                                                         </a>
                                                     ))
-                                                ) : (
-                                                    <span className="text-muted">No files</span>
                                                 )}
                                             </Col>
+
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} className='icon_checkList'>

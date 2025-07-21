@@ -712,12 +712,14 @@ const updateChecklist = async (req, res) => {
             return res.status(400).json({ message: "Admission number is required" });
         }
 
-        const getFilePath = (field) =>
+        const getFilePath = (field, existingPath) =>
             req.files && req.files[field]
-                ? req.files[field].map(f => `uploads/Reunion/Discharge_Checklist/${f.filename}`).join(',')
-                : '';
+                ? req.files[field].map(file => `uploads/Reunion/Discharge_Checklist/${file.filename}`).join(',')
+                : existingPath; // Keep old value if no new file uploaded
 
+        const [existingRows] = await db.query('SELECT familyRequestLetterFile, selfDeclarationFile, mediaConsentFile, familyIDproofFile, residentIDproofFile,aadharCardFile, udidCardFile,  disabilityCertificateFile,bankPassbookFile, healthInsuranceFile,medicalReportFile,  dischargeSummaryFile, medicationsFile,ClothesFile, possessionsRecoveredFile, dischargeAllowanceFile, travelExpensesFile, travelSafetyLetterFile, reunionPhotoFile, witnessSignatureFile  FROM discharge_checklist WHERE admission_no = ?', [admission_no]);
 
+        const existing = existingRows[0] || {};
 
         const {
             familyRequestLetter,
@@ -762,7 +764,7 @@ const updateChecklist = async (req, res) => {
                 possessionsRecovered = ?, possessionsRecoveredFile = ?,
                 dischargeAllowance = ?, dischargeAllowanceFile = ?,
                 travelExpenses = ?, travelExpensesFile = ?,
-                copyOfdischargeSummary = ?, copyOfdischargeSummaryFile = ?,
+                copyOfdischargeSummary = ?,
                 travelSafetyLetter = ?, travelSafetyLetterFile = ?,
                 reunionPhoto = ?, reunionPhotoFile = ?,
                 witnessSignature = ?, witnessSignatureFile = ?,
@@ -774,48 +776,51 @@ const updateChecklist = async (req, res) => {
             familyRequestLetter,
             selfDeclarationLetter,
             mediaConsentLetter,
-            getFilePath('familyRequestLetterFile'),
-            getFilePath('selfDeclarationFile'),
-            getFilePath('mediaConsentFile'),
+            getFilePath('familyRequestLetterFile[]', existing.familyRequestLetterFile),
+            getFilePath('selfDeclarationFile[]', existing.selfDeclarationFile),
+            getFilePath('mediaConsentFile[]', existing.mediaConsentFile),
             familyIDproof,
-            getFilePath('familyIDproofFile'),
+            getFilePath('familyIDproofFile[]', existing.familyIDproofFile),
             residentIDproof,
-            getFilePath('residentIDproofFile'),
+            getFilePath('residentIDproofFile[]', existing.residentIDproofFile),
             aadharCard,
-            getFilePath('aadharCardFile'),
+            getFilePath('aadharCardFile[]', existing.aadharCardFile),
             udidCard,
-            getFilePath('udidCardFile'),
+            getFilePath('udidCardFile[]', existing.udidCardFile),
             disabilityCertificate,
-            getFilePath('disabilityCertificateFile'),
+            getFilePath('disabilityCertificateFile[]', existing.disabilityCertificateFile),
             bankPassbook,
-            getFilePath('bankPassbookFile'),
+            getFilePath('bankPassbookFile[]', existing.bankPassbookFile),
             healthInsurance,
-            getFilePath('healthInsuranceFile'),
+            getFilePath('healthInsuranceFile[]', existing.healthInsuranceFile),
             medicalReport,
-            getFilePath('medicalReportFile'),
+            getFilePath('medicalReportFile[]', existing.medicalReportFile),
             dischargeSummary,
-            getFilePath('dischargeSummaryFile'),
+            getFilePath('dischargeSummaryFile[]', existing.dischargeSummaryFile),
             medications,
-            getFilePath('medicationsFile'),
+            getFilePath('medicationsFile[]', existing.medicationsFile),
             Clothes,
-            getFilePath('ClothesFile'),
+            getFilePath('ClothesFile[]', existing.ClothesFile),
             possessionsRecovered,
-            getFilePath('possessionsRecoveredFile'),
+            getFilePath('possessionsRecoveredFile[]', existing.possessionsRecoveredFile),
             dischargeAllowance,
-            getFilePath('dischargeAllowanceFile'),
+            getFilePath('dischargeAllowanceFile[]', existing.dischargeAllowanceFile),
             travelExpenses,
-            getFilePath('travelExpensesFile'),
+            getFilePath('travelExpensesFile[]', existing.travelExpensesFile),
             copyOfdischargeSummary,
-            getFilePath('copyOfdischargeSummaryFile'),
+            getFilePath('copyOfdischargeSummaryFile[]', existing.copyOfdischargeSummaryFile),
             travelSafetyLetter,
-            getFilePath('travelSafetyLetterFile'),
+            getFilePath('travelSafetyLetterFile[]', existing.travelSafetyLetterFile),
             reunionPhoto,
-            getFilePath('reunionPhotoFile'),
+            getFilePath('reunionPhotoFile[]', existing.reunionPhotoFile),
             witnessSignature,
-            getFilePath('witnessSignatureFile'),
+            getFilePath('witnessSignatureFile[]', existing.witnessSignatureFile),
             any_other,
             admission_no
         ];
+
+        console.log("Uploaded travelExpensesFile:", req.files['travelExpensesFile']);
+        console.log(req.files);
 
         await db.query(query, values);
         res.status(200).json({ message: "Discharge checklist updated successfully" });

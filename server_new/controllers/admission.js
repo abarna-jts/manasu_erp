@@ -74,9 +74,17 @@ const createFirstForm = async (req, res) => {
     } = req.body;
 
     // File paths
-    const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
-    const policeMemoPath = req.files['attach_policeMemo'] ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}` : null;
-    const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
+    const rescue_image_path = req.files['rescue_image']
+      ? req.files['rescue_image'].map(file => `uploads/Rescue_Document/${file.filename}`)
+      : [];
+    // const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
+    const policeMemoPath = req.files['attach_policeMemo']
+      ? req.files['attach_policeMemo'].map(file => `uploads/Rescue_Document/${file.filename}`)
+      : [];
+    const govIdFile_path = req.files['govIdFile']
+      ? req.files['govIdFile'].map(file => `uploads/Rescue_Document/${file.filename}`)
+      : [];
+    // const govIdFile_path = req.files['govIdFile'] ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}` : null;
 
     const q = `
       INSERT INTO first_information (
@@ -93,15 +101,15 @@ const createFirstForm = async (req, res) => {
     `;
 
     const values = [
-      referred_by, from_place, date_time, police_memo, policeMemoPath,
+      referred_by, from_place, date_time, police_memo, JSON.stringify(policeMemoPath),
       police_station, information_public, admission_date, admission_no, rescue_name,
       age || null, rescue_status, religion || null, language1, language2 || null, language3 || null,
       education, father || null, mother || null, other_relation || null, place || null,
       phone_no || null, phone_no_two || null, clothing || null, dress_code || null, complexion || null,
       indentification_mark || null, tattoo || null, wound_infection || null, height, weight,
       things_carried || null, remark || null, mental_status, behaviour, community_ability,
-      self_careCapacity, diagnosis, govIdType, govIdNumber || null, govIdFile_path || null,
-      rescue_image_path
+      self_careCapacity, diagnosis, govIdType, govIdNumber || null, JSON.stringify(govIdFile_path) || null,
+      JSON.stringify(rescue_image_path)
     ];
 
     const [result] = await db.query(q, values);
@@ -234,14 +242,18 @@ const UpdateFirstForm = async (req, res) => {
 
     const rescueId = req.params.id;
     const newRescueImage = req.files['rescue_image']
-      ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}`
+      ? req.files['rescue_image'].map(f => `uploads/Rescue_Images/${f.filename}`)
       : null;
+
     const newAttachPoliceMemo = req.files['attach_policeMemo']
-      ? `uploads/Rescue_Document/${req.files['attach_policeMemo'][0].filename}`
+      ? req.files['attach_policeMemo'].map(f => `uploads/Rescue_Document/${f.filename}`)
       : null;
+
     const newgovIdFile = req.files['govIdFile']
-      ? `uploads/Rescue_Document/${req.files['govIdFile'][0].filename}`
+      ? req.files['govIdFile'].map(f => `uploads/Rescue_Document/${f.filename}`)
       : null;
+
+
     // const newRescueImage = req.file ? `uploads/Rescue_Images/${req.file.filename}` : null;
     // const newAttachPoliceMemo = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
     // const newgovIdFile = req.file ? `uploads/Rescue_Document/${req.file.filename}` : null;
@@ -249,9 +261,17 @@ const UpdateFirstForm = async (req, res) => {
     // Fetch the existing logo path
     const [selectData] = await db.query("SELECT rescue_image, attach_policeMemo, govIdFile FROM first_information WHERE id = ?", [rescueId]);
     const existingData = selectData[0] || {};
-    const finalRescuePath = newRescueImage || existingData.rescue_image;
-    const finalPoliceMemo = newAttachPoliceMemo || existingData.attach_policeMemo;
-    const finalGovtID = newgovIdFile || existingData.govIdFile;
+    const finalRescuePath = newRescueImage
+      ? JSON.stringify(newRescueImage)
+      : existingData.rescue_image;
+
+    const finalPoliceMemo = newAttachPoliceMemo
+      ? JSON.stringify(newAttachPoliceMemo)
+      : existingData.attach_policeMemo;
+
+    const finalGovtID = newgovIdFile
+      ? JSON.stringify(newgovIdFile)
+      : existingData.govIdFile;
 
     // Update the catalogue
     const updateQuery = `

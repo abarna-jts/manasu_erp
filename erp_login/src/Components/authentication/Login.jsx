@@ -3,10 +3,15 @@ import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup } from '
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+
 
 function Login() {
     const [form, setForm] = useState({ email: '', password: '' });
     const [token, setToken] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -63,12 +68,21 @@ function Login() {
                                             <Form.Group id="password" className="mb-4 text-start">
                                                 <Form.Label>Your Password</Form.Label>
                                                 <InputGroup>
-                                                    {/* <InputGroup.Text>
-                                    <FontAwesomeIcon icon={faUnlockAlt} />
-                                    </InputGroup.Text> */}
-                                                    <Form.Control required type="password" name="password" onChange={handleChange} />
+                                                    <Form.Control
+                                                        required
+                                                        type={showPassword ? "text" : "password"}
+                                                        name="password"
+                                                        onChange={handleChange}
+                                                    />
+                                                    <InputGroup.Text
+                                                        style={{ cursor: 'pointer', userSelect: 'none' }}
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                    >
+                                                        {showPassword ? '' : '👁️'}
+                                                    </InputGroup.Text>
                                                 </InputGroup>
                                             </Form.Group>
+
                                             <div className="d-flex justify-content-between align-items-center mb-4">
                                                 <Form.Check type="checkbox">
                                                     <FormCheck.Input id="defaultCheck5" className="me-2" />

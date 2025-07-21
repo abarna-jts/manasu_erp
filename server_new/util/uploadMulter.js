@@ -18,9 +18,9 @@ const storage = multer.diskStorage({
 
 // Multer instance (callback-style)
 const upload = multer({ storage: storage }).fields([
-  { name: 'rescue_image', maxCount: 1 },
-  { name: 'attach_policeMemo', maxCount: 1 },
-  { name: 'govIdFile', maxCount: 1 },
+  { name: 'rescue_image', maxCount: 15 },
+  { name: 'attach_policeMemo', maxCount: 15 },
+  { name: 'govIdFile', maxCount: 15 },
 ]);
 
 // ✅ Now promisify AFTER upload is declared

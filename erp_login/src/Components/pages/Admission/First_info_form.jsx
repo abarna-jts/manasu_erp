@@ -22,6 +22,7 @@ function First_info_form() {
     const [rescue_image, setRescueImage] = useState(null);
     const [attach_policeMemo, setAttachPoliceMemo] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [govtImagePreview, setGovtImagePreview] = useState(null);
     const [isStep1Invalid, setIsStep1Invalid] = useState(false);
     const [isStep2Invalid, setIsStep2Invalid] = useState(false);
     const [isStep3Invalid, setIsStep3Invalid] = useState(false);
@@ -29,20 +30,33 @@ function First_info_form() {
     const [isStep5Invalid, setIsStep5Invalid] = useState(false);
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setRescueImage(file);
-            setImagePreview(URL.createObjectURL(file));
-        }
+        const files = Array.from(e.target.files);
+        setRescueImage(files);
+
+        const previewUrls = files.map((file) => URL.createObjectURL(file));
+        setImagePreview(previewUrls);
     };
 
-    const handleMemoChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setAttachPoliceMemo(file);
-            setImagePreview(URL.createObjectURL(file));
-        }
+
+    // const handleMemoChange = (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         setAttachPoliceMemo(file);
+    //         setImagePreview(URL.createObjectURL(file));
+    //     }
+    // }
+
+    const handleGovtIdFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setGovIdFile(files);
+
+        const previewUrls = files.map((file) => URL.createObjectURL(file));
+        setGovtImagePreview(previewUrls);
     }
+    const handleMemoChange = (e) => {
+        const files = Array.from(e.target.files);
+        setAttachPoliceMemo(files);
+    };
     const [rescue_name, setRescueName] = useState('');
     const [age, setAge] = useState('');
     const [rescue_status, setRescueStatus] = useState('');
@@ -592,10 +606,23 @@ function First_info_form() {
         // formData.append('f_member_address', f_member_address);
 
 
+        attach_policeMemo.forEach((file) => {
+            formData.append("attach_policeMemo", file);
+        });
 
-        formData.append('rescue_image', rescue_image);
-        formData.append('attach_policeMemo', attach_policeMemo);
-        formData.append('govIdFile', govIdFile);
+        rescue_image.forEach((file) => {
+            formData.append("rescue_image", file);
+        });
+
+        govIdFile.forEach((file) => {
+            formData.append("govIdFile", file);
+        });
+
+
+
+        // formData.append('rescue_image', rescue_image);
+        // formData.append('attach_policeMemo', attach_policeMemo);
+        // formData.append('govIdFile', govIdFile);
 
         console.log("Rescue Image File", rescue_image);
         console.log("Police Memo:", attach_policeMemo);
@@ -617,12 +644,10 @@ function First_info_form() {
             });
             console.log("Full Response:", response.data);
             if (response.data.message === "First Form Created Successfully") {
-                setSubmissionMessage("Form submitted successfully!");
-                setMessageType("success");
-                window.location.reload();
+                alert("Form submitted successfully!");
+                window.location.reload(); 
             } else {
-                setSubmissionMessage("Submission failed.");
-                setMessageType("danger");
+                alert("Form submission failed: " + response.data.message);
             }
         } catch (error) {
             console.error("Error submitting form", error);
@@ -800,20 +825,9 @@ function First_info_form() {
                                                     accept=".jpg,.jpeg,.png"
                                                     onChange={handleMemoChange}
                                                     required={!attach_policeMemo}
+                                                    multiple
                                                 />
-                                                {/* {attach_policeMemo && (
-                                                    <>
-                                                        <div className="mt-1 text-success">
-                                                            Selected file: {attach_policeMemo.name}
-                                                        </div>
-                                                        <img
-                                                            src={imagePreview}
-                                                            alt="Preview"
-                                                            className="mt-2"
-                                                            style={{ maxWidth: "200px", maxHeight: "200px", border: "1px solid #ccc" }}
-                                                        />
-                                                    </>
-                                                )} */}
+
                                             </Form.Group>
                                         </Col>
                                     </Row>
@@ -873,19 +887,27 @@ function First_info_form() {
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleImageChange}
                                             required={!rescue_image}
+                                            multiple
                                         />
                                         {rescue_image && (
-                                            <>
-                                                <div className="mt-1 text-success">
-                                                    Selected file: {rescue_image.name}
-                                                </div>
-                                                <img
-                                                    src={imagePreview}
-                                                    alt="Preview"
-                                                    className="mt-2"
-                                                    style={{ maxWidth: "200px", maxHeight: "200px", border: "1px solid #ccc" }}
-                                                />
-                                            </>
+                                            <div className="mt-2 d-flex flex-wrap">
+                                                {imagePreview.map((preview, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={preview}
+                                                        alt={`Preview ${index}`}
+                                                        style={{
+                                                            width: "120px",
+                                                            height: "120px",
+                                                            objectFit: "cover",
+                                                            marginRight: "10px",
+                                                            marginBottom: "10px",
+                                                            border: "1px solid #ccc",
+                                                            borderRadius: "4px"
+                                                        }}
+                                                    />
+                                                ))}
+                                            </div>
                                         )}
                                     </Form.Group>
                                 </Col>
@@ -1070,11 +1092,27 @@ function First_info_form() {
                                                             type="file"
                                                             name="govIdFile"
                                                             accept=".pdf,image/*"
-                                                            onChange={(e) => setGovIdFile(e.target.files[0])}
+                                                            multiple
+                                                            onChange={handleGovtIdFileChange}
                                                         />
                                                         {govIdFile && (
-                                                            <div className="mt-1 text-success">
-                                                                Selected file: {govIdFile.name}
+                                                            <div className="mt-2 d-flex flex-wrap">
+                                                                {govtImagePreview.map((preview, index) => (
+                                                                    <img
+                                                                        key={index}
+                                                                        src={preview}
+                                                                        alt={`Preview ${index}`}
+                                                                        style={{
+                                                                            width: "120px",
+                                                                            height: "120px",
+                                                                            objectFit: "cover",
+                                                                            marginRight: "10px",
+                                                                            marginBottom: "10px",
+                                                                            border: "1px solid #ccc",
+                                                                            borderRadius: "4px"
+                                                                        }}
+                                                                    />
+                                                                ))}
                                                             </div>
                                                         )}
                                                     </Col>

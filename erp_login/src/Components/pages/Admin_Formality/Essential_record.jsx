@@ -629,13 +629,26 @@ function Essential_record() {
             console.log("API Result:", result);
 
             if (result && result.rescue_image) {
-                const imagePath = result.rescue_image.startsWith("http")
-                    ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                let imagePath = "";
+
+                try {
+                    // Attempt to parse rescue_image as JSON (in case it's a stringified array)
+                    const parsedImage = JSON.parse(result.rescue_image);
+                    if (Array.isArray(parsedImage)) {
+                        imagePath = `http://localhost:5002/${parsedImage[0]}`; // Use first image
+                    } else {
+                        imagePath = `http://localhost:5002/${result.rescue_image}`;
+                    }
+                } catch (e) {
+                    // If it's not a stringified array, treat as normal string path
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${result.rescue_image}`;
+                }
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");
-                setError(""); // clear any previous error
+                setError(""); // Clear previous error
             } else {
                 setRescueImage(null);
                 setRescueName("");
@@ -648,6 +661,7 @@ function Essential_record() {
             setError("Admission Number Not found");
         }
     };
+
 
     // Trigger when admission number changes
     useEffect(() => {

@@ -68,6 +68,8 @@ function Edit_Rescue_details() {
   });
   const { id } = useParams();
 
+  const [files, setFiles] = useState({});
+
   const apiRoute = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
   });
@@ -122,7 +124,70 @@ function Edit_Rescue_details() {
           rescue_image_url: data.rescue_image,
           attach_policeMemo_url: data.attach_policeMemo,
           govIdFile_url: data.govIdFile,
+
+
         });
+
+        let policeMemoAttach = [];
+        if (data.attach_policeMemo) {
+          try {
+            const parsed = JSON.parse(data.attach_policeMemo);
+            if (Array.isArray(parsed)) {
+              policeMemoAttach = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+            }
+          } catch (err) {
+            console.warn('Failed to parse attach_policeMemo:', err);
+            // Fallback: comma-separated string
+            policeMemoAttach = data.attach_policeMemo
+              .split(',')
+              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+          }
+        }
+
+        let RescueImage = [];
+        if (data.rescue_image) {
+          try {
+            const parsed = JSON.parse(data.rescue_image);
+            if (Array.isArray(parsed)) {
+              RescueImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+            }
+          } catch (err) {
+            console.warn('Failed to parse attach_policeMemo:', err);
+            // Fallback: comma-separated string
+            RescueImage = data.rescue_image
+              .split(',')
+              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+          }
+        }
+
+        let govtFilePath = [];
+        if (data.govIdFile) {
+          try {
+            const parsed = JSON.parse(data.govIdFile);
+            if (Array.isArray(parsed)) {
+              govtFilePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+            }
+          } catch (err) {
+            console.warn('Failed to parse govIdFile:', err);
+            // Fallback: comma-separated string
+            govtFilePath = data.govIdFile
+              .split(',')
+              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+          }
+        }
+
+        console.log("Rescue Image Path", RescueImage);
+        console.log("Police Memo Attachment", policeMemoAttach);
+        console.log("Govertnment Id File", govtFilePath);
+        // Set files state
+        setFiles((files) => ({
+          ...files,
+          rescue_image: RescueImage,
+          attach_policeMemo: policeMemoAttach,
+          govIdFile: govtFilePath
+        }));
+
+
       } catch (error) {
         console.error('Failed to fetch:', error);
       }
@@ -132,15 +197,11 @@ function Edit_Rescue_details() {
   }, [id]);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    const { name } = e.target;
-
-    if (file) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: file
-      }));
-    }
+    const { name, files } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: [...files] // store multiple files as array
+    }));
   };
 
 
@@ -220,13 +281,19 @@ function Edit_Rescue_details() {
     formDataToSend.append("diagnosis", formData.diagnosis);
 
     if (formData.rescue_image) {
-      formDataToSend.append("rescue_image", formData.rescue_image);
+      formData.rescue_image.forEach((file) =>
+        formDataToSend.append("rescue_image", file)
+      );
     }
     if (formData.attach_policeMemo) {
-      formDataToSend.append("attach_policeMemo", formData.attach_policeMemo);
+      formData.attach_policeMemo.forEach((file) =>
+        formDataToSend.append("attach_policeMemo", file)
+      );
     }
     if (formData.govIdFile) {
-      formDataToSend.append("govIdFile", formData.govIdFile);
+      formData.govIdFile.forEach((file) =>
+        formDataToSend.append("govIdFile", file)
+      );
     }
 
     try {
@@ -341,16 +408,29 @@ function Edit_Rescue_details() {
                     </Form.Label>
                     <Col sm="8 d-flex flex-row align-items-center">
 
-                      {formData.attach_policeMemo_url && (
-                        <img
-                          src={`https://www.pahrultours.com/app2/${formData.attach_policeMemo_url}`}
-                          alt="Rescue Preview"
-                          style={{ marginTop: '10px', width: '100px', maxHeight: '200px', objectFit: 'cover' }}
-                        />
-                      )}
+                      {Array.isArray(files?.attach_policeMemo) &&
+                        files.attach_policeMemo.map((img, index) => (
+                          <img
+                            key={index}
+                            src={img}
+                            alt={`Police Memo ${index}`}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/fallback-image.png";
+                            }}
+                            style={{
+                              width: "100px",
+                              height: "auto",
+                              objectFit: "cover",
+                              marginRight: "10px"
+                            }}
+                          />
+                        ))}
+
                       <Form.Control
                         type="file"
                         name="attach_policeMemo"
+                        multiple
                         accept=".jpg,.jpeg,.png"
                         onChange={handleFileChange}
                       />
@@ -420,18 +500,33 @@ function Edit_Rescue_details() {
                     </Form.Label>
                     <Col sm="7 d-flex flex-column align-items-center">
 
-                      {formData.rescue_image_url && (
-                        <img
-                          src={`https://www.pahrultours.com/app2/${formData.rescue_image_url}`}
-                          alt="Rescue Preview"
-                          style={{ marginTop: '10px', width: '100px', maxHeight: '200px', objectFit: 'cover' }}
-                        />
-                      )}
+                      {Array.isArray(files.rescue_image) &&
+                        files.rescue_image.map((img, index) => (
+                          <img
+                            key={index}
+                            src={img}
+                            alt={`rescue_image ${index}`}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/fallback-image.png";
+                            }}
+                            style={{
+                              width: "100px",
+                              height: "auto",
+                              objectFit: "cover",
+                              marginRight: "10px",
+                              marginBottom: "10px"
+                            }}
+                          />
+                        ))}
+
+
                       <Form.Control
                         type="file"
                         name="rescue_image"
                         accept=".jpg,.jpeg,.png"
                         onChange={handleFileChange}
+                        multiple
                       />
                     </Col>
                   </Form.Group>
@@ -479,12 +574,26 @@ function Edit_Rescue_details() {
                             onChange={(e) =>
                               setFormData({ ...formData, govIdFile: e.target.files[0] })
                             }
+                            multiple
                           />
-                          {formData.govIdFile && (
-                            <div className="mt-1 text-success">
-                              Selected file: {formData.govIdFile.name}
-                            </div>
-                          )}
+                          {Array.isArray(files.govIdFile) &&
+                            files.govIdFile.map((img, index) => (
+                              <img
+                                key={index}
+                                src={img}
+                                alt={`govIdFile ${index}`}
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = "/fallback-image.png";
+                                }}
+                                style={{
+                                  width: "100px",
+                                  height: "auto",
+                                  objectFit: "cover",
+                                  marginRight: "10px"
+                                }}
+                              />
+                            ))}
                         </Col>
                       </Form.Group>
                     </>
