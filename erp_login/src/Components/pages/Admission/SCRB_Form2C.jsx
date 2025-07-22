@@ -329,13 +329,37 @@ function SCRB_Form2C() {
       console.log("API Result:", result);
 
       if (result && result.rescue_image) {
-        const imagePath = result.rescue_image.startsWith("http")
-          ? result.rescue_image
-          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+        let imagePath = null;
 
-        setRescueImage(imagePath);
-        setRescueName(result.rescue_name || "");
-        setError(""); // clear any previous error
+        // Check if rescue_image is an array-like string
+        if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+          try {
+            // Parse the string to get the array
+            const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+
+            if (Array.isArray(imageArray) && imageArray.length > 0) {
+              imagePath = `http://localhost:5002/${imageArray[0]}`;
+            }
+          } catch (parseError) {
+            console.error("Error parsing image array:", parseError);
+            imagePath = null;
+          }
+        } else {
+          // It's a single image path
+          imagePath = result.rescue_image.startsWith("http")
+            ? result.rescue_image
+            : `http://localhost:5002/${result.rescue_image}`;
+        }
+
+        if (imagePath) {
+          setRescueImage(imagePath);
+          setRescueName(result.rescue_name || "");
+          setError("");
+        } else {
+          setRescueImage(null);
+          setRescueName("");
+          setError("Image not found for this admission number");
+        }
       } else {
         setRescueImage(null);
         setRescueName("");

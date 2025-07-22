@@ -70,7 +70,10 @@ function SCRB_form() {
 
 
     const handleFileChange = (e) => {
-        setFiles({ ...files, [e.target.name]: e.target.files[0] });
+        setFiles({
+            ...files,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
     const handleSearch = async () => {
@@ -81,19 +84,34 @@ function SCRB_form() {
             const result = response.data.data[0];
             console.log("API Result:", result);
 
+            let imagePath = null;
+
             if (result && result.rescue_image) {
                 console.log("Raw image path:", result.rescue_image);
 
-                const cleanPath = result.rescue_image.startsWith("/")
-                    ? result.rescue_image.slice(1)
-                    : result.rescue_image;
+                // Case 1: If it's a stringified array of images
+                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+                    try {
+                        const parsedArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+                        if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+                            imagePath = `http://localhost:5002/${parsedArray[0]}`;
+                        }
+                    } catch (parseErr) {
+                        console.error("Failed to parse image array", parseErr);
+                        imagePath = null;
+                    }
+                } else {
+                    // Case 2: It's a direct path
+                    const cleanPath = result.rescue_image.startsWith("/")
+                        ? result.rescue_image.slice(1)
+                        : result.rescue_image;
 
-                const imagePath = result.rescue_image.startsWith("http")
-                    ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${cleanPath}`;
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${cleanPath}`;
+                }
 
                 console.log("Final image path:", imagePath);
-
                 setRescueImage(imagePath);
                 setError('');
             } else {
@@ -119,6 +137,7 @@ function SCRB_form() {
             setError("Admission Number Not found");
         }
     };
+
 
     const old_photoRef = useRef(null);
     const new_photoRef = useRef(null);
@@ -172,6 +191,30 @@ function SCRB_form() {
         data.append('seal', files.seal);
         data.append('name_rescue', formData.name_rescue);
         data.append('phone_no', formData.phone_no);
+
+        if (files.old_photo && files.old_photo.length > 0) {
+            files.old_photo.forEach(file => {
+                data.append('old_photo', file); // ✅ no []
+            });
+        }
+
+        if (files.new_photo && files.new_photo.length > 0) {
+            files.new_photo.forEach(file => {
+                data.append('new_photo', file); // ✅ no []
+            });
+        }
+
+        if (files.signature && files.signature.length > 0) {
+            files.signature.forEach(file => {
+                data.append('signature', file); // ✅ no []
+            });
+        }
+
+        if (files.seal && files.seal.length > 0) {
+            files.seal.forEach(file => {
+                data.append('seal', file); // ✅ no []
+            });
+        }
 
         try {
             const res = await apiRoute.post('/scrb_form/create_form2', data, {
@@ -281,14 +324,79 @@ function SCRB_form() {
                 addition_info: data.addition_info || '',
             }));
 
+            let oldPhotoPath = [];
+            if (data.old_photo) {
+                try {
+                    const parsed = JSON.parse(data.old_photo);
+                    if (Array.isArray(parsed)) {
+                        oldPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    oldPhotoPath = data.old_photo
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let newPhotoPath = [];
+            if (data.new_photo) {
+                try {
+                    const parsed = JSON.parse(data.new_photo);
+                    if (Array.isArray(parsed)) {
+                        newPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    newPhotoPath = data.new_photo
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let signaturepath = [];
+            if (data.signature) {
+                try {
+                    const parsed = JSON.parse(data.signature);
+                    if (Array.isArray(parsed)) {
+                        signaturepath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    signaturepath = data.signature
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let sealpath = [];
+            if (data.seal) {
+                try {
+                    const parsed = JSON.parse(data.seal);
+                    if (Array.isArray(parsed)) {
+                        sealpath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    sealpath = data.seal
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+
             // Base path for images
             const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
 
             // Handle old and new photo paths correctly
-            const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2${data.old_photo}` : null;
-            const newPhotoPath = data.new_photo ? `https://www.pahrultours.com/app2${data.new_photo}` : null;
-            const signaturepath = data.signature ? `https://www.pahrultours.com/app2${data.signature}` : null;
-            const sealpath = data.seal ? `https://www.pahrultours.com/app2${data.seal}` : null;
+            // const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2${data.old_photo}` : null;
+            // const newPhotoPath = data.new_photo ? `https://www.pahrultours.com/app2${data.new_photo}` : null;
+            // const signaturepath = data.signature ? `https://www.pahrultours.com/app2${data.signature}` : null;
+            // const sealpath = data.seal ? `https://www.pahrultours.com/app2${data.seal}` : null;
 
             // Set files state
             setFiles((files) => ({
@@ -554,6 +662,7 @@ function SCRB_form() {
                                                         onChange={handleFileChange}
                                                         ref={old_photoRef}
                                                         required
+                                                        multiple
                                                     />
                                                 </div>
 
@@ -568,8 +677,7 @@ function SCRB_form() {
                                                                 alt="Rescue"
                                                                 style={{
                                                                     width: "100px",
-                                                                    height: "100px",
-                                                                    objectFit: "cover",
+                                                                    height: "auto",
                                                                     border: "1px solid #ccc",
                                                                     marginTop: "10px",
                                                                 }}
@@ -583,7 +691,9 @@ function SCRB_form() {
                                                         className="form-control"
                                                         onChange={handleFileChange}
                                                         ref={new_photoRef}
-                                                        
+                                                        multiple
+                                                        required
+
                                                     />
                                                 </div>
                                             </div>
@@ -911,6 +1021,7 @@ function SCRB_form() {
                                                 className="form-control"
                                                 ref={signatureRef}
                                                 required
+                                                multiple
                                             />
                                         </td>
                                     </tr>
@@ -973,6 +1084,7 @@ function SCRB_form() {
                                                 className="form-control"
                                                 ref={sealRef}
                                                 required
+                                                multiple
                                             />
                                         </td>
                                     </tr>
@@ -1072,33 +1184,45 @@ function SCRB_form() {
                                                 {/* Old Photo */}
                                                 <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
                                                     <label>Old Photo</label><br />
-                                                    {files.old_photo ? (
-                                                        <>
+                                                    {Array.isArray(files.old_photo) &&
+                                                        files.old_photo.map((imgUrl, index) => (
                                                             <img
-                                                                src={files.old_photo}
-                                                                alt="Old"
-                                                                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                                key={index}
+                                                                src={imgUrl}
+                                                                alt={`old_photo - ${index}`}
+                                                                style={{
+                                                                    width: "150px",
+                                                                    height: "auto",
+                                                                    margin: "10px",
+                                                                    border: "1px solid #ccc",
+                                                                }}
+                                                                onError={(e) => {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                }}
                                                             />
-                                                        </>
-                                                    ) : (
-                                                        <p>No old photo available</p> // Display if no photo
-                                                    )}
+                                                        ))}
                                                 </div>
 
                                                 {/* New Photo */}
                                                 <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
                                                     <label>New Photo</label><br />
-                                                    {files.new_photo ? (
-                                                        <>
+                                                    {Array.isArray(files.new_photo) &&
+                                                        files.new_photo.map((imgUrl, index) => (
                                                             <img
-                                                                src={files.new_photo}
-                                                                alt="New"
-                                                                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                                key={index}
+                                                                src={imgUrl}
+                                                                alt={`new_photo - ${index}`}
+                                                                style={{
+                                                                    width: "150px",
+                                                                    height: "auto",
+                                                                    margin: "10px",
+                                                                    border: "1px solid #ccc",
+                                                                }}
+                                                                onError={(e) => {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                }}
                                                             />
-                                                        </>
-                                                    ) : (
-                                                        <p>No new photo available</p> // Display if no photo
-                                                    )}
+                                                        ))}
                                                 </div>
                                             </div>
                                         </td>
@@ -1416,17 +1540,23 @@ function SCRB_form() {
                                             </div>
                                         </td>
                                         <td style={{ marginBottom: "20px" }}>
-                                            {files.signature ? (
-                                                <>
+                                            {Array.isArray(files.signature) &&
+                                                files.signature.map((imgUrl, index) => (
                                                     <img
-                                                        src={files.signature}
-                                                        alt="Old"
-                                                        style={{ width: "80px", height: "80px" }}
+                                                        key={index}
+                                                        src={imgUrl}
+                                                        alt={`signature - ${index}`}
+                                                        style={{
+                                                            width: "150px",
+                                                            height: "auto",
+                                                            margin: "10px",
+                                                            border: "1px solid #ccc",
+                                                        }}
+                                                        onError={(e) => {
+                                                            e.target.src = "/fallback-image.png";
+                                                        }}
                                                     />
-                                                </>
-                                            ) : (
-                                                <p>No signature available</p> // Display if no photo
-                                            )}
+                                                ))}
                                         </td>
                                     </tr>
                                     <tr className="mt-5 pt-5">
@@ -1477,17 +1607,23 @@ function SCRB_form() {
                                             </div>
                                         </td>
                                         <td>
-                                            {files.seal ? (
-                                                <>
+                                            {Array.isArray(files.seal) &&
+                                                files.seal.map((imgUrl, index) => (
                                                     <img
-                                                        src={files.seal}
-                                                        alt="Old"
-                                                        style={{ width: "80px", height: "80px" }}
+                                                        key={index}
+                                                        src={imgUrl}
+                                                        alt={`seal - ${index}`}
+                                                        style={{
+                                                            width: "150px",
+                                                            height: "auto",
+                                                            margin: "10px",
+                                                            border: "1px solid #ccc",
+                                                        }}
+                                                        onError={(e) => {
+                                                            e.target.src = "/fallback-image.png";
+                                                        }}
                                                     />
-                                                </>
-                                            ) : (
-                                                <p>No seal available</p> // Display if no photo
-                                            )}
+                                                ))}
                                         </td>
                                     </tr>
 

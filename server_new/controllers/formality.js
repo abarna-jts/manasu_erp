@@ -1,5 +1,6 @@
 import db from "../db.js";
 import { formalityAsync } from "../util/formalityMulter.js";
+import fs from "fs/promises";
 
 const createSelfDeclaration = async (req, res) => {
     const {
@@ -114,7 +115,6 @@ const updateFormalityForm = async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "No record updated. Check if admission_no exists." });
         }
-
         return res.status(200).json({ message: "Self Declaration updated successfully!" });
 
     } catch (error) {
@@ -169,7 +169,6 @@ const createRecords = async (req, res) => {
         const bank_passbookPath = req.files?.['bank_passbook']
             ? req.files['bank_passbook'].map(file => `uploads/Rescue_Images/${file.filename}`)
             : [];
-
 
         const Form7Path = req.files?.['form7_attach']
             ? req.files['form7_attach'].map(file => `uploads/Rescue_Images/${file.filename}`)
@@ -263,11 +262,11 @@ const updateEssentialRecords = async (req, res) => {
         // const newBankPassbook = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
         // const newForm7Attach = req.file ? `uploads/Resident_DocumentFile/${req.file.filename}` : null;
         const newBankPassbook = req.files['bank_passbook']
-            ? req.files['form7_attach'].map((f) => `uploads/Rescue_Images/${f.filename}`)
+            ? req.files['bank_passbook'].map((f) => `uploads/Rescue_Images/${f.filename}`)
             : null;
 
         const newForm7Attach = req.files['form7_attach']
-            ? req.files['bank_passbook'].map((f) => `uploads/Rescue_Images/${f.filename}`)
+            ? req.files['form7_attach'].map((f) => `uploads/Rescue_Images/${f.filename}`)
             : null;
 
         // Get existing file paths

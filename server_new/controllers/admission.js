@@ -73,9 +73,13 @@ const createFirstForm = async (req, res) => {
       govIdNumber
     } = req.body;
 
-    // File paths
+    // // File paths
+    // const rescue_image_path = req.files['rescue_image']
+    //   ? req.files['rescue_image'].map(f => `uploads/Rescue_Images/${f.filename}`)
+    //   : null;
+
     const rescue_image_path = req.files['rescue_image']
-      ? req.files['rescue_image'].map(file => `uploads/Rescue_Document/${file.filename}`)
+      ? req.files['rescue_image'].map(file => `uploads/Rescue_Images/${file.filename}`)
       : [];
     // const rescue_image_path = req.files['rescue_image'] ? `uploads/Rescue_Images/${req.files['rescue_image'][0].filename}` : null;
     const policeMemoPath = req.files['attach_policeMemo']

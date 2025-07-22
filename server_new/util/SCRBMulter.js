@@ -13,10 +13,10 @@ const storage = multer.diskStorage({
 
 // Accept two files
 const upload = multer({ storage: storage }).fields([
-  { name: 'old_photo', maxCount: 1 },
-  { name: 'new_photo', maxCount: 1 },
-  { name: 'signature', maxCount: 1 },
-  { name: 'seal', maxCount: 1 }
+  { name: 'old_photo', maxCount: 15 },
+  { name: 'new_photo', maxCount: 15 },
+  { name: 'signature', maxCount: 15 },
+  { name: 'seal', maxCount: 15 }
 ]);
 
 const SCRBAsync = util.promisify(upload);

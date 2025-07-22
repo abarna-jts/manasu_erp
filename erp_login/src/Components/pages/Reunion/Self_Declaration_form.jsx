@@ -397,13 +397,37 @@ function Self_Declaration_form() {
             console.log("API Result:", result);
 
             if (result && result.rescue_image) {
-                const imagePath = result.rescue_image.startsWith("http")
-                    ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                let imagePath = null;
 
-                setRescueImage(imagePath);
-                setRescueName(result.rescue_name || "");
-                setError(""); // clear any previous error
+                // Check if rescue_image is an array-like string
+                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+                    try {
+                        // Parse the string to get the array
+                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+
+                        if (Array.isArray(imageArray) && imageArray.length > 0) {
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing image array:", parseError);
+                        imagePath = null;
+                    }
+                } else {
+                    // It's a single image path
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${result.rescue_image}`;
+                }
+
+                if (imagePath) {
+                    setRescueImage(imagePath);
+                    setRescueName(result.rescue_name || "");
+                    setError("");
+                } else {
+                    setRescueImage(null);
+                    setRescueName("");
+                    setError("Image not found for this admission number");
+                }
             } else {
                 setRescueImage(null);
                 setRescueName("");
@@ -688,9 +712,8 @@ function Self_Declaration_form() {
                                             src={imgUrl}
                                             alt={`handwritten_document - ${index}`}
                                             style={{
-                                                width: "100px",
-                                                height: "100px",
-                                                objectFit: "cover",
+                                                width: "150px",
+                                                height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
@@ -714,9 +737,8 @@ function Self_Declaration_form() {
                                             src={imgUrl}
                                             alt={`signature - ${index}`}
                                             style={{
-                                                width: "100px",
-                                                height: "100px",
-                                                objectFit: "cover",
+                                                width: "150px",
+                                                height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
@@ -740,9 +762,8 @@ function Self_Declaration_form() {
                                             src={imgUrl}
                                             alt={`photo - ${index}`}
                                             style={{
-                                                width: "100px",
-                                                height: "100px",
-                                                objectFit: "cover",
+                                                width: "150px",
+                                                height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
@@ -811,9 +832,8 @@ function Self_Declaration_form() {
                                             alt={`handwritten_document - ${index}`}
                                             loading="lazy"
                                             style={{
-                                                width: "100px",
-                                                height: "100px",
-                                                objectFit: "cover",
+                                                width: "150px",
+                                                height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
@@ -848,9 +868,8 @@ function Self_Declaration_form() {
                                             alt={`signature - ${index}`}
                                             loading="lazy"
                                             style={{
-                                                width: "100px",
-                                                height: "100px",
-                                                objectFit: "cover",
+                                                width: "150px",
+                                                height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
@@ -884,9 +903,8 @@ function Self_Declaration_form() {
                                             alt={`photo - ${index}`}
                                             loading="lazy"
                                             style={{
-                                                width: "100px",
-                                                height: "100px",
-                                                objectFit: "cover",
+                                                width: "150px",
+                                                height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}

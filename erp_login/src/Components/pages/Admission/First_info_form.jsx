@@ -29,12 +29,17 @@ function First_info_form() {
     const [isStep4Invalid, setIsStep4Invalid] = useState(false);
     const [isStep5Invalid, setIsStep5Invalid] = useState(false);
 
+    // const handleImageChange = (e) => {
+    //     const { name, files } = e.target;
+    //     setRescueImage((prevData) => ({
+    //         ...prevData,
+    //         [name]: [...files] // store multiple files as array
+    //     }));
+    // };
+
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         setRescueImage(files);
-
-        const previewUrls = files.map((file) => URL.createObjectURL(file));
-        setImagePreview(previewUrls);
     };
 
 
@@ -614,9 +619,11 @@ function First_info_form() {
             formData.append("rescue_image", file);
         });
 
-        govIdFile.forEach((file) => {
-            formData.append("govIdFile", file);
-        });
+        if (formData.govIdFile) {
+            formData.govIdFile.forEach((file) =>
+                formData.append("govIdFile", file)
+            );
+        }
 
 
 
@@ -645,7 +652,7 @@ function First_info_form() {
             console.log("Full Response:", response.data);
             if (response.data.message === "First Form Created Successfully") {
                 alert("Form submitted successfully!");
-                window.location.reload(); 
+                window.location.reload();
             } else {
                 alert("Form submission failed: " + response.data.message);
             }
@@ -889,7 +896,7 @@ function First_info_form() {
                                             required={!rescue_image}
                                             multiple
                                         />
-                                        {rescue_image && (
+                                        {/* {rescue_image && (
                                             <div className="mt-2 d-flex flex-wrap">
                                                 {imagePreview.map((preview, index) => (
                                                     <img
@@ -908,7 +915,7 @@ function First_info_form() {
                                                     />
                                                 ))}
                                             </div>
-                                        )}
+                                        )} */}
                                     </Form.Group>
                                 </Col>
                             </Row>

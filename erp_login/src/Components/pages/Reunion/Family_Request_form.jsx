@@ -713,21 +713,45 @@ function Family_Request_form() {
 
     const fetchRescueDetails = async (admission_no) => {
         try {
-            const response = await apiRoute.get(`/scrb_form/get_scrbform2data/${admission_no}`);
-            const result = response.data;
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
             console.log("API Result:", result);
 
-            if (result && result.data) {
-                const imagePath = result.data.rescue_image.startsWith("http")
-                    ? result.data.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.data.rescue_image}`;
+            if (result && result.rescue_image) {
+                let imagePath = null;
 
-                setRescueImage(imagePath);
-                setRescueName(result.data.rescue_name || "");
-                setError(""); // clear any previous error
+                // Check if rescue_image is an array-like string
+                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+                    try {
+                        // Parse the string to get the array
+                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+
+                        if (Array.isArray(imageArray) && imageArray.length > 0) {
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing image array:", parseError);
+                        imagePath = null;
+                    }
+                } else {
+                    // It's a single image path
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${result.rescue_image}`;
+                }
+
+                if (imagePath) {
+                    setRescueImage(imagePath);
+                    setRescueName(result.rescue_name || "");
+                    setError("");
+                } else {
+                    setRescueImage(null);
+                    setRescueName("");
+                    setError("Image not found for this admission number");
+                }
             } else {
                 setRescueImage(null);
-
+                setRescueName("");
                 setError("Image not found for this admission number");
             }
         } catch (error) {
@@ -1378,9 +1402,8 @@ function Family_Request_form() {
                                                     src={imgUrl}
                                                     alt={`f_aadhar_card - ${index}`}
                                                     style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
+                                                        width: "150px",
+                                                        height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
@@ -1416,9 +1439,8 @@ function Family_Request_form() {
                                                     src={imgUrl}
                                                     alt={`f_ration_card - ${index}`}
                                                     style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
+                                                        width: "150px",
+                                                        height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
@@ -1455,9 +1477,8 @@ function Family_Request_form() {
                                                     src={imgUrl}
                                                     alt={`r_aadhar_card - ${index}`}
                                                     style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
+                                                        width: "150px",
+                                                        height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
@@ -1494,9 +1515,8 @@ function Family_Request_form() {
                                                     src={imgUrl}
                                                     alt={`r_ration_card - ${index}`}
                                                     style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
+                                                        width: "150px",
+                                                        height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
@@ -1531,9 +1551,8 @@ function Family_Request_form() {
                                                     src={imgUrl}
                                                     alt={`govt_id - ${index}`}
                                                     style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
+                                                        width: "150px",
+                                                        height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
@@ -1767,24 +1786,24 @@ function Family_Request_form() {
                                         {Array.isArray(files.f_aadhar_card) &&
                                             files.f_aadhar_card.map((imgUrl, index) => (
                                                 <img
-                                                        key={index}
-                                                        src={imgUrl}
-                                                        alt={`f_aadhar_card - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                            objectFit: "cover",
-                                                            margin: "10px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`f_aadhar_card - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
                                             ))}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
@@ -1817,24 +1836,24 @@ function Family_Request_form() {
                                         {Array.isArray(files.f_ration_card) &&
                                             files.f_ration_card.map((imgUrl, index) => (
                                                 <img
-                                                        key={index}
-                                                        src={imgUrl}
-                                                        alt={`f_ration_card - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                            objectFit: "cover",
-                                                            margin: "10px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`f_ration_card - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
                                             ))}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
@@ -1871,24 +1890,23 @@ function Family_Request_form() {
                                         {Array.isArray(files.r_aadhar_card) &&
                                             files.r_aadhar_card.map((imgUrl, index) => (
                                                 <img
-                                                        key={index}
-                                                        src={imgUrl}
-                                                        alt={`r_aadhar_card - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                            objectFit: "cover",
-                                                            margin: "10px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`r_aadhar_card - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "150px",
+                                                        height: "auto",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
                                             ))}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
@@ -1921,24 +1939,23 @@ function Family_Request_form() {
                                         {Array.isArray(files.r_ration_card) &&
                                             files.r_ration_card.map((imgUrl, index) => (
                                                 <img
-                                                        key={index}
-                                                        src={imgUrl}
-                                                        alt={`r_ration_card - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                            objectFit: "cover",
-                                                            margin: "10px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`r_ration_card - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "150px",
+                                                        height: "auto",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
                                             ))}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
@@ -1966,18 +1983,17 @@ function Family_Request_form() {
                                                     onChange={handleInputChange} />
                                             </Col>
                                         </Form.Group>
-                                        <div style={{ minHeight: "120px", display: "flex", flexWrap: "wrap" }}>
-                                            {Array.isArray(files.govt_id) &&
-                                                files.govt_id.map((imgUrl, index) => (
+                                        {Array.isArray(files.govt_id) && files.govt_id.length > 0 && (
+                                            <div style={{ minHeight: "120px", display: "flex", flexWrap: "wrap" }}>
+                                                {files.govt_id.map((imgUrl, index) => (
                                                     <img
                                                         key={index}
                                                         src={imgUrl}
                                                         alt={`govt_id - ${index}`}
                                                         loading="lazy"
                                                         style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                            objectFit: "cover",
+                                                            width: "150px",
+                                                            height: "auto",
                                                             margin: "10px",
                                                             border: "1px solid #ccc",
                                                         }}
@@ -1988,9 +2004,10 @@ function Family_Request_form() {
                                                             }
                                                         }}
                                                     />
-
                                                 ))}
-                                        </div>
+                                            </div>
+                                        )}
+
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">

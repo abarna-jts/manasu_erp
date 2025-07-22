@@ -539,8 +539,7 @@ function Rescue_Record_Sheet() {
                                                 loading="lazy"
                                                 style={{
                                                     width: "100px",
-                                                    height: "100px",
-                                                    objectFit: "cover",
+                                                    height: "auto",
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}

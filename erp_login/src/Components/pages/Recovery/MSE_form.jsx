@@ -1170,31 +1170,55 @@ function MSE_form() {
   }
 
   const fetchRescueDetails = async (admission_no) => {
-    try {
-      const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-      const result = response.data.data[0];
-      console.log("API Result:", result);
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
 
-      if (result && result.rescue_image) {
-        const imagePath = result.rescue_image.startsWith("http")
-          ? result.rescue_image
-          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+            if (result && result.rescue_image) {
+                let imagePath = null;
 
-        setRescueImage(imagePath);
-        setRescueName(result.rescue_name || "");
-        setError(""); // clear any previous error
-      } else {
-        setRescueImage(null);
+                // Check if rescue_image is an array-like string
+                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+                    try {
+                        // Parse the string to get the array
+                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
-        setError("Image not found for this admission number");
-      }
-    } catch (error) {
-      console.error("Error fetching data", error);
-      setRescueImage(null);
-      setRescueName("");
-      setError("Admission Number Not found");
-    }
-  };
+                        if (Array.isArray(imageArray) && imageArray.length > 0) {
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing image array:", parseError);
+                        imagePath = null;
+                    }
+                } else {
+                    // It's a single image path
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${result.rescue_image}`;
+                }
+
+                if (imagePath) {
+                    setRescueImage(imagePath);
+                    setRescueName(result.rescue_name || "");
+                    setError("");
+                } else {
+                    setRescueImage(null);
+                    setRescueName("");
+                    setError("Image not found for this admission number");
+                }
+            } else {
+                setRescueImage(null);
+                setRescueName("");
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueImage(null);
+            setRescueName("");
+            setError("Admission Number Not found");
+        }
+    };
   useEffect(() => {
           if (admission_no.trim() !== "") {
               fetchRescueDetails(admission_no);
@@ -1222,14 +1246,14 @@ function MSE_form() {
           <h4 className="section_title_1">Mental Status Examination (MSE)</h4>
         </Col>
 
-        <Col md={1} className='d-flex flex-column align-items-end'>
+        <Col md={1} className='d-flex flex-column align-items-center'>
           {error && <div className="text-danger mt-2">{error}</div>}
           {/* Rescue Name and Image */}
           {rescueImage && (
             <div>
               <img
                 alt={rescueName || "Rescue Image"}
-                style={{ width: "100px", height: "120px" }}
+                style={{ width: "150px", height: "auto" }}
                 src={rescueImage}
               />
               {rescueName && <h6 className="mb-2">{rescueName}</h6>}
@@ -1338,11 +1362,8 @@ function MSE_form() {
                   <li className="tab-content tab-content-first typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>1. GENERAL APPEARANCE AND BEHAVIOUR:</h1>
-                      {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3">
-                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handleAppearanceNavigate}>View All</Button>
+                      
+                      <Button className='btn btn-success mx-3' type='button' onClick={handleAppearanceNavigate}>View All</Button>
                     </div>
 
                     <ul>
@@ -1513,11 +1534,8 @@ function MSE_form() {
                   <li className="tab-content tab-content-2 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>2. SPEECH</h1>
-                      {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3">
-                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handleSpeechNavigate}>View All</Button>
+                      
+                      <Button className='btn btn-success mx-3' type='button' onClick={handleSpeechNavigate}>View All</Button>
                     </div>
 
                     <ul>
@@ -1582,11 +1600,11 @@ function MSE_form() {
                   <li className="tab-content tab-content-3 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>3. MOOD AND AFFECT</h1>
-                      {userType === "4" && (
+                      {/* {userType === "4" && (
                         <button type="button" className="btn btn-success mx-3">
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handleMoodAffectNavigate}>View All</Button>
+                      )} */}
+                      <Button className='btn btn-success mx-3' type='button' onClick={handleMoodAffectNavigate}>View All</Button>
                     </div>
 
                     <ul>
@@ -1691,11 +1709,8 @@ function MSE_form() {
                   <li className="tab-content tab-content-4 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>4. THOUGHT</h1>
-                      {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3">
-                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handleThoughNavigate}>View All</Button>
+                      
+                      <Button className='btn btn-success mx-3' type='button' onClick={handleThoughNavigate}>View All</Button>
                     </div>
 
                     <Form onSubmit={handlethoughSubmit}>
@@ -1762,11 +1777,8 @@ function MSE_form() {
                   <li className="tab-content tab-content-5 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>5. PERCEPTION</h1>
-                      {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3">
-                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handlePerceptionNavigate}>View All</Button>
+                      
+                      <Button className='btn btn-success mx-3' type='button' onClick={handlePerceptionNavigate}>View All</Button>
                     </div>
                     <Form onSubmit={handlePerceptionSubmit}>
                       <ul>
@@ -1895,11 +1907,8 @@ function MSE_form() {
                   <li className="tab-content tab-content-6 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</h1>
-                      {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3">
-                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handleCognitionNavigate}>View All</Button>
+                      
+                      <Button className='btn btn-success mx-3' type='button' onClick={handleCognitionNavigate}>View All</Button>
                     </div>
 
                     <Form onSubmit={handleCognitionSubmit}>
@@ -2264,11 +2273,8 @@ function MSE_form() {
                   <li className="tab-content tab-content-7 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>7. JUDGEMENT</h1>
-                      {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3">
-                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handleJudgementNavigate}>View All</Button>
+                      
+                      <Button className='btn btn-success mx-3' type='button' onClick={handleJudgementNavigate}>View All</Button>
                     </div>
                     <ul>
                       <Form onSubmit={handleJudgementSubmit}>
@@ -2340,11 +2346,8 @@ function MSE_form() {
                   <li className="tab-content tab-content-last typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>8. INSIGHT</h1>
-                      {userType === "4" && (
-                        <button type="button" className="btn btn-success mx-3">
-                          <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                      )}
-                      <Button className='btn btn-success' type='button' onClick={handleInsightNavigate}>View All</Button>
+                      
+                      <Button className='btn btn-success mx-3' type='button' onClick={handleInsightNavigate}>View All</Button>
                     </div>
                     <p>The patient's level of awareness and insight into their illness. </p>
                     <ul>

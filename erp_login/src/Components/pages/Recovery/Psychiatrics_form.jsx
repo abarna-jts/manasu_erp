@@ -258,16 +258,40 @@ function Psychiatrics_form() {
             console.log("API Result:", result);
 
             if (result && result.rescue_image) {
-                const imagePath = result.rescue_image.startsWith("http")
-                    ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                let imagePath = null;
 
-                setRescueImage(imagePath);
-                setRescueName(result.rescue_name || "");
-                setError(""); // clear any previous error
+                // Check if rescue_image is an array-like string
+                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+                    try {
+                        // Parse the string to get the array
+                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+
+                        if (Array.isArray(imageArray) && imageArray.length > 0) {
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing image array:", parseError);
+                        imagePath = null;
+                    }
+                } else {
+                    // It's a single image path
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${result.rescue_image}`;
+                }
+
+                if (imagePath) {
+                    setRescueImage(imagePath);
+                    setRescueName(result.rescue_name || "");
+                    setError("");
+                } else {
+                    setRescueImage(null);
+                    setRescueName("");
+                    setError("Image not found for this admission number");
+                }
             } else {
                 setRescueImage(null);
-
+                setRescueName("");
                 setError("Image not found for this admission number");
             }
         } catch (error) {
@@ -1105,25 +1129,22 @@ function Psychiatrics_form() {
                     <h6 className="breadcrumb_title">Social Worker</h6>
 
                 </div>
-                <div className="text-center col-md-8"><h3 className="section_title">Psychiatric Case History</h3></div>
+                <div className="text-center col-md-7"><h3 className="section_title">Psychiatric Case History</h3></div>
 
-                <div className="d-flex align-items-center px-3 justify-content-center">
-
-                    <Col md={2} className='d-flex flex-column align-items-end'>
+                    <Col md={2} className='d-flex flex-column align-items-center'>
                         {error && <div className="text-danger mt-2">{error}</div>}
                         {/* Rescue Name and Image */}
                         {rescueImage && (
                             <div>
                                 <img
                                     alt={rescueName || "Rescue Image"}
-                                    style={{ width: "100px", height: "120px" }}
+                                    style={{ width: "150px", height: "120px" }}
                                     src={rescueImage}
                                 />
                                 {rescueName && <h6 className="mb-2">{rescueName}</h6>}
                             </div>
                         )}
                     </Col>
-                </div>
             </div>
 
 

@@ -376,7 +376,7 @@ function Observation_report() {
                                                             <img
                                                                 src={`http://localhost:5002/${firstPhoto}`}
                                                                 alt="Recovery Photo"
-                                                                style={{ width: "70px", height: "70px", objectFit: "cover" }}
+                                                                style={{ width: "85px", height: "auto" }}
                                                             />
                                                         ) : (
                                                             "NULL"
@@ -544,8 +544,7 @@ function Observation_report() {
                                                 loading="lazy"
                                                 style={{
                                                     width: "100px",
-                                                    height: "100px",
-                                                    objectFit: "cover",
+                                                    height: "auto",
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}

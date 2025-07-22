@@ -487,24 +487,31 @@ function Rescue_details() {
                                     <td>{indexOfFirstItem + index + 1}</td>
                                     <td>{item.admission_no}</td>
                                     <td>
-                                        {
-                                            item.rescue_image.includes('[') ? (
-                                                // If it's a stringified array, parse and show the first image
+                                        {(() => {
+                                            let imagePath = item.rescue_image;
+
+                                            try {
+                                                const parsed = JSON.parse(item.rescue_image);
+                                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                                    imagePath = parsed[0];
+                                                }
+                                            } catch (e) {
+                                                // use directly
+                                            }
+
+                                            return imagePath ? (
                                                 <img
-                                                    src={`http://localhost:5002/${JSON.parse(item.rescue_image)[0]}`}
+                                                    src={`http://localhost:5002/${imagePath}`}
                                                     alt="Rescue Profile"
                                                     style={{ width: "70px", height: "70px", objectFit: "cover" }}
                                                 />
                                             ) : (
-                                                // Else use the path directly
-                                                <img
-                                                    src={`http://localhost:5002/${item.rescue_image}`}
-                                                    alt="Rescue Profile"
-                                                    style={{ width: "70px", height: "70px", objectFit: "cover" }}
-                                                />
-                                            )
-                                        }
+                                                <span>No image</span>
+                                            );
+                                        })()}
                                     </td>
+
+
 
                                     <td>{item.referred_by}</td>
                                     <td>{item.rescue_name}</td>

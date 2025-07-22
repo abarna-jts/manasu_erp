@@ -67,21 +67,21 @@ function Reunion_Checklist() {
     });
 
     const handleChange = (e) => {
-        const { name, files, value, type } = e.target;
+        const { name, value, files } = e.target;
 
-        if (type === "file" && e.target.multiple) {
+        if (e.target.type === 'file') {
             setFormData(prev => ({
                 ...prev,
-                [name]: files  // store as FileList
+                [name]: e.target.files, // Save entire FileList
             }));
+            return;
         } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: type === "file" ? files[0] : value
+            setFormData((prevState) => ({
+                ...prevState,
+                [name]: value,
             }));
         }
     };
-
 
     const familyRequestLetterFileRef = useRef(null);
     const selfDeclarationFileRef = useRef(null);
@@ -204,16 +204,16 @@ function Reunion_Checklist() {
         const data = new FormData();
 
         for (const key in formData) {
-            const value = formData[key];
-
-            if (value instanceof FileList || Array.isArray(value)) {
-                for (let i = 0; i < value.length; i++) {
-                    data.append(key, value[i]); // multiple files
+            if (formData[key] instanceof FileList || Array.isArray(formData[key])) {
+                for (let i = 0; i < formData[key].length; i++) {
+                    data.append(`${key}`, formData[key][i]); // DO NOT append as key[]
                 }
             } else {
-                data.append(key, value); // text fields
+                data.append(key, formData[key]);
             }
         }
+
+
 
         try {
             await apiRoute.post("/reunion/createDischarge_checklist", data, {
@@ -588,8 +588,8 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         name='familyRequestLetterFile'
                                                         onChange={handleChange}
-                                                        ref={familyRequestLetterFileRef}
                                                         multiple
+                                                        ref={familyRequestLetterFileRef}
                                                         required={formData.familyRequestLetter === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -630,6 +630,7 @@ function Reunion_Checklist() {
                                                         name='selfDeclarationFile'
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
+                                                        multiple
                                                         ref={selfDeclarationFileRef}
                                                         required={formData.selfDeclarationLetter === "Yes"} />
                                                 </Col>
@@ -671,6 +672,7 @@ function Reunion_Checklist() {
                                                         name='mediaConsentFile'
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={medicalReportFileRef}
+                                                        multiple
                                                         onChange={handleChange}
                                                         required={formData.mediaConsentLetter === "Yes"} />
                                                 </Col>
@@ -716,6 +718,7 @@ function Reunion_Checklist() {
                                                     <Form.Control type="file"
                                                         name='familyIDproofFile'
                                                         accept=".jpg,.jpeg,.png"
+                                                        multiple
                                                         onChange={handleChange}
                                                         ref={familyIDproofFileRef}
                                                         required={formData.familyIDproof === "Yes"} />
@@ -758,6 +761,7 @@ function Reunion_Checklist() {
                                                         name='residentIDproofFile'
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
+                                                        multiple
                                                         ref={residentIDproofFileRef}
                                                         required={formData.residentIDproof === "Yes"} />
                                                 </Col>
@@ -799,6 +803,7 @@ function Reunion_Checklist() {
                                                         name='aadharCardFile'
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
+                                                        multiple
                                                         ref={aadharCardFileRef}
                                                         required={formData.aadharCard === "Yes"} />
                                                 </Col>
@@ -840,6 +845,7 @@ function Reunion_Checklist() {
                                                         name='udidCardFile'
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
+                                                        multiple
                                                         ref={udidCardFileRef}
                                                         required={formData.udidCard === "Yes"} />
                                                 </Col>
@@ -882,6 +888,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         ref={disabilityCertificateFileRef}
+                                                        multiple
                                                         required={formData.disabilityCertificate === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -923,6 +930,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         ref={bankPassbookFileRef}
+                                                        multiple
                                                         required={formData.bankPassbook === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -964,6 +972,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={healthInsuranceFileRef}
                                                         onChange={handleChange}
+                                                        multiple
                                                         required={formData.healthInsurance === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1010,6 +1019,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={medicalReportFileRef}
                                                         onChange={handleChange}
+                                                        multiple
                                                         required={formData.medicalReport === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1051,6 +1061,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={dischargeSummaryFileRef}
                                                         onChange={handleChange}
+                                                        multiple
                                                         required={formData.dischargeSummary === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1092,6 +1103,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={medicalReportFileRef}
                                                         onChange={handleChange}
+                                                        multiple
                                                         required={formData.medications === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1137,6 +1149,7 @@ function Reunion_Checklist() {
                                                         onChange={handleChange}
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={ClothesFileRef}
+                                                        multiple
                                                         required={formData.Clothes === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1178,6 +1191,7 @@ function Reunion_Checklist() {
                                                         name='possessionsRecoveredFile'
                                                         onChange={handleChange}
                                                         ref={possessionsRecoveredFileRef}
+                                                        multiple
                                                         required={formData.possessionsRecovered === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1218,6 +1232,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={handleChange}
                                                         ref={dischargeAllowanceFileRef}
+                                                        multiple
                                                         required={formData.dischargeAllowance === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1259,6 +1274,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={travelExpensesFileRef}
                                                         onChange={handleChange}
+                                                        multiple
                                                         required={formData.travelExpenses === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1300,6 +1316,7 @@ function Reunion_Checklist() {
                                                         onChange={handleChange}
                                                         ref={copyOfdischargeSummaryFileRef}
                                                         accept=".jpg,.jpeg,.png"
+                                                        multiple
                                                         required={formData.copyOfdischargeSummary === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1346,6 +1363,7 @@ function Reunion_Checklist() {
                                                         onChange={handleChange}
                                                         ref={travelSafetyLetterFileRef}
                                                         accept=".jpg,.jpeg,.png"
+                                                        multiple
                                                         required={formData.travelSafetyLetter === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1387,6 +1405,7 @@ function Reunion_Checklist() {
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={reunionPhotoFileRef}
                                                         onChange={handleChange}
+                                                        multiple
                                                         required={formData.reunionPhoto === "Yes"} />
                                                 </Col>
                                             </Form.Group>
@@ -1433,6 +1452,7 @@ function Reunion_Checklist() {
                                                         onChange={handleChange}
                                                         accept=".jpg,.jpeg,.png"
                                                         ref={witnessSignatureFileRef}
+                                                        multiple
                                                         required={formData.witnessSignature === "Yes"} />
                                                 </Col>
                                             </Form.Group>

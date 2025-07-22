@@ -288,31 +288,55 @@ function SCRB_Form2A() {
 
   // Mock API call or fetch
   const fetchRescueDetails = async (admission_no) => {
-    try {
-      const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-      const result = response.data.data[0];
-      console.log("API Result:", result);
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
 
-      if (result && result.rescue_image) {
-        const imagePath = result.rescue_image.startsWith("http")
-          ? result.rescue_image
-          : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+            if (result && result.rescue_image) {
+                let imagePath = null;
 
-        setRescueImage(imagePath);
-        setRescueName(result.rescue_name || "");
-        setError(""); // clear any previous error
-      } else {
-        setRescueImage(null);
-        setRescueName("");
-        setError("Image not found for this admission number");
-      }
-    } catch (error) {
-      console.error("Error fetching data", error);
-      setRescueImage(null);
-      setRescueName("");
-      setError("Admission Number Not found");
-    }
-  };
+                // Check if rescue_image is an array-like string
+                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+                    try {
+                        // Parse the string to get the array
+                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+
+                        if (Array.isArray(imageArray) && imageArray.length > 0) {
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing image array:", parseError);
+                        imagePath = null;
+                    }
+                } else {
+                    // It's a single image path
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${result.rescue_image}`;
+                }
+
+                if (imagePath) {
+                    setRescueImage(imagePath);
+                    setRescueName(result.rescue_name || "");
+                    setError("");
+                } else {
+                    setRescueImage(null);
+                    setRescueName("");
+                    setError("Image not found for this admission number");
+                }
+            } else {
+                setRescueImage(null);
+                setRescueName("");
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueImage(null);
+            setRescueName("");
+            setError("Admission Number Not found");
+        }
+    };
 
   // Trigger when admission number changes
   useEffect(() => {

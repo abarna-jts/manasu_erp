@@ -87,13 +87,37 @@ function Reunion_summary() {
             console.log("API Result:", result);
 
             if (result && result.rescue_image) {
-                const imagePath = result.rescue_image.startsWith("http")
-                    ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                let imagePath = null;
 
-                setRescueImage(imagePath);
-                setRescueName(result.rescue_name || "");
-                setError(""); // clear any previous error
+                // Check if rescue_image is an array-like string
+                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+                    try {
+                        // Parse the string to get the array
+                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+
+                        if (Array.isArray(imageArray) && imageArray.length > 0) {
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing image array:", parseError);
+                        imagePath = null;
+                    }
+                } else {
+                    // It's a single image path
+                    imagePath = result.rescue_image.startsWith("http")
+                        ? result.rescue_image
+                        : `http://localhost:5002/${result.rescue_image}`;
+                }
+
+                if (imagePath) {
+                    setRescueImage(imagePath);
+                    setRescueName(result.rescue_name || "");
+                    setError("");
+                } else {
+                    setRescueImage(null);
+                    setRescueName("");
+                    setError("Image not found for this admission number");
+                }
             } else {
                 setRescueImage(null);
                 setRescueName("");
@@ -165,12 +189,12 @@ function Reunion_summary() {
         }
     }
 
+
     const ViewFormData = async () => {
         try {
             const response = await apiRoute.get(`/residency/getSummary/${admission_no}`);
             const data = response.data;
 
-            // Update form fields
             setFormData((formData) => ({
                 ...formData,
                 rescue_name: data.rescue_name || '',
@@ -178,6 +202,9 @@ function Reunion_summary() {
                 report: data.report || '',
             }));
 
+
+
+            // Parse form7_attach image array
             let summaryAttachPath = [];
             if (data.summary_attach) {
                 try {
@@ -186,7 +213,7 @@ function Reunion_summary() {
                         summaryAttachPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
-                    console.warn('Failed to parse signature:', err);
+                    console.warn('Failed to parse Summary Attachment:', err);
                     // Fallback: comma-separated string
                     summaryAttachPath = data.summary_attach
                         .split(',')
@@ -194,14 +221,6 @@ function Reunion_summary() {
                 }
             }
 
-            // console.log(scanReportPath);
-
-
-            // Handle old and new photo paths correctly
-            // const summaryAttachPath = data.summary_attach ? `https://www.pahrultours.com/app2/${data.summary_attach}` : null;
-
-            console.log(summaryAttachPath);
-            // Set files state
             setFiles((files) => ({
                 ...files,
                 summary_attach: summaryAttachPath,
@@ -209,10 +228,13 @@ function Reunion_summary() {
 
             setPreviewRequested(true);
         } catch (error) {
-            console.error("Error fetching form data:", error);
+            console.error("Error fetching data:", error);
             alert("Admission Number not found");
         }
-    }
+    };
+
+
+
 
     const formatDateForInput = (isoDateStr) => {
         if (!isoDateStr) return "";
@@ -592,24 +614,26 @@ function Reunion_summary() {
                                     Summary Attach :
                                 </Form.Label>
                                 <Col sm="7">
-                                    {Array.isArray(files.summary_attach) &&
-                                        files.summary_attach.map((imgUrl, index) => (
-                                            <img
-                                                key={index}
-                                                src={imgUrl}
-                                                alt={`summary_attach - ${index}`}
-                                                style={{
-                                                    width: "100px",
-                                                    height: "100px",
-                                                    objectFit: "cover",
-                                                    margin: "10px",
-                                                    border: "1px solid #ccc",
-                                                }}
-                                                onError={(e) => {
-                                                    e.target.src = "/fallback-image.png";
-                                                }}
-                                            />
-                                        ))}
+                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                        {files.summary_attach &&
+                                            files.summary_attach.map((imgUrl, index) => (
+                                                <img
+                                                    key={index}
+                                                    src={imgUrl}
+                                                    alt={`summary_attach - ${index}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "cover",
+                                                        margin: "10px",
+                                                        border: "1px solid #ccc",
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                    }}
+                                                />
+                                            ))}
+                                    </div>
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3 mt-3" controlId="formRescueName">
@@ -676,28 +700,30 @@ function Reunion_summary() {
                                             Summary Attachment :
                                         </Form.Label>
                                         <Col sm="12">
-                                            {Array.isArray(files.summary_attach) &&
-                                                files.summary_attach.map((imgUrl, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={imgUrl}
-                                                        alt={`summary_attach - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                            objectFit: "cover",
-                                                            margin: "10px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
-                                                ))}
+                                            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                                {files.summary_attach &&
+                                                    files.summary_attach.map((imgUrl, index) => (
+                                                        <img
+                                                            key={index}
+                                                            src={imgUrl}
+                                                            alt={`Summary Attachment - ${index}`}
+                                                            loading="lazy"
+                                                            style={{
+                                                                width: "100px",
+                                                                height: "100px",
+                                                                objectFit: "cover",
+                                                                margin: "10px",
+                                                                border: "1px solid #ccc",
+                                                            }}
+                                                            onError={(e) => {
+                                                                if (!e.target.dataset.errorHandled) {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                    e.target.dataset.errorHandled = "true";
+                                                                }
+                                                            }}
+                                                        />
+                                                    ))}
+                                            </div>
 
                                             <Form.Control
                                                 type="file"
