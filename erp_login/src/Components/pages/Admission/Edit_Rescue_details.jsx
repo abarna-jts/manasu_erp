@@ -133,14 +133,14 @@ function Edit_Rescue_details() {
           try {
             const parsed = JSON.parse(data.attach_policeMemo);
             if (Array.isArray(parsed)) {
-              policeMemoAttach = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+              policeMemoAttach = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
             }
           } catch (err) {
             console.warn('Failed to parse attach_policeMemo:', err);
             // Fallback: comma-separated string
             policeMemoAttach = data.attach_policeMemo
               .split(',')
-              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+              .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
           }
         }
 
@@ -149,14 +149,14 @@ function Edit_Rescue_details() {
           try {
             const parsed = JSON.parse(data.rescue_image);
             if (Array.isArray(parsed)) {
-              RescueImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+              RescueImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
             }
           } catch (err) {
             console.warn('Failed to parse attach_policeMemo:', err);
             // Fallback: comma-separated string
             RescueImage = data.rescue_image
               .split(',')
-              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+              .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
           }
         }
 
@@ -165,14 +165,14 @@ function Edit_Rescue_details() {
           try {
             const parsed = JSON.parse(data.govIdFile);
             if (Array.isArray(parsed)) {
-              govtFilePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+              govtFilePath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
             }
           } catch (err) {
             console.warn('Failed to parse govIdFile:', err);
             // Fallback: comma-separated string
             govtFilePath = data.govIdFile
               .split(',')
-              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+              .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
           }
         }
 

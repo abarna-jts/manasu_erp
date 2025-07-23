@@ -52,8 +52,8 @@ const createRescueCondition = async (req, res) => {
     const [result] = await db.query(q, values);
     // ✅ Email the Director
     const mailOptions = {
-      from: 'yourgmail@gmail.com',
-      to: ['abarnadevi.jorimts@gmail.com','abarnadevi2705@gmail.com'],
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
       subject: `New First Consultation Report Submitted by Nurse`,
       html: `
         <h3>New First Consultation Report Submitted by Nurse</h3>
@@ -181,8 +181,8 @@ const createRecord = async (req, res) => {
     console.log("Record created successfully:", result);
     // ✅ Email the Director
     const mailOptions = {
-      from: 'yourgmail@gmail.com',
-      to: 'manasucmf@gmail.com', // Replace with director's email
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
       subject: `New Nurse Record Sheet Submitted by Nurse`,
       html: `
         <h3>New Nurse Record Sheet Submitted by Nurse</h3>
@@ -484,8 +484,8 @@ const createObservationReport = async (req, res) => {
 
     // ✅ Email the Director
     const mailOptions = {
-      from: 'yourgmail@gmail.com',
-      to: ['abarnadevi.jorimts@gmail.com','abarnadevi2705@gmail.com'],
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
       subject: `New Resident Observation Report Submitted by Social Worker`,
       html: `
         <h3>Resident Observation & Progress Report – Social Worker</h3>
@@ -740,8 +740,8 @@ const createPrescription = async (req, res) => {
     await db.query(insertQuery, values);
     // ✅ Email the Director
     const mailOptions = {
-      from: 'yourgmail@gmail.com',
-      to: 'manasucmf@gmail.com',
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
       subject: `New Prescription Form Submitted by Nurse`,
       html: `
         <h3>New Prescription Form Submitted by Nurse</h3>
@@ -916,8 +916,8 @@ const createDrVisit = async (req, res) => {
     console.log('Data inserted successfully:', result);
     // ✅ Email the Director
     const mailOptions = {
-      from: 'yourgmail@gmail.com',
-      to: 'manasucmf@gmail.com',
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
       subject: `New Doctor Visit Submitted by Nurse`,
       html: `
         <h3>Doctor Visit Form</h3>
@@ -1057,8 +1057,8 @@ const createMedicalCamp = async (req, res) => {
     console.log('Data inserted successfully');
     // ✅ Email the Director
     const mailOptions = {
-      from: 'yourgmail@gmail.com',
-      to: 'manasucmf@gmail.com',
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
       subject: `Medical Camp Report Form Submitted by Nurse`,
       html: `
         <h3>Medical Camp Report </h3>
@@ -1217,8 +1217,8 @@ const createSummary = async (req, res) => {
 
     // ✅ Email the Director
     const mailOptions = {
-      from: 'yourgmail@gmail.com',
-      to: ['abarnadevi.jorimts@gmail.com','abarnadevi2705@gmail.com'],
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
       subject: `Reunion Summary Form Submitted by Nurse`,
       html: `
         <h3>Reunion Summary Form </h3>

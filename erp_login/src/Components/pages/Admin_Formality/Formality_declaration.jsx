@@ -66,7 +66,7 @@ function Formality_declaration() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -76,7 +76,7 @@ function Formality_declaration() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${result.rescue_image}`;
+                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -662,11 +662,9 @@ function Formality_declaration() {
                                         </Col>
                                     </Form.Group>
 
-                                    {userType === "1" && (
                                         <div className="mt-3">
                                             <Button variant="success" className="m-1" type="submit">Submit</Button>
                                         </div>
-                                    )}
 
                                 </Row>
                             </Form>

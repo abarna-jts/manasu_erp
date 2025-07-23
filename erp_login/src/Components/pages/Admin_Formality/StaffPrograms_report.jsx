@@ -120,14 +120,14 @@ function StaffPrograms_report() {
                 try {
                     const parsed = JSON.parse(data.staff_photos);
                     if (Array.isArray(parsed)) {
-                        StaffProgramImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        StaffProgramImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse staff_photos:', err);
                     // Fallback: comma-separated string
                     StaffProgramImage = data.staff_photos
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -210,7 +210,7 @@ function StaffPrograms_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -218,7 +218,7 @@ function StaffPrograms_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }

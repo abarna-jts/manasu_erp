@@ -172,7 +172,7 @@ function Rescue_Record_Sheet() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -180,7 +180,7 @@ function Rescue_Record_Sheet() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -370,7 +370,7 @@ function Rescue_Record_Sheet() {
 
                                                         return firstPhoto ? (
                                                             <img
-                                                                src={`http://localhost:5002/${firstPhoto}`}
+                                                                src={`https://www.pahrultours.com/app2/${firstPhoto}`}
                                                                 alt="Rescue Condition Photo"
                                                                 style={{ width: "70px", height: "70px", objectFit: "cover" }}
                                                             />

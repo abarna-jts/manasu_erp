@@ -120,7 +120,7 @@ function View_annualReport() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -128,7 +128,7 @@ function View_annualReport() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -276,14 +276,14 @@ function View_annualReport() {
                 try {
                     const parsed = JSON.parse(data.event_photos);
                     if (Array.isArray(parsed)) {
-                        EventImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        EventImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     EventImage = data.event_photos
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -292,14 +292,14 @@ function View_annualReport() {
                 try {
                     const parsed = JSON.parse(data.awarness_photos);
                     if (Array.isArray(parsed)) {
-                        AwarnessPhoto = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        AwarnessPhoto = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     AwarnessPhoto = data.awarness_photos
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -308,14 +308,14 @@ function View_annualReport() {
                 try {
                     const parsed = JSON.parse(data.outing_photos);
                     if (Array.isArray(parsed)) {
-                        OutingPhoto = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        OutingPhoto = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     OutingPhoto = data.outing_photos
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 

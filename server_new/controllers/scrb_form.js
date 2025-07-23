@@ -1,5 +1,6 @@
 import db from '../db.js';
 import { SCRBAsync } from '../util/SCRBMulter.js';
+import transporter from '../config/mailer.js';
 // Setup storage
 
 const createForm2 = async (req, res) => {
@@ -72,15 +73,63 @@ const createForm2 = async (req, res) => {
       phone_no,
       JSON.stringify(signature_path),
       JSON.stringify(seal_path)
-  ];
+    ];
 
     const [result] = await db.query(q, values);
+
+    // 3. THEN send email to director (doesn't block response)
+    sendDirectorMail({
+      admission_no,
+      rescue_name,
+      father,
+      gender,
+      date_time
+    }).then(() => {
+      console.log("✅ Email sent to director");
+    }).catch((error) => {
+      console.error("❌ Failed to send email to director:", error);
+    });
 
     return res.status(201).json({ message: "SCRB FORM2 Created Successfully", data: result });
 
   } catch (err) {
     console.error("Create SCRB FORM2 Error:", err);
     return res.status(500).json({ message: "Server error while creating SCRB FORM2", error: err });
+  }
+};
+
+
+const sendDirectorMail = async (form) => {
+  try {
+    const formatDate = (dateInput) => {
+      const date = new Date(dateInput);
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const yyyy = date.getFullYear();
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+    };
+    const formattedDateTime = formatDate(form.date_time);
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 SRCB Form2 Submitted: ${form.admission_no}`,
+      html: `
+        <h2>FORM - 2 FOUND PERSON PERSONAL DETAILS</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Father:</strong> ${form.father}</p>
+        <p><strong>Gender:</strong> ${form.gender}</p>
+        <p><strong>Date/Time:</strong> ${formattedDateTime}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
   }
 };
 
@@ -119,10 +168,45 @@ const createForm2A = async (req, res) => {
       addition_face || '',
     ]);
 
+    sendDirectorMailForm2A({
+      admission_no,
+      file_no,
+      category,
+      complexion,
+      face
+    }).then(() => {
+      console.log("✅ Email sent to director");
+    }).catch((error) => {
+      console.error("❌ Failed to send email to director:", error);
+    });
+
     res.status(201).json({ message: "SCRB Form 2A created successfully", insertId: result.insertId });
   } catch (err) {
     console.error("Error inserting SCRB Form 2A:", err);
     res.status(500).json({ message: "Database error", error: err.message });
+  }
+};
+
+const sendDirectorMailForm2A = async (form) => {
+  try {
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 SRCB Form2A Submitted: ${form.admission_no}`,
+      html: `
+        <h2>FORM 2A - FOUND PERSON DETAILS - PHYSICAL PARAMETERS -1</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>File No.:</strong> ${form.file_no}</p>
+        <p><strong>Category:</strong> ${form.category?.join(', ')}</p>
+        <p><strong>Complexion:</strong> ${form.complexion?.join(', ')}</p>
+        <p><strong>Face:</strong> ${form.face?.join(', ')}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
   }
 };
 
@@ -150,13 +234,53 @@ const createForm2B = async (req, res) => {
       name_ngo, admission_no, file_no, tattoo, addition_tatoo, scar, mole, height
     ]);
 
+    sendDirectorMailForm2B({
+      admission_no,
+      file_no,
+      tattoo,
+      addition_tatoo,
+      scar,
+      mole,
+      height
+    }).then(() => {
+      console.log("✅ Email sent to director");
+    }).catch((error) => {
+      console.error("❌ Failed to send email to director:", error);
+    });
+
     res.status(201).json({ message: "SCRB Form 2B created Successfully", insertId: result.insertId });
   } catch (err) {
     console.error("Error inserting SCRB Form 2B:", err)
   }
 };
 
-const createForm2C = async(req, res) => {
+const sendDirectorMailForm2B = async (form) => {
+  try {
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 SRCB Form2B Submitted: ${form.admission_no}`,
+      html: `
+        <h2>FORM 2B - FOUND PERSON DETAILS - PHYSICAL PARAMETERS -2</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>File No.:</strong> ${form.file_no}</p>
+        <p><strong>Tatoo:</strong> ${form.tattoo}</p>
+        <p><strong>Addition Tattoo:</strong> ${form.addition_tatoo}</p>
+        <p><strong>Scar:</strong> ${form.scar}</p>
+        <p><strong>Mole:</strong> ${form.mole}</p>
+        <p><strong>Height:</strong> ${form.height}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
+  }
+};
+
+const createForm2C = async (req, res) => {
   const { name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color } = req.body;
 
   const Csql = 'INSERT INTO form_2c (name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress,addition_lowerdress,upperdress_color, lowerdress_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -169,74 +293,110 @@ const createForm2C = async(req, res) => {
       (lowerdress || []).join(', '),
       addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color
     ]);
-    res.status(201).json({message:"SCRB Form 2C created Successfully", insertId:result.insertId});
+    
+    sendDirectorMailForm2C({
+      admission_no,
+      file_no,
+      upperdress_1,
+      upperdress_2,
+      lowerdress
+    }).then(() => {
+      console.log("✅ Email sent to director");
+    }).catch((error) => {
+      console.error("❌ Failed to send email to director:", error);
+    });
+
+    res.status(201).json({ message: "SCRB Form 2C created Successfully", insertId: result.insertId });
   } catch (err) {
     console.error("Error inserting SCRB Form 2C:", err)
   }
 
 }
 
+const sendDirectorMailForm2C = async (form) => {
+  try {
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 SRCB Form2C Submitted: ${form.admission_no}`,
+      html: `
+        <h2>FORM 2C - FOUND PERSON DETAILS - DRESS CODE</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>File No.:</strong> ${form.file_no}</p>
+        <p><strong>Upper Dress :</strong> ${form.upperdress_1}</p>
+        <p><strong>Lower Dress:</strong> ${form.lowerdress}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
+  }
+};
+
 
 //pdf view controllers
-const getForm2APDF = async(req, res) => {
+const getForm2APDF = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2a WHERE admission_no = ?';
 
-  try{
+  try {
     const [results] = await db.query(query, [admission_no]);
 
-    if(results.length === 0){
-      return res.status(404).json({message:"Form 2A not found"});
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Form 2A not found" });
     }
     res.status(200).json(results[0]);
-  }catch(err){
+  } catch (err) {
     console.error("Error fetching Form 2A:", err);
-    res.status(500).json({message:"Database Error", error:err.message});
+    res.status(500).json({ message: "Database Error", error: err.message });
   }
 }
 
-const getForm2BPDF = async(req, res) => {
+const getForm2BPDF = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2b WHERE admission_no = ?';
 
-  try{
+  try {
     const [results] = await db.query(query, [admission_no]);
     res.status(200).json(results[0]);
-  }catch(err){
+  } catch (err) {
     console.error("Error fetching Form 2B:", err);
-    res.status(500).json({message:"Database Error", error:err.message});
+    res.status(500).json({ message: "Database Error", error: err.message });
   }
 
 }
 
 
-const getForm2CPDF = async(req, res) => {
+const getForm2CPDF = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2c WHERE admission_no = ?';
 
-  try{
-    const [results] = await db.query(query,[admission_no]);
+  try {
+    const [results] = await db.query(query, [admission_no]);
     res.status(200).json(results[0]);
-  }catch(err){
+  } catch (err) {
     console.error("Error fetching Form 2A:", err);
-    res.status(500).json({message:"Database Error", error:err.message});
+    res.status(500).json({ message: "Database Error", error: err.message });
   }
 }
 
-const getForm2PDF = async(req, res) => {
+const getForm2PDF = async (req, res) => {
   const admission_no = req.params.admission_no;
   const query = 'SELECT * FROM form_2 WHERE admission_no = ?';
 
-  try{
+  try {
     const [results] = await db.query(query, [admission_no]);
 
-    if(results.length === 0){
-      return res.status(404).json({message:"Form 2 not found"});
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Form 2 not found" });
     }
     res.status(200).json(results[0]);
-  }catch(err){
+  } catch (err) {
     console.error("Error fetching Form 2:", err);
-    res.status(500).json({message:"Database Error", error:err.message});
+    res.status(500).json({ message: "Database Error", error: err.message });
   }
 }
 

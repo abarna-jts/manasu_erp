@@ -297,9 +297,7 @@ function Admin_RescueDetails() {
             <Container>
                 <Row className='d-flex align-items-center justify-content-between'>
                     <Col md={4} className='d-flex align-items-center justify-content-start'>
-                        {userType === "1" && (
-                            <Button type="button" className="btn btn-success" onClick={handleShow}>Add Details</Button>
-                        )}
+                        <Button type="button" className="btn btn-success" onClick={handleShow}>Add Details</Button>
                     </Col>
                     <Col md={3}>
                         <div className="d-flex align-items-center px-3">

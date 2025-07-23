@@ -1,6 +1,7 @@
 import db from "../db.js";
 import { formalityAsync } from "../util/formalityMulter.js";
 import fs from "fs/promises";
+import transporter from '../config/mailer.js';
 
 const createSelfDeclaration = async (req, res) => {
     const {
@@ -36,6 +37,19 @@ const createSelfDeclaration = async (req, res) => {
 
     try {
         const [data] = await db.query(q, values);
+        sendDirectorMailHandover({
+            admission_no,
+            rescue_name,
+            medicine_provided,
+            toiletries_provided,
+            dress_provided,
+            travel_expenses
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         res.status(201).json({
             message: "Document Handover Form submitted successfully",
             data: data
@@ -48,6 +62,33 @@ const createSelfDeclaration = async (req, res) => {
         });
     }
 }
+
+const sendDirectorMailHandover = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Handover Form Submitted: ${form.admission_no}`,
+            html: `
+        <h2>Resident's Possessions and Document Handover Form</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>30 days Medicine Provided : </strong> ${form.medicine_provided}</p>
+        <p><strong>Toiletries provided :</strong> ${form.toiletries_provided}</p>
+        <p><strong>1 month dress provided :</strong> ${form.dress_provided}</p>
+        <p><strong>Travel Expenses Provided :</strong> ${form.travel_expenses}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
+};
 
 const getFormalityForm = async (req, res) => {
     const admission_no = req.params.admission_no;
@@ -204,6 +245,19 @@ const createRecords = async (req, res) => {
 
         const [result] = await db.query(q, values);
 
+        // 3. THEN send email to director (doesn't block response)
+        sendDirectorMail({
+            admission_no,
+            rescue_name,
+            aadhar_card,
+            udid_no,
+            voter_id
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         res.status(201).json({
             message: "Essential Records Form Created Successfully",
             data: result
@@ -215,6 +269,30 @@ const createRecords = async (req, res) => {
             message: "Server Error while creating essential records",
             error: err
         });
+    }
+};
+
+const sendDirectorMail = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: "manasucmf@gmail.com", // ✅ change to director's real email
+            subject: `📝 Resident Document Information Form: ${form.admission_no}`,
+            html: `
+        <h2>New First Form Created by Admin</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Aadhar Card Number:</strong> ${form.aadhar_card}</p>
+        <p><strong>UDID No:</strong> ${form.udid_no}</p>
+        <p><strong>Voter ID:</strong> ${form.voter_id}</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
     }
 };
 
@@ -467,6 +545,22 @@ const createEventReport = async (req, res) => {
 
         const [result] = await db.query(q, values);
 
+        sendDirectorMailEvent({
+            event_name,
+            event_date: formatDate(event_date),
+            event_place,
+            awareness_name,
+            awarness_date: formatDate(awarness_date),
+            awarness_place,
+            outing_name,
+            outing_date: formatDate(outing_date),
+            outing_place
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         res.status(201).json({
             message: "Event Report Form Created Successfully",
             data: result
@@ -478,6 +572,36 @@ const createEventReport = async (req, res) => {
             message: "Server Error while creating event report",
             error: err
         });
+    }
+};
+
+const sendDirectorMailEvent = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Event/Awarness/Outing Form Submitted`,
+            html: `
+        <h2>Event / Awareness / Outing Details</h2>
+        <p><strong>Event Name:</strong> ${form.event_name || null}</p>
+        <p><strong>Event Date:</strong> ${form.event_date || null}</p>
+        <p><strong>Event Place:</strong> ${form.event_place || null}</p>
+        <p><strong>Awarness Name:</strong> ${form.awareness_name || null}</p>
+        <p><strong>Awarness Date:</strong> ${form.awarness_date || null}</p>
+        <p><strong>Awarness Place:</strong> ${form.awarness_place || null}</p>
+        <p><strong>Outing Name:</strong> ${form.outing_name || null}</p>
+        <p><strong>Outing Date:</strong> ${form.outing_date || null}</p>
+        <p><strong>Outing Place:</strong> ${form.outing_place || null}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
     }
 };
 
@@ -511,6 +635,19 @@ const createCelebrationReport = async (req, res) => {
         ]
 
         const [result] = await db.query(q, values);
+        sendDirectorMailCel({
+            celebration_name,
+            other_celebration,
+            celebration_date,
+            celebration_place,
+            celebration_rescue_count,
+            celebration_report
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         res.status(201).json({
             message: "Celebration Report Form Created Successfully",
             data: result
@@ -524,6 +661,33 @@ const createCelebrationReport = async (req, res) => {
         });
     }
 }
+
+const sendDirectorMailCel = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Celebration Form Submitted `,
+            html: `
+        <h2>General Celebration Details</h2>
+        <p><strong>Name of the Celebration:</strong> ${form.celebration_name || null}</p>
+        <p><strong>Celebration Date:</strong> ${form.celebration_date || null}</p>
+        <p><strong>Other Celebration:</strong> ${form.other_celebration || null}</p>
+        <p><strong>Celebration Place:</strong> ${form.celebration_place || null}</p>
+        <p><strong>No. of Participants:</strong> ${form.celebration_rescue_count || null}</p>
+        <p><strong>Report:</strong> ${form.celebration_place || null}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
+};
 
 const createCommunityReport = async (req, res) => {
     try {
@@ -558,6 +722,22 @@ const createCommunityReport = async (req, res) => {
         ]
 
         const [result] = await db.query(q, values);
+
+        sendDirectorMailCom({
+            community_name,
+            clg_name,
+            clg_dept,
+            resource_person,
+            community_date,
+            community_place,
+            community_rescue_count,
+            community_report
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         res.status(201).json({
             message: "Community Report Form Created Successfully",
             data: result
@@ -572,6 +752,33 @@ const createCommunityReport = async (req, res) => {
     }
 }
 
+const sendDirectorMailCom = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Community Form Submitted`,
+            html: `
+        <h2>Community Programs</h2>
+        <p><strong>Name of the Programs:</strong> ${form.community_name || null}</p>
+        <p><strong>College Name :</strong> ${form.clg_name || null}</p>
+        <p><strong>College Department:</strong> ${form.clg_dept || null}</p>
+        <p><strong>Resource Person:</strong> ${form.resource_person || null}</p>
+        <p><strong>Community Date:</strong> ${form.community_date || null}</p>
+        <p><strong>Community Place:</strong> ${form.community_place || null}</p>
+        <p><strong>No. of Participants:</strong> ${form.community_rescue_count || null}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
+};
 
 const createStaffReport = async (req, res) => {
     try {
@@ -600,6 +807,18 @@ const createStaffReport = async (req, res) => {
         ]
 
         const [result] = await db.query(q, values);
+        sendDirectorMailStaff({
+            staff_name,
+            staff_date,
+            staff_place,
+            staff_rescue_count,
+            staff_report
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         res.status(201).json({
             message: "Staff Report Form Created Successfully",
             data: result
@@ -613,6 +832,30 @@ const createStaffReport = async (req, res) => {
     }
 }
 
+const sendDirectorMailStaff = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Staff Programs Form Submitted`,
+            html: `
+        <h2>Staff Programs Form Details</h2>
+        <p><strong>Name of the Programs:</strong> ${form.staff_name}</p>
+        <p><strong> Date:</strong> ${form.staff_date}</p>
+        <p><strong>Venue:</strong> ${form.staff_place}</p>
+        <p><strong>No of participants:</strong> ${form.staff_rescue_count}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
+};
 
 const createAnnualReport = (req, res) => {
     const {
@@ -933,6 +1176,23 @@ const createRescueDischargeInfo = async (req, res) => {
     try {
         const [result] = await db.query(cquery, values);
 
+        sendDirectorMailDischarge({
+            admission_no,
+            rescue_name,
+            referred_by,
+            escape,
+            death,
+            discharge,
+            reunited,
+            transfer,
+            state_venue,
+            state
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         return res.status(201).json({
             message: "Rescue Discharge Summary Created Successfully",
             data: result
@@ -946,6 +1206,36 @@ const createRescueDischargeInfo = async (req, res) => {
     }
 };
 
+const sendDirectorMailDischarge = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Discharge Information Form Submitted: ${form.admission_no}`,
+            html: `
+        <h2>Resident's Discharge Information</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Referred By:</strong> ${form.referred_by}</p>
+        <p><strong>Escape:</strong> ${form.escape}</p>
+        <p><strong>Death:</strong> ${form.death}</p>
+        <p><strong>Discharge:</strong> ${form.discharge}</p>
+        <p><strong>Reunited:</strong> ${form.reunited}</p
+        <p><strong>Transfer:</strong> ${form.transfer}</p>
+        <p><strong>State Venue:</strong> ${form.state_venue || "N/A"}</p>
+        <p><strong>State:</strong> ${form.state || "N/A"}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
+};
 
 const getDischargeSummary = async (req, res) => {
     const query = "Select * from discharge_summary";
@@ -1092,6 +1382,24 @@ const createInternForm = async (req, res) => {
 
         const [result] = await db.query(insertQuery, values);
 
+        sendDirectorMailIntern({
+            stud_name,
+            stud_id,
+            department,
+            email,
+            phone,
+            field,
+            clg_name,
+            duration,
+            from_date,
+            to_date,
+            supervisor_name,
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Failed to create Internship Form" });
         }
@@ -1102,6 +1410,38 @@ const createInternForm = async (req, res) => {
         res.status(500).json({ message: "Database Error", error: err });
     }
 }
+
+const sendDirectorMailIntern = async (form) => {
+    try {
+
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Internship Information Form Submitted`,
+            html: `
+        <h2>Internship Information Form</h2>
+        <p><strong>Student Name:</strong> ${form.staff_name}</p>
+        <p><strong>Student ID:</strong> ${form.stud_id}</p>
+        <p><strong>Department:</strong> ${form.department}</p>
+        <p><strong>Email:</strong> ${form.email}</p>
+        <p><strong>Phone:</strong> ${form.phone}</p>
+        <p><strong>Field:</strong> ${form.field}</p>
+        <p><strong>College Name:</strong> ${form.clg_name}</p>
+        <p><strong>Duration:</strong> ${form.duration}</p>
+        <p><strong>From Date:</strong> ${form.from_date}</p>
+        <p><strong>To Date:</strong> ${form.to_date}</p>
+        <p><strong>Supervisor Name:</strong> ${form.supervisor_name}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
+};
 
 
 const getStudentDetails = async (req, res) => {

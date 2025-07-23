@@ -128,7 +128,7 @@ function Observation_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -136,7 +136,7 @@ function Observation_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -374,7 +374,7 @@ function Observation_report() {
 
                                                         return firstPhoto ? (
                                                             <img
-                                                                src={`http://localhost:5002/${firstPhoto}`}
+                                                                src={`https://www.pahrultours.com/app2/${firstPhoto}`}
                                                                 alt="Recovery Photo"
                                                                 style={{ width: "85px", height: "auto" }}
                                                             />

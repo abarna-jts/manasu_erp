@@ -320,7 +320,7 @@ function Essential_record() {
 
             // Parse bank passbook image
             const passbookPath = data.bank_passbook
-                ? [`http://localhost:5002/${data.bank_passbook}`]
+                ? [`https://www.pahrultours.com/app2/${data.bank_passbook}`]
                 : [];
 
             // Parse form7_attach image array
@@ -329,14 +329,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.form7_attach);
                     if (Array.isArray(parsed)) {
-                        form7Paths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        form7Paths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     form7Paths = data.form7_attach
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -345,14 +345,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.bank_passbook);
                     if (Array.isArray(parsed)) {
-                        bank_passbookPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        bank_passbookPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse bank passbook:', err);
                     // Fallback: comma-separated string
                     bank_passbookPath = data.bank_passbook
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -455,7 +455,7 @@ function Essential_record() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -463,7 +463,7 @@ function Essential_record() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -638,7 +638,7 @@ function Essential_record() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -648,7 +648,7 @@ function Essential_record() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${result.rescue_image}`;
+                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -966,7 +966,6 @@ function Essential_record() {
                                                 accept=".jpg,.jpeg,.png"
                                                 name="bank_passbook"
                                                 onChange={handleFileChange}
-                                                required
                                                 multiple
                                                 ref={bankPassbookRef}
                                             />
@@ -1033,9 +1032,7 @@ function Essential_record() {
                                     </Form.Group>
 
                                     <div>
-                                        {userType === "1" && (
-                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
-                                        )}
+                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
                                     </div>
 
                                 </Row>

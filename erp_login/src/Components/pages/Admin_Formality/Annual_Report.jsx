@@ -461,7 +461,7 @@ function Annual_Report() {
 
     const handleCommunitySubmit = async (e) => {
         e.preventDefault();
-        if (!programData.program_name || programData.program_name.length === 0) {
+        if (!programData.community_name || programData.community_name.length === 0) {
             alert("Community Programs Name is required.");
             return;
         }
@@ -478,21 +478,21 @@ function Annual_Report() {
             alert("Resource Person is required.");
             return;
         }
-        if (!programData.program_date || programData.program_date.length === 0) {
+        if (!programData.community_date || programData.community_date.length === 0) {
             alert("Community Programs Date is required.");
             return;
         }
-        if (!programData.program_rescue_count || programData.program_rescue_count.length === 0) {
+        if (!programData.community_rescue_count || programData.community_rescue_count.length === 0) {
             alert("Community Programs Participants is required.");
             return;
         }
 
         const data = new FormData();
-        data.append('program_name', programData.program_name);
-        data.append('program_date', programData.program_date);
-        data.append('program_place', programData.program_place);
-        data.append('program_report', programData.program_report);
-        data.append('program_rescue_count', programData.program_rescue_count);
+        data.append('community_name', programData.community_name);
+        data.append('community_date', programData.community_date);
+        data.append('community_place', programData.community_place);
+        data.append('community_rescue_count', programData.community_rescue_count);
+        data.append('community_report', programData.community_report);
         data.append('clg_dept', programData.clg_dept);
         data.append('clg_name', programData.clg_name);
         data.append('resource_person', programData.resource_person);
@@ -1159,7 +1159,7 @@ function Annual_Report() {
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control type="text"
-                                            name="program_name"
+                                            name="community_name"
                                             value={programData.community_name}
                                             onChange={handleInputChange2}
                                             required />
@@ -1211,7 +1211,7 @@ function Annual_Report() {
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control type="date"
-                                            name="program_date"
+                                            name="community_date"
                                             value={programData.community_date}
                                             max="9999-12-31"
                                             onChange={handleInputChange2}
@@ -1224,7 +1224,7 @@ function Annual_Report() {
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control type="text"
-                                            name="program_place"
+                                            name="community_place"
                                             value={programData.community_place}
                                             onChange={handleInputChange2}
                                             required />
@@ -1236,7 +1236,7 @@ function Annual_Report() {
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control type="text"
-                                            name="program_rescue_count"
+                                            name="community_rescue_count"
                                             value={programData.community_rescue_count}
                                             onChange={handleInputChange2}
                                             required />
@@ -1259,7 +1259,7 @@ function Annual_Report() {
                                     <Col sm="7">
                                         <Form.Control
                                             as="textarea"
-                                            name="program_report"
+                                            name="community_report"
                                             rows={3}
                                             value={programData.community_report}
                                             onChange={handleInputChange2}

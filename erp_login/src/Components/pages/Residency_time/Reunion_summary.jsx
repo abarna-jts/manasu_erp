@@ -96,7 +96,7 @@ function Reunion_summary() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -106,7 +106,7 @@ function Reunion_summary() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${result.rescue_image}`;
+                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -210,14 +210,14 @@ function Reunion_summary() {
                 try {
                     const parsed = JSON.parse(data.summary_attach);
                     if (Array.isArray(parsed)) {
-                        summaryAttachPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        summaryAttachPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Summary Attachment:', err);
                     // Fallback: comma-separated string
                     summaryAttachPath = data.summary_attach
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -342,7 +342,7 @@ function Reunion_summary() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -350,7 +350,7 @@ function Reunion_summary() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }

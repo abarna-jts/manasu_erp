@@ -1471,9 +1471,8 @@ function Reunion_Checklist() {
 
                                 </li>
                             </ol>
-                            {userType === "1" && (
                                 <Button type='submit' className='btn btn-success mb-5'>Submit</Button>
-                            )}
+
                         </Form>
 
                     </Col>

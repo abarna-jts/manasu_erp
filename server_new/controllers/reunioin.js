@@ -1,5 +1,6 @@
 import db from '../db.js';
 import { ReunionAsync } from '../util/ReunionMulter.js';
+import transporter from '../config/mailer.js';
 
 const createFamilyLetter = async (req, res) => {
     try {
@@ -71,6 +72,24 @@ const createFamilyLetter = async (req, res) => {
         ];
 
         const [result] = await db.query(q, values);
+
+        sendDirectorMail({
+            admissionNumber,
+            rescue_name,
+            rescue_relationship,
+            f_member_name,
+            f_member_phone,
+            f_member_address,
+            f_aadhar_card_no,
+            f_ration_card_no,
+            r_aadhar_card_no,
+            r_ration_card_no
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Failed to create Family Request Letter Form" });
         }
@@ -81,6 +100,35 @@ const createFamilyLetter = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 }
+
+const sendDirectorMail = async (form) => {
+  try {
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 Family Request Form Submitted: ${form.admissionNumber}`,
+      html: `
+        <h2>Family Request Form – Discharge of Resident</h2>
+        <p><strong>Admission No:</strong> ${form.admissionNumber}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Relationship:</strong> ${form.rescue_relationship}</p>
+        <p><strong>Family Member Name:</strong> ${form.f_member_name}</p>
+        <p><strong>Family Member Phone No.:</strong> ${form.f_member_phone}</p>
+        <p><strong>Family Member Address :</strong> ${form.f_member_address}</p>
+        <p><strong>Family Aadhar Card No. :</strong> ${form.f_aadhar_card_no}</p>
+        <p><strong>Family Ration Card No. :</strong> ${form.f_ration_card_no}</p>
+        <p><strong>Resident Aadhar Card No. :</strong> ${form.r_aadhar_card_no}</p>
+        <p><strong>Resident Ration Card No. :</strong> ${form.r_ration_card_no}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
+  }
+};
 
 const getFamilyRequestForm = async (req, res) => {
     const admissionNumber = req.params.admissionNumber;
@@ -288,6 +336,19 @@ const createSelfDeclaration = async (req, res) => {
         ]
 
         const [result] = await db.query(q, values);
+
+        sendDirectorMailSD({
+            admission_no,
+            rescue_name,
+            age,
+            description
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
+
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Failed to create Self Declaration Form" });
         }
@@ -298,6 +359,31 @@ const createSelfDeclaration = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 }
+
+const sendDirectorMailSD = async (form) => {
+  try {
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 Self-Declaration Form Submitted: ${form.admission_no}`,
+      html: `
+        <h2>Self-Declaration Form for Discharge by Resident</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Age:</strong> ${form.age}</p>
+        <p><strong>Description:</strong> ${form.description}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
+  }
+};
 
 const getSelfDeclaration = async (req, res) => {
     const admission_no = req.params.admission_no;
@@ -438,6 +524,16 @@ const createMediaConsent = async (req, res) => {
             description
         ];
         const [result] = await db.query(q, values);
+        sendDirectorMailMedia({
+            admission_no,
+            rescue_name,
+            social_media_consent,
+            description
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Failed to create Media Consent Form" });
         }
@@ -448,6 +544,29 @@ const createMediaConsent = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 }
+
+const sendDirectorMailMedia = async (form) => {
+  try {
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 Media Consent Form Submitted: ${form.admission_no}`,
+      html: `
+        <h2>Resident Consent Form for Social Media Use</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Did the Resident give the Media Consent?:</strong> ${form.social_media_consent}</p>
+        <p><strong>Description:</strong> ${form.description}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
+  }
+};
 
 
 const getMediaConsent = async (req, res) => {
@@ -666,6 +785,22 @@ const createDischargeList = async (req, res) => {
 
         // console.log("familyRequestLetterFile Paths:", getFilePathsArray('familyRequestLetterFile'));
         const [result] = await db.query(query, values);
+
+        sendDirectorMailChecklist({
+            admission_no,
+            familyRequestLetter,
+            selfDeclarationLetter,
+            mediaConsentLetter,
+            familyIDproof,
+            residentIDproof,
+            aadharCard
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
+
+
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Failed to create Discharge checklist Form" });
         }
@@ -678,6 +813,34 @@ const createDischargeList = async (req, res) => {
     }
 
 }
+
+const sendDirectorMailChecklist = async (form) => {
+  try {
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"],
+      subject: `📝 Discharge Checklist Form Submitted : ${form.admission_no}`,
+      html: `
+        <h2>Resident Discharge Summary and Checklist</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Family Request Letter:</strong> ${form.familyRequestLetter}</p>
+        <p><strong>Self-Declaration Letter:</strong> ${form.selfDeclarationLetter}</p>
+        <p><strong>Media Consent Letter:</strong> ${form.mediaConsentLetter}</p>
+        <p><strong>Family ID Proof:</strong> ${form.familyIDproof}</p>
+        <p><strong>Resident’s ID Proof:</strong> ${form.residentIDproof}</p>
+        <p><strong>Aadhaar Card:</strong> ${form.aadharCard}</p>
+        <hr>
+        <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
+  }
+};
 
 const getReunionChecklist = async (req, res) => {
     const admission_no = req.params.admission_no;
@@ -716,12 +879,26 @@ const updateChecklist = async (req, res) => {
     try {
         await ReunionAsync(req, res);
         const admission_no = req.params.admission_no;
+
         if (!admission_no) {
             return res.status(400).json({ message: "Admission number is required" });
         }
 
-        const getFilePath = (field) =>
-            req.files && req.files[field] ? `uploads/Reunion/Discharge_Checklist/${req.files[field][0].filename}` : '';
+        // Fetch existing file paths from DB
+        const [existingRows] = await db.query(`
+            SELECT * FROM discharge_checklist WHERE admission_no = ?
+        `, [admission_no]);
+
+        const existing = existingRows[0] || {};
+
+        // Helper to get new file path or fallback to existing
+        const getFilePath = (fieldName) =>
+            req.files && req.files[fieldName]
+                ? JSON.stringify(req.files[fieldName].map(f => `uploads/Reunion/Discharge_Checklist/${f.filename}`))
+                : existing[fieldName] || '[]';
+
+        console.log(getFilePath('familyRequestLetterFile'));
+
 
         const {
             familyRequestLetter,
@@ -821,6 +998,8 @@ const updateChecklist = async (req, res) => {
             admission_no
         ];
 
+        console.log('Files:', req.files.familyRequestLetterFile);
+
         await db.query(query, values);
         res.status(200).json({ message: "Discharge checklist updated successfully" });
 
@@ -829,6 +1008,7 @@ const updateChecklist = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 };
+
 
 
 export {

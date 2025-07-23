@@ -1,5 +1,6 @@
 import db from '../db.js';
 import { uploadAsync } from '../util/uploadMulter.js';
+import transporter from '../config/mailer.js';
 
 
 const checkAdmissionNo = async (req, res) => {
@@ -118,6 +119,20 @@ const createFirstForm = async (req, res) => {
 
     const [result] = await db.query(q, values);
 
+    // 3. THEN send email to director (doesn't block response)
+    sendDirectorMail({
+      admission_no,
+      rescue_name,
+      referred_by,
+      from_place,
+      admission_date,
+      date_time
+    }).then(() => {
+      console.log("✅ Email sent to director");
+    }).catch((error) => {
+      console.error("❌ Failed to send email to director:", error);
+    });
+
     return res.status(201).json({ message: "First Form Created Successfully", data: result });
 
   } catch (err) {
@@ -137,6 +152,43 @@ const createFirstForm = async (req, res) => {
       message: "Server error while creating first form",
       error: err.sqlMessage || err.message
     });
+  }
+};
+
+const sendDirectorMail = async (form) => {
+  try {
+     const formatDate = (dateInput) => {
+      const date = new Date(dateInput);
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const yyyy = date.getFullYear();
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+    };
+
+     const formattedAdmissionDate = formatDate(form.admission_date);
+    const formattedDateTime = formatDate(form.date_time);
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+      subject: `📝 New First Form Submitted: ${form.admission_no}`,
+      html: `
+        <h2>New First Form Created by Admin</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Referred By:</strong> ${form.referred_by}</p>
+        <p><strong>From Place:</strong> ${form.from_place}</p>
+        <p><strong>Admission Date:</strong> ${formattedAdmissionDate}</p>
+        <p><strong>Date/Time:</strong> ${formattedDateTime}</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to director successfully");
+  } catch (error) {
+    console.error("❌ Error sending email to director:", error.message);
   }
 };
 
@@ -454,5 +506,6 @@ export {
   UpdateStatus,
   getReunionData,
   getForm2Data,
-  getFirst2AForm
+  getFirst2AForm,
+  sendDirectorMail
 };

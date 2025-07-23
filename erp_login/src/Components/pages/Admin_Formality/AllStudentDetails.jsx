@@ -88,7 +88,7 @@ function AllStudentDetails() {
             const student = response.data.data[0]; // Access the first object in the 'data' array
 
             const photoArray = JSON.parse(student.stud_photo || '[]');
-            const fullImageUrls = photoArray.map(path => `http://localhost:5002/${path}`);
+            const fullImageUrls = photoArray.map(path => `https://www.pahrultours.com/app2/${path}`);
 
             setFormData((formData) => ({
                 ...formData,
@@ -115,14 +115,14 @@ function AllStudentDetails() {
                 try {
                     const parsed = JSON.parse(student.stud_photo);
                     if (Array.isArray(parsed)) {
-                        StudPhotoAll = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        StudPhotoAll = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     StudPhotoAll = student.stud_photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -214,7 +214,7 @@ function AllStudentDetails() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -222,7 +222,7 @@ function AllStudentDetails() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }

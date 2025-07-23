@@ -127,14 +127,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.signature);
                     if (Array.isArray(parsed)) {
-                        signaturePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        signaturePath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     signaturePath = data.signature
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -143,14 +143,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.photo);
                     if (Array.isArray(parsed)) {
-                        photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     photoPath = data.photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -159,14 +159,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.handwritten_document);
                     if (Array.isArray(parsed)) {
-                        handwritten_documentPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        handwritten_documentPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     handwritten_documentPath = data.handwritten_document
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -294,7 +294,7 @@ function Self_Declaration_form() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -302,7 +302,7 @@ function Self_Declaration_form() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -406,7 +406,7 @@ function Self_Declaration_form() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -416,7 +416,7 @@ function Self_Declaration_form() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${result.rescue_image}`;
+                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -632,12 +632,10 @@ function Self_Declaration_form() {
                                         </Col>
                                     </Form.Group>
 
-                                    {userType === "1" && (
                                         <div className="mt-3">
                                             <Button variant="success" className="m-1" type="submit">Submit</Button>
                                         </div>
-                                    )}
-
+                                    
                                 </Row>
                             </Form>
 

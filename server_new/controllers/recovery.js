@@ -350,9 +350,9 @@ const createInsight = async (req, res) => {
       if (sent.length === 0) {
         // ✅ Send email
         const mailOptions = {
-          from: 'yourgmail@gmail.com',
-          to: 'manasucmf@gmail.com',
-          subject: 'MSE Form Completed',
+          from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+          to: ['manasucmf@gmail.com'],
+          subject: 'MSE Form Completed by Social Worker',
           html: `
             <h3>MSE Form Completed</h3>
             <p>The Mental Status Examination for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>
@@ -2141,9 +2141,9 @@ const createSuicidalData = async (req, res) => {
       if (sent.length === 0) {
         // ✅ Send email
         const mailOptions = {
-          from: 'yourgmail@gmail.com',
-          to: 'manasucmf@gmail.com',
-          subject: 'Psychiatric Case History Form Completed',
+          from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+          to: ['manasucmf@gmail.com'],
+          subject: 'Psychiatric Case History Form Completed By Social Worker',
           html: `
             <h3>Psychiatric Case History Form Completed</h3>
             <p>The Psychiatric Case History for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>

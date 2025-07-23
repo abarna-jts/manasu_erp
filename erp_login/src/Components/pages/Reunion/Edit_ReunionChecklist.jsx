@@ -54,13 +54,22 @@ function Edit_ReunionChecklist() {
     });
 
     const handleChange = (e) => {
-        const { name, value, type, files } = e.target;
+        const { name, type, files, value } = e.target;
 
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: type === 'file' ? files[0] : value
-        }));
+        if (type === "file") {
+            // Convert FileList to Array
+            setFormData((prev) => ({
+                ...prev,
+                [name]: Array.from(files),
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
     };
+
 
     const { admission_no } = useParams();
 
@@ -265,10 +274,21 @@ function Edit_ReunionChecklist() {
         const formPayload = new FormData();
 
         for (const key in formData) {
-            if (formData[key] !== null && formData[key] !== '') {
+            if (formData[key] instanceof FileList || Array.isArray(formData[key])) {
+                for (let i = 0; i < formData[key].length; i++) {
+                    formPayload.append(key, formData[key][i]); // ✅ appends multiple files correctly
+                }
+
+
+            }
+
+            else {
                 formPayload.append(key, formData[key]);
             }
         }
+
+        console.log("FamilyRequestLetterFile:", formData.familyRequestLetterFile);
+
 
         try {
             const response = await apiRoute.post(`/reunion/updatechecklist/${admission_no}`, formPayload, {
@@ -368,7 +388,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.familyRequestLetterFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -429,6 +449,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="selfDeclarationFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.selfDeclarationFile === "Yes"}
                                                 />
                                             </Col>
@@ -438,7 +459,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.selfDeclarationFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -495,6 +516,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="mediaConsentFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.mediaConsentFile === "Yes"}
                                                 />
                                             </Col>
@@ -504,7 +526,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.mediaConsentFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -566,6 +588,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="familyIDproofFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.familyIDproofFile === "Yes"}
                                                 />
                                             </Col>
@@ -575,7 +598,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.familyIDproofFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -630,6 +653,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="residentIDproofFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.residentIDproofFile === "Yes"}
                                                 />
                                             </Col>
@@ -639,7 +663,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.residentIDproofFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -693,6 +717,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="aadharCardFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.aadharCardFile === "Yes"}
                                                 />
                                             </Col>
@@ -702,7 +727,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.aadharCardFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -756,6 +781,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="udidCardFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.udidCardFile === "Yes"}
                                                 />
                                             </Col>
@@ -766,7 +792,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.udidCardFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -820,6 +846,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="disabilityCertificateFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.disabilityCertificateFile === "Yes"}
                                                 />
                                             </Col>
@@ -829,7 +856,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.disabilityCertificateFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -882,6 +909,7 @@ function Edit_ReunionChecklist() {
                                                     type="file"
                                                     accept=".jpg,.jpeg,.png"
                                                     name="bankPassbookFile"
+                                                    multiple
                                                     onChange={handleChange}
                                                     required={formData.bankPassbookFile === "Yes"}
                                                 />
@@ -893,7 +921,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.bankPassbookFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -947,6 +975,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="healthInsuranceFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.healthInsuranceFile === "Yes"}
                                                 />
                                             </Col>
@@ -956,7 +985,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.healthInsuranceFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1015,6 +1044,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="medicalReportFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.medicalReportFile === "Yes"}
                                                 />
                                             </Col>
@@ -1025,7 +1055,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.medicalReportFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1079,6 +1109,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="dischargeSummaryFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.dischargeSummaryFile === "Yes"}
                                                 />
                                             </Col>
@@ -1088,7 +1119,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.dischargeSummaryFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1142,6 +1173,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="medicationsFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.medicationsFile === "Yes"}
                                                 />
                                             </Col>
@@ -1152,7 +1184,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.medicationsFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1210,6 +1242,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="ClothesFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.ClothesFile === "Yes"}
                                                 />
                                             </Col>
@@ -1219,7 +1252,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.ClothesFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1273,6 +1306,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="possessionsRecoveredFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.possessionsRecoveredFile === "Yes"}
                                                 />
                                             </Col>
@@ -1283,7 +1317,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.possessionsRecoveredFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1337,6 +1371,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="dischargeAllowanceFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.dischargeAllowanceFile === "Yes"}
                                                 />
                                             </Col>
@@ -1346,7 +1381,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.dischargeAllowanceFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1400,6 +1435,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="travelExpensesFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.travelExpensesFile === "Yes"}
                                                 />
                                             </Col>
@@ -1409,7 +1445,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.travelExpensesFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1463,6 +1499,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="copyOfdischargeSummaryFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.copyOfdischargeSummaryFile === "Yes"}
                                                 />
                                             </Col>
@@ -1472,7 +1509,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.copyOfdischargeSummaryFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1531,6 +1568,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="travelSafetyLetterFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.travelSafetyLetterFile === "Yes"}
                                                 />
                                             </Col>
@@ -1540,7 +1578,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.travelSafetyLetterFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1594,6 +1632,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="reunionPhotoFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.reunionPhotoFile === "Yes"}
                                                 />
                                             </Col>
@@ -1603,7 +1642,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.reunionPhotoFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"
@@ -1662,6 +1701,7 @@ function Edit_ReunionChecklist() {
                                                     accept=".jpg,.jpeg,.png"
                                                     name="witnessSignatureFile"
                                                     onChange={handleChange}
+                                                    multiple
                                                     required={formData.witnessSignatureFile === "Yes"}
                                                 />
                                             </Col>
@@ -1671,7 +1711,7 @@ function Edit_ReunionChecklist() {
                                                         {formData.witnessSignatureFile.map((filePath, index) => (
                                                             <a
                                                                 key={index}
-                                                                href={`http://localhost:5002/${filePath}`}
+                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="d-block text-primary mx-3"

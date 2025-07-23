@@ -306,7 +306,7 @@ const Sidebar = () => {
                 <NavItem title="Discharge Details" to="/admin_rescueDetails" icon={faUsers} onAnyClick={handleCloseAccordion} />
 
                 {/* Internship Form */}
-                <NavItem title="Intern Information" to="/allStudentDetails" icon={faUserGraduate} onAnyClick={handleCloseAccordion}/>
+                <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate} onAnyClick={handleCloseAccordion}/>
 
                 {/* <NavItem title="User Permission" to="/user_permission" icon={faUsers} onAnyClick={handleCloseAccordion}/> */}
 
