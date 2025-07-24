@@ -247,14 +247,14 @@ function Rescue_details() {
                 try {
                     const parsed = JSON.parse(data.attach_policeMemo);
                     if (Array.isArray(parsed)) {
-                        policeMemoAttach = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        policeMemoAttach = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse attach_policeMemo:', err);
                     // Fallback: comma-separated string
                     policeMemoAttach = data.attach_policeMemo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -263,14 +263,14 @@ function Rescue_details() {
                 try {
                     const parsed = JSON.parse(data.rescue_image);
                     if (Array.isArray(parsed)) {
-                        RescueImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        RescueImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse attach_policeMemo:', err);
                     // Fallback: comma-separated string
                     RescueImage = data.rescue_image
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -279,19 +279,19 @@ function Rescue_details() {
                 try {
                     const parsed = JSON.parse(data.govIdFile);
                     if (Array.isArray(parsed)) {
-                        govtFilePath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        govtFilePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse govIdFile:', err);
                     // Fallback: comma-separated string
                     govtFilePath = data.govIdFile
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
             // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/Rescue_Images";
+            const basePath = "http://localhost:5002/uploads/Rescue_Images";
             // const RescueImage = data.rescue_image ? `https://www.pahrultours.com/app2/${data.rescue_image}` : null;
             // const govtFilePath = data.govIdFile ? `https://www.pahrultours.com/app2/${data.govIdFile}` : null;
             // const FamilyAadharCard = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
@@ -411,7 +411,7 @@ function Rescue_details() {
     return (
         <>
 
-            <div className="d-xl-flex justify-content-between align-items-center flex-wrap flex-md-nowrap text-start py-2">
+            <div className="d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap text-start py-2">
                 <div className="d-block mb-4 mb-xl-0 px-4 ">
                     <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                         <Breadcrumb.Item></Breadcrumb.Item>
@@ -499,17 +499,43 @@ function Rescue_details() {
                                                 // use directly
                                             }
 
+                                            const fullUrl = `http://localhost:5002/${imagePath}`;
+                                            const filename = imagePath?.split('/').pop(); // Extract filename from path
+
                                             return imagePath ? (
-                                                <img
-                                                    src={`https://www.pahrultours.com/app2/${imagePath}`}
-                                                    alt="Rescue Profile"
-                                                    style={{ width: "70px", height: "70px", objectFit: "cover" }}
-                                                />
+                                                <a
+                                                    href={fullUrl}
+                                                    download={filename} // this hints the filename to browser
+                                                    onClick={(e) => {
+                                                        // To handle CORS or issues with direct download
+                                                        e.preventDefault();
+                                                        fetch(fullUrl, { mode: 'cors' }) // allow CORS
+                                                            .then((res) => res.blob())
+                                                            .then((blob) => {
+                                                                const url = window.URL.createObjectURL(blob);
+                                                                const a = document.createElement('a');
+                                                                a.href = url;
+                                                                a.download = filename || 'image.jpg';
+                                                                a.click();
+                                                                window.URL.revokeObjectURL(url);
+                                                            })
+                                                            .catch(() => alert('Download failed.'));
+                                                    }}
+                                                    style={{ display: 'inline-block' }}
+                                                >
+                                                    <img
+                                                        src={fullUrl}
+                                                        alt="Rescue Profile"
+                                                        style={{ width: "70px", height: "70px", objectFit: "cover", cursor: "pointer" }}
+                                                    />
+                                                </a>
                                             ) : (
                                                 <span>No image</span>
                                             );
                                         })()}
                                     </td>
+
+
 
 
 

@@ -169,6 +169,21 @@ function Essential_record() {
         }
     }
 
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -320,7 +335,7 @@ function Essential_record() {
 
             // Parse bank passbook image
             const passbookPath = data.bank_passbook
-                ? [`https://www.pahrultours.com/app2/${data.bank_passbook}`]
+                ? [`http://localhost:5002/${data.bank_passbook}`]
                 : [];
 
             // Parse form7_attach image array
@@ -329,14 +344,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.form7_attach);
                     if (Array.isArray(parsed)) {
-                        form7Paths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        form7Paths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     form7Paths = data.form7_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -345,14 +360,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.bank_passbook);
                     if (Array.isArray(parsed)) {
-                        bank_passbookPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        bank_passbookPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse bank passbook:', err);
                     // Fallback: comma-separated string
                     bank_passbookPath = data.bank_passbook
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -455,7 +470,7 @@ function Essential_record() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -463,7 +478,7 @@ function Essential_record() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -638,7 +653,7 @@ function Essential_record() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -648,7 +663,7 @@ function Essential_record() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -1372,26 +1387,31 @@ function Essential_record() {
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                     {files.form7_attach &&
                                         files.form7_attach.map((imgUrl, index) => (
-                                            <img
-                                                key={index}
-                                                src={imgUrl}
-                                                alt={`form7_attach - ${index}`}
-                                                loading="lazy"
-                                                style={{
-                                                    width: "150px",
-                                                    height: "auto",
-                                                    margin: "10px",
-                                                    border: "1px solid #ccc",
-                                                }}
-                                                onError={(e) => {
-                                                    if (!e.target.dataset.errorHandled) {
-                                                        e.target.src = "/fallback-image.png";
-                                                        e.target.dataset.errorHandled = "true";
-                                                    }
-                                                }}
-                                            />
+                                            <div key={index} style={{ margin: "10px", textAlign: 'center' }}>
+                                                <img
+                                                    src={imgUrl}
+                                                    alt={`form7_attach - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "150px",
+                                                        height: "auto",
+                                                        border: "1px solid #ccc",
+                                                        cursor: "pointer"
+                                                    }}
+                                                    onClick={() => downloadImage(imgUrl, `form7_attach_${index}.jpg`)}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
+                                                <p style={{ fontSize: "12px" }}>Click image to download</p>
+                                            </div>
                                         ))}
                                 </div>
+
+
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
@@ -1462,24 +1482,27 @@ function Essential_record() {
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                     {files.bank_passbook &&
                                         files.bank_passbook.map((imgUrl, index) => (
-                                            <img
-                                                key={index}
-                                                src={imgUrl}
-                                                alt={`bank_passbook - ${index}`}
-                                                loading="lazy"
-                                                style={{
-                                                    width: "150px",
-                                                    height: "auto",
-                                                    margin: "10px",
-                                                    border: "1px solid #ccc",
-                                                }}
-                                                onError={(e) => {
-                                                    if (!e.target.dataset.errorHandled) {
-                                                        e.target.src = "/fallback-image.png";
-                                                        e.target.dataset.errorHandled = "true";
-                                                    }
-                                                }}
-                                            />
+                                            <div key={index} style={{ margin: "10px", textAlign: 'center' }}>
+                                                <img
+                                                    src={imgUrl}
+                                                    alt={`bank_passbook - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "150px",
+                                                        height: "auto",
+                                                        border: "1px solid #ccc",
+                                                        cursor: "pointer"
+                                                    }}
+                                                    onClick={() => downloadImage(imgUrl, `bank_passbook${index}.jpg`)}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
+                                                <p style={{ fontSize: "12px" }}>Click image to download</p>
+                                            </div>
                                         ))}
                                 </div>
 

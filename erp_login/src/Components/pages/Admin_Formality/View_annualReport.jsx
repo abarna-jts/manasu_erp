@@ -120,7 +120,7 @@ function View_annualReport() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -128,7 +128,7 @@ function View_annualReport() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -151,6 +151,20 @@ function View_annualReport() {
         } catch (error) {
             console.error("Error fetching form data:", error);
         }
+    };
+
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
     };
 
     const handleUpdate = async (e) => {
@@ -276,14 +290,14 @@ function View_annualReport() {
                 try {
                     const parsed = JSON.parse(data.event_photos);
                     if (Array.isArray(parsed)) {
-                        EventImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        EventImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     EventImage = data.event_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -292,14 +306,14 @@ function View_annualReport() {
                 try {
                     const parsed = JSON.parse(data.awarness_photos);
                     if (Array.isArray(parsed)) {
-                        AwarnessPhoto = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        AwarnessPhoto = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     AwarnessPhoto = data.awarness_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -308,14 +322,14 @@ function View_annualReport() {
                 try {
                     const parsed = JSON.parse(data.outing_photos);
                     if (Array.isArray(parsed)) {
-                        OutingPhoto = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        OutingPhoto = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     OutingPhoto = data.outing_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -385,6 +399,10 @@ function View_annualReport() {
         }
     };
 
+    const handleCelebration = () => {
+        navigate("/celebration_report");
+    }
+
 
     return (
         <>
@@ -422,9 +440,15 @@ function View_annualReport() {
 
                 </Row>
             </Container>
-            <Col md={3}>
-                <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
-            </Col>
+            <Row className='d-flex align-items-center justify-content-between mb-3'>
+                <Col md={3}>
+                    <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
+                </Col>
+                <Col md={3}>
+                    <Button type='button' className='btn btn-success' onClick={() => handleCelebration()}>Next</Button>
+                </Col>
+            </Row>
+
             <Container>
                 <>
                     <Row>
@@ -873,6 +897,7 @@ function View_annualReport() {
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
+                                                onClick={() => downloadImage(imgUrl, `event_photos_${index}.jpg`)}
                                                 onError={(e) => {
                                                     if (!e.target.dataset.errorHandled) {
                                                         e.target.src = "/fallback-image.png";
@@ -973,6 +998,7 @@ function View_annualReport() {
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
+                                                onClick={() => downloadImage(imgUrl, `awarness_photos_${index}.jpg`)}
                                                 onError={(e) => {
                                                     if (!e.target.dataset.errorHandled) {
                                                         e.target.src = "/fallback-image.png";
@@ -1072,6 +1098,7 @@ function View_annualReport() {
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
+                                                onClick={() => downloadImage(imgUrl, `outing_photos_${index}.jpg`)}
                                                 onError={(e) => {
                                                     if (!e.target.dataset.errorHandled) {
                                                         e.target.src = "/fallback-image.png";

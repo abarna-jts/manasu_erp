@@ -310,8 +310,6 @@ function Edit_ReunionChecklist() {
         }
     };
 
-
-
     return (
         <>
             <div className="d-xl-flex align-items-center flex-wrap flex-md-nowrap text-start py-2">
@@ -385,22 +383,45 @@ function Edit_ReunionChecklist() {
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.familyRequestLetterFile) && formData.familyRequestLetterFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.familyRequestLetterFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.familyRequestLetterFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
                                                 )}
                                             </Col>
+
                                             {/* Show view links if files exist */}
 
                                         </Col>
@@ -450,23 +471,45 @@ function Edit_ReunionChecklist() {
                                                     name="selfDeclarationFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.selfDeclarationFile === "Yes"}
+                                                    required={formData.selfDeclarationLetter === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.selfDeclarationFile) && formData.selfDeclarationFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.selfDeclarationFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.selfDeclarationFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -517,23 +560,45 @@ function Edit_ReunionChecklist() {
                                                     name="mediaConsentFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.mediaConsentFile === "Yes"}
+                                                    required={formData.mediaConsentLetter === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.mediaConsentFile) && formData.mediaConsentFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.mediaConsentFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.mediaConsentFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -589,23 +654,45 @@ function Edit_ReunionChecklist() {
                                                     name="familyIDproofFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.familyIDproofFile === "Yes"}
+                                                    required={formData.familyIDproof === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.familyIDproofFile) && formData.familyIDproofFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.familyIDproofFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.familyIDproofFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -654,23 +741,45 @@ function Edit_ReunionChecklist() {
                                                     name="residentIDproofFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.residentIDproofFile === "Yes"}
+                                                    required={formData.residentIDproof === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.residentIDproofFile) && formData.residentIDproofFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.residentIDproofFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.residentIDproofFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -718,23 +827,45 @@ function Edit_ReunionChecklist() {
                                                     name="aadharCardFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.aadharCardFile === "Yes"}
+                                                    required={formData.aadharCard === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.aadharCardFile) && formData.aadharCardFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.aadharCardFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.aadharCardFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -782,24 +913,46 @@ function Edit_ReunionChecklist() {
                                                     name="udidCardFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.udidCardFile === "Yes"}
+                                                    required={formData.udidCard === "Yes"}
                                                 />
                                             </Col>
 
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.udidCardFile) && formData.udidCardFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.udidCardFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.udidCardFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -847,23 +1000,45 @@ function Edit_ReunionChecklist() {
                                                     name="disabilityCertificateFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.disabilityCertificateFile === "Yes"}
+                                                    required={formData.disabilityCertificate === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.disabilityCertificateFile) && formData.disabilityCertificateFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.disabilityCertificateFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.disabilityCertificateFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -911,24 +1086,46 @@ function Edit_ReunionChecklist() {
                                                     name="bankPassbookFile"
                                                     multiple
                                                     onChange={handleChange}
-                                                    required={formData.bankPassbookFile === "Yes"}
+                                                    required={formData.bankPassbook === "Yes"}
                                                 />
                                             </Col>
 
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.bankPassbookFile) && formData.bankPassbookFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.bankPassbookFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.bankPassbookFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -976,23 +1173,45 @@ function Edit_ReunionChecklist() {
                                                     name="healthInsuranceFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.healthInsuranceFile === "Yes"}
+                                                    required={formData.healthInsurance === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.healthInsuranceFile) && formData.healthInsuranceFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.healthInsuranceFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.healthInsuranceFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1045,24 +1264,46 @@ function Edit_ReunionChecklist() {
                                                     name="medicalReportFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.medicalReportFile === "Yes"}
+                                                    required={formData.medicalReport === "Yes"}
                                                 />
                                             </Col>
 
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.medicalReportFile) && formData.medicalReportFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.medicalReportFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.medicalReportFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1110,23 +1351,45 @@ function Edit_ReunionChecklist() {
                                                     name="dischargeSummaryFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.dischargeSummaryFile === "Yes"}
+                                                    required={formData.dischargeSummary === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.dischargeSummaryFile) && formData.dischargeSummaryFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.dischargeSummaryFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.dischargeSummaryFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1174,24 +1437,46 @@ function Edit_ReunionChecklist() {
                                                     name="medicationsFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.medicationsFile === "Yes"}
+                                                    required={formData.medications === "Yes"}
                                                 />
                                             </Col>
 
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.medicationsFile) && formData.medicationsFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.medicationsFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.medicationsFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1243,23 +1528,45 @@ function Edit_ReunionChecklist() {
                                                     name="ClothesFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.ClothesFile === "Yes"}
+                                                    required={formData.Clothes === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.ClothesFile) && formData.ClothesFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.ClothesFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.ClothesFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1307,24 +1614,46 @@ function Edit_ReunionChecklist() {
                                                     name="possessionsRecoveredFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.possessionsRecoveredFile === "Yes"}
+                                                    required={formData.possessionsRecovered === "Yes"}
                                                 />
                                             </Col>
 
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.possessionsRecoveredFile) && formData.possessionsRecoveredFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.possessionsRecoveredFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.possessionsRecoveredFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1372,23 +1701,45 @@ function Edit_ReunionChecklist() {
                                                     name="dischargeAllowanceFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.dischargeAllowanceFile === "Yes"}
+                                                    required={formData.dischargeAllowance === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.dischargeAllowanceFile) && formData.dischargeAllowanceFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.dischargeAllowanceFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.dischargeAllowanceFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1436,23 +1787,45 @@ function Edit_ReunionChecklist() {
                                                     name="travelExpensesFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.travelExpensesFile === "Yes"}
+                                                    required={formData.travelExpenses === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.travelExpensesFile) && formData.travelExpensesFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.travelExpensesFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.travelExpensesFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1500,23 +1873,45 @@ function Edit_ReunionChecklist() {
                                                     name="copyOfdischargeSummaryFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.copyOfdischargeSummaryFile === "Yes"}
+                                                    required={formData.copyOfdischargeSummary === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.copyOfdischargeSummaryFile) && formData.copyOfdischargeSummaryFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.copyOfdischargeSummaryFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.copyOfdischargeSummaryFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1569,23 +1964,45 @@ function Edit_ReunionChecklist() {
                                                     name="travelSafetyLetterFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.travelSafetyLetterFile === "Yes"}
+                                                    required={formData.travelSafetyLetter === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.travelSafetyLetterFile) && formData.travelSafetyLetterFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.travelSafetyLetterFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.travelSafetyLetterFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1633,23 +2050,45 @@ function Edit_ReunionChecklist() {
                                                     name="reunionPhotoFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.reunionPhotoFile === "Yes"}
+                                                    required={formData.reunionPhoto === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.reunionPhotoFile) && formData.reunionPhotoFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.reunionPhotoFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.reunionPhotoFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1702,23 +2141,45 @@ function Edit_ReunionChecklist() {
                                                     name="witnessSignatureFile"
                                                     onChange={handleChange}
                                                     multiple
-                                                    required={formData.witnessSignatureFile === "Yes"}
+                                                    required={formData.witnessSignature === "Yes"}
                                                 />
                                             </Col>
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.witnessSignatureFile) && formData.witnessSignatureFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.witnessSignatureFile.map((filePath, index) => (
-                                                            <a
-                                                                key={index}
-                                                                href={`https://www.pahrultours.com/app2/${filePath}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="d-block text-primary mx-3"
-                                                            >
-                                                                View {index + 1}
-                                                            </a>
-                                                        ))}
+                                                        {formData.witnessSignatureFile.map((filePath, index) => {
+                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const filename = filePath?.split('/').pop();
+                                                            return (
+                                                                <a
+                                                                    key={index}
+                                                                    href={fullUrl}
+                                                                    download={filename}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="d-block text-primary mx-3"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl)
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+
+                                                                                // Open in new tab after download
+                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                >
+                                                                    View {index + 1}
+                                                                </a>
+                                                            );
+                                                        })}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>

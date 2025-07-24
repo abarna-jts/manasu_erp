@@ -389,14 +389,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.f_aadhar_card);
                     if (Array.isArray(parsed)) {
-                        f_aadhar_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        f_aadhar_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     f_aadhar_cardPaths = data.f_aadhar_card
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -405,14 +405,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.f_ration_card);
                     if (Array.isArray(parsed)) {
-                        f_ration_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        f_ration_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     f_ration_cardPaths = data.f_ration_card
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -421,14 +421,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.r_aadhar_card);
                     if (Array.isArray(parsed)) {
-                        r_aadhar_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        r_aadhar_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     r_aadhar_cardPaths = data.r_aadhar_card
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -437,14 +437,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.r_ration_card);
                     if (Array.isArray(parsed)) {
-                        r_ration_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        r_ration_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     r_ration_cardPaths = data.r_ration_card
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -453,14 +453,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.govt_id);
                     if (Array.isArray(parsed)) {
-                        govt_idPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        govt_idPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     govt_idPaths = data.govt_id
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -503,6 +503,20 @@ function Family_Request_form() {
         }
     }, [previewRequested]);
 
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
+    };
+
     const handleShow = async (admissionNumber) => {
         try {
             const response = await apiRoute.get(`/reunion/get_family_letter/${admissionNumber}`);
@@ -531,7 +545,7 @@ function Family_Request_form() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -539,7 +553,7 @@ function Family_Request_form() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -727,7 +741,7 @@ function Family_Request_form() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -737,7 +751,7 @@ function Family_Request_form() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -1206,9 +1220,9 @@ function Family_Request_form() {
                             </Form.Group>
 
                         </Col>
-                            <div className="mt-3 d-flex align-tems-cente justify-content-between">
-                                <Button variant="success" className="m-1 mb-5" type="submit">Submit</Button>
-                            </div>
+                        <div className="mt-3 d-flex align-tems-cente justify-content-between">
+                            <Button variant="success" className="m-1 mb-5" type="submit">Submit</Button>
+                        </div>
 
                     </Form>
 
@@ -1795,6 +1809,7 @@ function Family_Request_form() {
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
+                                                    onClick={() => downloadImage(imgUrl, `f_aadhar_card${index}.jpg`)}
                                                     onError={(e) => {
                                                         if (!e.target.dataset.errorHandled) {
                                                             e.target.src = "/fallback-image.png";
@@ -1845,6 +1860,7 @@ function Family_Request_form() {
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
+                                                    onClick={() => downloadImage(imgUrl, `f_ration_card${index}.jpg`)}
                                                     onError={(e) => {
                                                         if (!e.target.dataset.errorHandled) {
                                                             e.target.src = "/fallback-image.png";
@@ -1898,6 +1914,7 @@ function Family_Request_form() {
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
+                                                    onClick={() => downloadImage(imgUrl, `r_aadhar_card${index}.jpg`)}
                                                     onError={(e) => {
                                                         if (!e.target.dataset.errorHandled) {
                                                             e.target.src = "/fallback-image.png";
@@ -1983,26 +2000,30 @@ function Family_Request_form() {
                                         </Form.Group>
                                         {Array.isArray(files.govt_id) && files.govt_id.length > 0 && (
                                             <div style={{ minHeight: "120px", display: "flex", flexWrap: "wrap" }}>
-                                                {files.govt_id.map((imgUrl, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={imgUrl}
-                                                        alt={`govt_id - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "150px",
-                                                            height: "auto",
-                                                            margin: "10px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
-                                                ))}
+                                                {files.govt_id &&
+                                                    files.govt_id.map((imgUrl, index) => (
+                                                        <div key={index} style={{ margin: "10px", textAlign: 'center' }}>
+                                                            <img
+                                                                src={imgUrl}
+                                                                alt={`govt_id - ${index}`}
+                                                                loading="lazy"
+                                                                style={{
+                                                                    width: "150px",
+                                                                    height: "auto",
+                                                                    border: "1px solid #ccc",
+                                                                    cursor: "pointer"
+                                                                }}
+                                                                onClick={() => downloadImage(imgUrl, `govt_id${index}.jpg`)}
+                                                                onError={(e) => {
+                                                                    if (!e.target.dataset.errorHandled) {
+                                                                        e.target.src = "/fallback-image.png";
+                                                                        e.target.dataset.errorHandled = "true";
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <p style={{ fontSize: "12px" }}>Click image to download</p>
+                                                        </div>
+                                                    ))}
                                             </div>
                                         )}
 

@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faArrowRight, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -94,7 +94,7 @@ function SCRB_form() {
                     try {
                         const parsedArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
                         if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${parsedArray[0]}`;
+                            imagePath = `http://localhost:5002/${parsedArray[0]}`;
                         }
                     } catch (parseErr) {
                         console.error("Failed to parse image array", parseErr);
@@ -108,7 +108,7 @@ function SCRB_form() {
 
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${cleanPath}`;
+                        : `http://localhost:5002/${cleanPath}`;
                 }
 
                 console.log("Final image path:", imagePath);
@@ -329,14 +329,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.old_photo);
                     if (Array.isArray(parsed)) {
-                        oldPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        oldPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     oldPhotoPath = data.old_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -345,14 +345,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.new_photo);
                     if (Array.isArray(parsed)) {
-                        newPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        newPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     newPhotoPath = data.new_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -361,14 +361,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.signature);
                     if (Array.isArray(parsed)) {
-                        signaturepath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        signaturepath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     signaturepath = data.signature
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -377,20 +377,20 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.seal);
                     if (Array.isArray(parsed)) {
-                        sealpath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        sealpath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     sealpath = data.seal
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
 
             // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
+            const basePath = "http://localhost:5002/uploads/form_2a";
 
             // Handle old and new photo paths correctly
             // const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2${data.old_photo}` : null;
@@ -413,6 +413,10 @@ function SCRB_form() {
             alert("Admission Number not found");
         }
     };
+
+    const EditSCRBForm = async () => {
+        navigate("/scrb_formALL");
+    }
 
 
     useEffect(() => {
@@ -484,7 +488,7 @@ function SCRB_form() {
 
     return (
         <>
-            <div className="d-xl-flex align-items-center flex-wrap flex-md-nowrap text-start py-2">
+            <div className="d-flex align-items-center flex-wrap flex-md-nowrap text-start py-2">
                 <div className="d-block mb-4 mb-xl-0 px-4 ">
                     <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                         <Breadcrumb.Item></Breadcrumb.Item>
@@ -550,6 +554,10 @@ function SCRB_form() {
                                                 fetchFormData(); // Fetch & populate data before generating PDF
                                             }
                                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
+                                        <button type="button" className="btn btn-success col-md-3" onClick={EditSCRBForm}>
+                                            View All
+                                        </button>
+
                                         {/* <Col md={4}>
                                             <button type="button" className="btn btn-success" onClick={handleDownload}>
                                                 Import Excel Sheet
@@ -805,7 +813,7 @@ function SCRB_form() {
                                             <td style={{ width: '10%' }}>
                                                 <div className="row">
                                                     <div className="col-md-12">
-                                                        <label>Gendar / பாலினம் : <span style={{ color: 'red' }}>*</span></label>
+                                                        <label>Gender / பாலினம் : <span style={{ color: 'red' }}>*</span></label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -1509,7 +1517,7 @@ function SCRB_form() {
 
                                 </tbody>
                             </table>
-                            <table className="table table-border" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "60px", marginTop: "50px" }}>
+                            <table className="table table-border" style={{ border: "2px solid rgb(143 143 143)", marginBottom: "60px", marginTop: "100px" }}>
                                 <tbody>
                                     <tr>
                                         <td>
@@ -1532,7 +1540,7 @@ function SCRB_form() {
                             <table className="table">
                                 <tbody>
                                     <tr>
-                                        <td style={{ marginTop: "40px" }}>
+                                        <td style={{ marginTop: "20px" }}>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
                                                     <label>SIGNATURE / கையொப்பம் : </label>

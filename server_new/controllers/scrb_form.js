@@ -293,7 +293,7 @@ const createForm2C = async (req, res) => {
       (lowerdress || []).join(', '),
       addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color
     ]);
-    
+
     sendDirectorMailForm2C({
       admission_no,
       file_no,
@@ -453,6 +453,35 @@ const getAllSCRBFormData = async (req, res) => {
   }
 };
 
+const getAllSCRBForm2A = async (req, res) => {
+  const query = "Select * from form_2";
+  try {
+    const [data] = await db.query(query);
+    return res.status(200).json({ message: "SCRB Form 2 Get Successfully", data: data });
+  } catch (err) {
+    console.error("Database Error:", err);
+    return res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getSCRB_form2 = async (req, res) => {
+  const rescueID = req.params.id;
+  const query = 'SELECT * FROM form_2 WHERE id = ?';
+
+  try {
+    const [results] = await db.query(query, [rescueID]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'SCRB Form2 not found' });
+    }
+
+    return res.status(200).json(results[0]);
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ message: 'Database error', error: err });
+  }
+}
+
 export {
   createForm2,
   createForm2A,
@@ -463,5 +492,7 @@ export {
   getForm2CPDF,
   getForm2PDF,
   getForm2Data,
-  getAllSCRBFormData
+  getAllSCRBFormData,
+  getAllSCRBForm2A,
+  getSCRB_form2
 };

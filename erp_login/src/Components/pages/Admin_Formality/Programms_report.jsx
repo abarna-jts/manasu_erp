@@ -134,14 +134,14 @@ function Programms_report() {
                 try {
                     const parsed = JSON.parse(data.programms_photos);
                     if (Array.isArray(parsed)) {
-                        ProgrammsImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        ProgrammsImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     ProgrammsImage = data.programms_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -228,7 +228,7 @@ function Programms_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -236,7 +236,7 @@ function Programms_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -312,6 +312,24 @@ function Programms_report() {
         }
     };
 
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
+    };
+
+    const handleStaff = () => {
+        navigate("/staffPrograms_report");  
+    }
+
 
     return (
         <>
@@ -350,9 +368,14 @@ function Programms_report() {
                 </Row>
             </Container>
 
-            <Col md={3}>
-                <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
-            </Col>
+            <Row className='d-flex align-items-center justify-content-between mb-3'>
+                <Col md={3}>
+                    <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
+                </Col>
+                <Col md={3}>
+                    <Button type='button' className='btn btn-success' onClick={() => handleStaff()}>Next</Button>
+                </Col>
+            </Row>
 
             <Container>
                 <>
@@ -673,6 +696,7 @@ function Programms_report() {
                                             margin: "10px",
                                             border: "1px solid #ccc",
                                         }}
+                                        onClick={() => downloadImage(imgUrl, `programms_photos_${index}.jpg`)}
                                         onError={(e) => {
                                             if (!e.target.dataset.errorHandled) {
                                                 e.target.src = "/fallback-image.png";

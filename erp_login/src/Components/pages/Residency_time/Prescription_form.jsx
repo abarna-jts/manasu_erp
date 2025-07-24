@@ -74,7 +74,7 @@ function Prescription_form() {
         "METOPROLOL 25 MG", "DOLO 650", "BRUFEN 400 MG", "EMESET 4 MG",
         "DULCOLAX 10 MG", "PARACETAMOL 150MG", "EMESET 2MG", "AVIL 2ML",
         "DEXA 4MG", "BETADINE OINTMENT 15GM", "BETAMETHASONE OINTMENT 30GM",
-        "MOOV CREAM 50GM", "LIQUID PARAFFIN", "CANDID POWDER"
+        "MOOV CREAM 50GM", "LIQUID PARAFFIN", "CANDID POWDER", "ANY OTHER MEDICINE"
     ];
 
     const psychiatristMedicines = [
@@ -84,7 +84,7 @@ function Prescription_form() {
         "LORAZEPAM 2 MG", "METFORMIN 500 MG", "METOPROLOL 25MG", "NITRAZEPAM 5MG",
         "OLANZIPINE 5MG", "OMEZ 20 MG", "PANDAP 40GM", "PHENITION SODIUM 100 MG",
         "PROPANOLOL 40 MG", "RANTAC 150 MG", "RISPERIDONE 2MG", "SODIUM VALPROATE 200MG",
-        "TRIHEXYPHENIDYL 2MG", "VITAMIN C"
+        "TRIHEXYPHENIDYL 2MG", "VITAMIN C", "ANY OTHER MEDICINE"
     ];
 
 
@@ -512,6 +512,7 @@ function Prescription_form() {
         }
     };
 
+    
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -961,6 +962,16 @@ function Prescription_form() {
                                                         <option key={idx} value={med}>{med}</option>
                                                     ))}
                                                 </select>
+                                                {rows[i].medicine === 'ANY OTHER MEDICINE' && (
+                                                    <input
+                                                        type="text"
+                                                        name="medicine"
+                                                        onChange={(e) => handleRowChange(i, e)}
+                                                        placeholder="Enter Medicine"
+                                                        className="form-control"
+                                                        style={{ width: '35%' }}
+                                                    />
+                                                )}
 
                                                 <select
                                                     className="form-select"

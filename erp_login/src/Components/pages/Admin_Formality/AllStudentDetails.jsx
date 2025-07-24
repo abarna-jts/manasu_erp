@@ -88,7 +88,7 @@ function AllStudentDetails() {
             const student = response.data.data[0]; // Access the first object in the 'data' array
 
             const photoArray = JSON.parse(student.stud_photo || '[]');
-            const fullImageUrls = photoArray.map(path => `https://www.pahrultours.com/app2/${path}`);
+            const fullImageUrls = photoArray.map(path => `http://localhost:5002/${path}`);
 
             setFormData((formData) => ({
                 ...formData,
@@ -115,14 +115,14 @@ function AllStudentDetails() {
                 try {
                     const parsed = JSON.parse(student.stud_photo);
                     if (Array.isArray(parsed)) {
-                        StudPhotoAll = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        StudPhotoAll = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     StudPhotoAll = student.stud_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -214,7 +214,7 @@ function AllStudentDetails() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -222,7 +222,7 @@ function AllStudentDetails() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -314,6 +314,19 @@ function AllStudentDetails() {
         }
     };
 
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
+    };
 
     const handleFileChange = (e) => {
         setFiles({
@@ -776,6 +789,7 @@ function AllStudentDetails() {
                                                             margin: "10px",
                                                             border: "1px solid #ccc",
                                                         }}
+                                                        onClick={() => downloadImage(imgUrl, `stud_photo_${index}.jpg`)}
                                                         onError={(e) => {
                                                             if (!e.target.dataset.errorHandled) {
                                                                 e.target.src = "/fallback-image.png";

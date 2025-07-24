@@ -274,7 +274,7 @@ function Media_consent_form() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -282,7 +282,7 @@ function Media_consent_form() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -415,6 +415,20 @@ function Media_consent_form() {
             setRescueName("");
             setError("Admission Number Not found");
         }
+    };
+
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
     };
 
     // Trigger when admission number changes
@@ -785,6 +799,7 @@ function Media_consent_form() {
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
+                                            onClick={() => downloadImage(imgUrl, `scan_report${index}.jpg`)}
                                             onError={(e) => {
                                                 if (!e.target.dataset.errorHandled) {
                                                     e.target.src = "/fallback-image.png";

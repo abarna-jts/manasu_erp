@@ -1,5 +1,7 @@
 import express from 'express';
-import{createForm2 ,createForm2A,createForm2B, createForm2C,getForm2APDF,getForm2BPDF, getForm2CPDF, getForm2PDF, getForm2Data, getAllSCRBFormData} from "../controllers/scrb_form.js";
+import{createForm2 ,createForm2A,createForm2B, createForm2C,getForm2APDF,getForm2BPDF, getForm2CPDF, getForm2PDF, getForm2Data, getAllSCRBFormData,
+    getAllSCRBForm2A, getSCRB_form2
+} from "../controllers/scrb_form.js";
 
 const router = express.Router();
 
@@ -9,6 +11,9 @@ router.post("/create_form_2A", createForm2A); //(SCRB_Form2A.jsx)  //completed
 router.post("/create_form_2B",createForm2B); //(SCRB_Form2B.jsx)  //completed
 router.post("/create_form_2C",createForm2C); //(SCRB_Form2C.jsx)  //completed
 
+// all scrb form data
+router.get("/getAllSCRBForm2", getAllSCRBForm2A);
+router.get("/getSCRB_form2/:id",getSCRB_form2);
 //pdf file get from SCRB FORM
 router.get('/get_scrb_form2/:admission_no', getForm2PDF); //(SCRB_Form.jsx) //completed
 router.get('/get_scrb_form2adata/:admission_no', getForm2APDF); //(SCRB_Form2A.jsx) //completed

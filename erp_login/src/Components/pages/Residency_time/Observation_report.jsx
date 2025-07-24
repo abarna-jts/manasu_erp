@@ -9,6 +9,10 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css
 import { Alert } from "react-bootstrap";
 import Cookies from 'js-cookie';
+import { useRef } from 'react';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import manasu_logo from '../Admission/Manasu-Logo.png';
 
 function Observation_report() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -19,6 +23,7 @@ function Observation_report() {
     const [rescueName, setRescueName] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const [previewRequested, setPreviewRequested] = useState(false);
 
     const handleEditClose = () => setEditShow(false);
 
@@ -100,6 +105,20 @@ function Observation_report() {
         }
     };
 
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
+    };
+
     const handleEdiShow = async (id) => {
         try {
             const response = await apiRoute.get(`/residency/show_data/${id}`);
@@ -128,7 +147,7 @@ function Observation_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -136,7 +155,7 @@ function Observation_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -271,6 +290,107 @@ function Observation_report() {
         }
     };
 
+    const ViewFormData = async (id) => {
+        try {
+            const response = await apiRoute.get(`/residency/show_data/${id}`);
+            const data = response.data;
+
+            const [fromFormatted, toFormatted] = data.date.split(' to ');
+
+            const parseDate = (dmy) => {
+                const [day, month, year] = dmy.split("-");
+                return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+            };
+
+            // Update form fields
+            setFormData((formData) => ({
+                ...formData,
+                admission_no: data.admission_no || '',
+                resident_name: data.resident_name || '',
+                follow_up: data.follow_up || '',
+                date: parseDate(fromFormatted) || '',
+            }));
+
+            let recovery_photoPath = [];
+            if (data.recovery_photo) {
+                try {
+                    const parsed = JSON.parse(data.recovery_photo);
+                    if (Array.isArray(parsed)) {
+                        recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse signature:', err);
+                    // Fallback: comma-separated string
+                    recovery_photoPath = data.recovery_photo
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+            console.log(recovery_photoPath);
+            // Set files state
+            setFiles((files) => ({
+                ...files,
+                recovery_photo: recovery_photoPath,
+            }));
+
+            setPreviewRequested(true);
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Admission Number not found");
+        }
+    }
+
+    useEffect(() => {
+            if (previewRequested) {
+                // Delay slightly to allow DOM updates
+                setTimeout(() => {
+                    generatePDF();
+                    setPreviewRequested(false);
+                }, 100); // 100ms delay is often enough
+            }
+        }, [previewRequested]);
+    
+        const formRef = useRef();
+    
+        const generatePDF = async () => {
+            const input = formRef.current;
+            if (!input) {
+                console.error("Form reference is not defined");
+                return;
+            }
+    
+            try {
+                const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+                const imgData = canvas.toDataURL("image/png");
+    
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+    
+                const imgProps = pdf.getImageProperties(imgData);
+                const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    
+                let heightLeft = imgHeight;
+                let position = 0;
+    
+                while (heightLeft > 0) {
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                    heightLeft -= pdfHeight;
+                    if (heightLeft > 0) {
+                        pdf.addPage();
+                        position = -imgHeight + heightLeft;
+                    }
+                }
+    
+                const pdfBlob = pdf.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                window.open(pdfUrl, '_blank');
+            } catch (err) {
+                console.error("Error generating PDF:", err);
+                alert("Failed to generate PDF.");
+            }
+        };
+
     return (
         <>
             <Container fluid>
@@ -372,12 +492,43 @@ function Observation_report() {
                                                             }
                                                         }
 
+                                                        const fullUrl = `http://localhost:5002/${firstPhoto}`;
+                                                        const filename = firstPhoto?.split('/').pop();
+
                                                         return firstPhoto ? (
-                                                            <img
-                                                                src={`https://www.pahrultours.com/app2/${firstPhoto}`}
-                                                                alt="Recovery Photo"
-                                                                style={{ width: "85px", height: "auto" }}
-                                                            />
+                                                            <>
+                                                                <a
+                                                                    href={fullUrl}
+                                                                    download={filename} // this hints the filename to browser
+                                                                    onClick={(e) => {
+                                                                        // To handle CORS or issues with direct download
+                                                                        e.preventDefault();
+                                                                        fetch(fullUrl, { mode: 'cors' }) // allow CORS
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement('a');
+                                                                                a.href = url;
+                                                                                a.download = filename || 'image.jpg';
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+                                                                            })
+                                                                            .catch(() => alert('Download failed.'));
+                                                                    }}
+                                                                    style={{ display: 'inline-block' }}
+                                                                >
+                                                                    <img
+                                                                        src={fullUrl}
+                                                                        alt="Rescue Profile"
+                                                                        style={{ width: "70px", height: "70px", objectFit: "cover", cursor: "pointer" }}
+                                                                    />
+                                                                </a>
+                                                            </>
+                                                            // <img
+                                                            //     src={`https://www.pahrultours.com/app2/${firstPhoto}`}
+                                                            //     alt="Recovery Photo"
+                                                            //     style={{ width: "85px", height: "auto" }}
+                                                            // />
                                                         ) : (
                                                             "NULL"
                                                         );
@@ -388,6 +539,9 @@ function Observation_report() {
                                             </td>
 
                                             <td>
+                                                <button className="btn btn-success icon_details" onClick={() => ViewFormData(item.id)}>
+                                                    <i className="fas fa-eye"></i>
+                                                </button>
                                                 <button className="btn btn-success icon_details" onClick={() => handleEdiShow(item.id)}>
                                                     <i className="fas fa-edit"></i>
                                                 </button>
@@ -548,6 +702,7 @@ function Observation_report() {
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
+                                                onClick={() => downloadImage(imgUrl, `recovery_photo_${index}.jpg`)}
                                                 onError={(e) => {
                                                     if (!e.target.dataset.errorHandled) {
                                                         e.target.src = "/fallback-image.png";
@@ -591,6 +746,123 @@ function Observation_report() {
                     </Col>
                 </Modal.Body>
             </Modal>
+
+            <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+                        {/* <div className="logo_text">
+                                                    <h4><span>MANASU</span> <br />Mental Health Charity Home <br />Chennai,</h4>
+                                                </div> */}
+                    </Col>
+                    <Col md={9}>
+                        <h4 className="text-center">Consultation Report by Doctor</h4>
+                    </Col>
+                </Row>
+                <Col md={12}>
+                    <Form>
+                        <Form.Group as={Row} className="mb-3" controlId="formAdmissionNo">
+                            <Form.Label column sm="4" className='text-start'>Admission No. : <span style={{ color: 'red' }}>*</span></Form.Label>
+                            <Col sm="6">
+                                <Form.Control
+                                    type="number"
+                                    placeholder="Enter Admission Number"
+                                    name="admission_no"
+                                    value={formData.admission_no}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3" controlId="formResidentName">
+                            <Form.Label column sm="4" className='text-start'>Resident Name : <span style={{ color: 'red' }}>*</span></Form.Label>
+                            <Col sm="6">
+                                <Form.Control
+                                    type="text"
+                                    name="resident_name"
+                                    placeholder="Enter Resident Name"
+                                    value={formData.resident_name}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm="4" className='text-start'>Date</Form.Label>
+                            <Col sm="6">
+                                <Form.Control
+                                    type="date"
+                                    name="date"
+                                    max="9999-12-31"
+                                    value={formData.date}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
+                            <Col sm="6">
+                                {Array.isArray(files.recovery_photo) &&
+                                    files.recovery_photo.map((imgUrl, index) => (
+                                        <img
+                                            key={index}
+                                            src={imgUrl}
+                                            alt={`recovery_photo - ${index}`}
+                                            loading="lazy"
+                                            style={{
+                                                width: "100px",
+                                                height: "auto",
+                                                margin: "10px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                            onError={(e) => {
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
+                                            }}
+                                        />
+                                    ))}
+                            </Col>
+                        </Form.Group>
+
+
+                        <Form.Group as={Row} className="mb-3" controlId="formFollowUp">
+                            <Form.Label column sm="4" className='text-start'>Follow Up : <span style={{ color: 'red' }}>*</span></Form.Label>
+                            <Col sm="6">
+                                <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    value={formData.follow_up}
+                                    onChange={handleInputChange}
+                                    name="follow_up"
+                                    multiple
+
+                                />
+                            </Col>
+
+                        </Form.Group>
+                    </Form>
+                </Col>
+                <Col md={12}>
+                    <Row className="d-flex align-items-center justify-content-center mt-5">
+                        <Col md={6} className="mt-3 down_title">
+                            <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                        </Col>
+                        <Col md={6} className="mt-3 down_title">
+                            <h5 className="text-end">Manasu Seal</h5>
+                        </Col>
+                    </Row>
+                </Col>
+
+            </div>
         </>
     )
 }

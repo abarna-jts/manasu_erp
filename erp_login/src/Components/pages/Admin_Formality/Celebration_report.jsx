@@ -123,14 +123,14 @@ function Celebration_report() {
                 try {
                     const parsed = JSON.parse(data.celebration_photos);
                     if (Array.isArray(parsed)) {
-                        CelebrationImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        CelebrationImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     CelebrationImage = data.celebration_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -149,6 +149,21 @@ function Celebration_report() {
             console.error("Error fetching form data:", error);
         }
     }
+
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
+    };
+
     const formRef = useRef();
 
     const generatePDF = async () => {
@@ -212,7 +227,7 @@ function Celebration_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -220,7 +235,7 @@ function Celebration_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -286,6 +301,10 @@ function Celebration_report() {
         }
     };
 
+    const handleCommunity = () => {
+        navigate("/programs_report"); 
+    }
+
 
     return (
         <>
@@ -324,9 +343,14 @@ function Celebration_report() {
                 </Row>
             </Container>
 
-            <Col md={3}>
-                <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
-            </Col>
+            <Row className='d-flex align-items-center justify-content-between mb-3'>
+                <Col md={3}>
+                    <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
+                </Col>
+                <Col md={3}>
+                    <Button type='button' className='btn btn-success' onClick={() => handleCommunity()}>Next</Button>
+                </Col>
+            </Row>
 
             <Container>
                 <>
@@ -602,6 +626,7 @@ function Celebration_report() {
                                             margin: "10px",
                                             border: "1px solid #ccc",
                                         }}
+                                        onClick={() => downloadImage(imgUrl, `celebration_photos_${index}.jpg`)}
                                         onError={(e) => {
                                             if (!e.target.dataset.errorHandled) {
                                                 e.target.src = "/fallback-image.png";
@@ -612,7 +637,7 @@ function Celebration_report() {
                                 ))}
                             <Form.Group as={Row} className="mb-3 mt-3">
                                 <Form.Label column sm="6" className='text-start'>
-                                    Celebration Photos : 
+                                    Celebration Photos :
                                 </Form.Label>
                                 <Col sm="6">
                                     <Form.Control

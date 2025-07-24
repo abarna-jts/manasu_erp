@@ -1579,18 +1579,22 @@ const getEventReport = async (req, res) => {
 }
 
 const getCelebrationReport = async (req, res) => {
-    const query = "Select * from celebration_report";
+    const query = "SELECT * FROM celebration_report";
     try {
         const [result] = await db.query(query);
+
         if (result.length === 0) {
-            res.status(404).json({ message: "Celebration Report is not found" });
+            return res.status(404).json({ message: "Celebration Report is not found" });
         }
+
         return res.status(200).json({ message: "Celebration Report Get Successfully", data: result });
+
     } catch (err) {
-        console.log("Error fetching Celebration Report:", err);
-        res.status(500).json({ message: "Database Error", error: err });
+        console.error("Error fetching Celebration Report:", err);
+        return res.status(500).json({ message: "Database Error", error: err });
     }
-}
+};
+
 
 const getProgramsReport = async (req, res) => {
     const query = "Select * from community_report";

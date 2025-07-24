@@ -72,6 +72,7 @@ import Perception from './Components/pages/Recovery/Perception';
 import Cognition from './Components/pages/Recovery/Cognition';
 import Judgement from './Components/pages/Recovery/Judgement';
 import Insight from './Components/pages/Recovery/Insight';
+import SCRB_All_Details from './Components/pages/Admission/SCRB_All_Details';
 
 function App() {
 
@@ -710,6 +711,11 @@ function App() {
                 <Route
                   path='/scrb_form2C'
                   element={<MainLayout><SCRB_Form2C /></MainLayout>}
+                />
+
+                <Route
+                  path='/scrb_formALL'
+                  element={<MainLayout><SCRB_All_Details /></MainLayout>}
                 />
 
                 <Route

@@ -127,14 +127,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.signature);
                     if (Array.isArray(parsed)) {
-                        signaturePath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        signaturePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     signaturePath = data.signature
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -143,14 +143,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.photo);
                     if (Array.isArray(parsed)) {
-                        photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     photoPath = data.photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -159,14 +159,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.handwritten_document);
                     if (Array.isArray(parsed)) {
-                        handwritten_documentPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        handwritten_documentPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     handwritten_documentPath = data.handwritten_document
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -294,7 +294,7 @@ function Self_Declaration_form() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -302,7 +302,7 @@ function Self_Declaration_form() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -326,6 +326,20 @@ function Self_Declaration_form() {
             console.error("Error fetching form data:", error);
             alert("Admission Number not found");
         }
+    };
+
+    const downloadImage = (url, filename) => {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(console.error);
     };
 
     const handleUpdate = async (e, admission_no) => {
@@ -406,7 +420,7 @@ function Self_Declaration_form() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -416,7 +430,7 @@ function Self_Declaration_form() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -835,6 +849,7 @@ function Self_Declaration_form() {
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
+                                            onClick={() => downloadImage(imgUrl, `handwritten_document_${index}.jpg`)}
                                             onError={(e) => {
                                                 if (!e.target.dataset.errorHandled) {
                                                     e.target.src = "/fallback-image.png";
@@ -871,6 +886,7 @@ function Self_Declaration_form() {
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
+                                            onClick={() => downloadImage(imgUrl, `handwritten_document_${index}.jpg`)}
                                             onError={(e) => {
                                                 if (!e.target.dataset.errorHandled) {
                                                     e.target.src = "/fallback-image.png";
@@ -906,6 +922,7 @@ function Self_Declaration_form() {
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
+                                            onClick={() => downloadImage(imgUrl, `handwritten_document_${index}.jpg`)}
                                             onError={(e) => {
                                                 if (!e.target.dataset.errorHandled) {
                                                     e.target.src = "/fallback-image.png";
