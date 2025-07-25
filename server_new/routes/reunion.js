@@ -16,7 +16,8 @@ import { createFamilyLetter,
     createDischargeList,
     getReunionChecklist,
     getReunionChecklistAll,
-    updateChecklist
+    updateChecklist,
+    
 } from '../controllers/reunioin.js';
 const router = express.Router();
 
@@ -37,6 +38,7 @@ router.post("/createMediaConsent",createMediaConsent); // completed
 router.get("/getMediaConsent/:admission_no",getMediaConsent); // completed
 router.post("/updateMediaConsent/:admission_no",UpdateMediaConsent); //completed
 // router.delete("/deleteMediaConsent/:admission_no",deleteMediaConsent);
+
 
 //discharge checklist 
 router.post("/createDischarge_checklist",createDischargeList); // completed

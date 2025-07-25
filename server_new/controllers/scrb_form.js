@@ -453,11 +453,44 @@ const getAllSCRBFormData = async (req, res) => {
   }
 };
 
-const getAllSCRBForm2A = async (req, res) => {
+const getAllSCRBForm2 = async (req, res) => {
   const query = "Select * from form_2";
   try {
     const [data] = await db.query(query);
     return res.status(200).json({ message: "SCRB Form 2 Get Successfully", data: data });
+  } catch (err) {
+    console.error("Database Error:", err);
+    return res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getAllSCRBForm2A = async (req, res) => {
+  const query = "Select * from form_2a";
+  try {
+    const [data] = await db.query(query);
+    return res.status(200).json({ message: "SCRB Form 2A Get Successfully", data: data });
+  } catch (err) {
+    console.error("Database Error:", err);
+    return res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getAllSCRBForm2B = async (req, res) => {
+  const query = "Select * from form_2b";
+  try {
+    const [data] = await db.query(query);
+    return res.status(200).json({ message: "SCRB Form 2B Get Successfully", data: data });
+  } catch (err) {
+    console.error("Database Error:", err);
+    return res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const getAllSCRBForm2C = async (req, res) => {
+  const query = "Select * from form_2c";
+  try {
+    const [data] = await db.query(query);
+    return res.status(200).json({ message: "SCRB Form 2C Get Successfully", data: data });
   } catch (err) {
     console.error("Database Error:", err);
     return res.status(500).json({ message: "Database Error", error: err });
@@ -482,6 +515,320 @@ const getSCRB_form2 = async (req, res) => {
   }
 }
 
+const getSCRB_form2A = async (req, res) => {
+  const rescueID = req.params.id;
+  const query = 'SELECT * FROM form_2a WHERE id = ?';
+
+  try {
+    const [results] = await db.query(query, [rescueID]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'SCRB Form2a not found' });
+    }
+
+    return res.status(200).json(results[0]);
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ message: 'Database error', error: err });
+  }
+}
+
+const getSCRB_form2B = async (req, res) => {
+  const rescueID = req.params.id;
+  const query = 'SELECT * FROM form_2b WHERE id = ?';
+
+  try {
+    const [results] = await db.query(query, [rescueID]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'SCRB Form2b not found' });
+    }
+
+    return res.status(200).json(results[0]);
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ message: 'Database error', error: err });
+  }
+}
+
+const getSCRB_form2C = async (req, res) => {
+  const rescueID = req.params.id;
+  const query = 'SELECT * FROM form_2c WHERE id = ?';
+
+  try {
+    const [results] = await db.query(query, [rescueID]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'SCRB Form2c not found' });
+    }
+
+    return res.status(200).json(results[0]);
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ message: 'Database error', error: err });
+  }
+}
+
+const updateForm2 = async (req, res) => {
+  try {
+    await SCRBAsync(req, res);
+    const {
+      name_ngo,
+      koppu_en,
+      rescue_name,
+      parent_name,
+      gender,
+      found_date,
+      marital_status,
+      language,
+      district,
+      police_station,
+      addition_info,
+      name_rescue,
+      phone_no
+    } = req.body;
+
+    const id = req.params.id;
+
+    if (!id) {
+      return res.status(400).json({ message: "Missing ID" });
+    }
+
+    const oldPhotoPath = req.files['old_photo']
+      ? req.files['old_photo'].map(f => `uploads/form_2a/${f.filename}`)
+      : null;
+
+    const newPhotoPath = req.files['new_photo']
+      ? req.files['new_photo'].map(f => `uploads/form_2a/${f.filename}`)
+      : null;
+
+    const SignaturePhotoPath = req.files['signature']
+      ? req.files['signature'].map(f => `uploads/form_2a/${f.filename}`)
+      : null;
+
+    const sealPhotoPath = req.files['seal']
+      ? req.files['seal'].map(f => `uploads/form_2a/${f.filename}`)
+      : null;
+
+    // Fetch existing data from DB
+    const [existingRows] = await db.query(`
+            SELECT signature, old_photo, new_photo, seal 
+            FROM form_2 
+            WHERE id = ?
+        `, [id]);
+
+    if (existingRows.length === 0) {
+      return res.status(404).json({ message: "No record found for given ID" });
+    }
+
+    const existing = existingRows[0] || {};
+
+    const FinalOldPhotoPath = oldPhotoPath ? JSON.stringify(oldPhotoPath) : existing.old_photo;
+    const FinalNewPhotoPath = newPhotoPath ? JSON.stringify(newPhotoPath) : existing.new_photo;
+    const FinalSignaturePhotoPath = SignaturePhotoPath ? JSON.stringify(SignaturePhotoPath) : existing.signature;
+    const FinalSealPhotoPath = sealPhotoPath ? JSON.stringify(sealPhotoPath) : existing.seal;
+    const usquery = `UPDATE form_2 SET
+                    name_ngo = ?,
+                    koppu_en = ?,
+                    rescue_name = ?,
+                    parent_name = ?,
+                    gender = ?,
+                    found_date = ?,
+                    marital_status = ?,
+                    language = ?,
+                    district = ?,
+                    police_station = ?,
+                    addition_info = ?,
+                    old_photo = ?,
+                    new_photo = ?,
+                    name_rescue = ?,
+                    phone_no = ?,
+                    signature = ?,
+                    seal = ?
+                    WHERE id= ?`;
+    const values = [
+      name_ngo,
+      koppu_en,
+      rescue_name,
+      parent_name,
+      gender,
+      found_date,
+      marital_status,
+      language,
+      district,
+      police_station,
+      addition_info,
+      FinalOldPhotoPath,
+      FinalNewPhotoPath,
+      name_rescue,
+      phone_no,
+      FinalSignaturePhotoPath,
+      FinalSealPhotoPath,
+      id
+    ];
+
+    await db.query(usquery, values);
+
+    return res.status(200).json({ message: "SCRB Form 2 updated successfully!" });
+
+  } catch (err) {
+    console.error("Error updating Celebration Report Form:", err);
+    res.status(500).json({ message: "Database Error", error: err });
+  }
+}
+
+const updateForm2A = async (req, res) => {
+  try {
+    const {
+      file_no,
+      category,
+      complexion,
+      face,
+      addition_category,
+      addition_complexion,
+      addition_face
+    } = req.body;
+    console.log('Received:', req.body);
+    const id = req.params.id;
+
+    const usquery = `
+    UPDATE form_2a SET
+      file_no = ?,
+      category = ?,
+      complexion = ?,
+      face = ?,
+      addition_category = ?,
+      addition_complexion = ?, 
+      addition_face = ?
+    WHERE id = ?
+  `;
+
+    const values = [
+      file_no,
+      category?.join(', ') || '',
+      complexion?.join(', ') || '',
+      face?.join(', ') || '',
+      addition_category,
+      addition_complexion,
+      addition_face,
+      id
+    ];
+    const [result] = await db.query(usquery, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "No SCRB Form 2A found with this ID." });
+    }
+
+    return res.status(200).json({ message: "SCRB Form 2A updated successfully!" });
+  } catch (error) {
+    console.error("Error updating SCRB Form 2A:", error);
+    return res.status(500).json({ message: "Database error during update", error });
+  }
+}
+
+const updateForm2B = async (req, res) => {
+  try {
+    const {
+      name_ngo,
+      file_no,
+      tatoo,
+      addition_tatoo,
+      scar,
+      mole,
+      height
+    } = req.body;
+    console.log('Received:', req.body);
+    const id = req.params.id;
+
+    const usquery = `
+    UPDATE form_2b SET
+      name_ngo = ?,
+      file_no = ?,
+      tatoo = ?,
+      addition_tatoo = ?,
+      scar = ?,
+      mole = ?,
+      height = ?
+    WHERE id = ?
+  `;
+
+    const values = [
+      name_ngo,
+      file_no,
+      tatoo,
+      addition_tatoo,
+      scar,
+      mole,
+      height,
+      id
+    ];
+    const [result] = await db.query(usquery, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "No SCRB Form 2A found with this ID." });
+    }
+
+    return res.status(200).json({ message: "SCRB Form 2A updated successfully!" });
+  } catch (error) {
+    console.error("Error updating SCRB Form 2A:", error);
+    return res.status(500).json({ message: "Database error during update", error });
+  }
+}
+
+const updateForm2C = async (req, res) => {
+  try {
+    const {
+      name_ngo,
+      file_no,
+      upperdress_1,
+      upperdress_2,
+      lowerdress,
+      addition_upperdress,
+      addition_lowerdress,
+      upperdress_color,
+      lowerdress_color,
+    } = req.body;
+    console.log('Received:', req.body);
+    const id = req.params.id;
+
+    const usquery = `
+    UPDATE form_2c SET
+      name_ngo = ?,
+      file_no = ?,
+      upperdress_1 = ?,
+      upperdress_2 = ?,
+      lowerdress = ?,
+      addition_upperdress = ?,
+      addition_lowerdress = ?,
+      upperdress_color = ?,
+      lowerdress_color = ?
+    WHERE id = ?
+  `;
+
+    const values = [
+      name_ngo,
+      file_no,
+      Array.isArray(upperdress_1) ? upperdress_1.join(', ') : upperdress_1,
+      Array.isArray(upperdress_2) ? upperdress_2.join(', ') : upperdress_2,
+      Array.isArray(lowerdress) ? lowerdress.join(', ') : lowerdress,
+      addition_upperdress,
+      addition_lowerdress,
+      upperdress_color,
+      lowerdress_color,
+      id
+    ];
+    const [result] = await db.query(usquery, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "No SCRB Form 2C found with this ID." });
+    }
+
+    return res.status(200).json({ message: "SCRB Form 2C updated successfully!" });
+  } catch (error) {
+    console.error("Error updating SCRB Form 2C:", error);
+    return res.status(500).json({ message: "Database error during update", error });
+  }
+}
 export {
   createForm2,
   createForm2A,
@@ -493,6 +840,10 @@ export {
   getForm2PDF,
   getForm2Data,
   getAllSCRBFormData,
+  getAllSCRBForm2,
   getAllSCRBForm2A,
-  getSCRB_form2
+  getAllSCRBForm2B,
+  getAllSCRBForm2C,
+  getSCRB_form2, getSCRB_form2A, getSCRB_form2B, getSCRB_form2C,
+  updateForm2, updateForm2A, updateForm2B, updateForm2C
 };

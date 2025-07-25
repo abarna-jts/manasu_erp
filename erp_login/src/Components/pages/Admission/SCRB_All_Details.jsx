@@ -2,9 +2,6 @@ import React from 'react'
 import { Breadcrumb, Form, InputGroup, Container, Row, Col, Table } from '@themesberg/react-bootstrap';
 import { useState, useEffect } from "react";
 import axios from 'axios';
-import { useRef } from "react";
-import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 
@@ -23,7 +20,7 @@ function SCRB_All_Details() {
         father: '',
         date_time: '',
         rescue_status: '',
-        language1: '',
+        language: '',
         place: '',
         police_station: '',
         addition_info: '',
@@ -113,7 +110,7 @@ function SCRB_All_Details() {
             const response = await apiRoute.get(`/scrb_form/getSCRB_form2/${id}`);
             const data = response.data; // Access the first object in the 'data' array
             console.log(data.id);
-            setScrbForm2List({
+            setFormData({
                 id: data.id || '',
                 name_ngo: data.name_ngo || 'NULL',
                 admission_no: data.admission_no || 'NULL',
@@ -172,6 +169,84 @@ function SCRB_All_Details() {
         }
     };
 
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        const id = formData.id; // ✅ Get it from form data
+        console.log("Updating form with ID:", id);
+        if (!id) {
+            alert("ID not found.");
+            return;
+        }
+        const data = new FormData();
+        data.append('name_ngo', formData.name_ngo);
+        data.append('koppu_en', formData.koppu_en);
+        data.append('rescue_name', formData.rescue_name);
+        data.append('parent_name', formData.parent_name);
+        data.append('gender', formData.gender);
+        data.append('found_date', formData.found_date);
+        data.append('marital_status', formData.marital_status);
+        data.append('language', formData.language);
+        data.append('district', formData.district);
+        data.append('police_station', formData.police_station);
+        data.append('addition_info', formData.addition_info);
+        data.append('name_rescue', formData.name_rescue);
+        data.append('phone_no', formData.phone_no);
+
+
+        if (files.old_photo && files.old_photo.length > 0) {
+            files.old_photo.forEach(file => {
+                data.append('old_photo', file); // ✅ no []
+            });
+        }
+        if (files.new_photo && files.new_photo.length > 0) {
+            files.new_photo.forEach(file => {
+                data.append('new_photo', file); // ✅ no []
+            });
+        }
+        if (files.signature && files.signature.length > 0) {
+            files.signature.forEach(file => {
+                data.append('signature', file); // ✅ no []
+            });
+        }
+        if (files.seal && files.seal.length > 0) {
+            files.seal.forEach(file => {
+                data.append('seal', file); // ✅ no []
+            });
+        }
+        try {
+            const response = await apiRoute.put(`/scrb_form/updateForm2/${id}`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            console.log(response.data);
+            if (response.status === 200 || response.status === 201) {
+                alert('Form Updated successfully!');
+                handleClose(true);
+                setFormData({
+                    name_ngo: '',
+                    koppu_en: '',
+                    rescue_name: '',
+                    parent_name: '',
+                    gender: '',
+                    found_date: '',
+                    marital_status: '',
+                    language: '',
+                    district: '',
+                    police_station: '',
+                    addition_info: '',
+                    name_rescue: '',
+                    phone_no: ''
+                })
+            } else {
+                alert('Error Updating form.');
+            }
+
+        } catch (error) {
+            console.error('There was an error Updating the form:', error);
+            alert('There was an error Updating the form.');
+        }
+    };
+
     const handleInputChange1 = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -211,14 +286,17 @@ function SCRB_All_Details() {
 
                 </Row>
             </Container>
-            <Row className='d-flex align-items-center justify-content-between mb-3'>
-                <Col md={3}>
-                    <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
-                </Col>
-                <Col md={3}>
-                    <Button type='button' className='btn btn-success' onClick={() => SCRBForm2()}>Next</Button>
-                </Col>
-            </Row>
+            <Container>
+                <Row className='d-flex align-items-center justify-content-between mb-3'>
+                    <Col md={3} className='d-flex align-items-start justify-content-start'>
+                        <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
+                    </Col>
+                    <Col md={3} className='d-flex align-items-end justify-content-end'>
+                        <Button type='button' className='btn btn-success' onClick={() => SCRBForm2()}>Next</Button>
+                    </Col>
+                </Row>
+
+            </Container>
             <Container>
                 <>
                     <Row>
@@ -243,7 +321,7 @@ function SCRB_All_Details() {
                                                 <td>{index + 1}</td>
                                                 <td>{item.admission_no || "null"}</td>
                                                 <td>{item.rescue_name || "null"}</td>
-                                                <td>
+                                                <td className='d-flex align-items-center justify-content-center'>
                                                     {(() => {
                                                         let imagePath = item.old_photo;
 
@@ -253,44 +331,62 @@ function SCRB_All_Details() {
                                                                 imagePath = parsed[0];
                                                             }
                                                         } catch (e) {
-                                                            // use directly
+                                                            // fallback to original string
                                                         }
 
                                                         const fullUrl = `http://localhost:5002/${imagePath}`;
-                                                        const filename = imagePath?.split('/').pop(); // Extract filename from path
+                                                        const filename = imagePath?.split("/").pop();
 
                                                         return imagePath ? (
-                                                            <a
-                                                                href={fullUrl}
-                                                                download={filename} // this hints the filename to browser
-                                                                onClick={(e) => {
-                                                                    // To handle CORS or issues with direct download
-                                                                    e.preventDefault();
-                                                                    fetch(fullUrl, { mode: 'cors' }) // allow CORS
-                                                                        .then((res) => res.blob())
-                                                                        .then((blob) => {
-                                                                            const url = window.URL.createObjectURL(blob);
-                                                                            const a = document.createElement('a');
-                                                                            a.href = url;
-                                                                            a.download = filename || 'image.jpg';
-                                                                            a.click();
-                                                                            window.URL.revokeObjectURL(url);
-                                                                        })
-                                                                        .catch(() => alert('Download failed.'));
-                                                                }}
-                                                                style={{ display: 'inline-block' }}
-                                                            >
+                                                            <div className="image-container">
                                                                 <img
                                                                     src={fullUrl}
                                                                     alt="Old Photo"
-                                                                    style={{ width: "70px", height: "70px", objectFit: "cover", cursor: "pointer" }}
+                                                                    className="preview-image"
                                                                 />
-                                                            </a>
+                                                                <div className="image-overlay">
+                                                                    {/* View icon */}
+                                                                    <a
+                                                                        href={fullUrl}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        title="View Image"
+                                                                        className="icon-button"
+                                                                    >
+                                                                        <i className="fas fa-eye"></i>
+                                                                    </a>
+
+                                                                    {/* Download icon */}
+                                                                    <button
+                                                                        title="Download Image"
+                                                                        className="icon-button"
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            fetch(fullUrl, { mode: "cors" })
+                                                                                .then((res) => res.blob())
+                                                                                .then((blob) => {
+                                                                                    const url = window.URL.createObjectURL(blob);
+                                                                                    const a = document.createElement("a");
+                                                                                    a.href = url;
+                                                                                    a.download = filename || "image.jpg";
+                                                                                    a.click();
+                                                                                    window.URL.revokeObjectURL(url);
+                                                                                })
+                                                                                .catch(() => alert("Download failed."));
+                                                                        }}
+                                                                    >
+                                                                        <i className="fas fa-download"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         ) : (
                                                             <span>No image</span>
                                                         );
                                                     })()}
                                                 </td>
+
+
+
                                                 <td>
                                                     {(() => {
                                                         let imagePath = item.new_photo;
@@ -308,32 +404,47 @@ function SCRB_All_Details() {
                                                         const filename = imagePath?.split('/').pop(); // Extract filename from path
 
                                                         return imagePath ? (
-                                                            <a
-                                                                href={fullUrl}
-                                                                download={filename} // this hints the filename to browser
-                                                                onClick={(e) => {
-                                                                    // To handle CORS or issues with direct download
-                                                                    e.preventDefault();
-                                                                    fetch(fullUrl, { mode: 'cors' }) // allow CORS
-                                                                        .then((res) => res.blob())
-                                                                        .then((blob) => {
-                                                                            const url = window.URL.createObjectURL(blob);
-                                                                            const a = document.createElement('a');
-                                                                            a.href = url;
-                                                                            a.download = filename || 'image.jpg';
-                                                                            a.click();
-                                                                            window.URL.revokeObjectURL(url);
-                                                                        })
-                                                                        .catch(() => alert('Download failed.'));
-                                                                }}
-                                                                style={{ display: 'inline-block' }}
-                                                            >
+                                                            <div className="image-container">
                                                                 <img
                                                                     src={fullUrl}
                                                                     alt="New Photo"
-                                                                    style={{ width: "70px", height: "70px", objectFit: "cover", cursor: "pointer" }}
+                                                                    className="preview-image"
                                                                 />
-                                                            </a>
+                                                                <div className="image-overlay">
+                                                                    {/* View icon */}
+                                                                    <a
+                                                                        href={fullUrl}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        title="View Image"
+                                                                        className="icon-button"
+                                                                    >
+                                                                        <i className="fas fa-eye"></i>
+                                                                    </a>
+
+                                                                    {/* Download icon */}
+                                                                    <button
+                                                                        title="Download Image"
+                                                                        className="icon-button"
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            fetch(fullUrl, { mode: "cors" })
+                                                                                .then((res) => res.blob())
+                                                                                .then((blob) => {
+                                                                                    const url = window.URL.createObjectURL(blob);
+                                                                                    const a = document.createElement("a");
+                                                                                    a.href = url;
+                                                                                    a.download = filename || "image.jpg";
+                                                                                    a.click();
+                                                                                    window.URL.revokeObjectURL(url);
+                                                                                })
+                                                                                .catch(() => alert("Download failed."));
+                                                                        }}
+                                                                    >
+                                                                        <i className="fas fa-download"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         ) : (
                                                             <span>No image</span>
                                                         );
@@ -411,28 +522,77 @@ function SCRB_All_Details() {
                                 </Col>
                             </Form.Group>
                             {Array.isArray(files.old_photo) &&
-                                files.old_photo.map((imgUrl, index) => (
-                                    <img
-                                        key={index}
-                                        src={imgUrl}
-                                        alt={`old_photo - ${index}`}
-                                        loading="lazy"
-                                        style={{
-                                            width: "100px",
-                                            height: "100px",
-                                            objectFit: "cover",
-                                            margin: "10px",
-                                            border: "1px solid #ccc",
-                                        }}
-                                        onClick={() => downloadImage(imgUrl, `old_photo${index}.jpg`)}
-                                        onError={(e) => {
-                                            if (!e.target.dataset.errorHandled) {
-                                                e.target.src = "/fallback-image.png";
-                                                e.target.dataset.errorHandled = "true";
-                                            }
-                                        }}
-                                    />
-                                ))}
+                                files.old_photo.map((imgUrl, index) => {
+                                    const filename = `old_photo_${index}.jpg`;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="image-container"
+                                            style={{
+                                                position: "relative",
+                                                width: "100px",
+                                                height: "100px",
+                                                margin: "10px",
+                                                display: "inline-block",
+                                            }}
+                                        >
+                                            <img
+                                                src={imgUrl}
+                                                alt={`old_photo - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "4px",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
+                                            />
+
+                                            <div className="image-overlay">
+                                                {/* View icon */}
+                                                <a
+                                                    href={imgUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title="View Image"
+                                                    className="icon-button"
+                                                >
+                                                    <i className="fas fa-eye"></i>
+                                                </a>
+
+                                                {/* Download icon */}
+                                                <button
+                                                    title="Download Image"
+                                                    className="icon-button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        fetch(imgUrl, { mode: "cors" })
+                                                            .then((res) => res.blob())
+                                                            .then((blob) => {
+                                                                const url = window.URL.createObjectURL(blob);
+                                                                const a = document.createElement("a");
+                                                                a.href = url;
+                                                                a.download = filename;
+                                                                a.click();
+                                                                window.URL.revokeObjectURL(url);
+                                                            })
+                                                            .catch(() => alert("Download failed."));
+                                                    }}
+                                                >
+                                                    <i className="fas fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="6" className='text-start'>
                                     Found Person Photo :
@@ -441,32 +601,82 @@ function SCRB_All_Details() {
                                     <Form.Control type="file"
                                         name="old_photo"
                                         onChange={handleFileChange}
+                                        multiple
                                         required />
                                 </Col>
                             </Form.Group>
                             {Array.isArray(files.new_photo) &&
-                                files.new_photo.map((imgUrl, index) => (
-                                    <img
-                                        key={index}
-                                        src={imgUrl}
-                                        alt={`new_photo - ${index}`}
-                                        loading="lazy"
-                                        style={{
-                                            width: "100px",
-                                            height: "100px",
-                                            objectFit: "cover",
-                                            margin: "10px",
-                                            border: "1px solid #ccc",
-                                        }}
-                                        onClick={() => downloadImage(imgUrl, `new_photo_${index}.jpg`)}
-                                        onError={(e) => {
-                                            if (!e.target.dataset.errorHandled) {
-                                                e.target.src = "/fallback-image.png";
-                                                e.target.dataset.errorHandled = "true";
-                                            }
-                                        }}
-                                    />
-                                ))}
+                                files.new_photo.map((imgUrl, index) => {
+                                    const filename = `new_photo_${index}.jpg`;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="image-container"
+                                            style={{
+                                                position: "relative",
+                                                width: "100px",
+                                                height: "100px",
+                                                margin: "10px",
+                                                display: "inline-block",
+                                            }}
+                                        >
+                                            <img
+                                                src={imgUrl}
+                                                alt={`new_photo - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "4px",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
+                                            />
+
+                                            <div className="image-overlay">
+                                                {/* View icon */}
+                                                <a
+                                                    href={imgUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title="View Image"
+                                                    className="icon-button"
+                                                >
+                                                    <i className="fas fa-eye"></i>
+                                                </a>
+
+                                                {/* Download icon */}
+                                                <button
+                                                    title="Download Image"
+                                                    className="icon-button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        fetch(imgUrl, { mode: "cors" })
+                                                            .then((res) => res.blob())
+                                                            .then((blob) => {
+                                                                const url = window.URL.createObjectURL(blob);
+                                                                const a = document.createElement("a");
+                                                                a.href = url;
+                                                                a.download = filename;
+                                                                a.click();
+                                                                window.URL.revokeObjectURL(url);
+                                                            })
+                                                            .catch(() => alert("Download failed."));
+                                                    }}
+                                                >
+                                                    <i className="fas fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="6" className='text-start'>
                                     Recent Photo :
@@ -475,6 +685,7 @@ function SCRB_All_Details() {
                                     <Form.Control type="file"
                                         name="new_photo"
                                         onChange={handleFileChange}
+                                        multiple
                                         required />
                                 </Col>
                             </Form.Group>
@@ -496,8 +707,8 @@ function SCRB_All_Details() {
                                 </Form.Label>
                                 <Col sm="6">
                                     <Form.Control type="text"
-                                        name="father"
-                                        value={formData.father}
+                                        name="parent_name"
+                                        value={formData.parent_name}
                                         onChange={handleInputChange1}
                                         required />
                                 </Col>
@@ -521,9 +732,8 @@ function SCRB_All_Details() {
                                 <Col sm="6">
                                     <Form.Control
                                         type="text"
-                                        name="date_time"
-                                        max="9999-12-31"
-                                        value={formatDateOnly(formData.date_time || '')}
+                                        name="found_date"
+                                        value={formatDateOnly(formData.found_date || '')}
                                         onChange={handleInputChange1}
                                         required
                                     />
@@ -546,8 +756,8 @@ function SCRB_All_Details() {
                                 <Col sm="6">
                                     <Form.Control
                                         type="text"
-                                        name="language1"
-                                        value={formData.language1}
+                                        name="language"
+                                        value={formData.language}
                                         onChange={handleInputChange1}
                                         required
                                     />
@@ -558,8 +768,8 @@ function SCRB_All_Details() {
                                 <Col sm="6">
                                     <Form.Control
                                         type="text"
-                                        name="place"
-                                        value={formData.place}
+                                        name="district"
+                                        value={formData.district}
                                         onChange={handleInputChange1}
                                         required
                                     />
@@ -590,28 +800,77 @@ function SCRB_All_Details() {
                                 </Col>
                             </Form.Group>
                             {Array.isArray(files.signature) &&
-                                files.signature.map((imgUrl, index) => (
-                                    <img
-                                        key={index}
-                                        src={imgUrl}
-                                        alt={`signature - ${index}`}
-                                        loading="lazy"
-                                        style={{
-                                            width: "100px",
-                                            height: "100px",
-                                            objectFit: "cover",
-                                            margin: "10px",
-                                            border: "1px solid #ccc",
-                                        }}
-                                        onClick={() => downloadImage(imgUrl, `signature${index}.jpg`)}
-                                        onError={(e) => {
-                                            if (!e.target.dataset.errorHandled) {
-                                                e.target.src = "/fallback-image.png";
-                                                e.target.dataset.errorHandled = "true";
-                                            }
-                                        }}
-                                    />
-                                ))}
+                                files.signature.map((imgUrl, index) => {
+                                    const filename = `signature_${index}.jpg`;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="image-container"
+                                            style={{
+                                                position: "relative",
+                                                width: "100px",
+                                                height: "100px",
+                                                margin: "10px",
+                                                display: "inline-block",
+                                            }}
+                                        >
+                                            <img
+                                                src={imgUrl}
+                                                alt={`signature - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "4px",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
+                                            />
+
+                                            <div className="image-overlay">
+                                                {/* View icon */}
+                                                <a
+                                                    href={imgUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title="View Image"
+                                                    className="icon-button"
+                                                >
+                                                    <i className="fas fa-eye"></i>
+                                                </a>
+
+                                                {/* Download icon */}
+                                                <button
+                                                    title="Download Image"
+                                                    className="icon-button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        fetch(imgUrl, { mode: "cors" })
+                                                            .then((res) => res.blob())
+                                                            .then((blob) => {
+                                                                const url = window.URL.createObjectURL(blob);
+                                                                const a = document.createElement("a");
+                                                                a.href = url;
+                                                                a.download = filename;
+                                                                a.click();
+                                                                window.URL.revokeObjectURL(url);
+                                                            })
+                                                            .catch(() => alert("Download failed."));
+                                                    }}
+                                                >
+                                                    <i className="fas fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="6" className='text-start'>
                                     Signature :
@@ -620,6 +879,7 @@ function SCRB_All_Details() {
                                     <Form.Control type="file"
                                         name="signature"
                                         onChange={handleFileChange}
+                                        multiple
                                         required />
                                 </Col>
                             </Form.Group>
@@ -648,28 +908,77 @@ function SCRB_All_Details() {
                                 </Col>
                             </Form.Group>
                             {Array.isArray(files.seal) &&
-                                files.seal.map((imgUrl, index) => (
-                                    <img
-                                        key={index}
-                                        src={imgUrl}
-                                        alt={`seal - ${index}`}
-                                        loading="lazy"
-                                        style={{
-                                            width: "100px",
-                                            height: "100px",
-                                            objectFit: "cover",
-                                            margin: "10px",
-                                            border: "1px solid #ccc",
-                                        }}
-                                        onClick={() => downloadImage(imgUrl, `seal${index}.jpg`)}
-                                        onError={(e) => {
-                                            if (!e.target.dataset.errorHandled) {
-                                                e.target.src = "/fallback-image.png";
-                                                e.target.dataset.errorHandled = "true";
-                                            }
-                                        }}
-                                    />
-                                ))}
+                                files.seal.map((imgUrl, index) => {
+                                    const filename = `seal_${index}.jpg`;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="image-container"
+                                            style={{
+                                                position: "relative",
+                                                width: "100px",
+                                                height: "100px",
+                                                margin: "10px",
+                                                display: "inline-block",
+                                            }}
+                                        >
+                                            <img
+                                                src={imgUrl}
+                                                alt={`seal - ${index}`}
+                                                loading="lazy"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "4px",
+                                                }}
+                                                onError={(e) => {
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
+                                                }}
+                                            />
+
+                                            <div className="image-overlay">
+                                                {/* View icon */}
+                                                <a
+                                                    href={imgUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title="View Image"
+                                                    className="icon-button"
+                                                >
+                                                    <i className="fas fa-eye"></i>
+                                                </a>
+
+                                                {/* Download icon */}
+                                                <button
+                                                    title="Download Image"
+                                                    className="icon-button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        fetch(imgUrl, { mode: "cors" })
+                                                            .then((res) => res.blob())
+                                                            .then((blob) => {
+                                                                const url = window.URL.createObjectURL(blob);
+                                                                const a = document.createElement("a");
+                                                                a.href = url;
+                                                                a.download = filename;
+                                                                a.click();
+                                                                window.URL.revokeObjectURL(url);
+                                                            })
+                                                            .catch(() => alert("Download failed."));
+                                                    }}
+                                                >
+                                                    <i className="fas fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="6" className='text-start'>
                                     Seal :
@@ -678,12 +987,13 @@ function SCRB_All_Details() {
                                     <Form.Control type="file"
                                         name="seal"
                                         onChange={handleFileChange}
+                                        multiple
                                         required />
                                 </Col>
                             </Form.Group>
                             <Col md={12} className='d-flex align-items-center justify-content-between'>
                                 <div className="mt-3 d-flex align-tems-cente justify-content-between">
-                                    <Button variant="success" className="m-1" type="button">Update</Button>
+                                    <Button variant="success" className="m-1" type="button" onClick={handleUpdate}>Update</Button>
                                     <Button variant="secondary" className="m-1" type="button" onClick={handleClose}>
                                         Close
                                     </Button>

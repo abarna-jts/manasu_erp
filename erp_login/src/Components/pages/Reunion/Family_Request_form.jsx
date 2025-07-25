@@ -1796,28 +1796,77 @@ function Family_Request_form() {
                                             )}
                                         </Form.Group>
                                         {Array.isArray(files.f_aadhar_card) &&
-                                            files.f_aadhar_card.map((imgUrl, index) => (
-                                                <img
-                                                    key={index}
-                                                    src={imgUrl}
-                                                    alt={`f_aadhar_card - ${index}`}
-                                                    loading="lazy"
-                                                    style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
-                                                        margin: "10px",
-                                                        border: "1px solid #ccc",
-                                                    }}
-                                                    onClick={() => downloadImage(imgUrl, `f_aadhar_card${index}.jpg`)}
-                                                    onError={(e) => {
-                                                        if (!e.target.dataset.errorHandled) {
-                                                            e.target.src = "/fallback-image.png";
-                                                            e.target.dataset.errorHandled = "true";
-                                                        }
-                                                    }}
-                                                />
-                                            ))}
+                                            files.f_aadhar_card.map((imgUrl, index) => {
+                                                const filename = `f_aadhar_card_${index}.jpg`;
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="image-container"
+                                                        style={{
+                                                            position: "relative",
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            margin: "10px",
+                                                            display: "inline-block",
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={imgUrl}
+                                                            alt={`f_aadhar_card - ${index}`}
+                                                            loading="lazy"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                border: "1px solid #ccc",
+                                                                borderRadius: "4px",
+                                                            }}
+                                                            onError={(e) => {
+                                                                if (!e.target.dataset.errorHandled) {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                    e.target.dataset.errorHandled = "true";
+                                                                }
+                                                            }}
+                                                        />
+
+                                                        <div className="image-overlay">
+                                                            {/* View icon */}
+                                                            <a
+                                                                href={imgUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                title="View Image"
+                                                                className="icon-button"
+                                                            >
+                                                                <i className="fas fa-eye"></i>
+                                                            </a>
+
+                                                            {/* Download icon */}
+                                                            <button
+                                                                title="Download Image"
+                                                                className="icon-button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    fetch(imgUrl, { mode: "cors" })
+                                                                        .then((res) => res.blob())
+                                                                        .then((blob) => {
+                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const a = document.createElement("a");
+                                                                            a.href = url;
+                                                                            a.download = filename;
+                                                                            a.click();
+                                                                            window.URL.revokeObjectURL(url);
+                                                                        })
+                                                                        .catch(() => alert("Download failed."));
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-download"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
                                                 Aadhar Card (Relation):
@@ -1847,28 +1896,77 @@ function Family_Request_form() {
                                             </Col>
                                         </Form.Group>
                                         {Array.isArray(files.f_ration_card) &&
-                                            files.f_ration_card.map((imgUrl, index) => (
-                                                <img
-                                                    key={index}
-                                                    src={imgUrl}
-                                                    alt={`f_ration_card - ${index}`}
-                                                    loading="lazy"
-                                                    style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
-                                                        margin: "10px",
-                                                        border: "1px solid #ccc",
-                                                    }}
-                                                    onClick={() => downloadImage(imgUrl, `f_ration_card${index}.jpg`)}
-                                                    onError={(e) => {
-                                                        if (!e.target.dataset.errorHandled) {
-                                                            e.target.src = "/fallback-image.png";
-                                                            e.target.dataset.errorHandled = "true";
-                                                        }
-                                                    }}
-                                                />
-                                            ))}
+                                            files.f_ration_card.map((imgUrl, index) => {
+                                                const filename = `f_ration_card_${index}.jpg`;
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="image-container"
+                                                        style={{
+                                                            position: "relative",
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            margin: "10px",
+                                                            display: "inline-block",
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={imgUrl}
+                                                            alt={`f_ration_card - ${index}`}
+                                                            loading="lazy"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                border: "1px solid #ccc",
+                                                                borderRadius: "4px",
+                                                            }}
+                                                            onError={(e) => {
+                                                                if (!e.target.dataset.errorHandled) {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                    e.target.dataset.errorHandled = "true";
+                                                                }
+                                                            }}
+                                                        />
+
+                                                        <div className="image-overlay">
+                                                            {/* View icon */}
+                                                            <a
+                                                                href={imgUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                title="View Image"
+                                                                className="icon-button"
+                                                            >
+                                                                <i className="fas fa-eye"></i>
+                                                            </a>
+
+                                                            {/* Download icon */}
+                                                            <button
+                                                                title="Download Image"
+                                                                className="icon-button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    fetch(imgUrl, { mode: "cors" })
+                                                                        .then((res) => res.blob())
+                                                                        .then((blob) => {
+                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const a = document.createElement("a");
+                                                                            a.href = url;
+                                                                            a.download = filename;
+                                                                            a.click();
+                                                                            window.URL.revokeObjectURL(url);
+                                                                        })
+                                                                        .catch(() => alert("Download failed."));
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-download"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
                                                 Ration Card (Relation):
@@ -1902,27 +2000,77 @@ function Family_Request_form() {
                                             )}
                                         </Form.Group>
                                         {Array.isArray(files.r_aadhar_card) &&
-                                            files.r_aadhar_card.map((imgUrl, index) => (
-                                                <img
-                                                    key={index}
-                                                    src={imgUrl}
-                                                    alt={`r_aadhar_card - ${index}`}
-                                                    loading="lazy"
-                                                    style={{
-                                                        width: "150px",
-                                                        height: "auto",
-                                                        margin: "10px",
-                                                        border: "1px solid #ccc",
-                                                    }}
-                                                    onClick={() => downloadImage(imgUrl, `r_aadhar_card${index}.jpg`)}
-                                                    onError={(e) => {
-                                                        if (!e.target.dataset.errorHandled) {
-                                                            e.target.src = "/fallback-image.png";
-                                                            e.target.dataset.errorHandled = "true";
-                                                        }
-                                                    }}
-                                                />
-                                            ))}
+                                            files.r_aadhar_card.map((imgUrl, index) => {
+                                                const filename = `r_aadhar_card_${index}.jpg`;
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="image-container"
+                                                        style={{
+                                                            position: "relative",
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            margin: "10px",
+                                                            display: "inline-block",
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={imgUrl}
+                                                            alt={`r_aadhar_card - ${index}`}
+                                                            loading="lazy"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                border: "1px solid #ccc",
+                                                                borderRadius: "4px",
+                                                            }}
+                                                            onError={(e) => {
+                                                                if (!e.target.dataset.errorHandled) {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                    e.target.dataset.errorHandled = "true";
+                                                                }
+                                                            }}
+                                                        />
+
+                                                        <div className="image-overlay">
+                                                            {/* View icon */}
+                                                            <a
+                                                                href={imgUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                title="View Image"
+                                                                className="icon-button"
+                                                            >
+                                                                <i className="fas fa-eye"></i>
+                                                            </a>
+
+                                                            {/* Download icon */}
+                                                            <button
+                                                                title="Download Image"
+                                                                className="icon-button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    fetch(imgUrl, { mode: "cors" })
+                                                                        .then((res) => res.blob())
+                                                                        .then((blob) => {
+                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const a = document.createElement("a");
+                                                                            a.href = url;
+                                                                            a.download = filename;
+                                                                            a.click();
+                                                                            window.URL.revokeObjectURL(url);
+                                                                        })
+                                                                        .catch(() => alert("Download failed."));
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-download"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
                                                 Aadhar Card No (Resident):
@@ -1952,26 +2100,77 @@ function Family_Request_form() {
                                         </Form.Group>
 
                                         {Array.isArray(files.r_ration_card) &&
-                                            files.r_ration_card.map((imgUrl, index) => (
-                                                <img
-                                                    key={index}
-                                                    src={imgUrl}
-                                                    alt={`r_ration_card - ${index}`}
-                                                    loading="lazy"
-                                                    style={{
-                                                        width: "150px",
-                                                        height: "auto",
-                                                        margin: "10px",
-                                                        border: "1px solid #ccc",
-                                                    }}
-                                                    onError={(e) => {
-                                                        if (!e.target.dataset.errorHandled) {
-                                                            e.target.src = "/fallback-image.png";
-                                                            e.target.dataset.errorHandled = "true";
-                                                        }
-                                                    }}
-                                                />
-                                            ))}
+                                            files.r_ration_card.map((imgUrl, index) => {
+                                                const filename = `r_ration_card_${index}.jpg`;
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="image-container"
+                                                        style={{
+                                                            position: "relative",
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            margin: "10px",
+                                                            display: "inline-block",
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={imgUrl}
+                                                            alt={`r_ration_card - ${index}`}
+                                                            loading="lazy"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                border: "1px solid #ccc",
+                                                                borderRadius: "4px",
+                                                            }}
+                                                            onError={(e) => {
+                                                                if (!e.target.dataset.errorHandled) {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                    e.target.dataset.errorHandled = "true";
+                                                                }
+                                                            }}
+                                                        />
+
+                                                        <div className="image-overlay">
+                                                            {/* View icon */}
+                                                            <a
+                                                                href={imgUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                title="View Image"
+                                                                className="icon-button"
+                                                            >
+                                                                <i className="fas fa-eye"></i>
+                                                            </a>
+
+                                                            {/* Download icon */}
+                                                            <button
+                                                                title="Download Image"
+                                                                className="icon-button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    fetch(imgUrl, { mode: "cors" })
+                                                                        .then((res) => res.blob())
+                                                                        .then((blob) => {
+                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const a = document.createElement("a");
+                                                                            a.href = url;
+                                                                            a.download = filename;
+                                                                            a.click();
+                                                                            window.URL.revokeObjectURL(url);
+                                                                        })
+                                                                        .catch(() => alert("Download failed."));
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-download"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
                                                 Ration Card (Resident):
@@ -1998,34 +2197,78 @@ function Family_Request_form() {
                                                     onChange={handleInputChange} />
                                             </Col>
                                         </Form.Group>
-                                        {Array.isArray(files.govt_id) && files.govt_id.length > 0 && (
-                                            <div style={{ minHeight: "120px", display: "flex", flexWrap: "wrap" }}>
-                                                {files.govt_id &&
-                                                    files.govt_id.map((imgUrl, index) => (
-                                                        <div key={index} style={{ margin: "10px", textAlign: 'center' }}>
-                                                            <img
-                                                                src={imgUrl}
-                                                                alt={`govt_id - ${index}`}
-                                                                loading="lazy"
-                                                                style={{
-                                                                    width: "150px",
-                                                                    height: "auto",
-                                                                    border: "1px solid #ccc",
-                                                                    cursor: "pointer"
+                                        {Array.isArray(files.govt_id) &&
+                                            files.govt_id.map((imgUrl, index) => {
+                                                const filename = `govt_id_${index}.jpg`;
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="image-container"
+                                                        style={{
+                                                            position: "relative",
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            margin: "10px",
+                                                            display: "inline-block",
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={imgUrl}
+                                                            alt={`govt_id - ${index}`}
+                                                            loading="lazy"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                border: "1px solid #ccc",
+                                                                borderRadius: "4px",
+                                                            }}
+                                                            onError={(e) => {
+                                                                if (!e.target.dataset.errorHandled) {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                    e.target.dataset.errorHandled = "true";
+                                                                }
+                                                            }}
+                                                        />
+
+                                                        <div className="image-overlay">
+                                                            {/* View icon */}
+                                                            <a
+                                                                href={imgUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                title="View Image"
+                                                                className="icon-button"
+                                                            >
+                                                                <i className="fas fa-eye"></i>
+                                                            </a>
+
+                                                            {/* Download icon */}
+                                                            <button
+                                                                title="Download Image"
+                                                                className="icon-button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    fetch(imgUrl, { mode: "cors" })
+                                                                        .then((res) => res.blob())
+                                                                        .then((blob) => {
+                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const a = document.createElement("a");
+                                                                            a.href = url;
+                                                                            a.download = filename;
+                                                                            a.click();
+                                                                            window.URL.revokeObjectURL(url);
+                                                                        })
+                                                                        .catch(() => alert("Download failed."));
                                                                 }}
-                                                                onClick={() => downloadImage(imgUrl, `govt_id${index}.jpg`)}
-                                                                onError={(e) => {
-                                                                    if (!e.target.dataset.errorHandled) {
-                                                                        e.target.src = "/fallback-image.png";
-                                                                        e.target.dataset.errorHandled = "true";
-                                                                    }
-                                                                }}
-                                                            />
-                                                            <p style={{ fontSize: "12px" }}>Click image to download</p>
+                                                            >
+                                                                <i className="fas fa-download"></i>
+                                                            </button>
                                                         </div>
-                                                    ))}
-                                            </div>
-                                        )}
+                                                    </div>
+                                                );
+                                            })}
 
 
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">

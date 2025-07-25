@@ -384,6 +384,10 @@ function SCRB_Form2C() {
     }
   }, [admission_no]);
 
+  const EditSCRBForm2C = async () => {
+        navigate("/scrb_form2cALL");
+    }
+
   return (
     <>
       <div className="d-xl-flex justify-content-between align-items-center flex-wrap flex-md-nowrap text-start py-2">
@@ -462,6 +466,9 @@ function SCRB_Form2C() {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                      <button type="button" className="btn btn-success col-md-2" onClick={EditSCRBForm2C}>
+                        View All
+                      </button>
                       {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
                         Import Excel Sheet
                       </button> */}

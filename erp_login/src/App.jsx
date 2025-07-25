@@ -73,6 +73,9 @@ import Cognition from './Components/pages/Recovery/Cognition';
 import Judgement from './Components/pages/Recovery/Judgement';
 import Insight from './Components/pages/Recovery/Insight';
 import SCRB_All_Details from './Components/pages/Admission/SCRB_All_Details';
+import SCRB_Form2A_ALL from './Components/pages/Admission/SCRB_Form2A_ALL';
+import SCRB_Form2B_All from './Components/pages/Admission/SCRB_Form2B_All';
+import SCRB_Form2C_All from './Components/pages/Admission/SCRB_Form2C_All';
 
 function App() {
 
@@ -716,6 +719,21 @@ function App() {
                 <Route
                   path='/scrb_formALL'
                   element={<MainLayout><SCRB_All_Details /></MainLayout>}
+                />
+
+                <Route
+                  path='/scrb_form2aALL'
+                  element={<MainLayout><SCRB_Form2A_ALL /></MainLayout>}
+                />
+
+                <Route
+                  path='/scrb_form2bALL'
+                  element={<MainLayout><SCRB_Form2B_All /></MainLayout>}
+                />
+
+                <Route
+                  path='/scrb_form2cALL'
+                  element={<MainLayout><SCRB_Form2C_All /></MainLayout>}
                 />
 
                 <Route

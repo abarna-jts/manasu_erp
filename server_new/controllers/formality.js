@@ -215,12 +215,20 @@ const createRecords = async (req, res) => {
             ? req.files['form7_attach'].map(file => `uploads/Rescue_Images/${file.filename}`)
             : [];
 
+        const AttachAadharPath = req.files?.['attach_aadhar']
+            ? req.files['attach_aadhar'].map(file => `uploads/Rescue_Images/${file.filename}`)
+            : [];
+
+        const UDIDAttachPath = req.files?.['udid_attach']
+            ? req.files['udid_attach'].map(file => `uploads/Rescue_Images/${file.filename}`)
+            : [];
+
         const q = `
             INSERT INTO essential_records (
-                admission_no, rescue_name, aadhar_card, udid_no, disability_no, voter_id,
+                admission_no, rescue_name, aadhar_card, udid_no, attach_aadhar, udid_attach, disability_no, voter_id,
                 form_7, form7_attach, bank_name, account_no, ifsc_code, bank_passbook,
                 insurance_provider, policy_no, validity_period, other_gvt_scheme, any_other
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const values = [
@@ -228,6 +236,8 @@ const createRecords = async (req, res) => {
             rescue_name,
             aadhar_card,
             udid_no,
+            JSON.stringify(AttachAadharPath),
+            JSON.stringify(UDIDAttachPath),
             disability_no,
             voter_id,
             form_7,
@@ -246,17 +256,17 @@ const createRecords = async (req, res) => {
         const [result] = await db.query(q, values);
 
         // 3. THEN send email to director (doesn't block response)
-        sendDirectorMail({
-            admission_no,
-            rescue_name,
-            aadhar_card,
-            udid_no,
-            voter_id
-        }).then(() => {
-            console.log("✅ Email sent to director");
-        }).catch((error) => {
-            console.error("❌ Failed to send email to director:", error);
-        });
+        // sendDirectorMail({
+        //     admission_no,
+        //     rescue_name,
+        //     aadhar_card,
+        //     udid_no,
+        //     voter_id
+        // }).then(() => {
+        //     console.log("✅ Email sent to director");
+        // }).catch((error) => {
+        //     console.error("❌ Failed to send email to director:", error);
+        // });
 
         res.status(201).json({
             message: "Essential Records Form Created Successfully",
@@ -272,29 +282,29 @@ const createRecords = async (req, res) => {
     }
 };
 
-const sendDirectorMail = async (form) => {
-    try {
+// const sendDirectorMail = async (form) => {
+//     try {
 
-        const mailOptions = {
-            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-            to: "manasucmf@gmail.com", // ✅ change to director's real email
-            subject: `📝 Resident Document Information Form: ${form.admission_no}`,
-            html: `
-        <h2>New First Form Created by Admin</h2>
-        <p><strong>Admission No:</strong> ${form.admission_no}</p>
-        <p><strong>Name:</strong> ${form.rescue_name}</p>
-        <p><strong>Aadhar Card Number:</strong> ${form.aadhar_card}</p>
-        <p><strong>UDID No:</strong> ${form.udid_no}</p>
-        <p><strong>Voter ID:</strong> ${form.voter_id}</p>
-      `,
-        };
+//         const mailOptions = {
+//             from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+//             to: "manasucmf@gmail.com", // ✅ change to director's real email
+//             subject: `📝 Resident Document Information Form: ${form.admission_no}`,
+//             html: `
+//         <h2>New First Form Created by Admin</h2>
+//         <p><strong>Admission No:</strong> ${form.admission_no}</p>
+//         <p><strong>Name:</strong> ${form.rescue_name}</p>
+//         <p><strong>Aadhar Card Number:</strong> ${form.aadhar_card}</p>
+//         <p><strong>UDID No:</strong> ${form.udid_no}</p>
+//         <p><strong>Voter ID:</strong> ${form.voter_id}</p>
+//       `,
+//         };
 
-        await transporter.sendMail(mailOptions);
-        console.log("📧 Email sent to director successfully");
-    } catch (error) {
-        console.error("❌ Error sending email to director:", error.message);
-    }
-};
+//         await transporter.sendMail(mailOptions);
+//         console.log("📧 Email sent to director successfully");
+//     } catch (error) {
+//         console.error("❌ Error sending email to director:", error.message);
+//     }
+// };
 
 
 const getEssentialRecords = async (req, res) => {

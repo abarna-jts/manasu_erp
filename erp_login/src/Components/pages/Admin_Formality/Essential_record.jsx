@@ -49,10 +49,14 @@ function Essential_record() {
 
     const bankPassbookRef = useRef(null);
     const form7AttachRef = useRef(null);
+    const AadharAttachRef = useRef(null);
+    const UDIDAttachRef = useRef(null);
 
     const [files, setFiles] = useState({
         bank_passbook: null,
         form7_attach: null,
+        attach_aadhar: null,
+        udid_attach: null
     });
 
     const handleFileChange = (e) => {
@@ -268,6 +272,18 @@ function Essential_record() {
             });
         }
 
+        if (files.attach_aadhar && files.attach_aadhar.length > 0) {
+            files.attach_aadhar.forEach(file => {
+                data.append('attach_aadhar', file); // ✅ no []
+            });
+        }
+
+        if (files.udid_attach && files.udid_attach.length > 0) {
+            files.udid_attach.forEach(file => {
+                data.append('udid_attach', file); // ✅ no []
+            });
+        }
+
         try {
             const res = await apiRoute.post('/formality/createRecords', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -300,6 +316,8 @@ function Essential_record() {
                 // Clear the file input elements in the DOM
                 if (bankPassbookRef.current) bankPassbookRef.current.value = "";
                 if (form7AttachRef.current) form7AttachRef.current.value = "";
+                if (AadharAttachRef.current) AadharAttachRef.current.value = "";
+                if (UDIDAttachRef.current) UDIDAttachRef.current.value = "";
             } else {
                 alert("Submission failed.");
             }
@@ -371,10 +389,44 @@ function Essential_record() {
                 }
             }
 
+            let attachAadharPath = [];
+            if (data.attach_aadhar) {
+                try {
+                    const parsed = JSON.parse(data.attach_aadhar);
+                    if (Array.isArray(parsed)) {
+                        attachAadharPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse Aadhar Card:', err);
+                    // Fallback: comma-separated string
+                    attachAadharPath = data.attach_aadhar
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
+            let UDIDPhotoPath = [];
+            if (data.udid_attach) {
+                try {
+                    const parsed = JSON.parse(data.udid_attach);
+                    if (Array.isArray(parsed)) {
+                        UDIDPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse UDID Card:', err);
+                    // Fallback: comma-separated string
+                    UDIDPhotoPath = data.udid_attach
+                        .split(',')
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                }
+            }
+
             setFiles((files) => ({
                 ...files,
                 bank_passbook: bank_passbookPath,
                 form7_attach: form7Paths,
+                attach_aadhar: attachAadharPath,
+                udid_attach: UDIDPhotoPath
             }));
 
             setPreviewRequested(true);
@@ -487,12 +539,16 @@ function Essential_record() {
 
             const form7Paths = parseImageField(data.form7_attach);
             const bankPassbookPaths = parseImageField(data.bank_passbook);
+            const attachAadharPath = parseImageField(data.attach_aadhar);
+            const UDIDPhotoPath = parseImageField(data.udid_attach);
 
             // Set image files
             setFiles((files) => ({
                 ...files,
                 form7_attach: form7Paths,
                 bank_passbook: bankPassbookPaths,
+                attach_aadhar: attachAadharPath,
+                udid_attach: UDIDPhotoPath
             }));
 
             setShow(true);
@@ -591,6 +647,18 @@ function Essential_record() {
             }
         }
 
+        if (files.attach_aadhar && files.attach_aadhar.length > 0) {
+            for (let i = 0; i < files.attach_aadhar.length; i++) {
+                data.append('attach_aadhar', files.attach_aadhar[i]);
+            }
+        }
+
+        if (files.udid_attach && files.udid_attach.length > 0) {
+            for (let i = 0; i < files.udid_attach.length; i++) {
+                data.append('udid_attach', files.udid_attach[i]);
+            }
+        }
+
         try {
             const res = await apiRoute.put(`/formality/updateEssentialRecords/${admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -618,6 +686,8 @@ function Essential_record() {
             // Clear the file input elements in the DOM
             if (bankPassbookRef.current) bankPassbookRef.current.value = "";
             if (form7AttachRef.current) form7AttachRef.current.value = "";
+            if (AadharAttachRef.current) AadharAttachRef.current.value = "";
+            if (UDIDAttachRef.current) UDIDAttachRef.current.value = "";
         } catch (err) {
             console.error(err);
             alert('Update failed.');
@@ -869,7 +939,15 @@ function Essential_record() {
                                             {formErrors.aadhar_card && (
                                                 <div className="text-danger small">{formErrors.aadhar_card}</div>
                                             )}
-
+                                            <Form.Label className="mb-1">Attach Aadhaar Card : <span style={{ color: 'red' }}>*</span></Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="attach_aadhar"
+                                                accept=".jpg,.jpeg,.png"
+                                                onChange={handleFileChange}
+                                                ref={AadharAttachRef}
+                                                multiple
+                                            />
 
                                             {/* UDID */}
                                             <Form.Label className="mb-1">UDID Card Number (Unique Disability ID):  <span style={{ color: 'red' }}>*</span></Form.Label>
@@ -883,6 +961,15 @@ function Essential_record() {
                                             {formErrors.udid_no && (
                                                 <div className="text-danger small">{formErrors.udid_no}</div>
                                             )}
+                                            <Form.Label className="mb-1">Attach UDID Card : <span style={{ color: 'red' }}>*</span></Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                name="udid_attach"
+                                                accept=".jpg,.jpeg,.png"
+                                                onChange={handleFileChange}
+                                                ref={UDIDAttachRef}
+                                                multiple
+                                            />
 
                                             {/* Disability Passport */}
                                             <Form.Label className="mb-1">Disability Certificate No. & Issuing Authority:  <span style={{ color: 'red' }}>*</span></Form.Label>
@@ -1102,7 +1189,26 @@ function Essential_record() {
                                     className="mb-2"
                                     required
                                 />
-
+                                <Form.Label className="mb-1">Aadhar Card Attachment </Form.Label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                    {files.attach_aadhar &&
+                                        files.attach_aadhar.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`Form 7 - ${index}`}
+                                                style={{
+                                                    width: "150px",
+                                                    height: "auto",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                }}
+                                            />
+                                        ))}
+                                </div>
 
                                 {/* UDID */}
                                 <Form.Label className="mb-1">UDID Card Number (Unique Disability ID)</Form.Label>
@@ -1113,6 +1219,27 @@ function Essential_record() {
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
+
+                                <Form.Label className="mb-1">UDID Card Attachment </Form.Label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                    {files.udid_attach &&
+                                        files.udid_attach.map((imgUrl, index) => (
+                                            <img
+                                                key={index}
+                                                src={imgUrl}
+                                                alt={`Form 7 - ${index}`}
+                                                style={{
+                                                    width: "150px",
+                                                    height: "auto",
+                                                    margin: "10px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                                onError={(e) => {
+                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                }}
+                                            />
+                                        ))}
+                                </div>
 
                                 {/* Disability Passport */}
                                 <Form.Label className="mb-1">Disability Certificate No. & Issuing Authority</Form.Label>
@@ -1385,30 +1512,78 @@ function Essential_record() {
 
                                 <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                    {files.form7_attach &&
-                                        files.form7_attach.map((imgUrl, index) => (
-                                            <div key={index} style={{ margin: "10px", textAlign: 'center' }}>
-                                                <img
-                                                    src={imgUrl}
-                                                    alt={`form7_attach - ${index}`}
-                                                    loading="lazy"
+                                    {Array.isArray(files.form7_attach) &&
+                                        files.form7_attach.map((imgUrl, index) => {
+                                            const filename = `form7_attach_${index}.jpg`;
+
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className="image-container"
                                                     style={{
-                                                        width: "150px",
-                                                        height: "auto",
-                                                        border: "1px solid #ccc",
-                                                        cursor: "pointer"
+                                                        position: "relative",
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        margin: "10px",
+                                                        display: "inline-block",
                                                     }}
-                                                    onClick={() => downloadImage(imgUrl, `form7_attach_${index}.jpg`)}
-                                                    onError={(e) => {
-                                                        if (!e.target.dataset.errorHandled) {
-                                                            e.target.src = "/fallback-image.png";
-                                                            e.target.dataset.errorHandled = "true";
-                                                        }
-                                                    }}
-                                                />
-                                                <p style={{ fontSize: "12px" }}>Click image to download</p>
-                                            </div>
-                                        ))}
+                                                >
+                                                    <img
+                                                        src={imgUrl}
+                                                        alt={`form7_attach - ${index}`}
+                                                        loading="lazy"
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            objectFit: "cover",
+                                                            border: "1px solid #ccc",
+                                                            borderRadius: "4px",
+                                                        }}
+                                                        onError={(e) => {
+                                                            if (!e.target.dataset.errorHandled) {
+                                                                e.target.src = "/fallback-image.png";
+                                                                e.target.dataset.errorHandled = "true";
+                                                            }
+                                                        }}
+                                                    />
+
+                                                    <div className="image-overlay">
+                                                        {/* View icon */}
+                                                        <a
+                                                            href={imgUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title="View Image"
+                                                            className="icon-button"
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </a>
+
+                                                        {/* Download icon */}
+                                                        <button
+                                                            title="Download Image"
+                                                            className="icon-button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                fetch(imgUrl, { mode: "cors" })
+                                                                    .then((res) => res.blob())
+                                                                    .then((blob) => {
+                                                                        const url = window.URL.createObjectURL(blob);
+                                                                        const a = document.createElement("a");
+                                                                        a.href = url;
+                                                                        a.download = filename;
+                                                                        a.click();
+                                                                        window.URL.revokeObjectURL(url);
+                                                                    })
+                                                                    .catch(() => alert("Download failed."));
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                 </div>
 
 
@@ -1480,30 +1655,78 @@ function Essential_record() {
 
                                 <Form.Label className="mb-1">Copy of Bank Passbook</Form.Label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                    {files.bank_passbook &&
-                                        files.bank_passbook.map((imgUrl, index) => (
-                                            <div key={index} style={{ margin: "10px", textAlign: 'center' }}>
-                                                <img
-                                                    src={imgUrl}
-                                                    alt={`bank_passbook - ${index}`}
-                                                    loading="lazy"
+                                    {Array.isArray(files.bank_passbook) &&
+                                        files.bank_passbook.map((imgUrl, index) => {
+                                            const filename = `bank_passbook_${index}.jpg`;
+
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className="image-container"
                                                     style={{
-                                                        width: "150px",
-                                                        height: "auto",
-                                                        border: "1px solid #ccc",
-                                                        cursor: "pointer"
+                                                        position: "relative",
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        margin: "10px",
+                                                        display: "inline-block",
                                                     }}
-                                                    onClick={() => downloadImage(imgUrl, `bank_passbook${index}.jpg`)}
-                                                    onError={(e) => {
-                                                        if (!e.target.dataset.errorHandled) {
-                                                            e.target.src = "/fallback-image.png";
-                                                            e.target.dataset.errorHandled = "true";
-                                                        }
-                                                    }}
-                                                />
-                                                <p style={{ fontSize: "12px" }}>Click image to download</p>
-                                            </div>
-                                        ))}
+                                                >
+                                                    <img
+                                                        src={imgUrl}
+                                                        alt={`bank_passbook - ${index}`}
+                                                        loading="lazy"
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            objectFit: "cover",
+                                                            border: "1px solid #ccc",
+                                                            borderRadius: "4px",
+                                                        }}
+                                                        onError={(e) => {
+                                                            if (!e.target.dataset.errorHandled) {
+                                                                e.target.src = "/fallback-image.png";
+                                                                e.target.dataset.errorHandled = "true";
+                                                            }
+                                                        }}
+                                                    />
+
+                                                    <div className="image-overlay">
+                                                        {/* View icon */}
+                                                        <a
+                                                            href={imgUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title="View Image"
+                                                            className="icon-button"
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </a>
+
+                                                        {/* Download icon */}
+                                                        <button
+                                                            title="Download Image"
+                                                            className="icon-button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                fetch(imgUrl, { mode: "cors" })
+                                                                    .then((res) => res.blob())
+                                                                    .then((blob) => {
+                                                                        const url = window.URL.createObjectURL(blob);
+                                                                        const a = document.createElement("a");
+                                                                        a.href = url;
+                                                                        a.download = filename;
+                                                                        a.click();
+                                                                        window.URL.revokeObjectURL(url);
+                                                                    })
+                                                                    .catch(() => alert("Download failed."));
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                 </div>
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">

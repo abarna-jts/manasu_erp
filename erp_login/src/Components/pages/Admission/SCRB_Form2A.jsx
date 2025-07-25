@@ -144,7 +144,7 @@ function SCRB_Form2A() {
         alert("SCRB Form2A Submitted Successfully");
         setFormData({
           admission_no: '',
-          name_ngo:"MANASU (Mental Health Charity Home)",
+          name_ngo: "MANASU (Mental Health Charity Home)",
           file_no: '',
           addition_category: '',
           addition_complexion: '',
@@ -288,55 +288,55 @@ function SCRB_Form2A() {
 
   // Mock API call or fetch
   const fetchRescueDetails = async (admission_no) => {
-        try {
-            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-            const result = response.data.data[0];
-            console.log("API Result:", result);
+    try {
+      const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+      const result = response.data.data[0];
+      console.log("API Result:", result);
 
-            if (result && result.rescue_image) {
-                let imagePath = null;
+      if (result && result.rescue_image) {
+        let imagePath = null;
 
-                // Check if rescue_image is an array-like string
-                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
-                    try {
-                        // Parse the string to get the array
-                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+        // Check if rescue_image is an array-like string
+        if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+          try {
+            // Parse the string to get the array
+            const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
-                        if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
-                        }
-                    } catch (parseError) {
-                        console.error("Error parsing image array:", parseError);
-                        imagePath = null;
-                    }
-                } else {
-                    // It's a single image path
-                    imagePath = result.rescue_image.startsWith("http")
-                        ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
-                }
-
-                if (imagePath) {
-                    setRescueImage(imagePath);
-                    setRescueName(result.rescue_name || "");
-                    setError("");
-                } else {
-                    setRescueImage(null);
-                    setRescueName("");
-                    setError("Image not found for this admission number");
-                }
-            } else {
-                setRescueImage(null);
-                setRescueName("");
-                setError("Image not found for this admission number");
+            if (Array.isArray(imageArray) && imageArray.length > 0) {
+              imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
             }
-        } catch (error) {
-            console.error("Error fetching data", error);
-            setRescueImage(null);
-            setRescueName("");
-            setError("Admission Number Not found");
+          } catch (parseError) {
+            console.error("Error parsing image array:", parseError);
+            imagePath = null;
+          }
+        } else {
+          // It's a single image path
+          imagePath = result.rescue_image.startsWith("http")
+            ? result.rescue_image
+            : `https://www.pahrultours.com/app2/${result.rescue_image}`;
         }
-    };
+
+        if (imagePath) {
+          setRescueImage(imagePath);
+          setRescueName(result.rescue_name || "");
+          setError("");
+        } else {
+          setRescueImage(null);
+          setRescueName("");
+          setError("Image not found for this admission number");
+        }
+      } else {
+        setRescueImage(null);
+        setRescueName("");
+        setError("Image not found for this admission number");
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+      setRescueImage(null);
+      setRescueName("");
+      setError("Admission Number Not found");
+    }
+  };
 
   // Trigger when admission number changes
   useEffect(() => {
@@ -348,6 +348,10 @@ function SCRB_Form2A() {
       setError("");
     }
   }, [admission_no]);
+
+  const EditSCRBForm2A = async () => {
+        navigate("/scrb_form2aALL");
+    }
 
 
   return (
@@ -428,6 +432,9 @@ function SCRB_Form2A() {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                      <button type="button" className="btn btn-success col-md-2" onClick={EditSCRBForm2A}>
+                        View All
+                      </button>
                       {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
                         Import Excel Sheet
                       </button> */}

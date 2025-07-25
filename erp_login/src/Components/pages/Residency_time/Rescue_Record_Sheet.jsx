@@ -462,72 +462,68 @@ function Rescue_Record_Sheet() {
                                                     style={{ width: "70px", height: "70px", objectFit: "cover" }}
                                                 />
                                             </td> */}
-                                            <td>
-                                                {item.rescue_recovery_photo && item.rescue_recovery_photo !== "NULL" ? (
-                                                    (() => {
-                                                        let firstPhoto = null;
+                                            <td className='d-flex align-items-center justify-content-center'>
+                                                {(() => {
+                                                    let imagePath = item.rescue_recovery_photo;
 
-                                                        if (Array.isArray(item.rescue_recovery_photo)) {
-                                                            // Already an array
-                                                            firstPhoto = item.rescue_recovery_photo[0];
-                                                        } else if (typeof item.rescue_recovery_photo === "string") {
-                                                            try {
-                                                                const parsed = JSON.parse(item.rescue_recovery_photo);
-                                                                if (Array.isArray(parsed)) {
-                                                                    firstPhoto = parsed[0];
-                                                                } else {
-                                                                    // Not an array, just use the string
-                                                                    firstPhoto = item.rescue_recovery_photo;
-                                                                }
-                                                            } catch (e) {
-                                                                // Not JSON, just use the string
-                                                                firstPhoto = item.rescue_recovery_photo;
-                                                            }
+                                                    try {
+                                                        const parsed = JSON.parse(item.rescue_recovery_photo);
+                                                        if (Array.isArray(parsed) && parsed.length > 0) {
+                                                            imagePath = parsed[0];
                                                         }
-                                                        const fullUrl = `http://localhost:5002/${firstPhoto}`;
-                                                        const filename = firstPhoto?.split('/').pop();
+                                                    } catch (e) {
+                                                        // fallback to original string
+                                                    }
 
-                                                        return firstPhoto ? (
-                                                            <>
+                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
+                                                    const filename = imagePath?.split("/").pop();
+
+                                                    return imagePath ? (
+                                                        <div className="image-container">
+                                                            <img
+                                                                src={fullUrl}
+                                                                alt="Rescue Recovery Photo"
+                                                                className="preview-image"
+                                                            />
+                                                            <div className="image-overlay">
+                                                                {/* View icon */}
                                                                 <a
                                                                     href={fullUrl}
-                                                                    download={filename} // this hints the filename to browser
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    title="View Image"
+                                                                    className="icon-button"
+                                                                >
+                                                                    <i className="fas fa-eye"></i>
+                                                                </a>
+
+                                                                {/* Download icon */}
+                                                                <button
+                                                                    title="Download Image"
+                                                                    className="icon-button"
                                                                     onClick={(e) => {
-                                                                        // To handle CORS or issues with direct download
                                                                         e.preventDefault();
-                                                                        fetch(fullUrl, { mode: 'cors' }) // allow CORS
+                                                                        fetch(fullUrl, { mode: "cors" })
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
-                                                                    style={{ display: 'inline-block' }}
                                                                 >
-                                                                    <img
-                                                                        src={fullUrl}
-                                                                        alt="Rescue Profile"
-                                                                        style={{ width: "70px", height: "70px", objectFit: "cover", cursor: "pointer" }}
-                                                                    />
-                                                                </a>
-                                                            </>
-                                                            // <img
-                                                            //     src={`http://localhost:5002/${firstPhoto}`}
-                                                            //     alt="Rescue Condition Photo"
-                                                            //     style={{ width: "70px", height: "70px", objectFit: "cover" }}
-                                                            // />
-                                                        ) : (
-                                                            "NULL"
-                                                        );
-                                                    })()
-                                                ) : (
-                                                    "NULL"
-                                                )}
+                                                                    <i className="fas fa-download"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span>No image</span>
+                                                    );
+                                                })()}
                                             </td>
 
 
@@ -681,27 +677,77 @@ function Rescue_Record_Sheet() {
                                 <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                                 <Col sm="12">
                                     {Array.isArray(files.rescue_recovery_photo) &&
-                                        files.rescue_recovery_photo.map((imgUrl, index) => (
-                                            <img
-                                                key={index}
-                                                src={imgUrl}
-                                                alt={`rescue_recovery_photo - ${index}`}
-                                                loading="lazy"
-                                                style={{
-                                                    width: "100px",
-                                                    height: "auto",
-                                                    margin: "10px",
-                                                    border: "1px solid #ccc",
-                                                }}
-                                                onClick={() => downloadImage(imgUrl, `rescue_recovery_photo_${index}.jpg`)}
-                                                onError={(e) => {
-                                                    if (!e.target.dataset.errorHandled) {
-                                                        e.target.src = "/fallback-image.png";
-                                                        e.target.dataset.errorHandled = "true";
-                                                    }
-                                                }}
-                                            />
-                                        ))}
+                                        files.rescue_recovery_photo.map((imgUrl, index) => {
+                                            const filename = `rescue_recovery_photo_${index}.jpg`;
+
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className="image-container"
+                                                    style={{
+                                                        position: "relative",
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        margin: "10px",
+                                                        display: "inline-block",
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={imgUrl}
+                                                        alt={`Recovery Photo - ${index}`}
+                                                        loading="lazy"
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            objectFit: "cover",
+                                                            border: "1px solid #ccc",
+                                                            borderRadius: "4px",
+                                                        }}
+                                                        onError={(e) => {
+                                                            if (!e.target.dataset.errorHandled) {
+                                                                e.target.src = "/fallback-image.png";
+                                                                e.target.dataset.errorHandled = "true";
+                                                            }
+                                                        }}
+                                                    />
+
+                                                    <div className="image-overlay">
+                                                        {/* View icon */}
+                                                        <a
+                                                            href={imgUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title="View Image"
+                                                            className="icon-button"
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </a>
+
+                                                        {/* Download icon */}
+                                                        <button
+                                                            title="Download Image"
+                                                            className="icon-button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                fetch(imgUrl, { mode: "cors" })
+                                                                    .then((res) => res.blob())
+                                                                    .then((blob) => {
+                                                                        const url = window.URL.createObjectURL(blob);
+                                                                        const a = document.createElement("a");
+                                                                        a.href = url;
+                                                                        a.download = filename;
+                                                                        a.click();
+                                                                        window.URL.revokeObjectURL(url);
+                                                                    })
+                                                                    .catch(() => alert("Download failed."));
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     <Form.Control
                                         type="file"
                                         accept=".jpg,.jpeg,.png"

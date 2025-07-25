@@ -403,6 +403,10 @@ function SCRB_Form2B() {
     }
   }, [admission_no]);
 
+  const EditSCRBForm2B = async () => {
+        navigate("/scrb_form2bALL");
+    }
+
 
   return (
     <>
@@ -481,6 +485,9 @@ function SCRB_Form2B() {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                      <button type="button" className="btn btn-success col-md-2" onClick={EditSCRBForm2B}>
+                        View All
+                      </button>
                       {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
                         Import Excel Sheet
                       </button> */}

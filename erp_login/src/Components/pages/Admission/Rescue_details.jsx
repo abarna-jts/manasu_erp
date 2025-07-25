@@ -486,7 +486,7 @@ function Rescue_details() {
                                     </td> */}
                                     <td>{indexOfFirstItem + index + 1}</td>
                                     <td>{item.admission_no}</td>
-                                    <td>
+                                    <td className="d-flex align-items-center justify-content-center">
                                         {(() => {
                                             let imagePath = item.rescue_image;
 
@@ -503,32 +503,47 @@ function Rescue_details() {
                                             const filename = imagePath?.split('/').pop(); // Extract filename from path
 
                                             return imagePath ? (
-                                                <a
-                                                    href={fullUrl}
-                                                    download={filename} // this hints the filename to browser
-                                                    onClick={(e) => {
-                                                        // To handle CORS or issues with direct download
-                                                        e.preventDefault();
-                                                        fetch(fullUrl, { mode: 'cors' }) // allow CORS
-                                                            .then((res) => res.blob())
-                                                            .then((blob) => {
-                                                                const url = window.URL.createObjectURL(blob);
-                                                                const a = document.createElement('a');
-                                                                a.href = url;
-                                                                a.download = filename || 'image.jpg';
-                                                                a.click();
-                                                                window.URL.revokeObjectURL(url);
-                                                            })
-                                                            .catch(() => alert('Download failed.'));
-                                                    }}
-                                                    style={{ display: 'inline-block' }}
-                                                >
+                                                <div className="image-container">
                                                     <img
                                                         src={fullUrl}
-                                                        alt="Rescue Profile"
-                                                        style={{ width: "70px", height: "70px", objectFit: "cover", cursor: "pointer" }}
+                                                        alt="Rescue Images"
+                                                        className="preview-image"
                                                     />
-                                                </a>
+                                                    <div className="image-overlay">
+                                                        {/* View icon */}
+                                                        <a
+                                                            href={fullUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title="View Image"
+                                                            className="icon-button"
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </a>
+
+                                                        {/* Download icon */}
+                                                        <button
+                                                            title="Download Image"
+                                                            className="icon-button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                fetch(fullUrl, { mode: "cors" })
+                                                                    .then((res) => res.blob())
+                                                                    .then((blob) => {
+                                                                        const url = window.URL.createObjectURL(blob);
+                                                                        const a = document.createElement("a");
+                                                                        a.href = url;
+                                                                        a.download = filename || "image.jpg";
+                                                                        a.click();
+                                                                        window.URL.revokeObjectURL(url);
+                                                                    })
+                                                                    .catch(() => alert("Download failed."));
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             ) : (
                                                 <span>No image</span>
                                             );

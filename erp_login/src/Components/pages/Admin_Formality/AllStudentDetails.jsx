@@ -776,28 +776,77 @@ function AllStudentDetails() {
                                         <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                                         <Col sm="7" className='d-flex'>
                                             {Array.isArray(files.stud_photo) &&
-                                                files.stud_photo.map((imgUrl, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={imgUrl}
-                                                        alt={`stud_photo - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                            objectFit: "cover",
-                                                            margin: "10px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                        onClick={() => downloadImage(imgUrl, `stud_photo_${index}.jpg`)}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
-                                                ))}
+                                                files.stud_photo.map((imgUrl, index) => {
+                                                    const filename = `stud_photo_${index}.jpg`;
+
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="image-container"
+                                                            style={{
+                                                                position: "relative",
+                                                                width: "100px",
+                                                                height: "100px",
+                                                                margin: "10px",
+                                                                display: "inline-block",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={imgUrl}
+                                                                alt={`stud_photo - ${index}`}
+                                                                loading="lazy"
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "cover",
+                                                                    border: "1px solid #ccc",
+                                                                    borderRadius: "4px",
+                                                                }}
+                                                                onError={(e) => {
+                                                                    if (!e.target.dataset.errorHandled) {
+                                                                        e.target.src = "/fallback-image.png";
+                                                                        e.target.dataset.errorHandled = "true";
+                                                                    }
+                                                                }}
+                                                            />
+
+                                                            <div className="image-overlay">
+                                                                {/* View icon */}
+                                                                <a
+                                                                    href={imgUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    title="View Image"
+                                                                    className="icon-button"
+                                                                >
+                                                                    <i className="fas fa-eye"></i>
+                                                                </a>
+
+                                                                {/* Download icon */}
+                                                                <button
+                                                                    title="Download Image"
+                                                                    className="icon-button"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(imgUrl, { mode: "cors" })
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement("a");
+                                                                                a.href = url;
+                                                                                a.download = filename;
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+                                                                            })
+                                                                            .catch(() => alert("Download failed."));
+                                                                    }}
+                                                                >
+                                                                    <i className="fas fa-download"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
 
                                         </Col>
                                         <Form.Control
