@@ -5,7 +5,7 @@ import fs from "fs";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        if (file.fieldname === 'bank_passbook' || file.fieldname === 'form7_attach') {
+        if (file.fieldname === 'bank_passbook' || file.fieldname === 'form7_attach' || file.fieldname === 'attach_aadhar' || file.fieldname === 'udid_attach') {
             cb(null, path.resolve('uploads/Rescue_Images/'));
         }
         else if (file.fieldname === 'stud_photo') {

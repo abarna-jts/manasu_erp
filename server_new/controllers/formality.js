@@ -256,17 +256,17 @@ const createRecords = async (req, res) => {
         const [result] = await db.query(q, values);
 
         // 3. THEN send email to director (doesn't block response)
-        // sendDirectorMail({
-        //     admission_no,
-        //     rescue_name,
-        //     aadhar_card,
-        //     udid_no,
-        //     voter_id
-        // }).then(() => {
-        //     console.log("✅ Email sent to director");
-        // }).catch((error) => {
-        //     console.error("❌ Failed to send email to director:", error);
-        // });
+        sendDirectorMail({
+            admission_no,
+            rescue_name,
+            aadhar_card,
+            udid_no,
+            voter_id
+        }).then(() => {
+            console.log("✅ Email sent to director");
+        }).catch((error) => {
+            console.error("❌ Failed to send email to director:", error);
+        });
 
         res.status(201).json({
             message: "Essential Records Form Created Successfully",
@@ -282,29 +282,29 @@ const createRecords = async (req, res) => {
     }
 };
 
-// const sendDirectorMail = async (form) => {
-//     try {
+const sendDirectorMail = async (form) => {
+    try {
 
-//         const mailOptions = {
-//             from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-//             to: "manasucmf@gmail.com", // ✅ change to director's real email
-//             subject: `📝 Resident Document Information Form: ${form.admission_no}`,
-//             html: `
-//         <h2>New First Form Created by Admin</h2>
-//         <p><strong>Admission No:</strong> ${form.admission_no}</p>
-//         <p><strong>Name:</strong> ${form.rescue_name}</p>
-//         <p><strong>Aadhar Card Number:</strong> ${form.aadhar_card}</p>
-//         <p><strong>UDID No:</strong> ${form.udid_no}</p>
-//         <p><strong>Voter ID:</strong> ${form.voter_id}</p>
-//       `,
-//         };
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: "manasucmf@gmail.com", // ✅ change to director's real email
+            subject: `📝 Resident Document Information Form: ${form.admission_no}`,
+            html: `
+        <h2>New First Form Created by Admin</h2>
+        <p><strong>Admission No:</strong> ${form.admission_no}</p>
+        <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Aadhar Card Number:</strong> ${form.aadhar_card}</p>
+        <p><strong>UDID No:</strong> ${form.udid_no}</p>
+        <p><strong>Voter ID:</strong> ${form.voter_id}</p>
+      `,
+        };
 
-//         await transporter.sendMail(mailOptions);
-//         console.log("📧 Email sent to director successfully");
-//     } catch (error) {
-//         console.error("❌ Error sending email to director:", error.message);
-//     }
-// };
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
+};
 
 
 const getEssentialRecords = async (req, res) => {

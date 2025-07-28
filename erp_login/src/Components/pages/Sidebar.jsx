@@ -119,7 +119,7 @@ const Sidebar = () => {
       {/* Toggle Button for Mobile - Now on LEFT */}
       <Button
         variant="link"
-        className="d-md-none text-primary position-fixed top-0 end-0 my-3 z-3"
+        className="d-lg-none text-primary position-fixed top-0 end-0 my-3 z-3"
         onClick={onCollapse}
         style={{ zIndex: 2000 }}
       >
@@ -128,8 +128,6 @@ const Sidebar = () => {
 
       <SimpleBar className={`sidebar d-md-block text-white ${show ? "show" : ""}`}>
         <div className="sidebar-inner pt-3">
-
-
           {/* Close button (mobile) - Now on LEFT */}
           {/* Top Bar with Logo and Close Button (Mobile) */}
           <div className="d-flex justify-content-between align-items-center">
@@ -143,7 +141,7 @@ const Sidebar = () => {
             <Button
               variant="link"
               onClick={onCollapse}
-              className="d-md-none text-white"
+              className="d-lg-none text-white"
               style={{ fontSize: '1.5rem' }}
             >
               <i className="fas fa-times" />

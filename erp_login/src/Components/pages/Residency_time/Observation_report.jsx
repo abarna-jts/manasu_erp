@@ -147,7 +147,7 @@ function Observation_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -155,7 +155,7 @@ function Observation_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -316,14 +316,14 @@ function Observation_report() {
                 try {
                     const parsed = JSON.parse(data.recovery_photo);
                     if (Array.isArray(parsed)) {
-                        recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        recovery_photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     recovery_photoPath = data.recovery_photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
             console.log(recovery_photoPath);
@@ -482,7 +482,7 @@ function Observation_report() {
                                                         // fallback to original string
                                                     }
 
-                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
+                                                    const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
                                                     const filename = imagePath?.split("/").pop();
 
                                                     return imagePath ? (

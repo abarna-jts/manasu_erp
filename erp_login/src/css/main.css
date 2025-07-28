@@ -1853,6 +1853,112 @@ body {
 	.modal-backdrop {
 		width: 100% !important;
 	}
+
+	.Recent_photo {
+		width: 50% !important;
+		height: auto !important;
+	}
+
+	.recent_photo {
+		width: 100px !important;
+		height: 100px !important;
+	}
+
+	.photo_atTime {
+		width: 50% !important;
+		height: auto;
+	}
+}
+
+@media(max-width:1024px) and (min-width:768px) {
+	.sidebar-wrapper {
+		width: 0px !important;
+	}
+
+	.piechart_class {
+		flex-direction: column;
+	}
+
+	.piechart_diagram {
+		height: 210px !important;
+	}
+
+	.rescue_report {
+		width: 50% !important;
+	}
+
+	.rescue_detailsClass {
+		width: 85% !important;
+	}
+
+	.first_infoFormRow .col-md-4 {
+		width: 45% !important;
+	}
+
+	.form-label {
+		font-size: 0.9rem !important;
+	}
+
+	.h6,
+	h6 {
+		font-size: 0.9rem !important;
+	}
+
+	.section_title {
+		margin-bottom: 10px;
+		font-size: 1.4rem;
+	}
+
+	.form-control {
+		font-size: 0.9rem !important;
+	}
+
+	.breadcrumb {
+		display: none !important;
+	}
+
+	.breadcrumb_title {
+		display: none !important;
+	}
+
+	.essential_record {
+		width: 100% !important;
+	}
+
+	.recent_photo {
+		width: 216px !important;
+	}
+
+	.profile_img {
+		width: 16.333333% !important;
+	}
+	.view_all_size{
+		width: 28.666667% !important;
+	}
+	.section_title_1 {
+		font-size: 1.4rem !important;
+	}
+	.mse_admissionForm{
+		width: 100% !important;
+	}
+	.mse_date{
+		width: 50% !important;
+	}
+	.mse_admission{
+		width: 58% !important;
+	}
+	.family_form{
+		width: 80% !important ;
+	}
+	.self_declaration_form{
+		width: 90% !important;
+	}
+	.media_consent_form{
+		width: 90% !important;
+	}
+	.hand_over_form{
+		width: 90% !important;
+	}
 }
 
 .psychiatrics_tab>label {
@@ -2079,7 +2185,7 @@ body {
 	position: relative;
 	width: 80px;
 	height: 80px;
-	
+
 }
 
 .preview-image {

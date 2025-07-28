@@ -609,7 +609,12 @@ function MSE_form() {
       })
     } catch (error) {
       console.error("Error submitting Insight form:", error);
-      alert("Error submitting Insight form.");
+
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message); // Backend validation error
+      } else {
+        alert("Error submitting Insight form.");
+      }
     }
   }
 
@@ -1170,64 +1175,64 @@ function MSE_form() {
   }
 
   const fetchRescueDetails = async (admission_no) => {
-        try {
-            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
-            const result = response.data.data[0];
-            console.log("API Result:", result);
+    try {
+      const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+      const result = response.data.data[0];
+      console.log("API Result:", result);
 
-            if (result && result.rescue_image) {
-                let imagePath = null;
+      if (result && result.rescue_image) {
+        let imagePath = null;
 
-                // Check if rescue_image is an array-like string
-                if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
-                    try {
-                        // Parse the string to get the array
-                        const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
+        // Check if rescue_image is an array-like string
+        if (result.rescue_image.startsWith("[") && result.rescue_image.endsWith("]")) {
+          try {
+            // Parse the string to get the array
+            const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
-                        if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
-                        }
-                    } catch (parseError) {
-                        console.error("Error parsing image array:", parseError);
-                        imagePath = null;
-                    }
-                } else {
-                    // It's a single image path
-                    imagePath = result.rescue_image.startsWith("http")
-                        ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
-                }
-
-                if (imagePath) {
-                    setRescueImage(imagePath);
-                    setRescueName(result.rescue_name || "");
-                    setError("");
-                } else {
-                    setRescueImage(null);
-                    setRescueName("");
-                    setError("Image not found for this admission number");
-                }
-            } else {
-                setRescueImage(null);
-                setRescueName("");
-                setError("Image not found for this admission number");
+            if (Array.isArray(imageArray) && imageArray.length > 0) {
+              imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
             }
-        } catch (error) {
-            console.error("Error fetching data", error);
-            setRescueImage(null);
-            setRescueName("");
-            setError("Admission Number Not found");
-        }
-    };
-  useEffect(() => {
-          if (admission_no.trim() !== "") {
-              fetchRescueDetails(admission_no);
-          } else {
-              setRescueImage(null);
-              setRescueName("");
-              setError("");
+          } catch (parseError) {
+            console.error("Error parsing image array:", parseError);
+            imagePath = null;
           }
-      }, [admission_no]);
+        } else {
+          // It's a single image path
+          imagePath = result.rescue_image.startsWith("http")
+            ? result.rescue_image
+            : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+        }
+
+        if (imagePath) {
+          setRescueImage(imagePath);
+          setRescueName(result.rescue_name || "");
+          setError("");
+        } else {
+          setRescueImage(null);
+          setRescueName("");
+          setError("Image not found for this admission number");
+        }
+      } else {
+        setRescueImage(null);
+        setRescueName("");
+        setError("Image not found for this admission number");
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+      setRescueImage(null);
+      setRescueName("");
+      setError("Admission Number Not found");
+    }
+  };
+  useEffect(() => {
+    if (admission_no.trim() !== "") {
+      fetchRescueDetails(admission_no);
+    } else {
+      setRescueImage(null);
+      setRescueName("");
+      setError("");
+    }
+  }, [admission_no]);
 
   return (
     <>
@@ -1267,10 +1272,10 @@ function MSE_form() {
 
           <Col md={12}>
             <Row>
-              <Col md="9">
+              <Col md="9" className='mse_admissionForm'>
                 <div className="d-flex align-items-center px-3 mse_search">
 
-                  <Form className="navbar-search col-md-8">
+                  <Form className="navbar-search col-md-8 mse_admission">
                     <Form.Group id="topbarSearch" className="d-flex align-items-center">
                       <Col md={5}>
                         <Form.Label>Admission Number:</Form.Label>
@@ -1300,7 +1305,7 @@ function MSE_form() {
                     </Form.Group>
                   </Form>
 
-                  <Form className="navbar-search col-md-6">
+                  <Form className="navbar-search col-md-6 mse_date">
                     <Form.Group id="topbarSearch" className="d-flex align-items-center">
                       <Col md={3}>
                         <Form.Label>Date:</Form.Label>
@@ -1362,7 +1367,7 @@ function MSE_form() {
                   <li className="tab-content tab-content-first typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>1. GENERAL APPEARANCE AND BEHAVIOUR:</h1>
-                      
+
                       <Button className='btn btn-success mx-3' type='button' onClick={handleAppearanceNavigate}>View All</Button>
                     </div>
 
@@ -1384,6 +1389,7 @@ function MSE_form() {
                               ["Proper Dressing", "Proper Dressing"],
                               ["Dressing Neatly", "Dressing Neatly"],
                               ["Facial Expression", "Facial Expression"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("general_appearance", id, label))}
                           </div>
                         </Form.Group>
@@ -1400,6 +1406,7 @@ function MSE_form() {
                               ["attentiveness", "Attentiveness"],
                               ["Shows Interest", "Shows Interest"],
                               ["Lacks Interest", "Lacks Interest"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("attitude", id, label))}
                           </div>
                         </Form.Group>
@@ -1412,6 +1419,7 @@ function MSE_form() {
                               ["intact", "Intact"],
                               ["partially-impaired", "Partially Impaired"],
                               ["fully-impaired", "Fully Impaired"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("comprehension", id, label))}
                           </div>
                         </Form.Group>
@@ -1429,6 +1437,7 @@ function MSE_form() {
                               ["walking-abnormal", "Abnormal Walking Pattern"],
                               ["lying-normal", "Normal Lying Position"],
                               ["lying-abnormal", "Abnormal Lying Position"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("gait_posture", id, label))}
                           </div>
                         </Form.Group>
@@ -1448,6 +1457,7 @@ function MSE_form() {
                               ["akathisia", "Skathisia"],
                               ["social withdrawal", "Social Withdrawal"],
                               ["autism", "Autism"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("motor_activity", id, label))}
                           </div>
                         </Form.Group>
@@ -1466,6 +1476,7 @@ function MSE_form() {
                               ["automatic obedience", "Automatic Obedience"],
                               ["Echo- Praxia", "Echo- Praxia"],
                               ["psychological-pillow", "Psychological-Pillow"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("catatonic_sign", id, label))}
                           </div>
                         </Form.Group>
@@ -1477,6 +1488,7 @@ function MSE_form() {
                             {[
                               ["pseudo seizures", "Pseudo Seizures"],
                               ["possession states", "possession States"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("conversion_dissociative", id, label))}
                           </div>
                         </Form.Group>
@@ -1489,6 +1501,7 @@ function MSE_form() {
                               ["social-increased", "Increased"],
                               ["social-decreased", "Decreased"],
                               ["inappropriate", "Inappropriate"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("social_manner", id, label))}
                           </div>
                         </Form.Group>
@@ -1518,6 +1531,7 @@ function MSE_form() {
                               ["Engages in non-social speech", "Engages in non-social speech"],
                               ["Odd gesturing in response to auditory", "Odd gesturing in response to auditory"],
                               ["visual hallucinations", "Visual Hallucinations"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderCheckbox("hallucinatory_behaviour", id, label))}
                           </div>
                         </Form.Group>
@@ -1534,7 +1548,7 @@ function MSE_form() {
                   <li className="tab-content tab-content-2 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>2. SPEECH</h1>
-                      
+
                       <Button className='btn btn-success mx-3' type='button' onClick={handleSpeechNavigate}>View All</Button>
                     </div>
 
@@ -1553,6 +1567,7 @@ function MSE_form() {
                               ["slow", "Rate is slow"],
                               ["pressure_of_speech", "Pressure of speech"],
                               ["poverty_of_speech", "Poverty of Speech"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderspeechCheckbox("rate_quantity", id, label))}
                           </div>
                         </li>
@@ -1583,6 +1598,7 @@ function MSE_form() {
                               ["stereotypies", "Stereotypies (verbal)"],
                               ["flight", "Flight of ideas"],
                               ["clang", "Clang associations"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderspeechCheckbox("flow_rhythm", id, label))}
                           </div>
                         </li>
@@ -1626,7 +1642,8 @@ function MSE_form() {
                               ["Elated", "Elated"],
                               ["Irritable", "Irritable"],
                               ["Fearful", "Fearful"],
-                              ["Silly", "Silly"]
+                              ["Silly", "Silly"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => rendermoodCheckbox("mood_description", id, label))}
                           </div>
                         </li>
@@ -1689,6 +1706,7 @@ function MSE_form() {
                               ["irritable mood", "Irritable Mood"],
                               ["blut affect", "Blunt Affect"],
                               ["flat affect", "Flat Affect"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) =>
                               rendermoodCheckbox("resident_look", id, label)
                             )}
@@ -1709,7 +1727,7 @@ function MSE_form() {
                   <li className="tab-content tab-content-4 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>4. THOUGHT</h1>
-                      
+
                       <Button className='btn btn-success mx-3' type='button' onClick={handleThoughNavigate}>View All</Button>
                     </div>
 
@@ -1731,7 +1749,8 @@ function MSE_form() {
                               ["loosening of circumstantiality", "Loose of circumstantiality"],
                               ["Illogical thinking", "Illogical thinking"],
                               ["perseveration", "Perseveration"],
-                              ["verbigeration is noted", "Verbigeration is noted"]
+                              ["verbigeration is noted", "Verbigeration is noted"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderthoughCheckbox("stream_form_though", id, label))}
                           </div>
 
@@ -1759,7 +1778,8 @@ function MSE_form() {
                               ["thought insertion", "thought insertion"],
                               ["thought withdrawal", "thought withdrawal"],
                               ["thought broadcasting", "thought broadcasting"],
-                              ["Neologisms", "Neologisms"]
+                              ["Neologisms", "Neologisms"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderthoughCheckbox("content_though", id, label))}
                           </div>
 
@@ -1777,7 +1797,7 @@ function MSE_form() {
                   <li className="tab-content tab-content-5 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>5. PERCEPTION</h1>
-                      
+
                       <Button className='btn btn-success mx-3' type='button' onClick={handlePerceptionNavigate}>View All</Button>
                     </div>
                     <Form onSubmit={handlePerceptionSubmit}>
@@ -1791,6 +1811,7 @@ function MSE_form() {
                               ["olfactory", "Olfactory"],
                               ["gustatory", "Gustatory"],
                               ["tactile", "Tactile"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderhallucinationCheck("hallucination_type", id, label))}
                           </div>
 
@@ -1853,6 +1874,7 @@ function MSE_form() {
                               ["other_sensory_fields", "Other Sensory Fields"],
                               ["clearConsciousness", "Occur in clear consciousness"],
                               ["unclearConsciousness", "Occur in unclear consciousness"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderillusion("illusion", id, label))}
                           </div>
 
@@ -1866,6 +1888,7 @@ function MSE_form() {
                             {[
                               ["Depersonalization", "Depersonalization"],
                               ["derealization", "derealization"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderPerceptionChanges("perception_changes", id, label))}
                           </div>
                         </li>
@@ -1887,6 +1910,7 @@ function MSE_form() {
                               ["autoscopy", "Autoscopy"],
                               ["abnormalVestibular", "Abnormal vestibular sensations"],
                               ["senseOfPresence", "Sense of presence"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderothers("others", id, label))}
                           </div>
                           <Col md={12} className="text-center mt-3">
@@ -1907,7 +1931,7 @@ function MSE_form() {
                   <li className="tab-content tab-content-6 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</h1>
-                      
+
                       <Button className='btn btn-success mx-3' type='button' onClick={handleCognitionNavigate}>View All</Button>
                     </div>
 
@@ -1923,6 +1947,7 @@ function MSE_form() {
                               ["Delirium", "Delirium"],
                               ["stupor", "Stupor"],
                               ["coma", "Coma"],
+                              ["Nothing", "Nothing"]
                             ].map(([id, label]) => renderConginationCheck("consciousness", id, label))}
                             <p className="w-100 mt-2">Any disturbance of consciousness should be rated on Glasgow Coma Scale.</p>
                           </div>
@@ -2273,7 +2298,7 @@ function MSE_form() {
                   <li className="tab-content tab-content-7 typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>7. JUDGEMENT</h1>
-                      
+
                       <Button className='btn btn-success mx-3' type='button' onClick={handleJudgementNavigate}>View All</Button>
                     </div>
                     <ul>
@@ -2346,7 +2371,7 @@ function MSE_form() {
                   <li className="tab-content tab-content-last typography">
                     <div className="update_class d-flex align-items-center">
                       <h1>8. INSIGHT</h1>
-                      
+
                       <Button className='btn btn-success mx-3' type='button' onClick={handleInsightNavigate}>View All</Button>
                     </div>
                     <p>The patient's level of awareness and insight into their illness. </p>

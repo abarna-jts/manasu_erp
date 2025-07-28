@@ -350,8 +350,8 @@ function SCRB_Form2A() {
   }, [admission_no]);
 
   const EditSCRBForm2A = async () => {
-        navigate("/scrb_form2aALL");
-    }
+    navigate("/scrb_form2aALL");
+  }
 
 
   return (
@@ -432,7 +432,7 @@ function SCRB_Form2A() {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                      <button type="button" className="btn btn-success col-md-2" onClick={EditSCRBForm2A}>
+                      <button type="button" className="btn btn-success col-md-2 view_all_size" onClick={EditSCRBForm2A}>
                         View All
                       </button>
                       {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>

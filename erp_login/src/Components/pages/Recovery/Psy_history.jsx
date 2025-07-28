@@ -25,7 +25,7 @@ function Psy_history() {
             String(item.psychiatric_diagnoses).toLowerCase().includes(searchTerm) ||
             String(item.treatment_history).toLowerCase().includes(searchTerm) ||
             String(item.medications).toLowerCase().includes(searchTerm) ||
-            String(item.hospitalisation_reason).toLowerCase().includes(searchTerm) 
+            String(item.hospitalisation_reason).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -49,6 +49,8 @@ function Psy_history() {
         fm_mentalHealth: '',
         significant_life: '',
         chronic_stressors: '',
+        other_exploration: '',
+        other_legalEnvironment: '',
         trauma_exploration: [],
         legal_environment: []
     });
@@ -99,6 +101,8 @@ function Psy_history() {
                 fm_mentalHealth: data.fm_mentalHealth || '',
                 significant_life: data.significant_life || '',
                 chronic_stressors: data.chronic_stressors || '',
+                other_exploration: data.other_exploration || '',
+                other_legalEnvironment: data.other_legalEnvironment || '',
                 trauma_exploration: data.trauma_exploration?.split(',') || ["NULL"],
                 legal_environment: data.legal_environment?.split(',') || ["NULL"]
             }));
@@ -170,7 +174,7 @@ function Psy_history() {
             type="checkbox"
             id={id}
             label={label}
-            checked={psyHistoryData[field]?.includes(label)}
+            checked={Array.isArray(psyHistoryData[field]) && psyHistoryData[field].includes(label)}
             onChange={(e) => {
                 const updated = e.target.checked
                     ? [...psyHistoryData[field], label]
@@ -191,7 +195,7 @@ function Psy_history() {
 
             setPsyHistoryData((psyHistoryData) => ({
                 ...psyHistoryData,
-                id:data.id ||'',
+                id: data.id || '',
                 admission_no: data.admission_no || '',
                 date: data.date || '',
                 psychiatric_diagnoses: data.psychiatric_diagnoses || '',
@@ -207,6 +211,8 @@ function Psy_history() {
                 fm_mentalHealth: data.fm_mentalHealth || '',
                 significant_life: data.significant_life || '',
                 chronic_stressors: data.chronic_stressors || '',
+                other_exploration: data.other_exploration || '',
+                other_legalEnvironment: data.other_legalEnvironment || '',
                 trauma_exploration: data.trauma_exploration?.split(',').map(i => i.trim()) || [],
                 legal_environment: data.legal_environment?.split(',').map(i => i.trim()) || []
             }));
@@ -329,11 +335,11 @@ function Psy_history() {
                                                 <i className="fas fa-eye"></i>
                                             </button>
                                             {userType === "4" && (
-                                            <button className="btn btn-primary icon_details"
-                                                onClick={() => {
-                                                    handleEditform(item.id);
-                                                }}
-                                            ><i className="fas fa-edit"></i> </button>
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
                                             )}
                                             {/* {userType === "2" && (
                                                 <button className="btn btn-danger icon_details"
@@ -624,6 +630,23 @@ function Psy_history() {
                     <Form.Group className="mb-3" as={Row}>
                         <Form.Label column sm="6" className='text-start'>
                             <li className='icon-li'>
+                                <h5>Others Exploration of Trauma: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='other_exploration'
+                                value={psyHistoryData.other_exploration || "Null"}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Col>
+                    </Form.Group>
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
                                 <h5>Legal Involvement: </h5>
                             </li>
                         </Form.Label>
@@ -633,6 +656,23 @@ function Psy_history() {
                                 rows={2}
                                 name='legal_environment'
                                 value={psyHistoryData.legal_environment}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Col>
+                    </Form.Group>
+                    <Form.Group className="mb-3" as={Row}>
+                        <Form.Label column sm="6" className='text-start'>
+                            <li className='icon-li'>
+                                <h5>Others Legal Involvement: </h5>
+                            </li>
+                        </Form.Label>
+                        <Col md={6}>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                name='other_legalEnvironment'
+                                value={psyHistoryData.other_legalEnvironment || "Null"}
                                 onChange={handleInputChange}
                                 required
                             />
@@ -809,24 +849,68 @@ function Psy_history() {
                                     ["Physical", "Physical"],
                                     ["Emotional", "Emotional"],
                                     ["Sexual abuse ", "Sexual abuse"],
-                                    ["Coping mechanisms", "Coping mechanisms"]
+                                    ["Coping mechanisms", "Coping mechanisms"],
+                                    ["Others", "Others"]
 
                                 ].map(([id, label]) => renderpsyCheckbox("trauma_exploration", id, label))}
+
+                                {Array.isArray(psyHistoryData.trauma_exploration) &&
+                                    psyHistoryData.trauma_exploration.includes("Others") && (
+                                        <Col md={6}>
+                                            <Form.Group as={Row} className="mb-3">
+                                                <Form.Label column sm="4" className="text-start">
+                                                    Others:
+                                                </Form.Label>
+                                                <Col sm="8">
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        rows={2}
+                                                        name="other_exploration"
+                                                        value={psyHistoryData.other_exploration}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                </Col>
+                                            </Form.Group>
+                                        </Col>
+                                    )}
                             </div>
                         </Form.Group>
 
                         <li className='icon-li'>
-                            <h5>Legal Involvement:</h5>
+                            <h4>Legal Involvement: <span style={{ color: 'red' }}>*</span></h4>
                         </li>
                         <Form.Group as={Row} className="mb-3">
                             <div className="d-flex flex-wrap gap-3 mt-2">
                                 {[
                                     ["Involuntary Hospitalizations", "Involuntary Hospitalizations"],
                                     ["Legal conflicts", "Legal conflicts"],
-                                    ["Involvement with the criminal justice system ", "Involvement with the criminal justice system"]
+                                    ["Involvement with the criminal justice system ", "Involvement with the criminal justice system"],
+                                    ["Others", "Others"]
 
                                 ].map(([id, label]) => renderpsyCheckbox("legal_environment", id, label))}
                             </div>
+                            {Array.isArray(psyHistoryData.legal_environment) &&
+                                psyHistoryData.legal_environment.includes("Others") && (
+                                    <Col md={6}>
+                                        <Form.Group as={Row} className="mb-3">
+                                            <Form.Label column sm="4" className="text-start">
+                                                Others:
+                                            </Form.Label>
+                                            <Col sm="8">
+                                                <Form.Control
+                                                    as="textarea"
+                                                    rows={2}
+                                                    type="text"
+                                                    name="other_legalEnvironment"
+                                                    value={psyHistoryData.other_legalEnvironment}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                    </Col>
+                                )}
                         </Form.Group>
 
                         <div className="mt-3">

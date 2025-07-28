@@ -83,7 +83,7 @@ function Dashboard() {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                console.log("API response for nurse record:", res.data);
+                // console.log("API response for nurse record:", res.data);
 
                 // Normalize and align the data
                 const fullData = MONTHS.map(monthShort => {
@@ -265,9 +265,8 @@ function Dashboard() {
                         </Row>
 
 
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
-                            <div style={{ width: 350, height: 350 }}>
-
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }} className="piechart_class">
+                            <div style={{ width: 350, height: 350 }} className="piechart_diagram">
 
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
+import { useNavigate } from 'react-router-dom';
 
 function SCRB_All_Details() {
     const [scrbForm2List, setScrbForm2List] = useState([]);
@@ -135,7 +136,7 @@ function SCRB_All_Details() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -143,7 +144,7 @@ function SCRB_All_Details() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -251,6 +252,12 @@ function SCRB_All_Details() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const navigate = useNavigate();
+
+    const gotoSCRBForm2A = () =>{
+        navigate("/scrb_form2aALL");
+    }
+
     return (
         <>
             <Container fluid>
@@ -292,7 +299,7 @@ function SCRB_All_Details() {
                         <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
                     </Col>
                     <Col md={3} className='d-flex align-items-end justify-content-end'>
-                        <Button type='button' className='btn btn-success' onClick={() => SCRBForm2()}>Next</Button>
+                        <Button type='button' className='btn btn-success' onClick={() => gotoSCRBForm2A()}>Next</Button>
                     </Col>
                 </Row>
 
@@ -334,7 +341,7 @@ function SCRB_All_Details() {
                                                             // fallback to original string
                                                         }
 
-                                                        const fullUrl = `http://localhost:5002/${imagePath}`;
+                                                        const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
                                                         const filename = imagePath?.split("/").pop();
 
                                                         return imagePath ? (
@@ -400,7 +407,7 @@ function SCRB_All_Details() {
                                                             // use directly
                                                         }
 
-                                                        const fullUrl = `http://localhost:5002/${imagePath}`;
+                                                        const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
                                                         const filename = imagePath?.split('/').pop(); // Extract filename from path
 
                                                         return imagePath ? (

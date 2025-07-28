@@ -274,7 +274,7 @@ function Media_consent_form() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -282,7 +282,7 @@ function Media_consent_form() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -537,7 +537,7 @@ function Media_consent_form() {
 
 
                 <Row className='d-flex align-items-center justify-content-center'>
-                    <Col md={8} className="consultant_box my-4">
+                    <Col md={8} className="consultant_box my-4 media_consent_form">
                         <div className="consultant_details">
                             <Form className='media_consent' onSubmit={handleSubmit}>
                                 <Row>

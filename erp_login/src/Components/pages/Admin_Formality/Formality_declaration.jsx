@@ -447,7 +447,7 @@ function Formality_declaration() {
                     </Form.Group>
                 </Form>
                 <Row className='d-flex align-items-center justify-content-center'>
-                    <Col md={8} className="consultant_box my-4">
+                    <Col md={8} className="consultant_box my-4 hand_over_form">
                         <div className="consultant_details">
                             <Form className='self_declaration' onSubmit={handleSubmit}>
                                 <Row>

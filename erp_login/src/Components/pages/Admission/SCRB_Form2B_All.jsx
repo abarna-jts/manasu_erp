@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
+import { useNavigate } from 'react-router-dom';
 
 function SCRB_Form2B_All() {
     const [scrbForm2BList, setScrbForm2BList] = useState([]);
@@ -186,6 +187,12 @@ function SCRB_Form2B_All() {
         }
     };
 
+    const navigate = useNavigate();
+
+    const gotoSCRBForm2c = () =>{
+        navigate("/scrb_form2cALL");
+    }
+
     
     return (
         <>
@@ -227,7 +234,7 @@ function SCRB_Form2B_All() {
                         <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
                     </Col>
                     <Col md={3} className='d-flex align-items-end justify-content-end'>
-                        <Button type='button' className='btn btn-success' onClick={() => SCRBForm2()}>Next</Button>
+                        <Button type='button' className='btn btn-success' onClick={() => gotoSCRBForm2c()}>Next</Button>
                     </Col>
                 </Row>
 

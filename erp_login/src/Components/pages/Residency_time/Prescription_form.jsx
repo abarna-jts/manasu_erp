@@ -74,7 +74,7 @@ function Prescription_form() {
         "METOPROLOL 25 MG", "DOLO 650", "BRUFEN 400 MG", "EMESET 4 MG",
         "DULCOLAX 10 MG", "PARACETAMOL 150MG", "EMESET 2MG", "AVIL 2ML",
         "DEXA 4MG", "BETADINE OINTMENT 15GM", "BETAMETHASONE OINTMENT 30GM",
-        "MOOV CREAM 50GM", "LIQUID PARAFFIN", "CANDID POWDER", "ANY OTHER MEDICINE"
+        "MOOV CREAM 50GM", "LIQUID PARAFFIN", "CANDID POWDER"
     ];
 
     const psychiatristMedicines = [
@@ -84,7 +84,7 @@ function Prescription_form() {
         "LORAZEPAM 2 MG", "METFORMIN 500 MG", "METOPROLOL 25MG", "NITRAZEPAM 5MG",
         "OLANZIPINE 5MG", "OMEZ 20 MG", "PANDAP 40GM", "PHENITION SODIUM 100 MG",
         "PROPANOLOL 40 MG", "RANTAC 150 MG", "RISPERIDONE 2MG", "SODIUM VALPROATE 200MG",
-        "TRIHEXYPHENIDYL 2MG", "VITAMIN C", "ANY OTHER MEDICINE"
+        "TRIHEXYPHENIDYL 2MG", "VITAMIN C"
     ];
 
 
@@ -230,9 +230,11 @@ function Prescription_form() {
 
     const handleRowChange = (index, e) => {
         const updatedRows = [...rows];
-        updatedRows[index][e.target.name] = e.target.value;
+        const { name, value } = e.target;
+        updatedRows[index][name] = value;
         setRows(updatedRows);
     };
+
 
     const medicineOptions = formData.medical_type === 'General'
         ? generalMedicines
@@ -261,17 +263,20 @@ function Prescription_form() {
             return;
         }
 
-        const todayDate = new Date().toISOString().split('T')[0]; // e.g., "2025-05-23"
+        const todayDate = new Date().toISOString().split('T')[0];
 
-        // ✅ Helper to flatten row fields into comma-separated strings
         const flattenField = (field) => rows.map(r => r[field] || '').join(',');
 
-        // ✅ Construct flattened data object
+        const getSubmittedMedicine = () =>
+            rows.map(row =>
+                row.medicine === 'ANY OTHER MEDICINE' ? row.other_medicine || '' : row.medicine || ''
+            ).join(',');
+
         const data = {
             ...formData,
-            admission_no: admissionNumber.trim(),
+            admission_no: trimmedAdNo,
             current_date: todayDate,
-            medicine: flattenField('medicine'),
+            medicine: getSubmittedMedicine(),
             medicine_type: flattenField('medicine_type'),
             duration: flattenField('duration'),
             intake: flattenField('intake'),
@@ -285,8 +290,8 @@ function Prescription_form() {
 
         try {
             const res = await apiRoute.post('/residency/createPrescription', data);
-            console.log(res);
             alert("Prescription and Medicine Summary Saved Successfully");
+
             setFormData({
                 admission_no: '',
                 rescue_name: '',
@@ -300,7 +305,8 @@ function Prescription_form() {
                 instruction: '',
                 advice: '',
                 follow_up: '',
-            })
+            });
+
             handleClose(true);
             getPrescriptionDetails();
         } catch (error) {
@@ -309,6 +315,7 @@ function Prescription_form() {
             setMessageType("danger");
         }
     };
+
 
 
     //fetching prescription details
@@ -479,17 +486,22 @@ function Prescription_form() {
 
                     console.log("Duration of edit", durations);
 
-                    const formattedMeds = medicines.map((_, i) => ({
-                        id: id[i],
-                        medicine: medicines[i] || '',
-                        medicine_type: types[i] || '',
-                        duration: durations[i] || '',
-                        med_instruction: instructions[i] || '',
-                        morning: mornings[i] || '',
-                        afternoon: afternoons[i] || '',
-                        night: nights[i] || '',
-                        intake: intakes[i] || '',
-                    }));
+                    const formattedMeds = medicines.map((medName, i) => {
+                        const isOther = !medicineOptions.includes(medName); // not in predefined list
+                        return {
+                            id: id[i],
+                            medicine: isOther ? 'ANY OTHER MEDICINE' : medName,  // Set to 'ANY OTHER MEDICINE' for select
+                            other_medicine: isOther ? medName : '',              // Store actual value separately
+                            medicine_type: types[i] || '',
+                            duration: durations[i] || '',
+                            med_instruction: instructions[i] || '',
+                            morning: mornings[i] || '',
+                            afternoon: afternoons[i] || '',
+                            night: nights[i] || '',
+                            intake: intakes[i] || '',
+                        };
+                    });
+
 
                     console.log("Parsed intake values:", intakes);
 
@@ -512,19 +524,24 @@ function Prescription_form() {
         }
     };
 
-    
+
 
     const handleUpdate = async (e) => {
         e.preventDefault();
 
         try {
-            // Helper to flatten all rows into comma-separated strings
+            // Flatten helper
             const flattenField = (field) =>
                 viewData.prescription_medicines.map(row => row[field] || '').join(',');
 
+            const getUpdatedMedicine = () =>
+                viewData.prescription_medicines.map(row =>
+                    row.medicine === 'ANY OTHER MEDICINE' ? (row.other_medicine || '') : (row.medicine || '')
+                ).join(',');
+
             const data = {
                 ...viewData,
-                medicine: flattenField('medicine'),
+                medicine: getUpdatedMedicine(), // ⬅️ Uses text if ANY OTHER MEDICINE
                 medicine_type: flattenField('medicine_type'),
                 duration: flattenField('duration'),
                 intake: flattenField('intake'),
@@ -535,7 +552,6 @@ function Prescription_form() {
             };
 
             console.log("Sending update data:", data);
-            console.log("Medical_type:", viewData.medical_type);
 
             const response = await apiRoute.put(
                 `/residency/updatePrescription/${viewData.id}`,
@@ -558,6 +574,7 @@ function Prescription_form() {
             }
         }
     };
+
 
 
     const handleMedicalTypeChange = (e) => {
@@ -949,27 +966,33 @@ function Prescription_form() {
 
                                         <td>
                                             <div className="input-group mb-2" style={{ width: 'auto', margin: 'auto' }}>
-                                                <select
-                                                    className="form-select"
-                                                    name="medicine"
-                                                    value={rows[i].medicine}
-                                                    onChange={(e) => handleRowChange(i, e)}
-                                                    required
-                                                    style={{ width: '45%' }}
-                                                >
-                                                    <option value="" disabled hidden>Select Medicine</option>
-                                                    {medicineOptions.map((med, idx) => (
-                                                        <option key={idx} value={med}>{med}</option>
-                                                    ))}
-                                                </select>
-                                                {rows[i].medicine === 'ANY OTHER MEDICINE' && (
+                                                {/* Show SELECT only if not 'ANY OTHER MEDICINE' */}
+                                                {rows[i].medicine !== 'ANY OTHER MEDICINE' ? (
+                                                    <select
+                                                        className="form-select"
+                                                        name="medicine"
+                                                        value={rows[i].medicine}
+                                                        onChange={(e) => handleRowChange(i, e)}
+                                                        required
+                                                        style={{ width: '45%' }}
+                                                    >
+                                                        <option value="" disabled hidden>Select Medicine</option>
+                                                        {medicineOptions.map((med, idx) => (
+                                                            <option key={idx} value={med}>{med}</option>
+                                                        ))}
+                                                        <option value="ANY OTHER MEDICINE">ANY OTHER MEDICINE</option>
+                                                    </select>
+                                                ) : (
+                                                    // Show TEXT INPUT if 'ANY OTHER MEDICINE' is selected
                                                     <input
                                                         type="text"
-                                                        name="medicine"
+                                                        name="other_medicine"
+                                                        value={rows[i].other_medicine}
                                                         onChange={(e) => handleRowChange(i, e)}
                                                         placeholder="Enter Medicine"
                                                         className="form-control"
-                                                        style={{ width: '35%' }}
+                                                        style={{ width: '45%' }}
+                                                        required
                                                     />
                                                 )}
 
@@ -986,9 +1009,10 @@ function Prescription_form() {
                                                     <option value="dl">dl</option>
                                                     <option value="ml">ml</option>
                                                 </select>
-
                                             </div>
                                         </td>
+
+
 
                                         <td>
                                             <input
@@ -1488,30 +1512,47 @@ function Prescription_form() {
                                             <td>
                                                 <Row>
                                                     <Col md={5}>
-                                                        <button type="button" id="meadd" className="btn btn-sm btn-primary add" onClick={handleAddRow}>+</button>
+                                                        <button type="button" id="meadd" className="btn btn-sm btn-primary add" onClick={handleAddRow1}>+</button>
                                                     </Col>
                                                     <Col md={7}>
                                                         {' '}
-                                                        <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow(i)}>-</button>
+                                                        <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow1(index)}>-</button>
                                                     </Col>
                                                 </Row>
                                             </td>
 
                                             <td>
                                                 <div className="input-group mb-2" style={{ width: 'auto', margin: 'auto' }}>
-                                                    <select
-                                                        className="form-select"
-                                                        name="medicine"
-                                                        value={med.medicine}
-                                                        onChange={(e) => handleRowChange1(index, e)}
-                                                        required
-                                                        style={{ width: '45%' }}
-                                                    >
-                                                        <option value="" disabled hidden>Select Medicine</option>
-                                                        {medicineOptions1.map((med, idx) => (
-                                                            <option key={idx} value={med}>{med}</option>
-                                                        ))}
-                                                    </select>
+                                                    {/* Show SELECT only if not 'ANY OTHER MEDICINE' */}
+                                                    {med.medicine !== 'ANY OTHER MEDICINE' ? (
+                                                        <select
+                                                            className="form-select"
+                                                            name="medicine"
+                                                            value={med.medicine}
+                                                            onChange={(e) => handleRowChange1(index, e)}
+                                                            required
+                                                            style={{ width: '45%' }}
+                                                        >
+                                                            <option value="" disabled hidden>Select Medicine</option>
+                                                            {medicineOptions.map((med, idx) => (
+                                                                <option key={idx} value={med}>{med}</option>
+                                                            ))}
+                                                            <option value="ANY OTHER MEDICINE">ANY OTHER MEDICINE</option>
+                                                        </select>
+                                                    ) : (
+                                                        // Show TEXT INPUT if 'ANY OTHER MEDICINE' is selected
+                                                        <input
+                                                            type="text"
+                                                            name="other_medicine"
+                                                            value={med.other_medicine}
+                                                            onChange={(e) => handleRowChange1(index, e)}
+                                                            placeholder="Enter Medicine"
+                                                            className="form-control"
+                                                            style={{ width: '45%' }}
+                                                            required
+                                                        />
+                                                    )}
+
                                                     <select
                                                         className="form-select"
                                                         name="medicine_type"
@@ -1527,7 +1568,6 @@ function Prescription_form() {
                                                     </select>
                                                 </div>
                                             </td>
-
                                             <td>
                                                 <input
                                                     type="text"

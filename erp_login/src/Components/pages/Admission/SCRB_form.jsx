@@ -94,7 +94,7 @@ function SCRB_form() {
                     try {
                         const parsedArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
                         if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-                            imagePath = `http://localhost:5002/${parsedArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${parsedArray[0]}`;
                         }
                     } catch (parseErr) {
                         console.error("Failed to parse image array", parseErr);
@@ -108,7 +108,7 @@ function SCRB_form() {
 
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${cleanPath}`;
+                        : `https://www.pahrultours.com/app2/${cleanPath}`;
                 }
 
                 console.log("Final image path:", imagePath);
@@ -329,14 +329,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.old_photo);
                     if (Array.isArray(parsed)) {
-                        oldPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        oldPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     oldPhotoPath = data.old_photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -345,14 +345,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.new_photo);
                     if (Array.isArray(parsed)) {
-                        newPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        newPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     newPhotoPath = data.new_photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -361,14 +361,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.signature);
                     if (Array.isArray(parsed)) {
-                        signaturepath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        signaturepath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     signaturepath = data.signature
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -377,20 +377,20 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.seal);
                     if (Array.isArray(parsed)) {
-                        sealpath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        sealpath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     sealpath = data.seal
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
 
             // Base path for images
-            const basePath = "http://localhost:5002/uploads/form_2a";
+            const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
 
             // Handle old and new photo paths correctly
             // const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2${data.old_photo}` : null;
@@ -504,7 +504,7 @@ function SCRB_form() {
                     <h5 className="sub_title">படிவம் - 2 மீட்கப்பட்டவர்களின் விவரங்கள்</h5>
                 </Col>
                 {error && <div className="text-danger mb-2">{error}</div>}
-                <Col md={1} className="d-flex align-items-center flex-column justify-content-end">
+                <Col md={1} className="d-flex align-items-center flex-column justify-content-end profile_img">
                     {rescue_image ? (
                         <>
                             <img
@@ -658,14 +658,14 @@ function SCRB_form() {
                                         <td style={{ width: '65%' }}>
                                             <div className="d-flex justify-content-evenly">
                                                 {/* Old Photo */}
-                                                <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
+                                                <div className="text-center Recent_photo" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
                                                     <label>RECENT PHOTO</label>
                                                     <h5 className="label_tamil">சமீபத்திய புகைப்படம்</h5>
                                                     <input
                                                         type="file"
                                                         name="old_photo"
                                                         accept=".jpg,.jpeg,.png"
-                                                        className="form-control"
+                                                        className="form-control recent_photo"
                                                         style={{ width: '300px', height: '100px' }}
                                                         onChange={handleFileChange}
                                                         ref={old_photoRef}
@@ -675,7 +675,7 @@ function SCRB_form() {
                                                 </div>
 
                                                 {/* New Photo */}
-                                                <div className="text-center" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
+                                                <div className="text-center photo_atTime" style={{ border: "1px solid rgb(108 108 108)", borderRadius: '5px' }}>
                                                     <label>PHOTO AT TIME YOU FOUND</label>
                                                     <h5 className="label_tamil">மீட்டகப்பட்டபொழுது எடுக்கப்பட்ட புகைப்படம்</h5>
                                                     {rescue_image && (
@@ -1028,7 +1028,6 @@ function SCRB_form() {
                                                 onChange={handleFileChange}
                                                 className="form-control"
                                                 ref={signatureRef}
-                                                required
                                                 multiple
                                             />
                                         </td>

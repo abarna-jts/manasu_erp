@@ -584,7 +584,8 @@ function Medical_History() {
                                 {[
                                     ["Foods", "Foods"],
                                     ["Environmental Factors", "Environmental Factors"],
-                                    ["Substances ", "Substances"]
+                                    ["Substances ", "Substances"],
+                                    ["Nothing","Nothing"]
                                 ].map(([id, label]) => renderMedCheckbox("other_allergy", id, label))}
                             </div>
                         </Form.Group>
@@ -597,8 +598,8 @@ function Medical_History() {
                                 {[
                                     ["Surgeries", "Surgeries"],
                                     ["Hospitalizations", "Hospitalizations"],
-                                    ["Major Illnesses ", "Major Illnesses"]
-
+                                    ["Major Illnesses ", "Major Illnesses"],
+                                    ["Factor", "Factor"]
                                 ].map(([id, label]) => renderMedCheckbox("significant_medical", id, label))}
                             </div>
                         </Form.Group>
@@ -622,8 +623,8 @@ function Medical_History() {
                                 {[
                                     ["Any concerns", "Any concerns"],
                                     ["Conditions", "Conditions"],
-                                    ["Treatments ", "Treatments"]
-
+                                    ["Treatments ", "Treatments"],
+                                    ["Impact", "Impact"]
                                 ].map(([id, label]) => renderMedCheckbox("sexual_health", id, label))}
                             </div>
                         </Form.Group>

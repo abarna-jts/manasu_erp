@@ -104,7 +104,10 @@ function SCRB_Form2B() {
     { id: 51, bodyPart: "Cleft Lip" },
     { id: 52, bodyPart: "Knee Right" },
     { id: 53, bodyPart: "Knee Left" },
-    { id: 54, bodyPart: "Rib" }
+    { id: 54, bodyPart: "Rib" },
+    { id: 55, bodyPart: "No Tattoos" },
+    { id: 56, bodyPart: "No Tattoos" },
+    { id: 57, bodyPart: "No Tattoos" },
   ];
 
   const handleChange = (e) => {
@@ -485,7 +488,7 @@ function SCRB_Form2B() {
                           createFormData(); // Fetch & populate data before generating PDF
                         }
                       }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                      <button type="button" className="btn btn-success col-md-2" onClick={EditSCRBForm2B}>
+                      <button type="button" className="btn btn-success col-md-2 view_all_size" onClick={EditSCRBForm2B}>
                         View All
                       </button>
                       {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>

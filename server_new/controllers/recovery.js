@@ -313,17 +313,17 @@ const createInsight = async (req, res) => {
     } = req.body;
 
     const query = `
-    INSERT INTO insight (
-      admission_no,
-      date,
-      denail_illness,
-      slight_awareness,
-      awarness_sick,
-      awarness_illness,
-      intellectual_insight,
-      true_emotion
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+      INSERT INTO insight (
+        admission_no,
+        date,
+        denail_illness,
+        slight_awareness,
+        awarness_sick,
+        awarness_illness,
+        intellectual_insight,
+        true_emotion
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     const values = [
       admission_no,
@@ -337,46 +337,80 @@ const createInsight = async (req, res) => {
     ];
 
     const [result] = await db.query(query, values);
-    // ✅ Check if all MSE parts are submitted
-    const isComplete = await checkMSECompletion(admission_no);
 
-    if (isComplete) {
-      // ✅ Check if email already sent
-      const [sent] = await db.query(
-        'SELECT * FROM mse_email_status WHERE admission_no = ?',
-        [admission_no]
-      );
-
-      if (sent.length === 0) {
-        // ✅ Send email
-        const mailOptions = {
-          from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-          to: ['manasucmf@gmail.com'],
-          subject: 'MSE Form Completed by Social Worker',
-          html: `
-            <h3>MSE Form Completed</h3>
-            <p>The Mental Status Examination for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>
-          `
-        };
-
-        await transporter.sendMail(mailOptions);
-
-        // ✅ Record email status
-        await db.query(
-          'INSERT INTO mse_email_status (admission_no, sent_at) VALUES (?, NOW())',
-          [admission_no]
-        );
-      }
-    }
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
-    res.status(201).json({ message: "Insight Form created successfully" });
+
+    const isComplete = await checkMSECompletion(admission_no);
+
+    if (!isComplete) {
+      return res.status(400).json({
+        message: `Your Insight Form has been submitted successfully. However, please complete the other MSE form for this admission number: ${admission_no}.`
+      });
+    }
+
+    // ✅ Respond immediately after DB insert and MSE check
+    res.status(201).json({ message: "Insight Form submitted successfully" });
+
+    // ✅ Background email process (non-blocking)
+    const [sent] = await db.query(
+      'SELECT * FROM mse_email_status WHERE admission_no = ?',
+      [admission_no]
+    );
+
+    if (sent.length === 0) {
+      console.log("This is completed admission_no");
+      sendInsightEmailToDirector(
+        {
+          admission_no
+        }
+      )
+        .then(async () => {
+          console.log("✅ Email sent to director successfully");
+
+          await db.query(
+            'INSERT INTO mse_email_status (admission_no, sent_at) VALUES (?, NOW())',
+            [admission_no]
+          );
+        })
+        .catch((err) => {
+          console.error("❌ Failed to send insight email:", err.message);
+        });
+    }
+
   } catch (err) {
-    console.error("Error in createInsight:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("❌ Error in createInsight:", err.message, err.stack);
+    res.status(500).json({ error: "Internal server error" });
   }
-}
+};
+
+
+const sendInsightEmailToDirector = async (form) => {
+  try {
+    if (!process.env.EMAIL_USER) {
+      throw new Error("EMAIL_USER not set in environment variables.");
+    }
+
+    const { admission_no } = form; // ✅ Destructure admission_no
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
+      subject: `🧠 MSE Form Completed: ${admission_no}`,
+      html: `
+        <p>The MSE Form for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>
+        <p style="color: #555;">Please check the ERP portal for more details.</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.error("❌ Error in sendInsightEmailToDirector:", err.message);
+    throw err; // Re-throw for outer catch to log
+  }
+};
+
 
 
 const createCognition = async (req, res) => {
@@ -842,6 +876,8 @@ const updatePsychiatricData = async (req, res) => {
       fm_mentalHealth,
       significant_life,
       chronic_stressors,
+      other_exploration,
+      other_legalEnvironment,
       trauma_exploration,
       legal_environment
     } = req.body;
@@ -861,6 +897,8 @@ const updatePsychiatricData = async (req, res) => {
                     fm_mentalHealth = ?,
                     significant_life = ?,
                     chronic_stressors = ?,
+                    other_exploration = ?,
+                    other_legalEnvironment = ?,
                     trauma_exploration = ?,
                     legal_environment = ?
                     WHERE id = ?`;
@@ -878,8 +916,11 @@ const updatePsychiatricData = async (req, res) => {
       fm_mentalHealth,
       significant_life,
       chronic_stressors,
+      other_exploration,
+      other_legalEnvironment,
       trauma_exploration.join(", "),
-      legal_environment.join(", "), id
+      legal_environment.join(", "), 
+      id
     ];
     const [result] = await db.query(uquery, values);
     if (result.affectedRows === 0) {
@@ -1843,6 +1884,8 @@ const createPsyHistory = async (req, res) => {
       fm_mentalHealth,
       significant_life,
       chronic_stressors,
+      other_exploration,
+      other_legalEnvironment,
       trauma_exploration,
       legal_environment
     } = req.body;
@@ -1850,8 +1893,8 @@ const createPsyHistory = async (req, res) => {
     const query = `INSERT INTO psy_history(admission_no, date, psychiatric_diagnoses,
     treatment_history, medications, dosage, adherence, sideEffect, experience_reaction,
     hospitalisation_reason, duration, crisis_episodes, fm_mentalHealth, significant_life,
-    chronic_stressors, trauma_exploration, legal_environment)
-    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    chronic_stressors, other_exploration, other_legalEnvironment, trauma_exploration, legal_environment)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     const values = [
       admission_no, date,
@@ -1868,6 +1911,8 @@ const createPsyHistory = async (req, res) => {
       fm_mentalHealth,
       significant_life,
       chronic_stressors,
+      other_exploration,
+      other_legalEnvironment,
       trauma_exploration.join(", "),
       legal_environment.join(", ")
     ];
@@ -2114,8 +2159,15 @@ const createSuicidalData = async (req, res) => {
       emergency_response,
       hospital_required
     } = req.body;
-    const query = `INSERT INTO suicidal_data(admission_no, date, suicide_history, triggers_stressors, homicidal_ideation,
-    target_method, immediate_threat, emergency_response, hospital_required)VALUES(?,?,?,?,?,?,?,?,?)`;
+
+    const query = `
+      INSERT INTO suicidal_data (
+        admission_no, date, suicide_history, triggers_stressors,
+        homicidal_ideation, target_method, immediate_threat,
+        emergency_response, hospital_required
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
     const values = [
       admission_no,
       date,
@@ -2127,48 +2179,75 @@ const createSuicidalData = async (req, res) => {
       emergency_response,
       hospital_required
     ];
+
     const [result] = await db.query(query, values);
-    // ✅ Check if all MSE parts are submitted
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "No record inserted. Check if ID exists." });
+    }
+
     const isComplete = await checkMSECompletion(admission_no);
 
-    if (isComplete) {
-      // ✅ Check if email already sent
-      const [sent] = await db.query(
-        'SELECT * FROM psychiatric_email_status WHERE admission_no = ?',
-        [admission_no]
-      );
-
-      if (sent.length === 0) {
-        // ✅ Send email
-        const mailOptions = {
-          from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-          to: ['manasucmf@gmail.com'],
-          subject: 'Psychiatric Case History Form Completed By Social Worker',
-          html: `
-            <h3>Psychiatric Case History Form Completed</h3>
-            <p>The Psychiatric Case History for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>
-          `
-        };
-
-        await transporter.sendMail(mailOptions);
-
-        // ✅ Record email status
-        await db.query(
-          'INSERT INTO psychiatric_email_status (admission_no, sent_at) VALUES (?, NOW())',
-          [admission_no]
-        );
-      }
+    if (!isComplete) {
+      return res.status(400).json({
+        message: `Your Suicidal Form has been submitted successfully. However, please complete the other Psychiatric forms for this admission number: ${admission_no}.`
+      });
     }
-    if (result.affectedRows === 0) {
-      return res.status(400).json({ message: "No record inserted" });
+
+    // ✅ Respond immediately to client
+    res.status(201).json({ message: "Suicidal and Homicidal Ideation Form Submitted Successfully" });
+
+    // ✅ Background email send
+    const [sent] = await db.query(
+      'SELECT * FROM psychiatric_email_status WHERE admission_no = ?',
+      [admission_no]
+    );
+
+    if (sent.length === 0) {
+      console.log("📬 This is a completed admission_no, sending psychiatric email...");
+
+      sendPsychiatricEmailToDirector({ admission_no })
+        .then(async () => {
+          console.log("✅ Email sent to director successfully");
+          await db.query(
+            'INSERT INTO psychiatric_email_status (admission_no, sent_at) VALUES (?, NOW())',
+            [admission_no]
+          );
+        })
+        .catch((err) => {
+          console.error("❌ Failed to send psychiatric email:", err.message);
+        });
     }
-    res.status(200).json({ message: "Suicidal and Homicidal Ideation Form created Successfully" });
 
   } catch (err) {
-    console.error("Error in create Suicidal and Homicidal Ideation Form:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("❌ Error in createSuicidalData:", err.message, err.stack);
+    res.status(500).json({ error: "Internal server error" });
   }
-}
+};
+
+const sendPsychiatricEmailToDirector = async ({ admission_no }) => {
+  try {
+    if (!process.env.EMAIL_USER) {
+      throw new Error("EMAIL_USER not set in environment variables.");
+    }
+
+    const mailOptions = {
+      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+      to: ['manasucmf@gmail.com'],
+      subject: `🧠 Psychiatric Case History Form Completed: ${admission_no}`,
+      html: `
+        <p>The Psychiatric Case History Form for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>
+        <p style="color: #555;">Please check the ERP portal for more details.</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.error("❌ Error in sendPsychiatricEmailToDirector:", err.message);
+    throw err;
+  }
+};
+
 
 const getInformation = async (req, res) => {
   const { id } = req.params;

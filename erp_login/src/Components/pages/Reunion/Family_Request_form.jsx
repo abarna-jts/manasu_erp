@@ -389,14 +389,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.f_aadhar_card);
                     if (Array.isArray(parsed)) {
-                        f_aadhar_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        f_aadhar_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     f_aadhar_cardPaths = data.f_aadhar_card
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -405,14 +405,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.f_ration_card);
                     if (Array.isArray(parsed)) {
-                        f_ration_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        f_ration_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     f_ration_cardPaths = data.f_ration_card
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -421,14 +421,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.r_aadhar_card);
                     if (Array.isArray(parsed)) {
-                        r_aadhar_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        r_aadhar_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     r_aadhar_cardPaths = data.r_aadhar_card
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -437,14 +437,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.r_ration_card);
                     if (Array.isArray(parsed)) {
-                        r_ration_cardPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        r_ration_cardPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     r_ration_cardPaths = data.r_ration_card
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -453,14 +453,14 @@ function Family_Request_form() {
                 try {
                     const parsed = JSON.parse(data.govt_id);
                     if (Array.isArray(parsed)) {
-                        govt_idPaths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        govt_idPaths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     govt_idPaths = data.govt_id
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -545,7 +545,7 @@ function Family_Request_form() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -553,7 +553,7 @@ function Family_Request_form() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -741,7 +741,7 @@ function Family_Request_form() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -751,7 +751,7 @@ function Family_Request_form() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${result.rescue_image}`;
+                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -885,7 +885,7 @@ function Family_Request_form() {
                 <Row>
                     <Form className='d-flex align-items-center justify-content-center flex-column family_request_form' onSubmit={handleSubmit}>
 
-                        <Col md={8}>
+                        <Col md={8} className='family_form'>
                             <h5 className="pdfsub_heading">Rescue Details:</h5>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
@@ -967,7 +967,7 @@ function Family_Request_form() {
 
                         </Col>
 
-                        <Col md={8}>
+                        <Col md={8} className='family_form'>
                             <h5 className="pdfsub_heading">Family Details</h5>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">

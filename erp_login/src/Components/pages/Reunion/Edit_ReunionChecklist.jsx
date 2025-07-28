@@ -384,7 +384,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.familyRequestLetterFile) && formData.familyRequestLetterFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.familyRequestLetterFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -478,7 +478,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.selfDeclarationFile) && formData.selfDeclarationFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.selfDeclarationFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -567,7 +567,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.mediaConsentFile) && formData.mediaConsentFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.mediaConsentFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -661,7 +661,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.familyIDproofFile) && formData.familyIDproofFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.familyIDproofFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -748,7 +748,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.residentIDproofFile) && formData.residentIDproofFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.residentIDproofFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -834,7 +834,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.aadharCardFile) && formData.aadharCardFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.aadharCardFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -921,7 +921,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.udidCardFile) && formData.udidCardFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.udidCardFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1007,7 +1007,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.disabilityCertificateFile) && formData.disabilityCertificateFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.disabilityCertificateFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1094,7 +1094,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.bankPassbookFile) && formData.bankPassbookFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.bankPassbookFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1180,7 +1180,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.healthInsuranceFile) && formData.healthInsuranceFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.healthInsuranceFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1272,7 +1272,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.medicalReportFile) && formData.medicalReportFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.medicalReportFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1358,7 +1358,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.dischargeSummaryFile) && formData.dischargeSummaryFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.dischargeSummaryFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1445,7 +1445,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.medicationsFile) && formData.medicationsFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.medicationsFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1535,7 +1535,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.ClothesFile) && formData.ClothesFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.ClothesFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1622,7 +1622,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.possessionsRecoveredFile) && formData.possessionsRecoveredFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.possessionsRecoveredFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1708,7 +1708,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.dischargeAllowanceFile) && formData.dischargeAllowanceFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.dischargeAllowanceFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1794,7 +1794,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.travelExpensesFile) && formData.travelExpensesFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.travelExpensesFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1880,7 +1880,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.copyOfdischargeSummaryFile) && formData.copyOfdischargeSummaryFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.copyOfdischargeSummaryFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -1971,7 +1971,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.travelSafetyLetterFile) && formData.travelSafetyLetterFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.travelSafetyLetterFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -2057,7 +2057,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.reunionPhotoFile) && formData.reunionPhotoFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.reunionPhotoFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a
@@ -2148,7 +2148,7 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.witnessSignatureFile) && formData.witnessSignatureFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.witnessSignatureFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
+                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
                                                             const filename = filePath?.split('/').pop();
                                                             return (
                                                                 <a

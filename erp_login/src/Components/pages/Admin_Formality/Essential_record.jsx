@@ -81,9 +81,9 @@ function Essential_record() {
         }
 
         if (name === "udid_no") {
-            const udidPattern = /^([A-Z0-9]{20}|UNKNOWN)$/;
+            const udidPattern = /^([A-Z0-9]{18}|UNKNOWN)$/;
             if (!udidPattern.test(value)) {
-                error = "Enter a valid 20-character UDID or type UNKNOWN";
+                error = "Enter a valid 18-character UDID or type UNKNOWN";
             }
         }
 
@@ -353,7 +353,7 @@ function Essential_record() {
 
             // Parse bank passbook image
             const passbookPath = data.bank_passbook
-                ? [`http://localhost:5002/${data.bank_passbook}`]
+                ? [`https://www.pahrultours.com/app2/${data.bank_passbook}`]
                 : [];
 
             // Parse form7_attach image array
@@ -362,14 +362,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.form7_attach);
                     if (Array.isArray(parsed)) {
-                        form7Paths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        form7Paths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     form7Paths = data.form7_attach
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -378,14 +378,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.bank_passbook);
                     if (Array.isArray(parsed)) {
-                        bank_passbookPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        bank_passbookPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse bank passbook:', err);
                     // Fallback: comma-separated string
                     bank_passbookPath = data.bank_passbook
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -394,14 +394,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.attach_aadhar);
                     if (Array.isArray(parsed)) {
-                        attachAadharPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        attachAadharPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Aadhar Card:', err);
                     // Fallback: comma-separated string
                     attachAadharPath = data.attach_aadhar
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -410,14 +410,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.udid_attach);
                     if (Array.isArray(parsed)) {
-                        UDIDPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        UDIDPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse UDID Card:', err);
                     // Fallback: comma-separated string
                     UDIDPhotoPath = data.udid_attach
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -522,7 +522,7 @@ function Essential_record() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -530,7 +530,7 @@ function Essential_record() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -541,6 +541,9 @@ function Essential_record() {
             const bankPassbookPaths = parseImageField(data.bank_passbook);
             const attachAadharPath = parseImageField(data.attach_aadhar);
             const UDIDPhotoPath = parseImageField(data.udid_attach);
+
+            console.log("UDID Path:", UDIDPhotoPath);
+            console.log("Aadhar Card Path:", attachAadharPath);
 
             // Set image files
             setFiles((files) => ({
@@ -723,7 +726,7 @@ function Essential_record() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -733,7 +736,7 @@ function Essential_record() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${result.rescue_image}`;
+                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -904,7 +907,7 @@ function Essential_record() {
 
 
                 <Row className='d-flex align-items-center justify-content-center'>
-                    <Col md={8} className="consultant_box my-4">
+                    <Col md={8} className="consultant_box my-4 essential_record">
                         <div className="consultant_details">
                             <Form className='media_consent' onSubmit={handleSubmit}>
                                 <Row>
@@ -939,7 +942,7 @@ function Essential_record() {
                                             {formErrors.aadhar_card && (
                                                 <div className="text-danger small">{formErrors.aadhar_card}</div>
                                             )}
-                                            <Form.Label className="mb-1">Attach Aadhaar Card : <span style={{ color: 'red' }}>*</span></Form.Label>
+                                            <Form.Label className="mb-1">Attach Aadhaar Card : </Form.Label>
                                             <Form.Control
                                                 type="file"
                                                 name="attach_aadhar"
@@ -961,7 +964,7 @@ function Essential_record() {
                                             {formErrors.udid_no && (
                                                 <div className="text-danger small">{formErrors.udid_no}</div>
                                             )}
-                                            <Form.Label className="mb-1">Attach UDID Card : <span style={{ color: 'red' }}>*</span></Form.Label>
+                                            <Form.Label className="mb-1">Attach UDID Card : </Form.Label>
                                             <Form.Control
                                                 type="file"
                                                 name="udid_attach"
@@ -1457,6 +1460,88 @@ function Essential_record() {
                                         <div className="text-danger small">{formErrors.aadhar_card}</div>
                                     )}
                                 </Form.Group>
+                                {Array.isArray(files.attach_aadhar) &&
+                                    files.attach_aadhar.map((imgUrl, index) => {
+                                        const filename = `attach_aadhar${index}.jpg`;
+
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="image-container"
+                                                style={{
+                                                    position: "relative",
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    margin: "10px",
+                                                    padding: "0px",
+                                                    display: "inline-block",
+                                                }}
+                                            >
+                                                <img
+                                                    src={imgUrl}
+                                                    alt={`attach_aadhar - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit: "cover",
+                                                        border: "1px solid #ccc",
+                                                        borderRadius: "4px",
+                                                    }}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
+
+                                                <div className="image-overlay">
+                                                    {/* View icon */}
+                                                    <a
+                                                        href={imgUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title="View Image"
+                                                        className="icon-button"
+                                                    >
+                                                        <i className="fas fa-eye"></i>
+                                                    </a>
+
+                                                    {/* Download icon */}
+                                                    <button
+                                                        title="Download Image"
+                                                        className="icon-button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            fetch(imgUrl, { mode: "cors" })
+                                                                .then((res) => res.blob())
+                                                                .then((blob) => {
+                                                                    const url = window.URL.createObjectURL(blob);
+                                                                    const a = document.createElement("a");
+                                                                    a.href = url;
+                                                                    a.download = filename;
+                                                                    a.click();
+                                                                    window.URL.revokeObjectURL(url);
+                                                                })
+                                                                .catch(() => alert("Download failed."));
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                <Form.Label className="mb-1">Attach Aadhaar Card : <span style={{ color: 'red' }}>*</span></Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    name="attach_aadhar"
+                                    accept=".jpg,.jpeg,.png"
+                                    onChange={handleFileChange}
+                                    ref={AadharAttachRef}
+                                    multiple
+                                />
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
@@ -1476,6 +1561,90 @@ function Essential_record() {
                                         <div className="text-danger small">{formErrors.udid_no}</div>
                                     )}
                                 </Form.Group>
+
+                                {Array.isArray(files.udid_attach) &&
+                                    files.udid_attach.map((imgUrl, index) => {
+                                        const filename = `udid_attach_${index}.jpg`;
+
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="image-container"
+                                                style={{
+                                                    position: "relative",
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    margin: "10px",
+                                                    padding: "0px",
+                                                    display: "inline-block",
+                                                }}
+                                            >
+                                                <img
+                                                    src={imgUrl}
+                                                    alt={`udid_attach - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit: "cover",
+                                                        border: "1px solid #ccc",
+                                                        borderRadius: "4px",
+                                                    }}
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
+
+                                                <div className="image-overlay">
+                                                    {/* View icon */}
+                                                    <a
+                                                        href={imgUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title="View Image"
+                                                        className="icon-button"
+                                                    >
+                                                        <i className="fas fa-eye"></i>
+                                                    </a>
+
+                                                    {/* Download icon */}
+                                                    <button
+                                                        title="Download Image"
+                                                        className="icon-button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            fetch(imgUrl, { mode: "cors" })
+                                                                .then((res) => res.blob())
+                                                                .then((blob) => {
+                                                                    const url = window.URL.createObjectURL(blob);
+                                                                    const a = document.createElement("a");
+                                                                    a.href = url;
+                                                                    a.download = filename;
+                                                                    a.click();
+                                                                    window.URL.revokeObjectURL(url);
+                                                                })
+                                                                .catch(() => alert("Download failed."));
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                <Form.Label className="mb-1">Attach UDID Card : <span style={{ color: 'red' }}>*</span></Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    name="udid_attach"
+                                    accept=".jpg,.jpeg,.png"
+                                    onChange={handleFileChange}
+                                    ref={UDIDAttachRef}
+                                    multiple
+                                />
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>

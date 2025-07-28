@@ -215,9 +215,6 @@ function SCRB_Form2C_All() {
                     <Col md={3} className='d-flex align-items-start justify-content-start'>
                         <Button type='button' className='btn btn-success' onClick={() => window.history.back()}>Back</Button>
                     </Col>
-                    <Col md={3} className='d-flex align-items-end justify-content-end'>
-                        <Button type='button' className='btn btn-success' onClick={() => SCRBForm2()}>Next</Button>
-                    </Col>
                 </Row>
 
             </Container>
