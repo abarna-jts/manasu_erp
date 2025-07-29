@@ -22,6 +22,14 @@ const createForm2 = async (req, res) => {
       addition_info,
     } = req.body;
 
+    const [existing] = await db.query("SELECT admission_no FROM form_2 WHERE admission_no = ?", [admission_no]);
+
+    if (existing.length > 0) {
+      return res.status(409).json({
+        message: "Admission number already exists."
+      });
+    }
+
     const old_photo = req.files['old_photo']
       ? req.files['old_photo'].map(file => `uploads/form_2a/${file.filename}`)
       : [];
@@ -147,6 +155,14 @@ const createForm2A = async (req, res) => {
     addition_face,
   } = req.body;
 
+  const [existing] = await db.query("SELECT admission_no FROM form_2a WHERE admission_no = ?", [admission_no]);
+
+  if (existing.length > 0) {
+    return res.status(409).json({
+      message: "Admission number already exists."
+    });
+  }
+
   const sql = `
     INSERT INTO form_2a (
       name_ngo, admission_no, file_no, category, complexion, face,
@@ -223,6 +239,14 @@ const createForm2B = async (req, res) => {
     height
   } = req.body;
 
+  const [existing] = await db.query("SELECT admission_no FROM form_2b WHERE admission_no = ?", [admission_no]);
+
+  if (existing.length > 0) {
+    return res.status(409).json({
+      message: "Admission number already exists."
+    });
+  }
+
   if (!name_ngo || !file_no || !admission_no || !tattoo || !addition_tatoo || !scar || !mole || !height) {
     return res.status(400).send('All fields are required');
   }
@@ -282,6 +306,14 @@ const sendDirectorMailForm2B = async (form) => {
 
 const createForm2C = async (req, res) => {
   const { name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress, addition_lowerdress, upperdress_color, lowerdress_color } = req.body;
+
+  const [existing] = await db.query("SELECT admission_no FROM form_2c WHERE admission_no = ?", [admission_no]);
+
+  if (existing.length > 0) {
+    return res.status(409).json({
+      message: "Admission number already exists."
+    });
+  }
 
   const Csql = 'INSERT INTO form_2c (name_ngo, admission_no, file_no, upperdress_1, upperdress_2, lowerdress, addition_upperdress,addition_lowerdress,upperdress_color, lowerdress_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 

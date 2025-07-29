@@ -1191,6 +1191,14 @@ const createSummary = async (req, res) => {
       report
     } = req.body;
 
+    const [existing] = await db.query("SELECT admission_no FROM reunion_summary WHERE admission_no = ?", [admission_no]);
+
+    if (existing.length > 0) {
+      return res.status(409).json({
+        message: "Admission number already exists."
+      });
+    }
+
     const SummaryAttachPath = req.files?.['summary_attach']
       ? req.files['summary_attach'].map(file => `uploads/SummaryAttach/${file.filename}`)
       : [];

@@ -27,6 +27,7 @@ router.get('/get_scrb_form2adata/:admission_no', getForm2APDF); //(SCRB_Form2A.j
 router.get('/get_scrb_form2bdata/:admission_no', getForm2BPDF); //(SCRB_Form2B.jsx) //completed
 router.get('/get_scrb_form2cdata/:admission_no', getForm2CPDF); //(SCRB_Form2C.jsx) //completed
 
+
 //get scrb form2 details(SCRB_form.jsx, SCRB_form2A.jsx, SCRB_form2B.jsx, SCRB_form2C.jsx)
 router.get("/get_scrbform2data/:admission_no",getForm2Data); //completed
 

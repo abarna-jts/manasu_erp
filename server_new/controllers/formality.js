@@ -18,6 +18,13 @@ const createSelfDeclaration = async (req, res) => {
         travel_letter
     } = req.body;
 
+    const [existing] = await db.query("SELECT admission_no FROM formality_declaration WHERE admission_no = ?", [admission_no]);
+
+    if (existing.length > 0) {
+        return res.status(409).json({
+            message: "Admission number already exists."
+        });
+    }
 
     const q = "INSERT INTO formality_declaration (admission_no,rescue_name,age,medicine_provided,toiletries_provided,dress_provided,travel_expenses, welfare_expenses, medical_prescription, discharge_summary, travel_letter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -205,6 +212,15 @@ const createRecords = async (req, res) => {
             other_gvt_scheme,
             any_other
         } = req.body;
+
+        // Check if admission number exists
+        const [existing] = await db.query("SELECT admission_no FROM essential_records WHERE admission_no = ?", [admission_no]);
+
+        if (existing.length > 0) {
+            return res.status(409).json({
+                message: "Admission number already exists."
+            });
+        }
 
         // File paths if available
         const bank_passbookPath = req.files?.['bank_passbook']
@@ -1154,6 +1170,14 @@ const createRescueDischargeInfo = async (req, res) => {
         state_venue,
         state
     } = req.body;
+
+    const [existing] = await db.query("SELECT admission_no FROM discharge_summary WHERE admission_no = ?", [admission_no]);
+
+    if (existing.length > 0) {
+        return res.status(409).json({
+            message: "Admission number already exists."
+        });
+    }
 
     const cquery = `
         INSERT INTO discharge_summary (

@@ -314,6 +314,11 @@ function Family_Request_form() {
             }
 
         } catch (error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                alert(error.response.data.message);
+            } else {
+                alert("Something went wrong.");
+            }
             console.error("Error submitting form", error);
             setSubmissionMessage("Something went wrong.");
             setMessageType("danger");

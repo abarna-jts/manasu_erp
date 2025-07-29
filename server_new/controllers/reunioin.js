@@ -21,6 +21,14 @@ const createFamilyLetter = async (req, res) => {
             any_other
         } = req.body;
 
+        const [existing] = await db.query("SELECT admission_no FROM family_request_form WHERE admission_no = ?", [admissionNumber]);
+
+        if (existing.length > 0) {
+            return res.status(409).json({
+                message: "Admission number already exists."
+            });
+        }
+
         // File paths
         const aadharCardPath = req.files?.['f_aadhar_card']
             ? req.files['f_aadhar_card'].map(file => `uploads/Reunion/Family_Details/${file.filename}`)
@@ -102,13 +110,13 @@ const createFamilyLetter = async (req, res) => {
 }
 
 const sendDirectorMail = async (form) => {
-  try {
+    try {
 
-    const mailOptions = {
-      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
-      subject: `📝 Family Request Form Submitted: ${form.admissionNumber}`,
-      html: `
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+            subject: `📝 Family Request Form Submitted: ${form.admissionNumber}`,
+            html: `
         <h2>Family Request Form – Discharge of Resident</h2>
         <p><strong>Admission No:</strong> ${form.admissionNumber}</p>
         <p><strong>Name:</strong> ${form.rescue_name}</p>
@@ -121,13 +129,13 @@ const sendDirectorMail = async (form) => {
         <p><strong>Resident Aadhar Card No. :</strong> ${form.r_aadhar_card_no}</p>
         <p><strong>Resident Ration Card No. :</strong> ${form.r_ration_card_no}</p>
       `,
-    };
+        };
 
-    await transporter.sendMail(mailOptions);
-    console.log("📧 Email sent to director successfully");
-  } catch (error) {
-    console.error("❌ Error sending email to director:", error.message);
-  }
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
 };
 
 const getFamilyRequestForm = async (req, res) => {
@@ -308,6 +316,14 @@ const createSelfDeclaration = async (req, res) => {
             description
         } = req.body;
 
+        const [existing] = await db.query("SELECT admission_no FROM self_declaration WHERE admission_no = ?", [admission_no]);
+
+        if (existing.length > 0) {
+            return res.status(409).json({
+                message: "Admission number already exists."
+            });
+        }
+
         // File paths
         const handWrittenPath = req.files?.['handwritten_document']
             ? req.files['handwritten_document'].map(file => `uploads/Self_Declaration/${file.filename}`)
@@ -361,13 +377,13 @@ const createSelfDeclaration = async (req, res) => {
 }
 
 const sendDirectorMailSD = async (form) => {
-  try {
+    try {
 
-    const mailOptions = {
-      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
-      subject: `📝 Self-Declaration Form Submitted: ${form.admission_no}`,
-      html: `
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+            subject: `📝 Self-Declaration Form Submitted: ${form.admission_no}`,
+            html: `
         <h2>Self-Declaration Form for Discharge by Resident</h2>
         <p><strong>Admission No:</strong> ${form.admission_no}</p>
         <p><strong>Name:</strong> ${form.rescue_name}</p>
@@ -376,13 +392,13 @@ const sendDirectorMailSD = async (form) => {
         <hr>
         <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
       `,
-    };
+        };
 
-    await transporter.sendMail(mailOptions);
-    console.log("📧 Email sent to director successfully");
-  } catch (error) {
-    console.error("❌ Error sending email to director:", error.message);
-  }
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
 };
 
 const getSelfDeclaration = async (req, res) => {
@@ -509,6 +525,13 @@ const createMediaConsent = async (req, res) => {
             social_media_consent,
             description
         } = req.body;
+        const [existing] = await db.query("SELECT admission_no FROM media_consent WHERE admission_no = ?", [admission_no]);
+
+        if (existing.length > 0) {
+            return res.status(409).json({
+                message: "Admission number already exists."
+            });
+        }
         // File paths
         const scanReportPath = req.files?.['scan_report']
             ? req.files['scan_report'].map(file => `uploads/MediaConsent/${file.filename}`)
@@ -546,26 +569,26 @@ const createMediaConsent = async (req, res) => {
 }
 
 const sendDirectorMailMedia = async (form) => {
-  try {
+    try {
 
-    const mailOptions = {
-      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-      to: ["manasucmf@gmail.com"], // ✅ change to director's real email
-      subject: `📝 Media Consent Form Submitted: ${form.admission_no}`,
-      html: `
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"], // ✅ change to director's real email
+            subject: `📝 Media Consent Form Submitted: ${form.admission_no}`,
+            html: `
         <h2>Resident Consent Form for Social Media Use</h2>
         <p><strong>Admission No:</strong> ${form.admission_no}</p>
         <p><strong>Name:</strong> ${form.rescue_name}</p>
         <p><strong>Did the Resident give the Media Consent?:</strong> ${form.social_media_consent}</p>
         <p><strong>Description:</strong> ${form.description}</p>
       `,
-    };
+        };
 
-    await transporter.sendMail(mailOptions);
-    console.log("📧 Email sent to director successfully");
-  } catch (error) {
-    console.error("❌ Error sending email to director:", error.message);
-  }
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
 };
 
 
@@ -681,14 +704,19 @@ const createDischargeList = async (req, res) => {
             any_other
         } = req.body;
 
+        const [existing] = await db.query("SELECT admission_no FROM discharge_checklist WHERE admission_no = ?", [admission_no]);
+
+        if (existing.length > 0) {
+            return res.status(409).json({
+                message: "Admission number already exists."
+            });
+        }
+
         const getFilePathsArray = (fieldName) => {
             return req.files[fieldName]
                 ? req.files[fieldName].map(file => `uploads/Reunion/Discharge_Checklist/${file.filename}`)
                 : [];
         };
-
-
-
 
         const query = `
             INSERT INTO discharge_checklist (
@@ -815,13 +843,13 @@ const createDischargeList = async (req, res) => {
 }
 
 const sendDirectorMailChecklist = async (form) => {
-  try {
+    try {
 
-    const mailOptions = {
-      from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-      to: ["manasucmf@gmail.com"],
-      subject: `📝 Discharge Checklist Form Submitted : ${form.admission_no}`,
-      html: `
+        const mailOptions = {
+            from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
+            to: ["manasucmf@gmail.com"],
+            subject: `📝 Discharge Checklist Form Submitted : ${form.admission_no}`,
+            html: `
         <h2>Resident Discharge Summary and Checklist</h2>
         <p><strong>Admission No:</strong> ${form.admission_no}</p>
         <p><strong>Family Request Letter:</strong> ${form.familyRequestLetter}</p>
@@ -833,13 +861,13 @@ const sendDirectorMailChecklist = async (form) => {
         <hr>
         <p style="color: #444;">📌 Please refer or check the <strong>ERP application</strong> for complete details.</p>
       `,
-    };
+        };
 
-    await transporter.sendMail(mailOptions);
-    console.log("📧 Email sent to director successfully");
-  } catch (error) {
-    console.error("❌ Error sending email to director:", error.message);
-  }
+        await transporter.sendMail(mailOptions);
+        console.log("📧 Email sent to director successfully");
+    } catch (error) {
+        console.error("❌ Error sending email to director:", error.message);
+    }
 };
 
 const getReunionChecklist = async (req, res) => {

@@ -206,6 +206,11 @@ function Formality_declaration() {
             })
             setAdmissionNumber("");
         } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                alert(err.response.data.message);
+            } else {
+                alert("Something went wrong.");
+            }
             console.error(err);
             alert('Submission failed.');
         }

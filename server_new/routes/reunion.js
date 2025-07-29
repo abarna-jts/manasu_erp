@@ -47,4 +47,5 @@ router.get("/get_allCheckList/:admission_no", getReunionChecklistAll); // comple
 router.post("/updatechecklist/:admission_no",updateChecklist); // completed
 
 
+
 export default router;

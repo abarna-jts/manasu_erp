@@ -264,6 +264,11 @@ function Self_Declaration_form() {
             if (signatureRef.current) signatureRef.current.value = "";
             if (photoRef.current) photoRef.current.value = "";
         } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                alert(err.response.data.message);
+            } else {
+                alert("Something went wrong.");
+            }
             console.error(err);
             alert('Submission failed.');
         }

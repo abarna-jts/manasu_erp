@@ -145,6 +145,11 @@ function SCRB_Form2C() {
         setMessageType("danger");
       }
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("Something went wrong.");
+      }
       console.error("Error submitting form", error);
       setSubmissionMessage("Something went wrong.");
       setMessageType("danger");
@@ -312,7 +317,76 @@ function SCRB_Form2C() {
     saveAs(fileData, fileName);
   };
 
+  const handleForm2CDownload = async () => {
+    try {
+      const response = await apiRoute.get(`/scrb_form/getAllSCRBForm2C`);
+      console.log("Full response:", response);
 
+      const fetchedData = response.data?.data; // <-- Correct way to access it
+      console.log("Fetched data:", fetchedData);
+
+      if (!Array.isArray(fetchedData) || fetchedData.length === 0) {
+        alert("No form data available to export.");
+        return;
+      }
+
+      Form2CexportToExcel(fetchedData);
+    } catch (error) {
+      console.error("Error fetching or downloading:", error);
+      alert("This form does not have a valid admission number.");
+    }
+  };
+
+  const Form2CexportToExcel = (data) => {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      alert("Invalid data for Excel export.");
+      return;
+    }
+
+    const rows = Array.isArray(data) ? data : [data];
+
+    // Convert keys to UPPERCASE
+    const transformedRows = rows.map(row => {
+      const newRow = {};
+      for (let key in row) {
+        newRow[key.toUpperCase()] = row[key];
+      }
+      return newRow;
+    });
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(transformedRows);
+
+    // Dynamically set column widths
+    const keys = Object.keys(transformedRows[0]);
+    worksheet['!cols'] = [
+      { wch: 10 }, // Column A
+      { wch: 35 }, // Column B
+      { wch: 15 }, // Column C
+      { wch: 15 },
+      { wch: 30 },
+      { wch: 30 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+    ];
+
+    // Create workbook and append worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "SCRB Form");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const fileData = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(fileData, `SCRB_Form2C_${admission_no}.xlsx`);
+  };
 
 
   const navigate = useNavigate();
@@ -385,8 +459,8 @@ function SCRB_Form2C() {
   }, [admission_no]);
 
   const EditSCRBForm2C = async () => {
-        navigate("/scrb_form2cALL");
-    }
+    navigate("/scrb_form2cALL");
+  }
 
   return (
     <>
@@ -469,6 +543,9 @@ function SCRB_Form2C() {
                       <button type="button" className="btn btn-success col-md-2 view_all_size" onClick={EditSCRBForm2C}>
                         View All
                       </button>
+                      <button type="button" className="btn btn-success mx-2" onClick={handleForm2CDownload}>
+                        <i className="bi bi-file-earmark-excel"></i>
+                      </button>
                       {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
                         Import Excel Sheet
                       </button> */}
@@ -482,7 +559,7 @@ function SCRB_Form2C() {
                   <FontAwesomeIcon icon={faArrowLeft} className="me-2" />Back
                 </Button>
                 <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
-                  Export Excel Sheet
+                  <i className="bi bi-file-earmark-excel me-2"></i>Export All Form to Excel
                 </button>
               </Col>
             </Row>

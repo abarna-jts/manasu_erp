@@ -254,6 +254,11 @@ function SCRB_form() {
                 setMessageType("danger");
             }
         } catch (error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                alert(error.response.data.message);
+            } else {
+                alert("Something went wrong.");
+            }
             console.error("Error submitting form", error);
             setSubmissionMessage("Something went wrong.");
             setMessageType("danger");
@@ -431,20 +436,15 @@ function SCRB_form() {
 
     //excel sheet code 
     const handleDownload = async () => {
-        if (!admission_no.trim()) {
-            alert("Please enter admission number.");
-            return;
-        }
-
         try {
-            const response = await apiRoute.get(`/admision/getSCRBFormData/${admission_no}`);
+            const response = await apiRoute.get(`/scrb_form/getAllSCRBForm2`);
             console.log("Full response:", response);
 
-            const fetchedData = response.data?.data;
-            console.log(fetchedData);
+            const fetchedData = response.data?.data; // <-- Correct way to access it
+            console.log("Fetched data:", fetchedData);
 
-            if (!fetchedData || typeof fetchedData !== "object") {
-                alert("Invalid or missing data from server.");
+            if (!Array.isArray(fetchedData) || fetchedData.length === 0) {
+                alert("No form data available to export.");
                 return;
             }
 
@@ -456,29 +456,88 @@ function SCRB_form() {
     };
 
     const exportToExcel = (data) => {
+        const BASE_URL = "https://www.pahrultours.com/app2";
+
         if (!data || (Array.isArray(data) && data.length === 0)) {
             alert("Invalid data for Excel export.");
             return;
         }
 
-        // Ensure data is an array of objects
         const rows = Array.isArray(data) ? data : [data];
 
-        const worksheet = XLSX.utils.json_to_sheet(rows);
+        // Prepare headers (uppercase keys)
+        const headers = Object.keys(rows[0]).map(key => key.toUpperCase());
+
+        // Prepare data rows with hyperlinks for image fields
+        const imageFields = ["new_photo", "old_photo", "signature", "seal"];
+        const aoa = [headers]; // Array of Arrays: first row is header
+
+        rows.forEach(row => {
+            const rowData = headers.map(headerKey => {
+                const originalKey = headerKey.toLowerCase();
+                let value = row[originalKey];
+
+                // Format date
+                if (originalKey === "found_date" && value) {
+                    const date = new Date(value);
+                    const dd = String(date.getDate()).padStart(2, "0");
+                    const mm = String(date.getMonth() + 1).padStart(2, "0");
+                    const yyyy = date.getFullYear();
+                    const hours = String(date.getHours()).padStart(2, "0");
+                    const minutes = String(date.getMinutes()).padStart(2, "0");
+                    value = `${dd}/${mm}/${yyyy} ${hours}:${minutes}`;
+                }
+
+                // If image field, insert hyperlink
+                if (imageFields.includes(originalKey) && value) {
+                    const url = BASE_URL + value;
+                    return { f: `HYPERLINK("${url}", "View Image")` };
+                }
+
+                return value;
+            });
+            aoa.push(rowData);
+        });
+
+        // Create worksheet with hyperlinks
+        const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+
+        // Set column widths (optional)
+        worksheet['!cols'] = [
+            { wch: 10 }, // Column A
+            { wch: 35 }, // Column B
+            { wch: 15 }, // Column C
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+        ];
+
+
+        // Create and export workbook
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "SCRB Form");
 
-        const excelBuffer = XLSX.write(workbook, {
-            bookType: "xlsx",
-            type: "array",
-        });
-
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
         const fileData = new Blob([excelBuffer], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
 
-        saveAs(fileData, `SCRB_Form2A_${rows[0].admission_no || "data"}.xlsx`);
+        saveAs(fileData, `SCRB_Form2_${admission_no}.xlsx`);
     };
+
 
     const navigate = useNavigate();
 
@@ -547,22 +606,21 @@ function SCRB_form() {
                                             </button>
 
                                         </div>
-                                        <button type="button" className="btn btn-secondary mx-3" onClick={() => {
+                                        <button type="button" className="btn btn-secondary mx-2" onClick={() => {
                                             if (!admission_no.trim()) {
                                                 alert("Please enter admission number.");
                                             } else {
                                                 fetchFormData(); // Fetch & populate data before generating PDF
                                             }
                                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                                        <button type="button" className="btn btn-success col-md-3" onClick={EditSCRBForm}>
+                                        <button type="button" className="btn btn-success col-md-3 mx-2" onClick={EditSCRBForm}>
                                             View All
                                         </button>
 
-                                        {/* <Col md={4}>
-                                            <button type="button" className="btn btn-success" onClick={handleDownload}>
-                                                Import Excel Sheet
-                                            </button>
-                                        </Col> */}
+                                        <button type="button" className="btn btn-success" onClick={handleDownload}>
+                                            <i className="bi bi-file-earmark-excel"></i>
+                                        </button>
+
 
                                     </form>
 
@@ -1002,7 +1060,6 @@ function SCRB_form() {
                                                         name="addition_info"
                                                         id="exampleFormControlTextarea1"
                                                         onChange={handleInputChange}
-
                                                         rows="3"></textarea>
                                                 </div>
                                             </div>
@@ -1016,7 +1073,7 @@ function SCRB_form() {
                                         <td>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
-                                                    <label>SIGNATURE / கையொப்பம் :  <span style={{ color: 'red' }}>*</span></label>
+                                                    <label>SIGNATURE / கையொப்பம் :  </label>
                                                 </div>
                                             </div>
                                         </td>
@@ -1078,7 +1135,7 @@ function SCRB_form() {
                                         <td>
                                             <div className="row">
                                                 <div className="col-md-12 text-start">
-                                                    <label>SEAL / முத்திரை :  <span style={{ color: 'red' }}>*</span></label>
+                                                    <label>SEAL / முத்திரை : </label>
                                                 </div>
                                             </div>
                                         </td>
@@ -1090,7 +1147,6 @@ function SCRB_form() {
                                                 accept=".jpg,.jpeg,.png"
                                                 className="form-control"
                                                 ref={sealRef}
-                                                required
                                                 multiple
                                             />
                                         </td>
