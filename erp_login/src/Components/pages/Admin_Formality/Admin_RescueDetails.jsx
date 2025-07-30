@@ -16,6 +16,8 @@ function Admin_RescueDetails() {
     const [report_details, setReportDetail] = useState([]);
     const [previewRequested, setPreviewRequested] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const userType = Cookies.get('usertype');
 
@@ -111,7 +113,7 @@ function Admin_RescueDetails() {
         }
     }
 
-    const filteredRescueDetails = report_details.filter((item) => {
+    const searchFilteredRescueDetails = report_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.rescue_name).toLowerCase().includes(searchTerm) ||
@@ -281,6 +283,15 @@ function Admin_RescueDetails() {
         }
     };
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
     return (
         <div>
             <Container fluid>
@@ -342,8 +353,8 @@ function Admin_RescueDetails() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredRescueDetails.length > 0 ? (
-                                    filteredRescueDetails.map((item, index) => (
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((item, index) => (
                                         <tr key={item.id}>
                                             <td>{index + 1}</td>
                                             <td>{item.admission_no || "Null"}</td>
@@ -388,6 +399,25 @@ function Admin_RescueDetails() {
                             </tbody>
 
                         </Table>
+                        <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                            <button
+                                className="btn btn-success me-2"
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                            >
+                                <i className="fas fa-chevron-left"></i>
+                            </button>
+
+                            <span> Page {currentPage} of {totalPages} </span>
+
+                            <button
+                                className="btn btn-success ms-2"
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                            >
+                                <i className="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
                     </Col>
                 </Row>
             </Container>

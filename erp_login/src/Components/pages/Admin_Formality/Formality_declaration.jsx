@@ -115,7 +115,7 @@ function Formality_declaration() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >= 8) { // Adjust minimum length as needed
+        if (admission_no.trim().length >= 12) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
@@ -123,12 +123,18 @@ function Formality_declaration() {
     const fetchFormData = async () => {
         try {
             const response = await apiRoute.get(`/reunion/get_information/${admission_no}`);
-            setFormData(response.data.data[0]);
+            console.log("Fetched data:", response.data);
+            if (response.data && response.data.data) {
+                setFormData(response.data.data);
+            } else {
+                console.warn("Unexpected response structure:", response.data);
+            }
         } catch (error) {
             console.error('Error fetching data', error);
             alert("Admission Number Not found");
         }
     };
+
 
     const createFormData = () => {
         const targetElement = document.querySelector('.self_declaration');
@@ -147,8 +153,8 @@ function Formality_declaration() {
 
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
 
@@ -185,11 +191,14 @@ function Formality_declaration() {
             alert("Please select Travel Safety Letter field Yes or No.");
             return;
         }
-
+        console.log("Submitting form data:", formData);
+        console.log("Trimmed Admission No:", trimmedAdNo);
+        const payload = {
+            ...formData,
+            admission_no
+        }
         try {
-            const res = await apiRoute.post('/formality/createDeclaration', formData, {
-                headers: { 'Content-Type': 'application/json' },
-            });
+            const res = await apiRoute.post('/formality/createDeclaration', payload);
             alert('Document Handover Form submitted successfully!');
             setFormData({
                 admission_no: '',
@@ -667,9 +676,9 @@ function Formality_declaration() {
                                         </Col>
                                     </Form.Group>
 
-                                        <div className="mt-3">
-                                            <Button variant="success" className="m-1" type="submit">Submit</Button>
-                                        </div>
+                                    <div className="mt-3">
+                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                    </div>
 
                                 </Row>
                             </Form>

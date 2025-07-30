@@ -331,8 +331,8 @@ function Psychiatrics_form() {
 
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
 
@@ -385,8 +385,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -434,8 +434,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -512,8 +512,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -571,8 +571,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -627,8 +627,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -681,8 +681,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -725,8 +725,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -770,8 +770,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {
@@ -816,8 +816,8 @@ function Psychiatrics_form() {
         }
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
         if (!date || date.trim() === '') {

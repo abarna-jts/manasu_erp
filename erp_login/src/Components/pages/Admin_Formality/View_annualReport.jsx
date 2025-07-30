@@ -15,6 +15,8 @@ function View_annualReport() {
     const [report_details, setReportDetail] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [show, setShow] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const handleClose = () => setShow(false);
 
@@ -56,17 +58,15 @@ function View_annualReport() {
         outing_report: '',
     })
 
-    const filteredRescueDetails = report_details.filter((item) => {
+    const searchFilteredRescueDetails = report_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.event_place).toLowerCase().includes(searchTerm) ||
             String(item.event_name).toLowerCase().includes(searchTerm) ||
-            String(item.celebration_name).toLowerCase().includes(searchTerm) ||
-            String(item.program_name).toLowerCase().includes(searchTerm) ||
-            String(item.internship_duration).toLowerCase().includes(searchTerm) ||
-            String(item.police_memo).toLowerCase().includes(searchTerm) ||
-            String(item.staff_name).toLowerCase().includes(searchTerm) ||
-            String(item.outing_name).toLowerCase().includes(searchTerm)
+            String(item.awareness_name).toLowerCase().includes(searchTerm) ||
+            String(item.awareness_place).toLowerCase().includes(searchTerm) ||
+            String(item.outing_name).toLowerCase().includes(searchTerm) ||
+            String(item.outing_place).toLowerCase().includes(searchTerm) 
         );
     });
 
@@ -403,6 +403,14 @@ function View_annualReport() {
         navigate("/celebration_report");
     }
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     return (
         <>
@@ -470,8 +478,8 @@ function View_annualReport() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredRescueDetails.length > 0 ? (
-                                        filteredRescueDetails.map((item, index) => (
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((item, index) => (
                                             <tr key={item.id}>
                                                 <td>{index + 1}</td>
                                                 <td>{item.event_name || "null"}</td>
@@ -513,6 +521,25 @@ function View_annualReport() {
                                     )}
                                 </tbody>
                             </Table>
+                            <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                                <button
+                                    className="btn btn-success me-2"
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                </button>
+
+                                <span> Page {currentPage} of {totalPages} </span>
+
+                                <button
+                                    className="btn btn-success ms-2"
+                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <i className="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
                         </Col>
                     </Row>
                 </>

@@ -17,8 +17,12 @@ const createSelfDeclaration = async (req, res) => {
         discharge_summary,
         travel_letter
     } = req.body;
+    console.log("Incoming Request Body:", req.body);
 
+    console.log("Checking existing admission number:", admission_no);
     const [existing] = await db.query("SELECT admission_no FROM formality_declaration WHERE admission_no = ?", [admission_no]);
+    console.log("Existing result:", existing);
+
 
     if (existing.length > 0) {
         return res.status(409).json({

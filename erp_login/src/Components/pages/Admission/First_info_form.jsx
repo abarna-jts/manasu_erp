@@ -154,9 +154,6 @@ function First_info_form() {
     };
 
 
-
-
-
     const AdmissionNumber = async () => {
         const now = new Date();
         const year = now.getFullYear();
@@ -177,7 +174,7 @@ function First_info_form() {
                 }
 
                 // Admission number exists, try next suffix
-                const suffix = String(counter).padStart(2, '0');
+                const suffix = String(counter).padStart(1);
                 newAdmissionNo = `${baseAdmissionNo}${suffix}`;
                 counter++;
 
@@ -625,8 +622,6 @@ function First_info_form() {
             );
         }
 
-
-
         // formData.append('rescue_image', rescue_image);
         // formData.append('attach_policeMemo', attach_policeMemo);
         // formData.append('govIdFile', govIdFile);
@@ -645,7 +640,7 @@ function First_info_form() {
         console.log("Submitting values:", admission_no, admission_date);
         try {
             const response = await apiRoute.post("/admision/create_first_form", formData, {
-                headers: {
+                headers: { 
                     'Content-Type': 'multipart/form-data', // Important for file uploads
                 }
             });
@@ -662,7 +657,6 @@ function First_info_form() {
             setMessageType("danger");
         }
     }
-
 
 
     const handleBack = () => {
@@ -720,8 +714,6 @@ function First_info_form() {
                     <h3 className="section_title">Resident Intake Form</h3>
                 </Col>
                 <Col md={2}></Col>
-
-
             </div>
 
             {/* Step Progress UI */}
@@ -758,10 +750,6 @@ function First_info_form() {
                     );
                 })}
             </div>
-
-
-
-
 
             <div>
                 {/* Show success or error message box */}

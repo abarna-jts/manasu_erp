@@ -407,6 +407,10 @@ function Rescue_details() {
 
     const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedStatus]);
+
 
     return (
         <>

@@ -10,6 +10,8 @@ function SCRB_All_Details() {
     const [scrbForm2List, setScrbForm2List] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [show, setShow] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const [formData, setFormData] = useState({
         id: '',
@@ -65,7 +67,7 @@ function SCRB_All_Details() {
         fetchSCRBForm2Report();
     }, []);
 
-    const filteredRescueDetails = scrbForm2List.filter((item) => {
+    const searchFilteredRescueDetails = scrbForm2List.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
@@ -254,9 +256,18 @@ function SCRB_All_Details() {
 
     const navigate = useNavigate();
 
-    const gotoSCRBForm2A = () =>{
+    const gotoSCRBForm2A = () => {
         navigate("/scrb_form2aALL");
     }
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     return (
         <>
@@ -322,8 +333,8 @@ function SCRB_All_Details() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredRescueDetails.length > 0 ? (
-                                        filteredRescueDetails.map((item, index) => (
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((item, index) => (
                                             <tr key={item.id}>
                                                 <td>{index + 1}</td>
                                                 <td>{item.admission_no || "null"}</td>
@@ -487,6 +498,25 @@ function SCRB_All_Details() {
                                     )}
                                 </tbody>
                             </Table>
+                            <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                                <button
+                                    className="btn btn-success me-2"
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                </button>
+
+                                <span> Page {currentPage} of {totalPages} </span>
+
+                                <button
+                                    className="btn btn-success ms-2"
+                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <i className="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
                         </Col>
                     </Row>
                 </>

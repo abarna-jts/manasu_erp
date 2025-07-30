@@ -20,6 +20,9 @@ function Medical_camp() {
     const handleClose = () => setShow(false);
     const handleClose1 = () => setShow1(false);
     const handleShow = () => setShow(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
 
     const userType = Cookies.get('usertype');
 
@@ -57,7 +60,7 @@ function Medical_camp() {
     };
 
 
-    const filteredRescueDetails = campDetails.filter((item) => {
+    const searchFilteredRescueDetails = campDetails.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.camp_name).toLowerCase().includes(searchTerm) ||
@@ -244,6 +247,14 @@ function Medical_camp() {
             setMessageType("danger");
         }
     };
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     return (
         <>
@@ -314,8 +325,8 @@ function Medical_camp() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRescueDetails.length > 0 ? (
-                                filteredRescueDetails.map((item, index) => (
+                            {currentItems.length > 0 ? (
+                                currentItems.map((item, index) => (
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td>{item.camp_name}</td>
@@ -353,6 +364,25 @@ function Medical_camp() {
                         </tbody>
 
                     </Table>
+                    <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                        <button
+                            className="btn btn-success me-2"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+
+                        <span> Page {currentPage} of {totalPages} </span>
+
+                        <button
+                            className="btn btn-success ms-2"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </Row>
             </Container>
 

@@ -15,10 +15,12 @@ function Though_Form() {
     const [previewRequested, setPreviewRequested] = useState(false);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const userType = Cookies.get('usertype');
 
-    const filteredRescueDetails = (visitDetails || []).filter((item) => {
+    const searchFilteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
@@ -179,22 +181,32 @@ function Though_Form() {
 
     const renderthoughCheckbox = (field, id, label) => (
         <Form.Check
-          type="checkbox"
-          id={id}
-          label={label}
-          checked={thoughFormData[field]?.includes(label)}
-          onChange={(e) => {
-            const updated = e.target.checked
-              ? [...thoughFormData[field], label]
-              : thoughFormData[field].filter(item => item !== label);
-    
-            setThoughFormData(prev => ({
-              ...prev,
-              [field]: updated
-            }));
-          }}
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={thoughFormData[field]?.includes(label)}
+            onChange={(e) => {
+                const updated = e.target.checked
+                    ? [...thoughFormData[field], label]
+                    : thoughFormData[field].filter(item => item !== label);
+
+                setThoughFormData(prev => ({
+                    ...prev,
+                    [field]: updated
+                }));
+            }}
         />
-      );
+    );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
 
     return (
         <>
@@ -248,8 +260,8 @@ function Though_Form() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRescueDetails.length > 0 ? (
-                                filteredRescueDetails.map((item, index) => (
+                            {currentItems.length > 0 ? (
+                                currentItems.map((item, index) => (
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
@@ -287,6 +299,25 @@ function Though_Form() {
                         </tbody>
 
                     </Table>
+                    <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                        <button
+                            className="btn btn-success me-2"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+
+                        <span> Page {currentPage} of {totalPages} </span>
+
+                        <button
+                            className="btn btn-success ms-2"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </Row>
 
             </Container>

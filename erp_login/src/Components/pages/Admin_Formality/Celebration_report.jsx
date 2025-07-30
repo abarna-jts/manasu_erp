@@ -17,6 +17,8 @@ function Celebration_report() {
     const [searchQuery, setSearchQuery] = useState("");
     const [previewRequested, setPreviewRequested] = useState(false);
     const [show, setShow] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const handleClose = () => setShow(false);
 
@@ -49,7 +51,7 @@ function Celebration_report() {
 
     })
 
-    const filteredRescueDetails = celebration_details.filter((item) => {
+    const searchFilteredRescueDetails = celebration_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.celebration_name).toLowerCase().includes(searchTerm) ||
@@ -305,6 +307,14 @@ function Celebration_report() {
         navigate("/programs_report");
     }
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     return (
         <>
@@ -370,8 +380,8 @@ function Celebration_report() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredRescueDetails.length > 0 ? (
-                                        filteredRescueDetails.map((item, index) => (
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((item, index) => (
                                             <tr key={item.id}>
                                                 <td>{index + 1}</td>
                                                 <td>{item.celebration_name || "null"}</td>
@@ -411,6 +421,25 @@ function Celebration_report() {
                                     )}
                                 </tbody>
                             </Table>
+                            <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                                <button
+                                    className="btn btn-success me-2"
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                </button>
+
+                                <span> Page {currentPage} of {totalPages} </span>
+
+                                <button
+                                    className="btn btn-success ms-2"
+                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <i className="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
                         </Col>
                     </Row>
                 </>

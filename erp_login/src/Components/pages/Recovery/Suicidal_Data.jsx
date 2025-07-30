@@ -15,17 +15,19 @@ function Suicidal_Data() {
     const [previewRequested, setPreviewRequested] = useState(false);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const userType = Cookies.get('usertype');
 
-    const filteredRescueDetails = (visitDetails || []).filter((item) => {
+    const searchFilteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
             String(item.suicide_history).toLowerCase().includes(searchTerm) ||
             String(item.triggers_stressors).toLowerCase().includes(searchTerm) ||
             String(item.homicidal_ideation).toLowerCase().includes(searchTerm) ||
-            String(item.target_method).toLowerCase().includes(searchTerm) 
+            String(item.target_method).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -200,6 +202,14 @@ function Suicidal_Data() {
             alert('Update failed.');
         }
     }
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
     return (
         <>
             <Container fluid>
@@ -252,8 +262,8 @@ function Suicidal_Data() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRescueDetails.length > 0 ? (
-                                filteredRescueDetails.map((item, index) => (
+                            {currentItems.length > 0 ? (
+                                currentItems.map((item, index) => (
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
@@ -271,13 +281,13 @@ function Suicidal_Data() {
                                                 <i className="fas fa-eye"></i>
                                             </button>
                                             {userType === "4" && (
-                                            <button className="btn btn-primary icon_details"
-                                                onClick={() => {
-                                                    handleEditform(item.id);
-                                                }}
-                                            ><i className="fas fa-edit"></i> </button>
+                                                <button className="btn btn-primary icon_details"
+                                                    onClick={() => {
+                                                        handleEditform(item.id);
+                                                    }}
+                                                ><i className="fas fa-edit"></i> </button>
                                             )}
-                                            
+
                                         </td>
                                     </tr>
                                 ))
@@ -288,6 +298,25 @@ function Suicidal_Data() {
                             )}
                         </tbody>
                     </Table>
+                    <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                        <button
+                            className="btn btn-success me-2"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+
+                        <span> Page {currentPage} of {totalPages} </span>
+
+                        <button
+                            className="btn btn-success ms-2"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </Row>
             </Container>
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>

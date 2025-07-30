@@ -18,6 +18,9 @@ function Nurse_Record_sheet() {
     const [searchQuery, setSearchQuery] = useState("");
     const [nurse_record, setNurseRecord] = useState([]);
     const [show1, setShow1] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
 
     const handleClose1 = () => setShow1(false);
 
@@ -57,10 +60,11 @@ function Nurse_Record_sheet() {
 
         const trimmedAdNo = formData.admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
+        
         try {
             const response = await apiRoute.post("/residency/nurse_record", formData);
             console.log(response);
@@ -80,7 +84,7 @@ function Nurse_Record_sheet() {
                     date: ''
                 });
 
-                handleClose(); 
+                handleClose();
                 getNurseRecords();
             } else {
                 alert("Something Went Wrong to Create Form");
@@ -108,7 +112,7 @@ function Nurse_Record_sheet() {
         }
     };
 
-    const filteredRescueDetails = nurse_record.filter((item) => {
+    const searchFilteredRescueDetails = nurse_record.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.month).toLowerCase().includes(searchTerm) ||
@@ -186,7 +190,14 @@ function Nurse_Record_sheet() {
         }
     };
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
 
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     return (
         <>
@@ -263,8 +274,8 @@ function Nurse_Record_sheet() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredRescueDetails.length > 0 ? (
-                                    filteredRescueDetails.map((item, index) => (
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((item, index) => (
                                         <>
                                             <tr key={item.id}>
                                                 <td>{index + 1}</td>
@@ -297,6 +308,25 @@ function Nurse_Record_sheet() {
                                 )}
                             </tbody>
                         </Table>
+                        <div className="d-flex justify-content-end align-items-center mb-3 mx-3 mt-4">
+                            <button
+                                className="btn btn-success me-2"
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                            >
+                                <i className="fas fa-chevron-left"></i>
+                            </button>
+
+                            <span> Page {currentPage} of {totalPages} </span>
+
+                            <button
+                                className="btn btn-success ms-2"
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                            >
+                                <i className="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
                     </Col>
                 </Row>
             </Container>

@@ -175,7 +175,7 @@ function Family_Request_form() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admissionNumber.trim().length >= 8) { // Adjust minimum length as needed
+        if (admissionNumber.trim().length >= 12) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admissionNumber]);
@@ -206,8 +206,8 @@ function Family_Request_form() {
 
         const trimmedAdNo = admissionNumber.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
 

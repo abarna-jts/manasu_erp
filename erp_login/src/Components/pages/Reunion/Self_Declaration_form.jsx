@@ -40,7 +40,7 @@ function Self_Declaration_form() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >= 8) { // Adjust minimum length as needed
+        if (admission_no.trim().length >= 12) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
@@ -216,8 +216,8 @@ function Self_Declaration_form() {
 
         const trimmedAdNo = admission_no.trim();
 
-        if (!/^\d{8}$/.test(trimmedAdNo) && !/^\d{10}$/.test(trimmedAdNo)) {
-            alert("Admission Number must be exactly 8 or 10 digits (numbers only).");
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
 

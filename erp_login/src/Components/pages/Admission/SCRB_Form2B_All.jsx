@@ -11,6 +11,8 @@ function SCRB_Form2B_All() {
     const [searchQuery, setSearchQuery] = useState("");
     const [show, setShow] = useState(false);
     const [selectedTattoos, setSelectedTattoos] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const [formData, setFormData] = useState({
         name_ngo: 'MANASU (Mental Health Charity Home)',
@@ -38,7 +40,7 @@ function SCRB_Form2B_All() {
         fetchSCRBForm2BReport();
     }, []);
 
-    const filteredRescueDetails = scrbForm2BList.filter((item) => {
+    const searchFilteredRescueDetails = scrbForm2BList.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
@@ -73,10 +75,10 @@ function SCRB_Form2B_All() {
                 scar: data.scar || 'NULL',
                 mole: data.mole || 'NULL',
                 height: data.height || 'NULL',
-                tatoo : data.tatoo || 'NULL'
+                tatoo: data.tatoo || 'NULL'
             });
             setSelectedTattoos(typeof data.tatoo === 'string' ? data.tatoo.split(',').map(c => c.trim()) : []);
-            
+
             setShow(true);
         } catch (error) {
             console.error("Error fetching form data:", error);
@@ -189,11 +191,19 @@ function SCRB_Form2B_All() {
 
     const navigate = useNavigate();
 
-    const gotoSCRBForm2c = () =>{
+    const gotoSCRBForm2c = () => {
         navigate("/scrb_form2cALL");
     }
 
-    
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
     return (
         <>
             <Container fluid>
@@ -258,8 +268,8 @@ function SCRB_Form2B_All() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredRescueDetails.length > 0 ? (
-                                        filteredRescueDetails.map((item, index) => (
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((item, index) => (
                                             <tr key={item.id}>
                                                 <td>{index + 1}</td>
                                                 <td>{item.admission_no || "null"}</td>
@@ -288,6 +298,25 @@ function SCRB_Form2B_All() {
                                     )}
                                 </tbody>
                             </Table>
+                            <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                                <button
+                                    className="btn btn-success me-2"
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                </button>
+
+                                <span> Page {currentPage} of {totalPages} </span>
+
+                                <button
+                                    className="btn btn-success ms-2"
+                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <i className="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
                         </Col>
                     </Row>
                 </>

@@ -17,10 +17,12 @@ function Cognition() {
     const [selectedStates, setSelectedStates] = useState([]);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const userType = Cookies.get('usertype');
 
-    const filteredRescueDetails = (visitDetails || []).filter((item) => {
+    const searchFilteredRescueDetails = (visitDetails || []).filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
@@ -357,6 +359,15 @@ function Cognition() {
         { id: "Coma", img: "../assets/img/attention/attention 6.png" },
     ];
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
     return (
         <>
             <Container fluid>
@@ -410,8 +421,8 @@ function Cognition() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRescueDetails.length > 0 ? (
-                                filteredRescueDetails.map((item, index) => (
+                            {currentItems.length > 0 ? (
+                                currentItems.map((item, index) => (
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
@@ -446,6 +457,25 @@ function Cognition() {
                         </tbody>
 
                     </Table>
+                    <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                        <button
+                            className="btn btn-success me-2"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+
+                        <span> Page {currentPage} of {totalPages} </span>
+
+                        <button
+                            className="btn btn-success ms-2"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </Row>
 
             </Container>

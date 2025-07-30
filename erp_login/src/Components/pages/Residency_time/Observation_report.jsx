@@ -24,6 +24,9 @@ function Observation_report() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [previewRequested, setPreviewRequested] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
 
     const handleEditClose = () => setEditShow(false);
 
@@ -63,6 +66,18 @@ function Observation_report() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!admission_no || admission_no.trim() === '') {
+            alert("Admission Number is required.");
+            return;
+        }
+
+        const trimmedAdNo = admission_no.trim();
+
+        if (!/^\d{8,13}$/.test(trimmedAdNo)) {
+            alert("Admission Number must be between 8 to 13 digits (numbers only).");
+            return;
+        }
 
         const data = new FormData();
         data.append('admission_no', admission_no);
@@ -228,7 +243,7 @@ function Observation_report() {
         }
     };
 
-    const filteredRescueDetails = condition_details.filter((item) => {
+    const searchFilteredRescueDetails = condition_details.filter((item) => {
         const searchTerm = searchQuery.toLowerCase();
         return (
             String(item.admission_no).toLowerCase().includes(searchTerm) ||
@@ -390,6 +405,14 @@ function Observation_report() {
             alert("Failed to generate PDF.");
         }
     };
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = searchFilteredRescueDetails.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(searchFilteredRescueDetails.length / itemsPerPage);
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     return (
         <>
@@ -461,8 +484,8 @@ function Observation_report() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredRescueDetails.length > 0 ? (
-                                    filteredRescueDetails.map((item, index) => (
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((item, index) => (
                                         <tr key={item.id}>
                                             <td>{index + 1}</td>
                                             <td>{item.date}</td>
@@ -553,6 +576,25 @@ function Observation_report() {
                                 )}
                             </tbody>
                         </Table>
+                        <div className="d-flex justify-content-end align-items-center mb-3 mx-3">
+                            <button
+                                className="btn btn-success me-2"
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                            >
+                                <i className="fas fa-chevron-left"></i>
+                            </button>
+
+                            <span> Page {currentPage} of {totalPages} </span>
+
+                            <button
+                                className="btn btn-success ms-2"
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                            >
+                                <i className="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
                     </Col>
                 </Row>
             </Container>
