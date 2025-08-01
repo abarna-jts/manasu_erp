@@ -6,17 +6,19 @@ import { Breadcrumb } from '@themesberg/react-bootstrap';
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Alert } from "react-bootstrap";
+import { useSelector, useDispatch } from 'react-redux';
+import { setField, resetAll } from '../../../store/admissionSlice.js';
 
 function First_info_form() {
     const [admissionNumber, setAdmissionNo] = useState('');
     const [step, setStep] = useState(1);
     const [validated, setValidated] = useState(false);
     // formdata usestate
-    const [referred_by, setReferredBy] = useState('');
-    const [from_place, setFromPlace] = useState('');
-    const [date_time, setDateTime] = useState('');
-    const [police_memo, setPoliceMemo] = useState('');
-    const [information_public, setInformationPulic] = useState('');
+    // const [referred_by, setReferredBy] = useState('');
+    // const [from_place, setFromPlace] = useState('');
+    // const [date_time, setDateTime] = useState('');
+    // const [police_memo, setPoliceMemo] = useState('');
+    // const [information_public, setInformationPulic] = useState('');
     const [admission_date, setAdmissionDate] = useState('');
     const [admission_no, setAdmisisonNo] = useState('');
     const [rescue_image, setRescueImage] = useState(null);
@@ -28,20 +30,51 @@ function First_info_form() {
     const [isStep3Invalid, setIsStep3Invalid] = useState(false);
     const [isStep4Invalid, setIsStep4Invalid] = useState(false);
     const [isStep5Invalid, setIsStep5Invalid] = useState(false);
+    const dispatch = useDispatch();
+    const {
+        referred_by,
+        from_place,
+        date_time,
+        police_memo,
+        police_station,
+        information_public,
+        rescue_name,
+        age,
+        rescue_status,
+        religion,
+        language1,
+        language2,
+        language3,
+        education,
+        govIdType,
+        govIdNumber,
+        father,
+        mother,
+        other_relation,
+        place,
+        phone_no,
+        phone_no_two,
+        clothing,
+        dress_code,
+        remark,
+        complexion,
+        indentification_mark,
+        tattoo,
+        wound_infection,
+        height, weight,
+        things_carried,
+        mental_status,
+        behaviour,
+        community_ability,
+        self_careCapacity,
+        diagnosis,
 
-    // const handleImageChange = (e) => {
-    //     const { name, files } = e.target;
-    //     setRescueImage((prevData) => ({
-    //         ...prevData,
-    //         [name]: [...files] // store multiple files as array
-    //     }));
-    // };
+    } = useSelector(state => state.admission);
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         setRescueImage(files);
     };
-
 
     // const handleMemoChange = (e) => {
     //     const file = e.target.files[0];
@@ -62,53 +95,53 @@ function First_info_form() {
         const files = Array.from(e.target.files);
         setAttachPoliceMemo(files);
     };
-    const [rescue_name, setRescueName] = useState('');
-    const [age, setAge] = useState('');
-    const [rescue_status, setRescueStatus] = useState('');
-    const [religion, setReligion] = useState('');
-    const [language1, setLanguage1] = useState('');
-    const [language2, setLanguage2] = useState('');
-    const [language3, setLanguage3] = useState('');
-    const [education, setEducation] = useState('');
-    const [father, setFather] = useState('');
+    // const [rescue_name, setRescueName] = useState('');
+    // const [age, setAge] = useState('');
+    // const [rescue_status, setRescueStatus] = useState('');
+    // const [religion, setReligion] = useState('');
+    // const [language1, setLanguage1] = useState('');
+    // const [language2, setLanguage2] = useState('');
+    // const [language3, setLanguage3] = useState('');
+    // const [education, setEducation] = useState('');
+    // const [father, setFather] = useState('');
     const [fatherError, setFatherError] = useState(false);
-    const [mother, setMother] = useState('');
+    // const [mother, setMother] = useState('');
     const [motherError, setMotherError] = useState(false);
-    const [other_relation, setOtherRelation] = useState('');
+    // const [other_relation, setOtherRelation] = useState('');
     const [other_relationError, setOtherRelationError] = useState(false);
-    const [place, setPlace] = useState('');
+    // const [place, setPlace] = useState('');
     const [placeError, setPlaceError] = useState(false);
-    const [phone_no, setPhoneNumber] = useState('');
+    // const [phone_no, setPhoneNumber] = useState('');
     const [phone_noError, setPhoneNoError] = useState(false);
-    const [phone_no_two, setPhoneNumberTwo] = useState('');
-    const [clothing, setClothing] = useState('');
+    // const [phone_no_two, setPhoneNumberTwo] = useState('');
+    // const [clothing, setClothing] = useState('');
     const [clothingError, setClothingError] = useState(false);
-    const [dress_code, setDressCode] = useState('');
+    // const [dress_code, setDressCode] = useState('');
     const [dress_codeError, setDressCodeError] = useState(false);
-    const [complexion, setComplexion] = useState('');
+    // const [complexion, setComplexion] = useState('');
     const [complexionError, setComplexionError] = useState(false);
-    const [indentification_mark, setIdentification] = useState('');
+    // const [indentification_mark, setIdentification] = useState('');
     const [identificationMarkError, setIdentificationError] = useState(false);
-    const [tattoo, setTattoo] = useState('');
+    // const [tattoo, setTattoo] = useState('');
     const [tattooError, setTattooError] = useState(false);
-    const [wound_infection, setWoundInfection] = useState('');
+    // const [wound_infection, setWoundInfection] = useState('');
     const [woundInfectionError, setWoundInfectionError] = useState(false);
-    const [height, setHeight] = useState('');
-    const [weight, setWeight] = useState('');
-    const [things_carried, setThingsCarried] = useState('');
+    // const [height, setHeight] = useState('');
+    // const [weight, setWeight] = useState('');
+    // const [things_carried, setThingsCarried] = useState('');
     const [thingsCarrierError, setThingsCarriedError] = useState(false);
     const [heightError, setHeightError] = useState(false);
     const [weightError, setWeightError] = useState(false);
-    const [remark, setRemark] = useState('');
-    const [mental_status, setMentalStatus] = useState('');
-    const [behaviour, setBehaviour] = useState('');
-    const [community_ability, setCommunityAbility] = useState('');
-    const [self_careCapacity, setSelfCareCapacity] = useState('');
-    const [diagnosis, setDiagnosis] = useState('');
+    // const [remark, setRemark] = useState('');
+    // const [mental_status, setMentalStatus] = useState('');
+    // const [behaviour, setBehaviour] = useState('');
+    // const [community_ability, setCommunityAbility] = useState('');
+    // const [self_careCapacity, setSelfCareCapacity] = useState('');
+    // const [diagnosis, setDiagnosis] = useState('');
     // const [rescued_by, setRescuedBy] = useState('');
     // const [information, setInformation] = useState('');
-    const [govIdType, setGovIdType] = useState('');
-    const [govIdNumber, setGovIdNumber] = useState('');
+    // const [govIdType, setGovIdType] = useState('');
+    // const [govIdNumber, setGovIdNumber] = useState('');
     const [govIdFile, setGovIdFile] = useState(null);
     // const [articles_carried, setArticlesCarried] = useState('');
     // const [rescue_relationship, setRescueRelationship] = useState('');
@@ -118,7 +151,7 @@ function First_info_form() {
     // const [f_aadhar_card, setFAadharCard] = useState('');
     // const [f_ration_card, setRationCard] = useState('');
     // const [res_aadhar_card, setRescueAadharCard] = useState('');
-    const [police_station, setPoliceStation] = useState('');
+    // const [police_station, setPoliceStation] = useState('');
 
     //alert box values
     const [submissionMessage, setSubmissionMessage] = useState("");
@@ -153,7 +186,6 @@ function First_info_form() {
         setPhoneNoError(value.length !== 10);
     };
 
-
     const AdmissionNumber = async () => {
         const now = new Date();
         const year = now.getFullYear();
@@ -183,7 +215,6 @@ function First_info_form() {
                     throw new Error("Too many admission numbers for today");
                 }
             }
-
             setAdmisisonNo(newAdmissionNo); // Make sure this matches your state variable
 
         } catch (error) {
@@ -640,14 +671,16 @@ function First_info_form() {
         console.log("Submitting values:", admission_no, admission_date);
         try {
             const response = await apiRoute.post("/admision/create_first_form", formData, {
-                headers: { 
+                headers: {
                     'Content-Type': 'multipart/form-data', // Important for file uploads
                 }
             });
             console.log("Full Response:", response.data);
             if (response.data.message === "First Form Created Successfully") {
                 alert("Form submitted successfully!");
+                handleClear();
                 window.location.reload();
+
             } else {
                 alert("Form submission failed: " + response.data.message);
             }
@@ -657,7 +690,10 @@ function First_info_form() {
             setMessageType("danger");
         }
     }
-
+    const handleClear = () => {
+        dispatch(resetAll());
+        localStorage.removeItem('admissionState');
+    };
 
     const handleBack = () => {
         setStep(1);
@@ -776,7 +812,7 @@ function First_info_form() {
                                         <Form.Control type="text"
                                             name="referred_by"
                                             value={referred_by}
-                                            onChange={(e) => setReferredBy(e.target.value)}
+                                            onChange={e => dispatch(setField({ field: 'referred_by', value: e.target.value }))}
                                             required />
                                         <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
                                     </Form.Group>
@@ -786,7 +822,7 @@ function First_info_form() {
                                             type="text"
                                             name="from_place"
                                             value={from_place}
-                                            onChange={(e) => setFromPlace(e.target.value)}
+                                            onChange={e => dispatch(setField({ field: 'from_place', value: e.target.value }))}
                                             required />
                                     </Form.Group>
                                     <Form.Group className="mb-3 text-start" controlId="formdatetime">
@@ -796,7 +832,7 @@ function First_info_form() {
                                             name="date_time"
                                             value={date_time}
                                             max={new Date().toISOString().slice(0, 16)}
-                                            onChange={(e) => setDateTime(e.target.value)}
+                                            onChange={e => dispatch(setField({ field: 'date_time', value: e.target.value }))}
                                             required />
                                     </Form.Group>
                                     <Row>
@@ -807,7 +843,7 @@ function First_info_form() {
                                                     type="text"
                                                     name="police_memo"
                                                     value={police_memo}
-                                                    onChange={(e) => setPoliceMemo(e.target.value)}
+                                                    onChange={e => dispatch(setField({ field: 'police_memo', value: e.target.value }))}
                                                     required />
                                             </Form.Group>
                                         </Col>
@@ -834,7 +870,7 @@ function First_info_form() {
                                             type="text"
                                             name="police_station"
                                             value={police_station}
-                                            onChange={(e) => setPoliceStation(e.target.value)}
+                                            onChange={e => dispatch(setField({ field: 'police_station', value: e.target.value }))}
                                             required />
                                     </Form.Group>
                                     <Form.Group className="mb-3 text-start" controlId="formPublicInfo">
@@ -843,7 +879,7 @@ function First_info_form() {
                                             type="text"
                                             name="information_public"
                                             value={information_public}
-                                            onChange={(e) => setInformationPulic(e.target.value)}
+                                            onChange={e => dispatch(setField({ field: 'information_public', value: e.target.value }))}
                                             required />
                                     </Form.Group>
                                 </Col>
@@ -937,7 +973,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="rescue_name"
                                                 value={rescue_name}
-                                                onChange={(e) => setRescueName(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'rescue_name', value: e.target.value }))}
                                                 required />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formAge">
@@ -946,7 +982,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="age"
                                                 value={age}
-                                                onChange={(e) => setAge(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'age', value: e.target.value }))}
                                             />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formstatus">
@@ -954,7 +990,7 @@ function First_info_form() {
                                             <Form.Select
                                                 name="rescue_status"
                                                 value={rescue_status}
-                                                onChange={(e) => setRescueStatus(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'rescue_status', value: e.target.value }))}
                                                 required
                                             >
                                                 <option value="">-- Select Status --</option>
@@ -968,7 +1004,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="religion"
                                                 value={religion}
-                                                onChange={(e) => setReligion(e.target.value)} />
+                                                onChange={e => dispatch(setField({ field: 'religion', value: e.target.value }))} />
                                         </Form.Group>
                                         <Form.Group className="mb-3 text-start" controlId="formLanguage">
                                             <Form.Label>Known Languages: <span style={{ color: 'red' }}>*</span></Form.Label>
@@ -978,7 +1014,7 @@ function First_info_form() {
                                                         type="text"
                                                         placeholder="Language 1"
                                                         value={language1}
-                                                        onChange={(e) => setLanguage1(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'language1', value: e.target.value }))}
                                                         className="mb-2"
                                                         required
                                                     />
@@ -988,7 +1024,7 @@ function First_info_form() {
                                                         type="text"
                                                         placeholder="Language 2"
                                                         value={language2}
-                                                        onChange={(e) => setLanguage2(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'language2', value: e.target.value }))}
                                                         className="mb-2"
                                                     />
                                                 </Col>
@@ -997,7 +1033,7 @@ function First_info_form() {
                                                         type="text"
                                                         placeholder="Language 3"
                                                         value={language3}
-                                                        onChange={(e) => setLanguage3(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'language3', value: e.target.value }))}
                                                     />
                                                 </Col>
                                             </Row>
@@ -1012,7 +1048,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="education"
                                                 value={education}
-                                                onChange={(e) => setEducation(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'education', value: e.target.value }))}
                                                 required />
                                         </Form.Group>
                                     </Col>
@@ -1050,7 +1086,7 @@ function First_info_form() {
                                                 <Form.Select
                                                     value={govIdType}
                                                     name="govIdType"
-                                                    onChange={(e) => setGovIdType(e.target.value)}
+                                                    onChange={e => dispatch(setField({ field: 'govIdType', value: e.target.value }))}
                                                     required
                                                 >
                                                     <option value="">Select ID Type</option>
@@ -1075,7 +1111,7 @@ function First_info_form() {
                                                             placeholder={`Enter ${govIdType} number`}
                                                             value={govIdNumber}
                                                             name="govIdNumber"
-                                                            onChange={(e) => setGovIdNumber(e.target.value)}
+                                                            onChange={e => dispatch(setField({ field: 'govIdNumber', value: e.target.value }))}
                                                         />
                                                     </Col>
                                                 </Form.Group>
@@ -1155,7 +1191,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="father"
                                                 value={father}
-                                                onChange={(e) => setFather(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'father', value: e.target.value }))}
                                                 isInvalid={fatherError}
                                             />
                                             <Form.Control.Feedback type="invalid">
@@ -1169,7 +1205,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="mother"
                                                 value={mother}
-                                                onChange={(e) => setMother(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'mother', value: e.target.value }))}
                                                 isInvalid={motherError} />
                                             <Form.Control.Feedback type="invalid">
                                                 Please enter "Unknown" or "NA" if not available.
@@ -1182,7 +1218,7 @@ function First_info_form() {
                                                 name="other_relation"
                                                 value={other_relation}
                                                 placeholder="Eg.Smith John (Brother)"
-                                                onChange={(e) => setOtherRelation(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'other_relation', value: e.target.value }))}
                                                 isInvalid={other_relationError}
                                             />
                                             <Form.Control.Feedback type="invalid">
@@ -1196,7 +1232,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="place"
                                                 value={place}
-                                                onChange={(e) => setPlace(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'place', value: e.target.value }))}
                                                 isInvalid={placeError}
                                             />
                                             <Form.Control.Feedback type="invalid">
@@ -1211,7 +1247,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="phone_no"
                                                         value={phone_no}
-                                                        onChange={handlePhoneChange}
+                                                        onChange={e => dispatch(setField({ field: 'phone_no', value: e.target.value }))}
                                                         isInvalid={phone_noError}
                                                     />
                                                     <Form.Control.Feedback type="invalid">
@@ -1226,7 +1262,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="phone_no_two"
                                                         value={phone_no_two}
-                                                        onChange={(e) => setPhoneNumberTwo(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'phone_no_two', value: e.target.value }))}
                                                     />
                                                 </Col>
                                             </Row>
@@ -1298,7 +1334,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="clothing"
                                                         value={clothing}
-                                                        onChange={(e) => setClothing(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'clothing', value: e.target.value }))}
                                                         isInvalid={clothingError} />
                                                     <Form.Control.Feedback type="invalid">
                                                         Please enter "Unknown" or "NA" if not available.
@@ -1312,7 +1348,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="dress_code"
                                                         value={dress_code}
-                                                        onChange={(e) => setDressCode(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'dress_code', value: e.target.value }))}
                                                         isInvalid={dress_codeError} />
                                                     <Form.Control.Feedback type="invalid">
                                                         Please enter "Unknown" or "NA" if not available.
@@ -1327,7 +1363,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="complexion"
                                                 value={complexion}
-                                                onChange={(e) => setComplexion(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'complexion', value: e.target.value }))}
                                                 isInvalid={complexionError} />
                                             <Form.Control.Feedback type="invalid">
                                                 Please enter "Unknown" or "NA" if not available.
@@ -1339,7 +1375,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="indentification_mark"
                                                 value={indentification_mark}
-                                                onChange={(e) => setIdentification(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'indentification_mark', value: e.target.value }))}
                                                 isInvalid={identificationMarkError} />
                                             <Form.Control.Feedback type="invalid">
                                                 Please enter "Unknown" or "NA" if not available.
@@ -1353,7 +1389,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="tattoo"
                                                         value={tattoo}
-                                                        onChange={(e) => setTattoo(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'tattoo', value: e.target.value }))}
                                                         isInvalid={tattooError} />
                                                     <Form.Control.Feedback type="invalid">
                                                         Please enter "Unknown" or "NA" if not available.
@@ -1367,7 +1403,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="wound_infection"
                                                         value={wound_infection}
-                                                        onChange={(e) => setWoundInfection(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'wound_infection', value: e.target.value }))}
                                                         isInvalid={woundInfectionError} />
                                                     <Form.Control.Feedback type="invalid">
                                                         Please enter "Unknown" or "NA" if not available.
@@ -1384,7 +1420,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="height"
                                                         value={height}
-                                                        onChange={(e) => setHeight(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'height', value: e.target.value }))}
                                                         isInvalid={heightError}
                                                         required />
                                                 </Form.Group>
@@ -1396,7 +1432,7 @@ function First_info_form() {
                                                         type="text"
                                                         name="weight"
                                                         value={weight}
-                                                        onChange={(e) => setWeight(e.target.value)}
+                                                        onChange={e => dispatch(setField({ field: 'weight', value: e.target.value }))}
                                                         isInvalid={weightError}
                                                         required />
                                                 </Form.Group>
@@ -1408,7 +1444,7 @@ function First_info_form() {
                                                 type="text"
                                                 name="things_carried"
                                                 value={things_carried}
-                                                onChange={(e) => setThingsCarried(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'things_carried', value: e.target.value }))}
                                                 isInvalid={thingsCarrierError} />
                                             <Form.Control.Feedback type="invalid">
                                                 Please enter "Unknown" or "NA" if not available.
@@ -1420,7 +1456,7 @@ function First_info_form() {
                                                 as="textarea"
                                                 name="remark"
                                                 value={remark}
-                                                onChange={(e) => setRemark(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'remark', value: e.target.value }))}
                                                 rows={3} />
                                         </Form.Group>
                                     </Col>
@@ -1486,7 +1522,7 @@ function First_info_form() {
                                                 as="textarea"
                                                 name="mental_status"
                                                 value={mental_status}
-                                                onChange={(e) => setMentalStatus(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'mental_status', value: e.target.value }))}
                                                 rows={3}
                                                 required />
                                         </Form.Group>
@@ -1496,7 +1532,7 @@ function First_info_form() {
                                                 as="textarea"
                                                 name="behaviour"
                                                 value={behaviour}
-                                                onChange={(e) => setBehaviour(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'behaviour', value: e.target.value }))}
                                                 rows={3}
                                                 required />
                                         </Form.Group>
@@ -1506,7 +1542,7 @@ function First_info_form() {
                                                 as="textarea"
                                                 name="community_ability"
                                                 value={community_ability}
-                                                onChange={(e) => setCommunityAbility(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'community_ability', value: e.target.value }))}
                                                 rows={3}
                                                 required />
                                         </Form.Group>
@@ -1516,7 +1552,7 @@ function First_info_form() {
                                                 as="textarea"
                                                 name="self_careCapacity"
                                                 value={self_careCapacity}
-                                                onChange={(e) => setSelfCareCapacity(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'self_careCapacity', value: e.target.value }))}
                                                 rows={3}
                                                 required />
                                         </Form.Group>
@@ -1526,7 +1562,7 @@ function First_info_form() {
                                                 as="textarea"
                                                 name="diagnosis"
                                                 value={diagnosis}
-                                                onChange={(e) => setDiagnosis(e.target.value)}
+                                                onChange={e => dispatch(setField({ field: 'diagnosis', value: e.target.value }))}
                                                 rows={3}
                                                 required />
                                         </Form.Group>

@@ -76,6 +76,7 @@ import SCRB_All_Details from './Components/pages/Admission/SCRB_All_Details';
 import SCRB_Form2A_ALL from './Components/pages/Admission/SCRB_Form2A_ALL';
 import SCRB_Form2B_All from './Components/pages/Admission/SCRB_Form2B_All';
 import SCRB_Form2C_All from './Components/pages/Admission/SCRB_Form2C_All';
+import PDF_preview from './Components/pages/Admission/PDF_preview';
 
 function App() {
 
@@ -181,6 +182,17 @@ function App() {
                   <MainLayout><SCRB_Form2C /></MainLayout>
                 ) : (
                   <MainLayout><SCRB_Form2C /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/sample_form'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><PDF_preview /></MainLayout>
+                ) : (
+                  <MainLayout><PDF_preview /></MainLayout>
                 )
               }
             />
