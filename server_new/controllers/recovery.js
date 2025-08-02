@@ -1,6 +1,7 @@
 import db from '../db.js';
 import { recoveryAsync } from '../util/recoveryMulter.js';
 import { checkMSECompletion } from '../util/checkMSECompletion.js';
+import { checkPsychiatricCompletion } from '../util/checkPsychiatricCompletion.js';
 import transporter from '../config/mailer.js';
 
 const createMSEForm = async (req, res) => {
@@ -1755,9 +1756,9 @@ const createBasicInformation = async (req, res) => {
     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     const values = [
-      admission_no, date, patient_name, patient_age, patient_gender, sexual_orientation,
+      admission_no, date, patient_name, patient_age, "Male", sexual_orientation,
       education_bg, occupation, marital_status, economic_status, religion,
-      informant, residential_address, living_arrangements, family_structure, cultural_identity, language1, language2
+      informant, residential_address, living_arrangements, family_structure, cultural_identity, language1, language2 || "NULL"
     ];
 
     const [result] = await db.query(query, values);
@@ -2186,7 +2187,7 @@ const createSuicidalData = async (req, res) => {
       return res.status(400).json({ message: "No record inserted. Check if ID exists." });
     }
 
-    const isComplete = await checkMSECompletion(admission_no);
+    const isComplete = await checkPsychiatricCompletion(admission_no);
 
     if (!isComplete) {
       return res.status(400).json({
@@ -2233,7 +2234,7 @@ const sendPsychiatricEmailToDirector = async ({ admission_no }) => {
 
     const mailOptions = {
       from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-      to: ['manasucmf@gmail.com'],
+      to: ['abarnadevi2705@gmail.com'],
       subject: `🧠 Psychiatric Case History Form Completed: ${admission_no}`,
       html: `
         <p>The Psychiatric Case History Form for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>

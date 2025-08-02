@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Breadcrumb, InputGroup, Button, Form, FormLabel } from "react-bootstrap";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -13,7 +13,9 @@ import { useNavigate } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useSelector, useDispatch } from 'react-redux';
-import { setField, resetAll } from '../../../store/psychiatricSlice.js';
+import { setField, resetDemographics, resetCheifState, resetPresentationState,resetPsychiatricState,
+    resetMedicalState, resetFamilyState, resetSocialState, resetDevelopmentState, resetSubstanceState,resetSuicidialState
+ } from '../../../store/psychiatricSlice.js';
 
 function Psychiatrics_form() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -35,6 +37,8 @@ function Psychiatrics_form() {
     const developmentalData = useSelector((state) => state.psychiatric);
     const substanceData = useSelector((state) => state.psychiatric);
     const suicidalData = useSelector((state) => state.psychiatric);
+
+    // const STORAGE_KEY = 'psyc';
     // const initialState = {
     //     // ...other fields...
     //     mood_affect: [],
@@ -293,6 +297,56 @@ function Psychiatrics_form() {
         setDate(e.target.value);
     };
 
+    const clearDemographic = useCallback(() => {
+        dispatch(resetDemographics());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+    
+    const clearCheifData = useCallback(() => {
+        dispatch(resetCheifState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearPresentingData = useCallback(() => {
+        dispatch(resetPresentationState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearPsychiatricData = useCallback(() => {
+        dispatch(resetPsychiatricState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearMedicalData = useCallback(() => {
+        dispatch(resetMedicalState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearFamilyData = useCallback(() => {
+        dispatch(resetFamilyState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearSocialData = useCallback(() => {
+        dispatch(resetSocialState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearDevelopmentData = useCallback(() => {
+        dispatch(resetDevelopmentState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearSubstanceData = useCallback(() => {
+        dispatch(resetSubstanceState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
+    const clearSuicidialData = useCallback(() => {
+        dispatch(resetSuicidialState());
+        localStorage.removeItem('psychiatricState');
+    }, []);
+
     const fetchRescueDetails = async (admission_no) => {
         try {
             const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
@@ -391,7 +445,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_information', completeFormData);
             console.log("Form submitted successfully:", response.data);
             alert("Demographic Information submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetDemographics());
             // window.location.reload();
             localStorage.removeItem('psychiatricState');
         } catch (error) {
@@ -428,7 +482,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_chiefComplaint', completeChiefData);
             console.log("Chief Complaint submitted successfully:", response.data);
             alert("Chief Complaint submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetCheifState());
             localStorage.removeItem('psychiatricState');
             // window.location.reload();
         } catch (error) {
@@ -494,7 +548,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_presenting', completedPresentingData);
             console.log("Presenting Problems submitted successfully:", response.data);
             alert("Presenting Problems submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetPresentationState());
             localStorage.removeItem('psychiatricState');
         } catch (error) {
             console.error(error);
@@ -537,7 +591,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_psyhistory', completePsyHistoryData);
             console.log("Psychiatric History submitted successfully:", response.data);
             alert("Psychiatric History submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetPsychiatricState());
             localStorage.removeItem('psychiatricState');
         } catch (error) {
             console.error(error);
@@ -584,7 +638,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_medicalData', completeMedicalData);
             console.log("Medical History submitted successfully:", response.data);
             alert("Medical History submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetMedicalState());
             localStorage.removeItem('psychiatricState');
         } catch (error) {
             console.error(error);
@@ -630,7 +684,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_familyData', completeFamilyData);
             console.log("Family History submitted successfully:", response.data);
             alert("Family History submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetFamilyState());
             localStorage.removeItem('psychiatricState');
             // window.location.reload();
         } catch (error) {
@@ -664,7 +718,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_socialData', completeSocialData);
             console.log("Social History submitted successfully:", response.data);
             alert("Social History submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetSocialState());
             localStorage.removeItem('psychiatricState');
             // window.location.reload();
         } catch (error) {
@@ -698,7 +752,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_developmentalData', completeDevelopmentalData);
             console.log("Developmental History submitted successfully:", response.data);
             alert("Developmental History submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetDevelopmentState());
             localStorage.removeItem('psychiatricState');
         } catch (error) {
             console.error(error);
@@ -731,7 +785,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_substanceData', completeSubstanceData);
             console.log("Substance Use History submitted successfully:", response.data);
             alert("Substance Use History submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetSubstanceState());
             localStorage.removeItem('psychiatricState');
         } catch (error) {
             console.error(error);
@@ -765,7 +819,7 @@ function Psychiatrics_form() {
             const response = await apiRoute.post('/recovery/create_suicidalData', completeSuicidalData);
             console.log("Suicidal and Homicidal Ideation submitted successfully:", response.data);
             alert("Suicidal and Homicidal Ideation submitted successfully!");
-            dispatch(resetAll());
+            dispatch(resetSuicidialState());
             localStorage.removeItem('psychiatricState');
         } catch (error) {
             console.error("Error submitting Suicidal and Homicidal Ideation form:", error);
@@ -814,7 +868,6 @@ function Psychiatrics_form() {
             />
         );
     };
-
 
     const renderpsyCheckbox = (field, id, label) => {
         const psycurrent = Array.isArray(psyHistoryData[field]) ? psyHistoryData[field] : [];
@@ -1190,8 +1243,8 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-first typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>DEMOGRAPHIC INFORMATION</h1>
-
                                             <Button className='btn btn-success mx-3' type='button' onClick={handleBasicNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearDemographic}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -1225,7 +1278,7 @@ function Psychiatrics_form() {
                                                         <Col sm="8">
                                                             <Form.Control type='text'
                                                                 name='patient_gender'
-                                                                value={formData.patient_gender}
+                                                                value='Male'
                                                                 onChange={handleInputChange}
                                                                 readOnly
                                                                 required
@@ -1403,7 +1456,7 @@ function Psychiatrics_form() {
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>THE CHIEF COMPLAINT</h1>
 
-                                            <Button className='btn btn-success mx-3' type='button' onClick={handleCheifNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearCheifData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -1570,6 +1623,7 @@ function Psychiatrics_form() {
                                             <h1>PRESENTING PROBLEMS</h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handlePresentingNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearPresentingData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -1749,6 +1803,7 @@ function Psychiatrics_form() {
                                             <h1>PSYCHIATRIC HISTORY</h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handlepsyHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearPsychiatricData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -1995,6 +2050,7 @@ function Psychiatrics_form() {
                                             <h1>MEDICAL HISTORY</h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handleMedicalNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearMedicalData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2125,6 +2181,7 @@ function Psychiatrics_form() {
                                             <h1>FAMILY HISTORY</h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handleFamHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearFamilyData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2231,6 +2288,7 @@ function Psychiatrics_form() {
                                             <h1>SOCIAL HISTORY </h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handleSocHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearSocialData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2370,6 +2428,7 @@ function Psychiatrics_form() {
                                             <h1>DEVELOPMENTAL HISTORY </h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handleDevHistoryNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearDevelopmentData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2522,6 +2581,7 @@ function Psychiatrics_form() {
                                             <h1>SUBSTANCE USE HISTORY</h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handleSubstanceNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearSubstanceData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>
@@ -2686,6 +2746,7 @@ function Psychiatrics_form() {
                                             <h1>SUICIDAL AND HOMICIDAL IDEATION</h1>
 
                                             <Button className='btn btn-success mx-3' type='button' onClick={handleSuicidalNavigate}>View All</Button>
+                                            <Button className='btn btn-success mx-3' type='button' onClick={clearSuicidialData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>
                                             <Col md={9}>

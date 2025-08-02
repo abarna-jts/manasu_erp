@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Col, Breadcrumb, Container, Row, Table, Button, InputGroup, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faPlus, faEdit } from "@fortawesome/free-solid-svg-icons";
@@ -11,6 +11,11 @@ import manasu_logo from '../Admission/Manasu-Logo.png';
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  setMSEField, resetGeneralData, resetSpeechData, resetMoodData, resetThoughData,
+  resetJudgementData, resetPerceptionData, resetCognitionData, resetInsightData
+} from '../../../store/MSESlice.js';
 
 function MSE_form() {
   const [rescueImage, setRescueImage] = useState(null);
@@ -22,137 +27,141 @@ function MSE_form() {
   const [shouldGeneratePDF, setShouldGeneratePDF] = useState(false);
   const [date, setDate] = useState('');
   const [allFormEntries, setAllFormEntries] = useState([]);
-  const [formData, setFormData] = useState({
-    admission_no: '',
-    date: '',
-    general_appearance: [],
-    attitude: [],
-    comprehension: [],
-    gait_posture: [],
-    motor_activity: [],
-    catatonic_sign: [],
-    conversion_dissociative: [],
-    social_manner: [],
-    rapport: [],
-    hallucinatory_behaviour: []
-  });
 
-  const [speechFormData, setSpeechFormData] = useState({
-    rate_quantity: [],
-    volume_tone: [],
-    flow_rhythm: [],
-    admission_no: "",
-    date: '',
-  });
+  const dispatch = useDispatch();
+  const formData = useSelector((state) => state.mse);
+  const speechFormData = useSelector((state) => state.mse);
+  const moodFormData = useSelector((state) => state.mse);
+  const thoughFormData = useSelector((state) => state.mse);
+  const judgementData = useSelector((state) => state.mse);
+  const insightData = useSelector((state) => state.mse);
+  const perceptionData = useSelector((state) => state.mse);
+  const cognitionData = useSelector((state) => state.mse);
 
-  const [moodFormData, setMoodFormData] = useState({
-    mood_description: [],
-    appearance: "",
-    resident_feeling: "",
-    general_feeling: "",
-    mood_like: "",
-    resident_general_feeling: "",
-    resident_look: [],
-    admission_no: "",
-    date: '',
-  });
+  // const [formData, setFormData] = useState({
+  //   admission_no: '',
+  //   date: '',
+  //   general_appearance: [],
+  //   attitude: [],
+  //   comprehension: [],
+  //   gait_posture: [],
+  //   motor_activity: [],
+  //   catatonic_sign: [],
+  //   conversion_dissociative: [],
+  //   social_manner: [],
+  //   rapport: [],
+  //   hallucinatory_behaviour: []
+  // });
 
-  const [thoughFormData, setThoughFormData] = useState({
-    stream_form_though: [],
-    content_though: [],
-    admission_no: '',
-    date: '',
-  })
+  // const [speechFormData, setSpeechFormData] = useState({
+  //   rate_quantity: [],
+  //   volume_tone: [],
+  //   flow_rhythm: [],
+  //   admission_no: "",
+  //   date: '',
+  // });
 
-  const [judgementData, setJudgementFormData] = useState({
-    personal_judgement: '',
-    social_judgement: '',
-    test_judgement: '',
-    judgement: '',
-    admission_no: '',
-    date: '',
-  })
+  // const [moodFormData, setMoodFormData] = useState({
+  //   mood_description: [],
+  //   appearance: "",
+  //   resident_feeling: "",
+  //   general_feeling: "",
+  //   mood_like: "",
+  //   resident_general_feeling: "",
+  //   resident_look: [],
+  //   admission_no: "",
+  //   date: '',
+  // });
 
-  const [insightData, setInsightData] = useState({
-    denail_illness: '',
-    slight_awareness: '',
-    awarness_sick: '',
-    awarness_illness: '',
-    intellectual_insight: '',
-    true_emotion: '',
-    admission_no: '',
-    date: '',
-  })
+  // const [thoughFormData, setThoughFormData] = useState({
+  //   stream_form_though: [],
+  //   content_though: [],
+  //   admission_no: '',
+  //   date: '',
+  // })
 
-  const [perceptionData, setPerceptionData] = useState({
-    hallucination_type: [],
-    heard: '',
-    voices_heard: '',
-    part_of_day: '',
-    female_male_voices: '',
-    interpreted_person: '',
-    illusion: [],
-    perception_changes: [],
-    somatic: [],
-    others: [],
-    admission_no: '',
-    date: '',
-  })
+  // const [judgementData, setJudgementFormData] = useState({
+  //   personal_judgement: '',
+  //   social_judgement: '',
+  //   test_judgement: '',
+  //   judgement: '',
+  //   admission_no: '',
+  //   date: '',
+  // })
 
-  const [cognitionData, setCognitionData] = useState({
-    consciousness: [],
-    orientation_time: '',
-    orientation_place: '',
-    orientation_person: '',
-    consciousnessState: '',
-    canConcentrate: '',
-    distractibility: '',
-    asking_test: '',
-    names_months: '',
-    test_performance: '',
-    immediate_retention: '',
-    recall: '',
-    patient_place: '',
-    dinner_ate: '',
-    date_ofMrg: '',
-    birthdays_children: '',
-    person_past: '',
-    amnesia: '',
-    live_growing: '',
-    person_school: '',
-    breakfast_ques: '',
-    do_yesterday: '',
-    general_info: '',
-    test_red_wri: '',
-    calculation_test: '',
-    proverb_testing: '',
-    familiar_object: '',
-    admission_no: '',
-    date: '',
+  // const [insightData, setInsightData] = useState({
+  //   denail_illness: '',
+  //   slight_awareness: '',
+  //   awarness_sick: '',
+  //   awarness_illness: '',
+  //   intellectual_insight: '',
+  //   true_emotion: '',
+  //   admission_no: '',
+  //   date: '',
+  // })
 
-  })
+  // const [perceptionData, setPerceptionData] = useState({
+  //   hallucination_type: [],
+  //   heard: '',
+  //   voices_heard: '',
+  //   part_of_day: '',
+  //   female_male_voices: '',
+  //   interpreted_person: '',
+  //   illusion: [],
+  //   perception_changes: [],
+  //   somatic: [],
+  //   others: [],
+  //   admission_no: '',
+  //   date: '',
+  // })
+
+  // const [cognitionData, setCognitionData] = useState({
+  //   consciousness: [],
+  //   orientation_time: '',
+  //   orientation_place: '',
+  //   orientation_person: '',
+  //   consciousnessState: '',
+  //   canConcentrate: '',
+  //   distractibility: '',
+  //   asking_test: '',
+  //   names_months: '',
+  //   test_performance: '',
+  //   immediate_retention: '',
+  //   recall: '',
+  //   patient_place: '',
+  //   dinner_ate: '',
+  //   date_ofMrg: '',
+  //   birthdays_children: '',
+  //   person_past: '',
+  //   amnesia: '',
+  //   live_growing: '',
+  //   person_school: '',
+  //   breakfast_ques: '',
+  //   do_yesterday: '',
+  //   general_info: '',
+  //   test_red_wri: '',
+  //   calculation_test: '',
+  //   proverb_testing: '',
+  //   familiar_object: '',
+  //   admission_no: '',
+  //   date: '',
+
+  // })
 
   const userType = Cookies.get('usertype');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setJudgementFormData((prev) => ({
-      ...prev,
-      [name]: value, // dynamically set field, like formData.judgment
-    }));
+    dispatch(setMSEField({ field: name, value }));
   };
 
   const handleChange1 = (e) => {
     const { name, value } = e.target;
 
-    setCognitionData((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
+    dispatch(setMSEField({ field: name, value }));
   };
   const handleCheckboxChange1 = (e) => {
     const { id, checked } = e.target;
-
     let updatedStates = [...selectedStates];
 
     if (checked) {
@@ -163,11 +172,8 @@ function MSE_form() {
 
     setSelectedStates(updatedStates);
 
-    // Sync with cognitionData
-    setCognitionData((prevData) => ({
-      ...prevData,
-      consciousnessState: updatedStates,
-    }));
+    // Update Redux store
+    dispatch(setMSEField({ field: "consciousnessState", value: updatedStates }));
   };
 
 
@@ -183,36 +189,41 @@ function MSE_form() {
     baseURL: import.meta.env.VITE_API_BASE_URL,
   });
 
-  const handleCheckboxChange = (section, value) => {
-    setFormData((prevData) => {
-      const isChecked = prevData[section].includes(value);
-      return {
-        ...prevData,
-        [section]: isChecked
-          ? prevData[section].filter((v) => v !== value)
-          : [...prevData[section], value],
-      };
-    });
-  };
+  // const handleCheckboxChange = (section, value) => {
+  //   setFormData((prevData) => {
+  //     const isChecked = prevData[section].includes(value);
+  //     return {
+  //       ...prevData,
+  //       [section]: isChecked
+  //         ? prevData[section].filter((v) => v !== value)
+  //         : [...prevData[section], value],
+  //     };
+  //   });
+  // };
 
   const handleInputChange = (e) => {
-    setMoodFormData({ ...moodFormData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    dispatch(setMSEField({ field: name, value }));
   };
 
   const handleInputChange1 = (e) => {
-    setJudgementFormData({ ...judgementData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    dispatch(setMSEField({ field: name, value }));
   };
 
   const handleInputChange2 = (e) => {
-    setInsightData({ ...insightData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    dispatch(setMSEField({ field: name, value }));
   };
 
   const handleInputChange3 = (e) => {
-    setPerceptionData({ ...perceptionData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    dispatch(setMSEField({ field: name, value }));
   }
 
   const handleInputChange4 = (e) => {
-    setCognitionData({ ...cognitionData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    dispatch(setMSEField({ field: name, value }));
   }
 
 
@@ -224,6 +235,71 @@ function MSE_form() {
     { id: "Stupor", img: "../assets/img/attention/attention 5.png" },
     { id: "Coma", img: "../assets/img/attention/attention 6.png" },
   ];
+
+  // useEffect(() => {
+  //   try {
+  //     const stored = localStorage.getItem('admissionMSEInfo');
+  //     if (stored) {
+  //       const { admission_no: storedAdm, date: storedDate } = JSON.parse(stored);
+  //       if (storedAdm) setAdmissionNumber(storedAdm);
+  //       if (storedDate) setDate(storedDate);
+  //     }
+  //   } catch (e) {
+  //     console.warn('Failed to parse stored admission info', e);
+  //   }
+  // }, []);
+
+  // // whenever admission_no or date changes, persist
+  // useEffect(() => {
+  //   try {
+  //     localStorage.setItem(
+  //       'admissionMSEInfo',
+  //       JSON.stringify({ admission_no, date })
+  //     );
+  //   } catch (e) {
+  //     console.warn('Failed to save admission info', e);
+  //   }
+  // }, [admission_no, date]);
+
+  const clearGeneralData = useCallback(() => {
+    dispatch(resetGeneralData());
+    localStorage.removeItem('mseState');
+  }, []);
+
+  const clearSpeechData = useCallback(() => {
+    dispatch(resetSpeechData());
+    localStorage.removeItem('mseState');
+  }, []);
+
+  const clearMoodData = useCallback(() => {
+    dispatch(resetMoodData());
+    localStorage.removeItem('mseState');
+  }, []);
+
+  const clearThoughData = useCallback(() => {
+    dispatch(resetThoughData());
+    localStorage.removeItem('mseState');
+  }, []);
+
+  const clearPerceptionData = useCallback(() => {
+    dispatch(resetPerceptionData());
+    localStorage.removeItem('mseState');
+  }, []);
+
+  const clearCognitionData = useCallback(() => {
+    dispatch(resetCognitionData());
+    localStorage.removeItem('mseState');
+  }, []);
+
+  const clearJudgementData = useCallback(() => {
+    dispatch(resetJudgementData());
+    localStorage.removeItem('mseState');
+  }, []);
+
+  const clearInsightData = useCallback(() => {
+    dispatch(resetInsightData());
+    localStorage.removeItem('mseState');
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -292,18 +368,8 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_MSE', completeFormData);
       console.log("Form submitted successfully:", response.data);
       alert("Form submitted successfully!");
-      setFormData({
-        general_appearance: [],
-        attitude: [],
-        comprehension: [],
-        gait_posture: [],
-        motor_activity: [],
-        catatonic_sign: [],
-        conversion_dissociative: [],
-        social_manner: [],
-        rapport: [],
-        hallucinatory_behaviour: []
-      })
+      dispatch(resetGeneralData());
+      localStorage.removeItem('mseState');
     } catch (error) {
       console.error(error);
       if (error.response && error.response.status === 409) {
@@ -361,11 +427,8 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_speech', payload);
       console.log("Speech data submitted:", response.data);
       alert("Speech form submitted successfully!");
-      setSpeechFormData({
-        rate_quantity: [],
-        volume_tone: [],
-        flow_rhythm: [],
-      })
+      dispatch(resetSpeechData());
+      localStorage.removeItem('mseState');
     } catch (error) {
       console.error("Error submitting speech form:", error);
       alert("Error submitting speech form.");
@@ -427,15 +490,8 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_mood', payload);
       console.log("Mood data submitted:", response.data);
       alert("Mood form submitted successfully!");
-      setMoodFormData({
-        mood_description: [],
-        appearance: "",
-        resident_feeling: "",
-        general_feeling: "",
-        mood_like: "",
-        resident_general_feeling: "",
-        resident_look: [],
-      })
+      dispatch(resetMoodData());
+      localStorage.removeItem('mseState');
 
     } catch (error) {
       console.error("Error submitting mood form:", error);
@@ -480,10 +536,8 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_though', payload);
       console.log("Though Data submitted:", response.data);
       alert("Though form submitted successfully!");
-      setThoughFormData({
-        stream_form_though: [],
-        content_though: [],
-      })
+      dispatch(resetThoughData());
+      localStorage.removeItem('mseState');
     } catch (error) {
       console.error("Error submitting Though form:", error);
       alert("Error submitting Though form.");
@@ -535,12 +589,8 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_judgement', payload);
       console.log("Judgement Data submitted:", response.data);
       alert("Judgement form submitted successfully!");
-      setJudgementFormData({
-        personal_judgement: '',
-        social_judgement: '',
-        test_judgement: '',
-        judgement: '',
-      })
+      dispatch(resetJudgementData());
+      localStorage.removeItem('mseState');
     } catch (error) {
       console.error("Error submitting Judgement form:", error);
       alert("Error submitting Judgement form.");
@@ -599,14 +649,8 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_insight', payload);
       console.log("Insight Data submitted:", response.data);
       alert("Insight form submitted successfully!");
-      setInsightData({
-        denail_illness: '',
-        slight_awareness: '',
-        awarness_sick: '',
-        awarness_illness: '',
-        intellectual_insight: '',
-        true_emotion: ''
-      })
+      dispatch(resetInsightData());
+      localStorage.removeItem('mseState');
     } catch (error) {
       console.error("Error submitting Insight form:", error);
 
@@ -670,18 +714,8 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_perception', payload);
       console.log("Perception Data submitted:", response.data);
       alert("Perception form submitted successfully!");
-      setPerceptionData({
-        hallucination_type: [],
-        heard: '',
-        voices_heard: '',
-        part_of_day: '',
-        female_male_voices: '',
-        interpreted_person: '',
-        illusion: [],
-        perception_changes: [],
-        somatic: [],
-        others: []
-      })
+      dispatch(resetPerceptionData());
+      localStorage.removeItem('mseState');
     } catch (error) {
       console.error("Error submitting Perception form:", error);
       alert("Error submitting Perception form.");
@@ -774,35 +808,10 @@ function MSE_form() {
       const response = await apiRoute.post('/recovery/create_cognition', payload);
       console.log("Cognition Data submitted:", response.data);
       alert("Cognition form submitted successfully!");
-      setCognitionData({
-        consciousness: [],
-        orientation_time: '',
-        orientation_place: '',
-        orientation_person: '',
-        distractibility: '',
-        asking_test: '',
-        names_months: '',
-        test_performance: '',
-        immediate_retention: '',
-        recall: '',
-        patient_place: '',
-        dinner_ate: '',
-        date_ofMrg: '',
-        birthdays_children: '',
-        person_past: '',
-        amnesia: '',
-        live_growing: '',
-        person_school: '',
-        breakfast_ques: '',
-        do_yesterday: '',
-        general_info: '',
-        test_red_wri: '',
-        calculation_test: '',
-        proverb_testing: '',
-        familiar_object: ''
-      })
-      setSelectedStates([]);
-      setCanConcentrate('');
+      dispatch(resetCognitionData());
+      localStorage.removeItem('mseState');
+      // setSelectedStates([]);
+      // setCanConcentrate('');
     } catch (error) {
       console.error("Error submitting Cognition form:", error);
       alert("Error submitting Cognition form.");
@@ -810,198 +819,197 @@ function MSE_form() {
   }
 
 
-  const renderCheckbox = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={formData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...formData[field], label]
-          : formData[field].filter(item => item !== label);
+  const renderCheckbox = (field, id, label) => {
+    const current = Array.isArray(formData[field]) ? formData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={current.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...current, label]
+            : current.filter(item => item !== label);
 
-        setFormData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const renderspeechCheckbox = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={speechFormData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...speechFormData[field], label]
-          : speechFormData[field].filter(item => item !== label);
-
-        setSpeechFormData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const rendermoodCheckbox = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={moodFormData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...moodFormData[field], label]
-          : moodFormData[field].filter(item => item !== label);
-
-        setMoodFormData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const renderthoughCheckbox = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={thoughFormData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...thoughFormData[field], label]
-          : thoughFormData[field].filter(item => item !== label);
-
-        setThoughFormData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const renderhallucinationCheck = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={perceptionData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...perceptionData[field], label]
-          : perceptionData[field].filter(item => item !== label);
-
-        setPerceptionData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const renderillusion = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={perceptionData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...perceptionData[field], label]
-          : perceptionData[field].filter(item => item !== label);
-
-        setPerceptionData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const renderPerceptionChanges = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={perceptionData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...perceptionData[field], label]
-          : perceptionData[field].filter(item => item !== label);
-
-        setPerceptionData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const rendersomatic = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={perceptionData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...perceptionData[field], label]
-          : perceptionData[field].filter(item => item !== label);
-
-        setPerceptionData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
-
-  const renderothers = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={perceptionData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...perceptionData[field], label]
-          : perceptionData[field].filter(item => item !== label);
-
-        setPerceptionData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
-  );
+          dispatch(setMSEField({ field, value: updated })); // use mse's action, not psych's
+        }}
+      />
+    );
+  };
 
 
-  const renderConginationCheck = (field, id, label) => (
-    <Form.Check
-      type="checkbox"
-      id={id}
-      label={label}
-      checked={cognitionData[field]?.includes(label)}
-      onChange={(e) => {
-        const updated = e.target.checked
-          ? [...cognitionData[field], label]
-          : cognitionData[field].filter(item => item !== label);
+  const renderspeechCheckbox = (field, id, label) => {
+    const speechcurrent = Array.isArray(speechFormData[field]) ? speechFormData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={speechcurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...speechcurrent, label]
+            : speechcurrent.filter(item => item !== label);
 
-        setCognitionData(prev => ({
-          ...prev,
-          [field]: updated
-        }));
-      }}
-    />
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
+
+  const rendermoodCheckbox = (field, id, label) => {
+    const moodcurrent = Array.isArray(moodFormData[field]) ? moodFormData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={moodcurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...moodcurrent, label]
+            : moodcurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
+
+  const renderthoughCheckbox = (field, id, label) => {
+    const thoughcurrent = Array.isArray(thoughFormData[field]) ? thoughFormData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={thoughcurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...thoughcurrent, label]
+            : thoughcurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
+
+  const renderhallucinationCheck = (field, id, label) => {
+    const hallucinationcurrent = Array.isArray(perceptionData[field]) ? perceptionData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={hallucinationcurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...hallucinationcurrent, label]
+            : hallucinationcurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
+
+  const renderillusion = (field, id, label) => {
+    const illusioncurrent = Array.isArray(perceptionData[field]) ? perceptionData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={illusioncurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...illusioncurrent, label]
+            : illusioncurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
+
+  const renderPerceptionChanges = (field, id, label) => {
+    const Perceptioncurrent = Array.isArray(perceptionData[field]) ? perceptionData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={Perceptioncurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...Perceptioncurrent, label]
+            : Perceptioncurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
+
+  const rendersomatic = (field, id, label) => {
+    const somaticCurrent = Array.isArray(perceptionData[field]) ? perceptionData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={somaticCurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...somaticCurrent, label]
+            : somaticCurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
+
+  const renderothers = (field, id, label) => {
+    const othersCurrent = Array.isArray(perceptionData[field]) ? perceptionData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={othersCurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...othersCurrent, label]
+            : othersCurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
 
 
-  );
+  const renderConginationCheck = (field, id, label) => {
+    const cognitionCurrent = Array.isArray(cognitionData[field]) ? cognitionData[field] : [];
+    return (
+      <Form.Check
+        type="checkbox"
+        id={id}
+        label={label}
+        checked={cognitionCurrent.includes(label)}
+        onChange={(e) => {
+          const updated = e.target.checked
+            ? [...cognitionCurrent, label]
+            : cognitionCurrent.filter(item => item !== label);
+
+          dispatch(setMSEField({ field, value: updated }));
+        }}
+      />
+    );
+  };
 
   const fetchFormData = async () => {
     if (!admission_no.trim()) {
@@ -1369,6 +1377,7 @@ function MSE_form() {
                       <h1>1. GENERAL APPEARANCE AND BEHAVIOUR:</h1>
 
                       <Button className='btn btn-success mx-3' type='button' onClick={handleAppearanceNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearGeneralData}>Clear</Button>
                     </div>
 
                     <ul>
@@ -1550,6 +1559,7 @@ function MSE_form() {
                       <h1>2. SPEECH</h1>
 
                       <Button className='btn btn-success mx-3' type='button' onClick={handleSpeechNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearSpeechData}>Clear</Button>
                     </div>
 
                     <ul>
@@ -1621,6 +1631,7 @@ function MSE_form() {
                           <FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                       )} */}
                       <Button className='btn btn-success mx-3' type='button' onClick={handleMoodAffectNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearMoodData}>Clear</Button>
                     </div>
 
                     <ul>
@@ -1729,6 +1740,7 @@ function MSE_form() {
                       <h1>4. THOUGHT</h1>
 
                       <Button className='btn btn-success mx-3' type='button' onClick={handleThoughNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearThoughData}>Clear</Button>
                     </div>
 
                     <Form onSubmit={handlethoughSubmit}>
@@ -1799,6 +1811,7 @@ function MSE_form() {
                       <h1>5. PERCEPTION</h1>
 
                       <Button className='btn btn-success mx-3' type='button' onClick={handlePerceptionNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearPerceptionData}>Clear</Button>
                     </div>
                     <Form onSubmit={handlePerceptionSubmit}>
                       <ul>
@@ -1933,6 +1946,7 @@ function MSE_form() {
                       <h1>6. COGNITION OR NEUROPSYCHIATRIC ASSESSMENT</h1>
 
                       <Button className='btn btn-success mx-3' type='button' onClick={handleCognitionNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearCognitionData}>Clear</Button>
                     </div>
 
                     <Form onSubmit={handleCognitionSubmit}>
@@ -1994,7 +2008,7 @@ function MSE_form() {
                               <div key={state.id} style={{ width: "30%", minWidth: "200px" }}>
                                 <Form.Check
                                   type="checkbox"
-                                  name='consciousnessState'
+                                  name="consciousnessState"
                                   id={state.id}
                                   checked={selectedStates.includes(state.id)}
                                   onChange={handleCheckboxChange1}
@@ -2002,15 +2016,16 @@ function MSE_form() {
                                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                       <img
                                         src={state.img}
-                                        alt={state.label}
+                                        alt={state.id}
                                         style={{ width: "100%", height: "auto", objectFit: "contain" }}
                                       />
-                                      <span>{state.label}</span>
+                                      {/* <span>{state.id}</span> */}
                                     </div>
                                   }
                                 />
                               </div>
                             ))}
+
                           </div>
 
                         </li>
@@ -2300,6 +2315,7 @@ function MSE_form() {
                       <h1>7. JUDGEMENT</h1>
 
                       <Button className='btn btn-success mx-3' type='button' onClick={handleJudgementNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearJudgementData}>Clear</Button>
                     </div>
                     <ul>
                       <Form onSubmit={handleJudgementSubmit}>
@@ -2373,6 +2389,7 @@ function MSE_form() {
                       <h1>8. INSIGHT</h1>
 
                       <Button className='btn btn-success mx-3' type='button' onClick={handleInsightNavigate}>View All</Button>
+                      <Button className='btn btn-success mx-3' type='button' onClick={clearInsightData}>Clear</Button>
                     </div>
                     <p>The patient's level of awareness and insight into their illness. </p>
                     <ul>
