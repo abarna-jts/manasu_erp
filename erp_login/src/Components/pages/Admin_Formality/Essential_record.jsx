@@ -1201,23 +1201,30 @@ function Essential_record() {
                                 />
                                 <Form.Label className="mb-1">Aadhar Card Attachment </Form.Label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                    {files.attach_aadhar &&
-                                        files.attach_aadhar.map((imgUrl, index) => (
+                                    {Array.isArray(files.aadhar_card) && files.aadhar_card.length > 0 ? (
+                                        files.aadhar_card.map((imgUrl, index) => (
                                             <img
                                                 key={index}
                                                 src={imgUrl}
-                                                alt={`Form 7 - ${index}`}
+                                                alt={`rescue recovery ${index + 1}`}
+                                                loading="lazy"
                                                 style={{
-                                                    width: "150px",
+                                                    width: "100px",
                                                     height: "auto",
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
                                                 onError={(e) => {
-                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
                                                 }}
                                             />
-                                        ))}
+                                        ))
+                                    ) : (
+                                        <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                    )}
                                 </div>
 
                                 {/* UDID */}
@@ -1232,23 +1239,30 @@ function Essential_record() {
 
                                 <Form.Label className="mb-1">UDID Card Attachment </Form.Label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                    {files.udid_attach &&
+                                    {Array.isArray(files.udid_attach) && files.udid_attach.length > 0 ? (
                                         files.udid_attach.map((imgUrl, index) => (
                                             <img
                                                 key={index}
                                                 src={imgUrl}
-                                                alt={`Form 7 - ${index}`}
+                                                alt={`rescue recovery ${index + 1}`}
+                                                loading="lazy"
                                                 style={{
-                                                    width: "150px",
+                                                    width: "100px",
                                                     height: "auto",
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
                                                 onError={(e) => {
-                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
                                                 }}
                                             />
-                                        ))}
+                                        ))
+                                    ) : (
+                                        <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                    )}
                                 </div>
 
                                 {/* Disability Passport */}
@@ -1283,23 +1297,30 @@ function Essential_record() {
 
                                 <Form.Label className="mb-1">Form 7 Attachment</Form.Label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                    {files.form7_attach &&
+                                    {Array.isArray(files.form7_attach) && files.form7_attach.length > 0 ? (
                                         files.form7_attach.map((imgUrl, index) => (
                                             <img
                                                 key={index}
                                                 src={imgUrl}
-                                                alt={`Form 7 - ${index}`}
+                                                alt={`rescue recovery ${index + 1}`}
+                                                loading="lazy"
                                                 style={{
-                                                    width: "150px",
+                                                    width: "100px",
                                                     height: "auto",
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
                                                 onError={(e) => {
-                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
                                                 }}
                                             />
-                                        ))}
+                                        ))
+                                    ) : (
+                                        <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                    )}
                                 </div>
 
 
@@ -1343,23 +1364,30 @@ function Essential_record() {
 
                                 <Form.Label className="mb-1 mt-5">Copy of Bank Passbook (attach)</Form.Label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                    {files.bank_passbook &&
+                                    {Array.isArray(files.bank_passbook) && files.bank_passbook.length > 0 ? (
                                         files.bank_passbook.map((imgUrl, index) => (
                                             <img
                                                 key={index}
                                                 src={imgUrl}
-                                                alt={`Bank Passbook - ${index}`}
+                                                alt={`rescue recovery ${index + 1}`}
+                                                loading="lazy"
                                                 style={{
-                                                    width: "150px",
+                                                    width: "100px",
                                                     height: "auto",
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
                                                 onError={(e) => {
-                                                    e.target.src = "/fallback-image.png"; // Use a fallback image if it fails to load
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
                                                 }}
                                             />
-                                        ))}
+                                        ))
+                                    ) : (
+                                        <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                    )}
                                 </div>
 
                             </Col>

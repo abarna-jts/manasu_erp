@@ -141,8 +141,6 @@ function Family_Request_form() {
             }));
         }
 
-
-
         // Phone number validation
         if (name === "f_member_phone" || name === "phone_no") {
             updatedValue = value.replace(/\D/g, '').slice(0, 10);
@@ -182,8 +180,10 @@ function Family_Request_form() {
 
     const fetchFormData = async () => {
         try {
-            const response = await apiRoute.get(`/admision/get_scrb_formdata/${admissionNumber}`);
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admissionNumber}`);
             setStoreData(response.data.data[0]);
+            console.log("First Fetching", response.data.data[0]);
+            console.log("Rescue Name:", response.rescue_name);
         } catch (error) {
             console.error('Error fetching data', error);
             alert("Admission Number Not found");
@@ -1412,23 +1412,30 @@ function Family_Request_form() {
                                         Aadhar Card (Relation) :
                                     </Form.Label>
                                     <Col sm="8">
-                                        {Array.isArray(files.f_aadhar_card) &&
+                                        {Array.isArray(files.f_aadhar_card) && files.f_aadhar_card.length > 0 ? (
                                             files.f_aadhar_card.map((imgUrl, index) => (
                                                 <img
                                                     key={index}
                                                     src={imgUrl}
-                                                    alt={`f_aadhar_card - ${index}`}
+                                                    alt={`rescue recovery ${index + 1}`}
+                                                    loading="lazy"
                                                     style={{
-                                                        width: "150px",
+                                                        width: "100px",
                                                         height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
                                                     onError={(e) => {
-                                                        e.target.src = "/fallback-image.png";
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
                                                     }}
                                                 />
-                                            ))}
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                        )}
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -1449,23 +1456,30 @@ function Family_Request_form() {
                                         Ration Card (Relation):
                                     </Form.Label>
                                     <Col sm="8">
-                                        {Array.isArray(files.f_ration_card) &&
+                                        {Array.isArray(files.f_ration_card) && files.f_ration_card.length > 0 ? (
                                             files.f_ration_card.map((imgUrl, index) => (
                                                 <img
                                                     key={index}
                                                     src={imgUrl}
-                                                    alt={`f_ration_card - ${index}`}
+                                                    alt={`rescue recovery ${index + 1}`}
+                                                    loading="lazy"
                                                     style={{
-                                                        width: "150px",
+                                                        width: "100px",
                                                         height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
                                                     onError={(e) => {
-                                                        e.target.src = "/fallback-image.png";
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
                                                     }}
                                                 />
-                                            ))}
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                        )}
 
                                     </Col>
                                 </Form.Group>
@@ -1487,23 +1501,30 @@ function Family_Request_form() {
                                         Aadhar Card (Resident):
                                     </Form.Label>
                                     <Col sm="8">
-                                        {Array.isArray(files.r_aadhar_card) &&
+                                        {Array.isArray(files.r_aadhar_card) && files.r_aadhar_card.length > 0 ? (
                                             files.r_aadhar_card.map((imgUrl, index) => (
                                                 <img
                                                     key={index}
                                                     src={imgUrl}
-                                                    alt={`r_aadhar_card - ${index}`}
+                                                    alt={`rescue recovery ${index + 1}`}
+                                                    loading="lazy"
                                                     style={{
-                                                        width: "150px",
+                                                        width: "100px",
                                                         height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
                                                     onError={(e) => {
-                                                        e.target.src = "/fallback-image.png";
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
                                                     }}
                                                 />
-                                            ))}
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                        )}
                                     </Col>
                                 </Form.Group>
 
@@ -1525,23 +1546,30 @@ function Family_Request_form() {
                                         Ration Card (Resident):
                                     </Form.Label>
                                     <Col sm="8">
-                                        {Array.isArray(files.r_ration_card) &&
+                                        {Array.isArray(files.r_ration_card) && files.r_ration_card.length > 0 ? (
                                             files.r_ration_card.map((imgUrl, index) => (
                                                 <img
                                                     key={index}
                                                     src={imgUrl}
-                                                    alt={`r_ration_card - ${index}`}
+                                                    alt={`rescue recovery ${index + 1}`}
+                                                    loading="lazy"
                                                     style={{
-                                                        width: "150px",
+                                                        width: "100px",
                                                         height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
                                                     onError={(e) => {
-                                                        e.target.src = "/fallback-image.png";
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
                                                     }}
                                                 />
-                                            ))}
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                        )}
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -1561,23 +1589,30 @@ function Family_Request_form() {
                                         Any other Government ID :
                                     </Form.Label>
                                     <Col sm="8">
-                                        {Array.isArray(files.govt_id) &&
+                                        {Array.isArray(files.govt_id) && files.govt_id.length > 0 ? (
                                             files.govt_id.map((imgUrl, index) => (
                                                 <img
                                                     key={index}
                                                     src={imgUrl}
-                                                    alt={`govt_id - ${index}`}
+                                                    alt={`rescue recovery ${index + 1}`}
+                                                    loading="lazy"
                                                     style={{
-                                                        width: "150px",
+                                                        width: "100px",
                                                         height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
                                                     onError={(e) => {
-                                                        e.target.src = "/fallback-image.png";
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
                                                     }}
                                                 />
-                                            ))}
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                        )}
                                     </Col>
                                 </Form.Group>
 

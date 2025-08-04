@@ -397,7 +397,7 @@ const sendInsightEmailToDirector = async (form) => {
 
     const mailOptions = {
       from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-      to: ['manasucmf@gmail.com'],
+      to: ['abarnadevi2705@gmail.com'],
       subject: `🧠 MSE Form Completed: ${admission_no}`,
       html: `
         <p>The MSE Form for <strong>Admission No: ${admission_no}</strong> has been submitted fully by the Social Worker.</p>

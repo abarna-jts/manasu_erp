@@ -451,9 +451,7 @@ function Reunion_summary() {
                         {/* Rescue Name and Image */}
                         {rescueImage && (
                             <div>
-
                                 <img
-
                                     alt={rescueName || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}

@@ -307,7 +307,7 @@ const sendDirectorMail = async (form) => {
 
         const mailOptions = {
             from: `"Manasu ERP Application" <${process.env.EMAIL_USER}>`,
-            to: "manasucmf@gmail.com", // ✅ change to director's real email
+            to: "abarnadevi2705@gmail.com", // ✅ change to director's real email
             subject: `📝 Resident Document Information Form: ${form.admission_no}`,
             html: `
         <h2>New First Form Created by Admin</h2>

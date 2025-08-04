@@ -236,30 +236,30 @@ function MSE_form() {
     { id: "Coma", img: "../assets/img/attention/attention 6.png" },
   ];
 
-  // useEffect(() => {
-  //   try {
-  //     const stored = localStorage.getItem('admissionMSEInfo');
-  //     if (stored) {
-  //       const { admission_no: storedAdm, date: storedDate } = JSON.parse(stored);
-  //       if (storedAdm) setAdmissionNumber(storedAdm);
-  //       if (storedDate) setDate(storedDate);
-  //     }
-  //   } catch (e) {
-  //     console.warn('Failed to parse stored admission info', e);
-  //   }
-  // }, []);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('admissionMSEInfo');
+      if (stored) {
+        const { admission_no: storedAdm, date: storedDate } = JSON.parse(stored);
+        if (storedAdm) setAdmissionNumber(storedAdm);
+        if (storedDate) setDate(storedDate);
+      }
+    } catch (e) {
+      console.warn('Failed to parse stored admission info', e);
+    }
+  }, []);
 
-  // // whenever admission_no or date changes, persist
-  // useEffect(() => {
-  //   try {
-  //     localStorage.setItem(
-  //       'admissionMSEInfo',
-  //       JSON.stringify({ admission_no, date })
-  //     );
-  //   } catch (e) {
-  //     console.warn('Failed to save admission info', e);
-  //   }
-  // }, [admission_no, date]);
+  // whenever admission_no or date changes, persist
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        'admissionMSEInfo',
+        JSON.stringify({ admission_no, date })
+      );
+    } catch (e) {
+      console.warn('Failed to save admission info', e);
+    }
+  }, [admission_no, date]);
 
   const clearGeneralData = useCallback(() => {
     dispatch(resetGeneralData());
@@ -651,9 +651,10 @@ function MSE_form() {
       alert("Insight form submitted successfully!");
       dispatch(resetInsightData());
       localStorage.removeItem('mseState');
+      setAdmissionNumber("")
+      setDate("");
     } catch (error) {
       console.error("Error submitting Insight form:", error);
-
       if (error.response && error.response.data && error.response.data.message) {
         alert(error.response.data.message); // Backend validation error
       } else {
@@ -1242,6 +1243,13 @@ function MSE_form() {
     }
   }, [admission_no]);
 
+  const handleClearAdmissionNo = () =>{
+    setAdmissionNumber("");
+  }
+  const handleClearDate = () =>{
+    setDate("");
+  }
+
   return (
     <>
       <div className="d-flex align-items-center flex-wrap flex-md-nowrap text-start py-2">
@@ -1297,16 +1305,20 @@ function MSE_form() {
                           />
 
                         </InputGroup>
-                      </Col>
 
-                      <button type="button" className="btn btn-secondary mx-2" onClick={fetchFormData}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
+                      </Col>
+                      <div className="close_admission mx-2" onClick={handleClearAdmissionNo}>
+                        <i className="bi bi-x-circle" style={{color:"red"}}></i>
+                      </div>
+
+                      {/* <button type="button" className="btn btn-secondary mx-2" onClick={fetchFormData}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
                       <button type="button" className="btn btn-success mx-2" onClick={() => {
                         if (!admission_no.trim()) {
                           alert("Please enter admission number.");
                         } else {
                           // createFormData(); // Fetch & populate data before generating PDF
                         }
-                      }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
+                      }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button> */}
                       {/* <button type="button" className="btn btn-success mx-2" onClick={handleDownload}>
                         Import Excel Sheet
                       </button> */}
@@ -1328,6 +1340,9 @@ function MSE_form() {
                           />
                         </InputGroup>
                       </Col>
+                      <div className="close_admission mx-2" onClick={handleClearDate}>
+                        <i className="bi bi-x-circle" style={{color:"red"}}></i>
+                      </div>
                     </Form.Group>
                   </Form>
 

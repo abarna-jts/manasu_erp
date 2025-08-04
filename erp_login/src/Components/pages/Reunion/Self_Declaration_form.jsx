@@ -722,23 +722,30 @@ function Self_Declaration_form() {
                                 HandWritten Document :
                             </Form.Label>
                             <Col sm="8">
-                                {Array.isArray(files.handwritten_document) &&
+                                {Array.isArray(files.handwritten_document) && files.handwritten_document.length > 0 ? (
                                     files.handwritten_document.map((imgUrl, index) => (
                                         <img
                                             key={index}
                                             src={imgUrl}
-                                            alt={`handwritten_document - ${index}`}
+                                            alt={`rescue recovery ${index + 1}`}
+                                            loading="lazy"
                                             style={{
-                                                width: "150px",
+                                                width: "100px",
                                                 height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
                                             onError={(e) => {
-                                                e.target.src = "/fallback-image.png";
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
                                             }}
                                         />
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                )}
                             </Col>
                         </Form.Group>
 
@@ -747,23 +754,30 @@ function Self_Declaration_form() {
                                 Signation :
                             </Form.Label>
                             <Col sm="8">
-                                {Array.isArray(files.signature) &&
+                                {Array.isArray(files.signature) && files.signature.length > 0 ? (
                                     files.signature.map((imgUrl, index) => (
                                         <img
                                             key={index}
                                             src={imgUrl}
-                                            alt={`signature - ${index}`}
+                                            alt={`rescue recovery ${index + 1}`}
+                                            loading="lazy"
                                             style={{
-                                                width: "150px",
+                                                width: "100px",
                                                 height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
                                             onError={(e) => {
-                                                e.target.src = "/fallback-image.png";
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
                                             }}
                                         />
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                )}
                             </Col>
                         </Form.Group>
 
@@ -772,23 +786,30 @@ function Self_Declaration_form() {
                                 Photo :
                             </Form.Label>
                             <Col sm="8">
-                                {Array.isArray(files.photo) &&
+                                {Array.isArray(files.photo) && files.photo.length > 0 ? (
                                     files.photo.map((imgUrl, index) => (
                                         <img
                                             key={index}
                                             src={imgUrl}
-                                            alt={`photo - ${index}`}
+                                            alt={`rescue recovery ${index + 1}`}
+                                            loading="lazy"
                                             style={{
-                                                width: "150px",
+                                                width: "100px",
                                                 height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
                                             onError={(e) => {
-                                                e.target.src = "/fallback-image.png";
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
                                             }}
                                         />
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                )}
                             </Col>
                         </Form.Group>
 
@@ -842,78 +863,78 @@ function Self_Declaration_form() {
                                 </Form.Group>
 
                                 {Array.isArray(files.handwritten_document) &&
-                                files.handwritten_document.map((imgUrl, index) => {
-                                    const filename = `handwritten_document_${index}.jpg`;
+                                    files.handwritten_document.map((imgUrl, index) => {
+                                        const filename = `handwritten_document_${index}.jpg`;
 
-                                    return (
-                                        <div
-                                            key={index}
-                                            className="image-container"
-                                            style={{
-                                                position: "relative",
-                                                width: "100px",
-                                                height: "100px",
-                                                margin: "10px",
-                                                padding: "0px",
-                                                display: "inline-block",
-                                            }}
-                                        >
-                                            <img
-                                                src={imgUrl}
-                                                alt={`handwritten_document - ${index}`}
-                                                loading="lazy"
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="image-container"
                                                 style={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    objectFit: "cover",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "4px",
+                                                    position: "relative",
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    margin: "10px",
+                                                    padding: "0px",
+                                                    display: "inline-block",
                                                 }}
-                                                onError={(e) => {
-                                                    if (!e.target.dataset.errorHandled) {
-                                                        e.target.src = "/fallback-image.png";
-                                                        e.target.dataset.errorHandled = "true";
-                                                    }
-                                                }}
-                                            />
-
-                                            <div className="image-overlay">
-                                                {/* View icon */}
-                                                <a
-                                                    href={imgUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    title="View Image"
-                                                    className="icon-button"
-                                                >
-                                                    <i className="fas fa-eye"></i>
-                                                </a>
-
-                                                {/* Download icon */}
-                                                <button
-                                                    title="Download Image"
-                                                    className="icon-button"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        fetch(imgUrl, { mode: "cors" })
-                                                            .then((res) => res.blob())
-                                                            .then((blob) => {
-                                                                const url = window.URL.createObjectURL(blob);
-                                                                const a = document.createElement("a");
-                                                                a.href = url;
-                                                                a.download = filename;
-                                                                a.click();
-                                                                window.URL.revokeObjectURL(url);
-                                                            })
-                                                            .catch(() => alert("Download failed."));
+                                            >
+                                                <img
+                                                    src={imgUrl}
+                                                    alt={`handwritten_document - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit: "cover",
+                                                        border: "1px solid #ccc",
+                                                        borderRadius: "4px",
                                                     }}
-                                                >
-                                                    <i className="fas fa-download"></i>
-                                                </button>
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
+
+                                                <div className="image-overlay">
+                                                    {/* View icon */}
+                                                    <a
+                                                        href={imgUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title="View Image"
+                                                        className="icon-button"
+                                                    >
+                                                        <i className="fas fa-eye"></i>
+                                                    </a>
+
+                                                    {/* Download icon */}
+                                                    <button
+                                                        title="Download Image"
+                                                        className="icon-button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            fetch(imgUrl, { mode: "cors" })
+                                                                .then((res) => res.blob())
+                                                                .then((blob) => {
+                                                                    const url = window.URL.createObjectURL(blob);
+                                                                    const a = document.createElement("a");
+                                                                    a.href = url;
+                                                                    a.download = filename;
+                                                                    a.click();
+                                                                    window.URL.revokeObjectURL(url);
+                                                                })
+                                                                .catch(() => alert("Download failed."));
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-download"></i>
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
                                 <Form.Group as={Row} className="mb-3 mt-3">
                                     <Form.Label column sm="6" className='text-start'>
                                         HandWritten Document : <span style={{ color: 'red' }}>*</span>
@@ -930,78 +951,78 @@ function Self_Declaration_form() {
                                 </Form.Group>
 
                                 {Array.isArray(files.signature) &&
-                                files.signature.map((imgUrl, index) => {
-                                    const filename = `signature_${index}.jpg`;
+                                    files.signature.map((imgUrl, index) => {
+                                        const filename = `signature_${index}.jpg`;
 
-                                    return (
-                                        <div
-                                            key={index}
-                                            className="image-container"
-                                            style={{
-                                                position: "relative",
-                                                width: "100px",
-                                                height: "100px",
-                                                margin: "10px",
-                                                padding: "0px",
-                                                display: "inline-block",
-                                            }}
-                                        >
-                                            <img
-                                                src={imgUrl}
-                                                alt={`signature - ${index}`}
-                                                loading="lazy"
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="image-container"
                                                 style={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    objectFit: "cover",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "4px",
+                                                    position: "relative",
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    margin: "10px",
+                                                    padding: "0px",
+                                                    display: "inline-block",
                                                 }}
-                                                onError={(e) => {
-                                                    if (!e.target.dataset.errorHandled) {
-                                                        e.target.src = "/fallback-image.png";
-                                                        e.target.dataset.errorHandled = "true";
-                                                    }
-                                                }}
-                                            />
-
-                                            <div className="image-overlay">
-                                                {/* View icon */}
-                                                <a
-                                                    href={imgUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    title="View Image"
-                                                    className="icon-button"
-                                                >
-                                                    <i className="fas fa-eye"></i>
-                                                </a>
-
-                                                {/* Download icon */}
-                                                <button
-                                                    title="Download Image"
-                                                    className="icon-button"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        fetch(imgUrl, { mode: "cors" })
-                                                            .then((res) => res.blob())
-                                                            .then((blob) => {
-                                                                const url = window.URL.createObjectURL(blob);
-                                                                const a = document.createElement("a");
-                                                                a.href = url;
-                                                                a.download = filename;
-                                                                a.click();
-                                                                window.URL.revokeObjectURL(url);
-                                                            })
-                                                            .catch(() => alert("Download failed."));
+                                            >
+                                                <img
+                                                    src={imgUrl}
+                                                    alt={`signature - ${index}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit: "cover",
+                                                        border: "1px solid #ccc",
+                                                        borderRadius: "4px",
                                                     }}
-                                                >
-                                                    <i className="fas fa-download"></i>
-                                                </button>
+                                                    onError={(e) => {
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
+                                                    }}
+                                                />
+
+                                                <div className="image-overlay">
+                                                    {/* View icon */}
+                                                    <a
+                                                        href={imgUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title="View Image"
+                                                        className="icon-button"
+                                                    >
+                                                        <i className="fas fa-eye"></i>
+                                                    </a>
+
+                                                    {/* Download icon */}
+                                                    <button
+                                                        title="Download Image"
+                                                        className="icon-button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            fetch(imgUrl, { mode: "cors" })
+                                                                .then((res) => res.blob())
+                                                                .then((blob) => {
+                                                                    const url = window.URL.createObjectURL(blob);
+                                                                    const a = document.createElement("a");
+                                                                    a.href = url;
+                                                                    a.download = filename;
+                                                                    a.click();
+                                                                    window.URL.revokeObjectURL(url);
+                                                                })
+                                                                .catch(() => alert("Download failed."));
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-download"></i>
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
                                 <Form.Group as={Row} className="mb-3 mt-3">
                                     <Form.Label column sm="6" className='text-start'>
                                         Signation : <span style={{ color: 'red' }}>*</span>

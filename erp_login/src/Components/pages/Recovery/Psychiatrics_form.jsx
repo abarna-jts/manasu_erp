@@ -13,9 +13,10 @@ import { useNavigate } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useSelector, useDispatch } from 'react-redux';
-import { setField, resetDemographics, resetCheifState, resetPresentationState,resetPsychiatricState,
-    resetMedicalState, resetFamilyState, resetSocialState, resetDevelopmentState, resetSubstanceState,resetSuicidialState
- } from '../../../store/psychiatricSlice.js';
+import {
+    setField, resetDemographics, resetCheifState, resetPresentationState, resetPsychiatricState,
+    resetMedicalState, resetFamilyState, resetSocialState, resetDevelopmentState, resetSubstanceState, resetSuicidialState
+} from '../../../store/psychiatricSlice.js';
 
 function Psychiatrics_form() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -301,7 +302,7 @@ function Psychiatrics_form() {
         dispatch(resetDemographics());
         localStorage.removeItem('psychiatricState');
     }, []);
-    
+
     const clearCheifData = useCallback(() => {
         dispatch(resetCheifState());
         localStorage.removeItem('psychiatricState');
@@ -821,6 +822,8 @@ function Psychiatrics_form() {
             alert("Suicidal and Homicidal Ideation submitted successfully!");
             dispatch(resetSuicidialState());
             localStorage.removeItem('psychiatricState');
+            setAdmissionNumber("");
+            setDate("");
         } catch (error) {
             console.error("Error submitting Suicidal and Homicidal Ideation form:", error);
 
@@ -1019,9 +1022,6 @@ function Psychiatrics_form() {
         }
     };
 
-
-
-
     useEffect(() => {
         if (shouldGeneratePDF) {
             generatePDF();
@@ -1102,6 +1102,12 @@ function Psychiatrics_form() {
     const handleSuicidalNavigate = () => {
         navigate("/suicidal_data");
     }
+    const handleClearAdmissionNo = () => {
+        setAdmissionNumber("");
+    }
+    const handleClearDate = () => {
+        setDate("");
+    }
 
     return (
         <>
@@ -1113,7 +1119,6 @@ function Psychiatrics_form() {
                         <Breadcrumb.Item active>Recovery</Breadcrumb.Item>
                     </Breadcrumb>
                     <h6 className="breadcrumb_title">Social Worker</h6>
-
                 </div>
                 <div className="text-center col-md-7"><h3 className="section_title">Psychiatric Case History</h3></div>
 
@@ -1160,6 +1165,9 @@ function Psychiatrics_form() {
                                 />
                             </InputGroup>
                         </Col>
+                        <div className="close_admission mx-2" onClick={handleClearAdmissionNo}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                         {/* <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter admission number.");
@@ -1194,6 +1202,9 @@ function Psychiatrics_form() {
                             value={date}
                             max="9999-12-31"
                             onChange={handleDateChange} />
+                        <div className="close_admission mx-2" onClick={handleClearDate}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                     </Form.Group>
                 </Form>
             </Container>
@@ -1455,7 +1466,7 @@ function Psychiatrics_form() {
                                     <li className="tab-content tab-content-2 typography">
                                         <div className="update_class d-flex align-items-center justify-content-center">
                                             <h1>THE CHIEF COMPLAINT</h1>
-
+                                            <Button className='btn btn-success mx-3' type='button' onClick={handleCheifNavigate}>View All</Button>
                                             <Button className='btn btn-success mx-3' type='button' onClick={clearCheifData}>Clear</Button>
                                         </div>
                                         <Row className='d-flex justify-content-around'>

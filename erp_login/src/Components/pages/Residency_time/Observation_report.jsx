@@ -496,6 +496,14 @@ function Observation_report() {
                                                 {(() => {
                                                     let imagePath = item.recovery_photo;
 
+                                                    if (imagePath == `[]`) {
+                                                        return (
+                                                            <>
+                                                                <span className='mb-4'>No Image</span>
+                                                            </>
+                                                        )
+                                                    }
+
                                                     try {
                                                         const parsed = JSON.parse(item.recovery_photo);
                                                         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -724,7 +732,7 @@ function Observation_report() {
                             </Form.Group>
 
                             <Form.Group className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Resident Recovery Photo Attachment:</Form.Label>
+                                {/* <Form.Label column sm="5" className='text-start'>Resident Recovery Photo Attachment:</Form.Label> */}
                                 <Col sm="12">
                                     {Array.isArray(files.recovery_photo) &&
                                         files.recovery_photo.map((imgUrl, index) => {
@@ -896,12 +904,12 @@ function Observation_report() {
                         <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
                             <Col sm="6">
-                                {Array.isArray(files.recovery_photo) &&
+                                {Array.isArray(files.recovery_photo) && files.recovery_photo.length > 0 ? (
                                     files.recovery_photo.map((imgUrl, index) => (
                                         <img
                                             key={index}
                                             src={imgUrl}
-                                            alt={`recovery_photo - ${index}`}
+                                            alt={`rescue recovery ${index + 1}`}
                                             loading="lazy"
                                             style={{
                                                 width: "100px",
@@ -916,7 +924,10 @@ function Observation_report() {
                                                 }
                                             }}
                                         />
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                )}
                             </Col>
                         </Form.Group>
 

@@ -528,24 +528,30 @@ function Celebration_report() {
                         <Form.Group as={Row} className='mb-3'>
                             <Form.Label column sm="5" className='text-start'>Celebration Photos :</Form.Label>
                             <Col sm="7">
-                                {Array.isArray(files.celebration_photos) &&
+                                {Array.isArray(files.celebration_photos) && files.celebration_photos.length > 0 ? (
                                     files.celebration_photos.map((imgUrl, index) => (
                                         <img
                                             key={index}
                                             src={imgUrl}
-                                            alt={`celebration_photos - ${index}`}
+                                            alt={`rescue recovery ${index + 1}`}
+                                            loading="lazy"
                                             style={{
                                                 width: "100px",
-                                                height: "100px",
-                                                objectFit: "cover",
+                                                height: "auto",
                                                 margin: "10px",
                                                 border: "1px solid #ccc",
                                             }}
                                             onError={(e) => {
-                                                e.target.src = "/fallback-image.png";
+                                                if (!e.target.dataset.errorHandled) {
+                                                    e.target.src = "/fallback-image.png";
+                                                    e.target.dataset.errorHandled = "true";
+                                                }
                                             }}
                                         />
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                )}
                             </Col>
                         </Form.Group>
 

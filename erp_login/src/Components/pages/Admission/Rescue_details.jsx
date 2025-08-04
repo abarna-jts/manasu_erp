@@ -694,24 +694,30 @@ function Rescue_details() {
                                         Attach Police Memo :
                                     </Form.Label>
                                     <Col sm="7">
-                                        {Array.isArray(files.attach_policeMemo) &&
+                                        {Array.isArray(files.attach_policeMemo) && files.attach_policeMemo.length > 0 ? (
                                             files.attach_policeMemo.map((imgUrl, index) => (
                                                 <img
                                                     key={index}
                                                     src={imgUrl}
-                                                    alt={`attach_policeMemo - ${index}`}
+                                                    alt={`rescue recovery ${index + 1}`}
+                                                    loading="lazy"
                                                     style={{
                                                         width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
+                                                        height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
                                                     onError={(e) => {
-                                                        e.target.src = "/fallback-image.png";
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
                                                     }}
                                                 />
-                                            ))}
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                        )}
                                     </Col>
                                 </Form.Group>
 
@@ -746,24 +752,30 @@ function Rescue_details() {
                                         Profile:
                                     </Form.Label>
                                     <Col sm="8">
-                                        {Array.isArray(files.rescue_image) &&
+                                        {Array.isArray(files.rescue_image) && files.rescue_image.length > 0 ? (
                                             files.rescue_image.map((imgUrl, index) => (
                                                 <img
                                                     key={index}
                                                     src={imgUrl}
-                                                    alt={`rescue_image - ${index}`}
+                                                    alt={`rescue recovery ${index + 1}`}
+                                                    loading="lazy"
                                                     style={{
                                                         width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "cover",
+                                                        height: "auto",
                                                         margin: "10px",
                                                         border: "1px solid #ccc",
                                                     }}
                                                     onError={(e) => {
-                                                        e.target.src = "/fallback-image.png";
+                                                        if (!e.target.dataset.errorHandled) {
+                                                            e.target.src = "/fallback-image.png";
+                                                            e.target.dataset.errorHandled = "true";
+                                                        }
                                                     }}
                                                 />
-                                            ))}
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                        )}
                                     </Col>
                                 </Form.Group>
                                 <Form.Group className="mb-1" controlId="formDate">
@@ -909,24 +921,30 @@ function Rescue_details() {
                                         <Form.Group className="mb-3 text-start d-flex">
                                             <Form.Label column sm={4}>{formData.govIdType} File:</Form.Label>
                                             <Col sm={7}>
-                                                {Array.isArray(files.govIdFile) &&
+                                                {Array.isArray(files.govIdFile) && files.govIdFile.length > 0 ? (
                                                     files.govIdFile.map((imgUrl, index) => (
                                                         <img
                                                             key={index}
                                                             src={imgUrl}
-                                                            alt={`govIdFile - ${index}`}
+                                                            alt={`rescue recovery ${index + 1}`}
+                                                            loading="lazy"
                                                             style={{
                                                                 width: "100px",
-                                                                height: "100px",
-                                                                objectFit: "cover",
+                                                                height: "auto",
                                                                 margin: "10px",
                                                                 border: "1px solid #ccc",
                                                             }}
                                                             onError={(e) => {
-                                                                e.target.src = "/fallback-image.png";
+                                                                if (!e.target.dataset.errorHandled) {
+                                                                    e.target.src = "/fallback-image.png";
+                                                                    e.target.dataset.errorHandled = "true";
+                                                                }
                                                             }}
                                                         />
-                                                    ))}
+                                                    ))
+                                                ) : (
+                                                    <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                                )}
                                             </Col>
                                         </Form.Group>
                                     </>

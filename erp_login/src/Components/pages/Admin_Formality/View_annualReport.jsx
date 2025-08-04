@@ -66,7 +66,7 @@ function View_annualReport() {
             String(item.awareness_name).toLowerCase().includes(searchTerm) ||
             String(item.awareness_place).toLowerCase().includes(searchTerm) ||
             String(item.outing_name).toLowerCase().includes(searchTerm) ||
-            String(item.outing_place).toLowerCase().includes(searchTerm) 
+            String(item.outing_place).toLowerCase().includes(searchTerm)
         );
     });
 
@@ -624,24 +624,30 @@ function View_annualReport() {
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                         <Col sm="7">
-                            {Array.isArray(files.event_photos) &&
+                            {Array.isArray(files.event_photos) && files.event_photos.length > 0 ? (
                                 files.event_photos.map((imgUrl, index) => (
                                     <img
                                         key={index}
                                         src={imgUrl}
-                                        alt={`event_photos - ${index}`}
+                                        alt={`rescue recovery ${index + 1}`}
+                                        loading="lazy"
                                         style={{
                                             width: "100px",
-                                            height: "100px",
-                                            objectFit: "cover",
+                                            height: "auto",
                                             margin: "10px",
                                             border: "1px solid #ccc",
                                         }}
                                         onError={(e) => {
-                                            e.target.src = "/fallback-image.png";
+                                            if (!e.target.dataset.errorHandled) {
+                                                e.target.src = "/fallback-image.png";
+                                                e.target.dataset.errorHandled = "true";
+                                            }
                                         }}
                                     />
-                                ))}
+                                ))
+                            ) : (
+                                <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                            )}
                         </Col>
                     </Form.Group>
 
@@ -713,24 +719,30 @@ function View_annualReport() {
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                         <Col sm="7">
-                            {Array.isArray(files.awarness_photos) &&
+                            {Array.isArray(files.awarness_photos) && files.awarness_photos.length > 0 ? (
                                 files.awarness_photos.map((imgUrl, index) => (
                                     <img
                                         key={index}
                                         src={imgUrl}
-                                        alt={`awarness_photos - ${index}`}
+                                        alt={`rescue recovery ${index + 1}`}
+                                        loading="lazy"
                                         style={{
                                             width: "100px",
-                                            height: "100px",
-                                            objectFit: "cover",
+                                            height: "auto",
                                             margin: "10px",
                                             border: "1px solid #ccc",
                                         }}
                                         onError={(e) => {
-                                            e.target.src = "/fallback-image.png";
+                                            if (!e.target.dataset.errorHandled) {
+                                                e.target.src = "/fallback-image.png";
+                                                e.target.dataset.errorHandled = "true";
+                                            }
                                         }}
                                     />
-                                ))}
+                                ))
+                            ) : (
+                                <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                            )}
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="mb-3">
@@ -801,24 +813,30 @@ function View_annualReport() {
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                         <Col sm="7">
-                            {Array.isArray(files.outing_photos) &&
+                            {Array.isArray(files.outing_photos) && files.outing_photos.length > 0 ? (
                                 files.outing_photos.map((imgUrl, index) => (
                                     <img
                                         key={index}
                                         src={imgUrl}
-                                        alt={`outing_photos - ${index}`}
+                                        alt={`rescue recovery ${index + 1}`}
+                                        loading="lazy"
                                         style={{
                                             width: "100px",
-                                            height: "100px",
-                                            objectFit: "cover",
+                                            height: "auto",
                                             margin: "10px",
                                             border: "1px solid #ccc",
                                         }}
                                         onError={(e) => {
-                                            e.target.src = "/fallback-image.png";
+                                            if (!e.target.dataset.errorHandled) {
+                                                e.target.src = "/fallback-image.png";
+                                                e.target.dataset.errorHandled = "true";
+                                            }
                                         }}
                                     />
-                                ))}
+                                ))
+                            ) : (
+                                <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                            )}
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="mb-3">

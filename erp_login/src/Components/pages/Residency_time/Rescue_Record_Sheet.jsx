@@ -476,6 +476,14 @@ function Rescue_Record_Sheet() {
                                                 {(() => {
                                                     let imagePath = item.rescue_recovery_photo;
 
+                                                    if (imagePath == `[]`) {
+                                                        return (
+                                                            <>
+                                                                <span className='mb-4'>No Image</span>
+                                                            </>
+                                                        )
+                                                    }
+
                                                     try {
                                                         const parsed = JSON.parse(item.rescue_recovery_photo);
                                                         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -708,7 +716,6 @@ function Rescue_Record_Sheet() {
                                     {Array.isArray(files.rescue_recovery_photo) &&
                                         files.rescue_recovery_photo.map((imgUrl, index) => {
                                             const filename = `rescue_recovery_photo_${index}.jpg`;
-
                                             return (
                                                 <div
                                                     key={index}
@@ -876,12 +883,12 @@ function Rescue_Record_Sheet() {
                         <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm="4" className='text-start'>Attach Photos:</Form.Label>
                             <Col sm="6">
-                                {Array.isArray(files.rescue_recovery_photo) &&
+                                {Array.isArray(files.rescue_recovery_photo) && files.rescue_recovery_photo.length > 0 ? (
                                     files.rescue_recovery_photo.map((imgUrl, index) => (
                                         <img
                                             key={index}
                                             src={imgUrl}
-                                            alt={`rescue_recovery_photo - ${index}`}
+                                            alt={`rescue recovery ${index + 1}`}
                                             loading="lazy"
                                             style={{
                                                 width: "100px",
@@ -896,8 +903,12 @@ function Rescue_Record_Sheet() {
                                                 }
                                             }}
                                         />
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                )}
                             </Col>
+
                         </Form.Group>
 
 
