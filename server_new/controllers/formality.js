@@ -1763,16 +1763,28 @@ const updateEventDetail = async (req, res) => {
         }
 
         const EventPath = req.files['event_photos']
-            ? req.files['event_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
-            : JSON.parse(existing[0].event_photos || "[]");
+            ? req.files['event_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
+            : null;
 
         const AwarnessPath = req.files['awarness_photos']
-            ? req.files['awarness_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
-            : JSON.parse(existing[0].awarness_photos || "[]");
+            ? req.files['awarness_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
+            : null;
 
         const OutingPath = req.files['outing_photos']
-            ? req.files['outing_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
-            : JSON.parse(existing[0].outing_photos || "[]");
+            ? req.files['outing_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
+            : null;
+
+        // const EventPath = req.files['event_photos']
+        //     ? req.files['event_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+        //     : JSON.parse(existing[0].event_photos || []);
+
+        // const AwarnessPath = req.files['awarness_photos']
+        //     ? req.files['awarness_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+        //     : JSON.parse(existing[0].awarness_photos || []);
+
+        // const OutingPath = req.files['outing_photos']
+        //     ? req.files['outing_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+        //     : JSON.parse(existing[0].outing_photos || []);
 
         const formatDate = (isoDate) => {
             const d = new Date(isoDate);

@@ -491,7 +491,7 @@ function Edit_Rescue_details() {
                         type='number'
                         value={formData.admission_no}
                         onChange={handleInputChange}
-                        readOnly />
+                         />
                     </Col>
                   </Form.Group>
                   <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">

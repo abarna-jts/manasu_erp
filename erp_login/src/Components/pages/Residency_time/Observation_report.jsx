@@ -690,7 +690,7 @@ function Observation_report() {
 
             <Modal show={editshow} onHide={handleEditClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Rescue Condition</Modal.Title>
+                    <Modal.Title>Resident Observation & Progress Report</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
@@ -851,7 +851,7 @@ function Observation_report() {
                                                 </div> */}
                     </Col>
                     <Col md={9}>
-                        <h4 className="text-center">Consultation Report by Doctor</h4>
+                        <h4 className="text-center">Resident Observation & Progress Report - Social Worker</h4>
                     </Col>
                 </Row>
                 <Col md={12}>
@@ -932,7 +932,7 @@ function Observation_report() {
                         </Form.Group>
 
 
-                        <Form.Group as={Row} className="mb-3" controlId="formFollowUp">
+                        {/* <Form.Group as={Row} className="mb-3" controlId="formFollowUp">
                             <Form.Label column sm="4" className='text-start'>Follow Up : <span style={{ color: 'red' }}>*</span></Form.Label>
                             <Col sm="6">
                                 <Form.Control
@@ -946,13 +946,35 @@ function Observation_report() {
                                 />
                             </Col>
 
+                        </Form.Group> */}
+
+                        <Form.Group className="mb-3" as={Row}>
+                            <Form.Label column sm="4" className='text-start'>Follow Up : <span style={{ color: 'red' }}>*</span></Form.Label>
+                            <Col md={6}>
+                                <div
+                                    className="wrap-textarea"
+                                    style={{
+                                        border: '1px solid #ccc',
+                                        padding: '8px',
+                                        borderRadius: "5px",
+                                        minHeight: '40px',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        textAlign: "justify"
+                                    }}
+                                >
+                                    {formData.follow_up}
+                                </div>
+
+                            </Col>
                         </Form.Group>
                     </Form>
                 </Col>
                 <Col md={12}>
                     <Row className="d-flex align-items-center justify-content-center mt-5">
                         <Col md={6} className="mt-3 down_title">
-                            <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                            <h5 className="text-start">Signature / Thumbprint of Resident's</h5>
                         </Col>
                         <Col md={6} className="mt-3 down_title">
                             <h5 className="text-end">Manasu Seal</h5>

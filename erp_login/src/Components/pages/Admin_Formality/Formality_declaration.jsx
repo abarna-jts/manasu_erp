@@ -929,7 +929,7 @@ function Formality_declaration() {
                         <Col md={12}>
                             <Row className="d-flex align-items-center justify-content-center mt-3">
                                 <Col md={6} className="mt-3 down_title">
-                                    <h5 className="text-start">Signature / Thumbnail of Resident's</h5>
+                                    <h5 className="text-start">Signature / Thumbprint of Resident's</h5>
                                 </Col>
                                 <Col md={6} className="mt-3 down_title">
                                     <h5 className="text-end">Manasu Seal</h5>
