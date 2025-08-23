@@ -275,6 +275,17 @@ function App() {
             />
 
             <Route
+              path='/celebration_report'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><Celebration_report /></MainLayout>
+                ) : (
+                  <MainLayout><Celebration_report /></MainLayout>
+                )
+              }
+            />
+
+            <Route
               path='/internship_form'
               element={
                 userType === '1' || userType === '2' ? (

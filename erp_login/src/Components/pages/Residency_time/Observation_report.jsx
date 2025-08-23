@@ -13,6 +13,10 @@ import { useRef } from 'react';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    setObservationField, resetObservationData,
+} from '../../../store/observationSlice.js';
 
 function Observation_report() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -41,7 +45,11 @@ function Observation_report() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
-    const [formData, setFormData] = useState({
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.observation);
+
+    const [EditData, setEditData] = useState({
         admission_no: '',
         resident_name: '',
         follow_up: '',
@@ -54,8 +62,17 @@ function Observation_report() {
 
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setObservationField({ field: name, value }));
     };
+
+    const handleInputChangeEdit = (e) => {
+        const { name, value } = e.target;
+        setEditData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    }
 
     const handleFileChange = (e) => {
         setFiles({
@@ -63,6 +80,31 @@ function Observation_report() {
             [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
         });
     };
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionInfo');
+            if (stored) {
+                const { admission_no: storedAdm, date: storedName } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+                if (storedName) setRescueName(storedName);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionInfo',
+                JSON.stringify({ admission_no, rescueName })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no, rescueName]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -99,16 +141,13 @@ function Observation_report() {
             if (res.data.message === "Rescue Condition Created Successfully") {
                 alert("Observation Report Created Successfully");
 
-                setFormData({
-                    admission_no: '',
-                    resident_name: '',
-                    follow_up: '',
-                    date: ''
-                })
                 handleClose(true);
                 setAdmissionNumber("");
                 setRescueName("");
                 getConditionDetails();
+                dispatch(resetObservationData());
+                localStorage.removeItem('observation');
+                localStorage.removeItem('recovery_photo');
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -146,8 +185,8 @@ function Observation_report() {
                 return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
             };
 
-            setFormData((formData) => ({
-                ...formData,
+            setEditData((EditData) => ({
+                ...EditData,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
@@ -162,7 +201,7 @@ function Observation_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -170,7 +209,7 @@ function Observation_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -196,10 +235,10 @@ function Observation_report() {
         e.preventDefault();
 
         const data = new FormData();
-        data.append('admission_no', formData.admission_no);
-        data.append('resident_name', formData.resident_name);
-        data.append('date', formData.date);
-        data.append('follow_up', formData.follow_up);
+        data.append('admission_no', EditData.admission_no);
+        data.append('resident_name', EditData.resident_name);
+        data.append('date', EditData.date);
+        data.append('follow_up', EditData.follow_up);
 
         if (files.recovery_photo && files.recovery_photo.length > 0) {
             files.recovery_photo.forEach(file => {
@@ -208,7 +247,7 @@ function Observation_report() {
         }
 
         try {
-            const res = await apiRoute.post(`/residency/updateObservationReport/${formData.admission_no}`, data, {
+            const res = await apiRoute.post(`/residency/updateObservationReport/${EditData.admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             if (res.data.message === "Observation updated successfully") {
@@ -318,8 +357,8 @@ function Observation_report() {
             };
 
             // Update form fields
-            setFormData((formData) => ({
-                ...formData,
+            setEditData((EditData) => ({
+                ...EditData,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
@@ -331,14 +370,14 @@ function Observation_report() {
                 try {
                     const parsed = JSON.parse(data.recovery_photo);
                     if (Array.isArray(parsed)) {
-                        recovery_photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     recovery_photoPath = data.recovery_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
             console.log(recovery_photoPath);
@@ -513,7 +552,7 @@ function Observation_report() {
                                                         // fallback to original string
                                                     }
 
-                                                    const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
+                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
                                                     const filename = imagePath?.split("/").pop();
 
                                                     return imagePath ? (
@@ -643,7 +682,7 @@ function Observation_report() {
                                 <Form.Control
                                     type="date"
                                     name="date"
-                                    value={formData.date}
+                                    value={formData?.date || ""}   // prevent crash if undefined
                                     onChange={handleInputChange}
                                     max="9999-12-31"
                                     required
@@ -667,7 +706,7 @@ function Observation_report() {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={formData.follow_up}
+                                    value={formData?.follow_up}
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     required
@@ -701,8 +740,8 @@ function Observation_report() {
                                     type="number"
                                     placeholder="Enter Admission Number"
                                     name="admission_no"
-                                    value={formData.admission_no}
-                                    onChange={handleInputChange}
+                                    value={EditData.admission_no}
+                                    onChange={handleInputChangeEdit}
                                     required
                                 />
                             </Form.Group>
@@ -713,8 +752,8 @@ function Observation_report() {
                                     type="text"
                                     name="resident_name"
                                     placeholder="Enter Resident Name"
-                                    value={formData.resident_name}
-                                    onChange={handleInputChange}
+                                    value={EditData.resident_name}
+                                    onChange={handleInputChangeEdit}
                                     required
                                 />
                             </Form.Group>
@@ -725,8 +764,8 @@ function Observation_report() {
                                     type="date"
                                     name="date"
                                     max="9999-12-31"
-                                    value={formData.date}
-                                    onChange={handleInputChange}
+                                    value={EditData.date}
+                                    onChange={handleInputChangeEdit}
                                     required
                                 />
                             </Form.Group>
@@ -822,8 +861,8 @@ function Observation_report() {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={formData.follow_up}
-                                    onChange={handleInputChange}
+                                    value={EditData.follow_up}
+                                    onChange={handleInputChangeEdit}
                                     name="follow_up"
                                     required
                                 />
@@ -863,8 +902,8 @@ function Observation_report() {
                                     type="number"
                                     placeholder="Enter Admission Number"
                                     name="admission_no"
-                                    value={formData.admission_no}
-                                    onChange={handleInputChange}
+                                    value={EditData.admission_no}
+                                    onChange={handleInputChangeEdit}
                                     required
                                 />
                             </Col>
@@ -878,8 +917,8 @@ function Observation_report() {
                                     type="text"
                                     name="resident_name"
                                     placeholder="Enter Resident Name"
-                                    value={formData.resident_name}
-                                    onChange={handleInputChange}
+                                    value={EditData.resident_name}
+                                    onChange={handleInputChangeEdit}
                                     required
                                 />
                             </Col>
@@ -893,8 +932,8 @@ function Observation_report() {
                                     type="date"
                                     name="date"
                                     max="9999-12-31"
-                                    value={formData.date}
-                                    onChange={handleInputChange}
+                                    value={EditData.date}
+                                    onChange={handleInputChangeEdit}
                                     required
                                 />
                             </Col>
@@ -964,7 +1003,7 @@ function Observation_report() {
                                         textAlign: "justify"
                                     }}
                                 >
-                                    {formData.follow_up}
+                                    {EditData.follow_up}
                                 </div>
 
                             </Col>

@@ -81,10 +81,18 @@ function View_annualReport() {
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = (`0${date.getMonth() + 1}`).slice(-2);
         const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
         return `${year}-${month}-${day}`;
+    };
+
+    const formatDate1 = (dateString) => {
+        const date = new Date(dateString);
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
     };
 
 
@@ -271,17 +279,17 @@ function View_annualReport() {
                 ...eventData,
                 event_type: data.event_type || 'NULL',
                 event_name: data.event_name || 'NULL',
-                event_date: data.event_date || 'NULL',
+                event_date: formatDate1(data.event_date || 'NULL'),
                 event_place: data.event_place || 'NULL',
                 event_report: data.event_report,
                 event_rescue_count: data.event_rescue_count || 'NULL',
                 awareness_name: data.awareness_name || 'NULL',
-                awarness_date: data.awareness_date || 'NULL',
+                awarness_date: formatDate1(data.awarness_date || 'NULL'),
                 awarness_place: data.awareness_place || 'NULL',
                 awarness_report: data.awarness_report || 'NULL',
                 awarness_rescue_count: data.awarness_rescue_count || 'NULL',
                 outing_name: data.outing_name || 'NULL',
-                outing_date: data.outing_date || 'NULL',
+                outing_date: formatDate1(data.outing_date || 'NULL'),
                 outing_place: data.outing_place || 'NULL',
                 outing_report: data.outing_report || 'NULL',
 
@@ -596,15 +604,8 @@ function View_annualReport() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="date"
-                                        name="event_date"
-                                        max="9999-12-31"
-                                        value={formatDate(eventData.event_date)}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                <Col sm="7" style={{ textAlign: 'left' }}>
+                                    {eventData.event_date || "NULL"}
                                 </Col>
                             </Form.Group>
 
@@ -667,14 +668,21 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Event Report:</Form.Label>
                                 <Col sm="7">
-                                    <Form.Control
-                                        as="textarea"
-                                        name="event_report"
-                                        rows={3}
-                                        value={eventData.event_report}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <div
+                                        className="wrap-textarea"
+                                        style={{
+                                            border: '1px solid #ccc',
+                                            padding: '8px',
+                                            borderRadius: "5px",
+                                            minHeight: '40px',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            textAlign: "justify"
+                                        }}
+                                    >
+                                        {eventData.event_report}
+                                    </div>
                                 </Col>
                             </Form.Group>
                         </>
@@ -696,14 +704,9 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
                                 <Col sm="7">
-                                    <Form.Control
-                                        type="date"
-                                        name="awarness_date"
-                                        value={formatDate(eventData.awarness_date)}
-                                        max="9999-12-31"
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <Col sm="7" style={{ textAlign: 'left' }}>
+                                        {eventData.awarness_date || "NULL"}
+                                    </Col>
                                 </Col>
                             </Form.Group>
 
@@ -764,14 +767,21 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Awareness Report:</Form.Label>
                                 <Col sm="7">
-                                    <Form.Control
-                                        as="textarea"
-                                        name="awarness_report"
-                                        rows={3}
-                                        value={eventData.awarness_report}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <div
+                                        className="wrap-textarea"
+                                        style={{
+                                            border: '1px solid #ccc',
+                                            padding: '8px',
+                                            borderRadius: "5px",
+                                            minHeight: '40px',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            textAlign: "justify"
+                                        }}
+                                    >
+                                        {eventData.awarness_report}
+                                    </div>
                                 </Col>
                             </Form.Group>
                         </>
@@ -793,14 +803,9 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
                                 <Col sm="7">
-                                    <Form.Control
-                                        type="date"
-                                        name="outing_date"
-                                        value={formatDate(eventData.outing_date)}
-                                        max="9999-12-31"
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <Col sm="7" style={{ textAlign: 'left' }}>
+                                        {eventData.outing_date || "NULL"}
+                                    </Col>
                                 </Col>
                             </Form.Group>
 
@@ -823,7 +828,7 @@ function View_annualReport() {
                                     <Form.Control
                                         type="text"
                                         name="outing_rescue_count"
-                                        value={eventData.outing_rescue_count}
+                                        value={eventData.outing_rescue_count || "NULL"}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -861,14 +866,21 @@ function View_annualReport() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Outing Report:</Form.Label>
                                 <Col sm="7">
-                                    <Form.Control
-                                        as="textarea"
-                                        name="outing_report"
-                                        rows={3}
-                                        value={eventData.outing_report}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <div
+                                        className="wrap-textarea"
+                                        style={{
+                                            border: '1px solid #ccc',
+                                            padding: '8px',
+                                            borderRadius: "5px",
+                                            minHeight: '40px',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            textAlign: "justify"
+                                        }}
+                                    >
+                                        {eventData.outing_report}
+                                    </div>
                                 </Col>
                             </Form.Group>
                         </>
@@ -886,7 +898,7 @@ function View_annualReport() {
                     <Col md={12}>
                         <Form>
                             {/* Dropdown for selecting type */}
-                            
+
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Event Type:</Form.Label>
                                 <Col sm="7">
@@ -901,7 +913,7 @@ function View_annualReport() {
                             </Form.Group>
                             {eventData.event_type === 'event' && (
                                 <>
-                                <h5>Event Report</h5>
+                                    <h5>Event Report</h5>
                                     <Form.Group as={Row} className="mb-3">
                                         <Form.Label column sm="5" className='text-start'>Name of the Event:</Form.Label>
                                         <Col sm="7">
@@ -1056,310 +1068,310 @@ function View_annualReport() {
                             )}
                             {eventData.event_type === 'awareness' && (
                                 <>
-                            <h5>Awarness Report</h5>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Awareness Camp Name:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="text"
-                                        name="awareness_name"
-                                        value={eventData.awareness_name || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="date"
-                                        name="awarness_date"
-                                        max="9999-12-31"
-                                        value={eventData.awarness_date || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
+                                    <h5>Awarness Report</h5>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Awareness Camp Name:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="text"
+                                                name="awareness_name"
+                                                value={eventData.awareness_name || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="date"
+                                                name="awarness_date"
+                                                max="9999-12-31"
+                                                value={eventData.awarness_date || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
 
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Venue:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="text"
-                                        name="awarness_place"
-                                        value={eventData.awarness_place || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Venue:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="text"
+                                                name="awarness_place"
+                                                value={eventData.awarness_place || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
 
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>No. of Participants:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="text"
-                                        name="awarness_rescue_count"
-                                        value={eventData.awarness_rescue_count || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
-                                <Col sm="7">
-                                    {Array.isArray(files.awarness_photos) &&
-                                        files.awarness_photos.map((imgUrl, index) => {
-                                            const filename = `awarness_photos_${index}.jpg`;
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>No. of Participants:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="text"
+                                                name="awarness_rescue_count"
+                                                value={eventData.awarness_rescue_count || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                        <Col sm="7">
+                                            {Array.isArray(files.awarness_photos) &&
+                                                files.awarness_photos.map((imgUrl, index) => {
+                                                    const filename = `awarness_photos_${index}.jpg`;
 
-                                            return (
-                                                <div
-                                                    key={index}
-                                                    className="image-container"
-                                                    style={{
-                                                        position: "relative",
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        margin: "10px",
-                                                        display: "inline-block",
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={imgUrl}
-                                                        alt={`awarness_photos - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100%",
-                                                            height: "100%",
-                                                            objectFit: "cover",
-                                                            border: "1px solid #ccc",
-                                                            borderRadius: "4px",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
-
-                                                    <div className="image-overlay">
-                                                        {/* View icon */}
-                                                        <a
-                                                            href={imgUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            title="View Image"
-                                                            className="icon-button"
-                                                        >
-                                                            <i className="fas fa-eye"></i>
-                                                        </a>
-
-                                                        {/* Download icon */}
-                                                        <button
-                                                            title="Download Image"
-                                                            className="icon-button"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                fetch(imgUrl, { mode: "cors" })
-                                                                    .then((res) => res.blob())
-                                                                    .then((blob) => {
-                                                                        const url = window.URL.createObjectURL(blob);
-                                                                        const a = document.createElement("a");
-                                                                        a.href = url;
-                                                                        a.download = filename;
-                                                                        a.click();
-                                                                        window.URL.revokeObjectURL(url);
-                                                                    })
-                                                                    .catch(() => alert("Download failed."));
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="image-container"
+                                                            style={{
+                                                                position: "relative",
+                                                                width: "100px",
+                                                                height: "100px",
+                                                                margin: "10px",
+                                                                display: "inline-block",
                                                             }}
                                                         >
-                                                            <i className="fas fa-download"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    <Form.Control
-                                        type="file"
-                                        accept=".jpg,.jpeg,.png"
-                                        name="awarness_photos"
-                                        onChange={handleFileChange}
-                                        multiple
-                                    />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Awareness Report:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        as="textarea"
-                                        name="awarness_report"
-                                        rows={3}
-                                        value={eventData.awarness_report}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
-                        </>
-                    )}
-                    {eventData.event_type === 'outing' && (
-                        <>
-                            <h5>Outing Report</h5>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Outing Name:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="text"
-                                        name="outing_name"
-                                        value={eventData.outing_name || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="date"
-                                        name="outing_date"
-                                        max="9999-12-31"
-                                        value={eventData.outing_date} // remove || "NULL"
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
+                                                            <img
+                                                                src={imgUrl}
+                                                                alt={`awarness_photos - ${index}`}
+                                                                loading="lazy"
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "cover",
+                                                                    border: "1px solid #ccc",
+                                                                    borderRadius: "4px",
+                                                                }}
+                                                                onError={(e) => {
+                                                                    if (!e.target.dataset.errorHandled) {
+                                                                        e.target.src = "/fallback-image.png";
+                                                                        e.target.dataset.errorHandled = "true";
+                                                                    }
+                                                                }}
+                                                            />
 
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Venue:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="text"
-                                        name="outing_place"
-                                        value={eventData.outing_place || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
+                                                            <div className="image-overlay">
+                                                                {/* View icon */}
+                                                                <a
+                                                                    href={imgUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    title="View Image"
+                                                                    className="icon-button"
+                                                                >
+                                                                    <i className="fas fa-eye"></i>
+                                                                </a>
 
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>No. of Participants:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="text"
-                                        name="outing_rescue_count"
-                                        value={eventData.outing_rescue_count || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
-                                <Col sm="7">
-                                    {Array.isArray(files.outing_photos) &&
-                                        files.outing_photos.map((imgUrl, index) => {
-                                            const filename = `outing_photos_${index}.jpg`;
+                                                                {/* Download icon */}
+                                                                <button
+                                                                    title="Download Image"
+                                                                    className="icon-button"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(imgUrl, { mode: "cors" })
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement("a");
+                                                                                a.href = url;
+                                                                                a.download = filename;
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+                                                                            })
+                                                                            .catch(() => alert("Download failed."));
+                                                                    }}
+                                                                >
+                                                                    <i className="fas fa-download"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            <Form.Control
+                                                type="file"
+                                                accept=".jpg,.jpeg,.png"
+                                                name="awarness_photos"
+                                                onChange={handleFileChange}
+                                                multiple
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Awareness Report:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                as="textarea"
+                                                name="awarness_report"
+                                                rows={3}
+                                                value={eventData.awarness_report}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                </>
+                            )}
+                            {eventData.event_type === 'outing' && (
+                                <>
+                                    <h5>Outing Report</h5>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Outing Name:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="text"
+                                                name="outing_name"
+                                                value={eventData.outing_name || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="date"
+                                                name="outing_date"
+                                                max="9999-12-31"
+                                                value={eventData.outing_date} // remove || "NULL"
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
 
-                                            return (
-                                                <div
-                                                    key={index}
-                                                    className="image-container"
-                                                    style={{
-                                                        position: "relative",
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        margin: "10px",
-                                                        display: "inline-block",
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={imgUrl}
-                                                        alt={`outing_photos - ${index}`}
-                                                        loading="lazy"
-                                                        style={{
-                                                            width: "100%",
-                                                            height: "100%",
-                                                            objectFit: "cover",
-                                                            border: "1px solid #ccc",
-                                                            borderRadius: "4px",
-                                                        }}
-                                                        onError={(e) => {
-                                                            if (!e.target.dataset.errorHandled) {
-                                                                e.target.src = "/fallback-image.png";
-                                                                e.target.dataset.errorHandled = "true";
-                                                            }
-                                                        }}
-                                                    />
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Venue:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="text"
+                                                name="outing_place"
+                                                value={eventData.outing_place || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
 
-                                                    <div className="image-overlay">
-                                                        {/* View icon */}
-                                                        <a
-                                                            href={imgUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            title="View Image"
-                                                            className="icon-button"
-                                                        >
-                                                            <i className="fas fa-eye"></i>
-                                                        </a>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>No. of Participants:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                type="text"
+                                                name="outing_rescue_count"
+                                                value={eventData.outing_rescue_count || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                        <Col sm="7">
+                                            {Array.isArray(files.outing_photos) &&
+                                                files.outing_photos.map((imgUrl, index) => {
+                                                    const filename = `outing_photos_${index}.jpg`;
 
-                                                        {/* Download icon */}
-                                                        <button
-                                                            title="Download Image"
-                                                            className="icon-button"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                fetch(imgUrl, { mode: "cors" })
-                                                                    .then((res) => res.blob())
-                                                                    .then((blob) => {
-                                                                        const url = window.URL.createObjectURL(blob);
-                                                                        const a = document.createElement("a");
-                                                                        a.href = url;
-                                                                        a.download = filename;
-                                                                        a.click();
-                                                                        window.URL.revokeObjectURL(url);
-                                                                    })
-                                                                    .catch(() => alert("Download failed."));
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="image-container"
+                                                            style={{
+                                                                position: "relative",
+                                                                width: "100px",
+                                                                height: "100px",
+                                                                margin: "10px",
+                                                                display: "inline-block",
                                                             }}
                                                         >
-                                                            <i className="fas fa-download"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    <Form.Control
-                                        type="file"
-                                        accept=".jpg,.jpeg,.png"
-                                        name="outing_photos"
-                                        onChange={handleFileChange}
-                                        multiple
-                                    />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Outing Report:</Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        as="textarea"
-                                        name="outing_report"
-                                        rows={3}
-                                        value={eventData.outing_report || "NULL"}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Col>
-                            </Form.Group>
-                        </>
-                    )}
+                                                            <img
+                                                                src={imgUrl}
+                                                                alt={`outing_photos - ${index}`}
+                                                                loading="lazy"
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "cover",
+                                                                    border: "1px solid #ccc",
+                                                                    borderRadius: "4px",
+                                                                }}
+                                                                onError={(e) => {
+                                                                    if (!e.target.dataset.errorHandled) {
+                                                                        e.target.src = "/fallback-image.png";
+                                                                        e.target.dataset.errorHandled = "true";
+                                                                    }
+                                                                }}
+                                                            />
+
+                                                            <div className="image-overlay">
+                                                                {/* View icon */}
+                                                                <a
+                                                                    href={imgUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    title="View Image"
+                                                                    className="icon-button"
+                                                                >
+                                                                    <i className="fas fa-eye"></i>
+                                                                </a>
+
+                                                                {/* Download icon */}
+                                                                <button
+                                                                    title="Download Image"
+                                                                    className="icon-button"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fetch(imgUrl, { mode: "cors" })
+                                                                            .then((res) => res.blob())
+                                                                            .then((blob) => {
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const a = document.createElement("a");
+                                                                                a.href = url;
+                                                                                a.download = filename;
+                                                                                a.click();
+                                                                                window.URL.revokeObjectURL(url);
+                                                                            })
+                                                                            .catch(() => alert("Download failed."));
+                                                                    }}
+                                                                >
+                                                                    <i className="fas fa-download"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            <Form.Control
+                                                type="file"
+                                                accept=".jpg,.jpeg,.png"
+                                                name="outing_photos"
+                                                onChange={handleFileChange}
+                                                multiple
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="5" className='text-start'>Outing Report:</Form.Label>
+                                        <Col sm="7">
+                                            <Form.Control
+                                                as="textarea"
+                                                name="outing_report"
+                                                rows={3}
+                                                value={eventData.outing_report || "NULL"}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                </>
+                            )}
 
                             <Col md={12} className='d-flex align-items-center justify-content-between'>
                                 <div className="mt-3 d-flex align-tems-cente justify-content-between">

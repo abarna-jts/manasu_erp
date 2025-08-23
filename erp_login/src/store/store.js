@@ -2,11 +2,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import admissionReducer from './admissionSlice';
 import psychiatricReducer from './psychiatricSlice';
 import MSEReducer from './MSESlice';
+import observationReducer from './observationSlice';
 
 const STORAGE_KEYS = {
   admission: 'admissionState',
   psychiatric: 'psychiatricState',
-  mse: 'mseState'
+  mse: 'mseState',
+  observation: 'observationState',
 };
 
 // Load from localStorage
@@ -25,6 +27,7 @@ const loadState = () => {
     const admissionRaw = localStorage.getItem(STORAGE_KEYS.admission);
     const psychiatricRaw = localStorage.getItem(STORAGE_KEYS.psychiatric);
     const MSERaw = localStorage.getItem(STORAGE_KEYS.mse);
+    const ObservationRaw = localStorage.getItem(STORAGE_KEYS.observation);
 
     const parse = raw => {
       if (!raw) return undefined;
@@ -43,6 +46,7 @@ const loadState = () => {
       admission: parse(admissionRaw),
       psychiatric: parse(psychiatricRaw),
       mse: parse(MSERaw),
+      observation: parse(ObservationRaw),
     };
   } catch {
     return undefined;
@@ -70,6 +74,12 @@ const saveState = (state) => {
         JSON.stringify(makeStored(state.mse))
       );
     }
+    if (state.observation !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.observation,
+        JSON.stringify(makeStored(state.observation))
+      );
+    }
   } catch (error) {
     console.error('Error saving to localStorage:', error);
   }
@@ -82,6 +92,7 @@ const store = configureStore({
     admission: admissionReducer,
     psychiatric: psychiatricReducer,
     mse: MSEReducer,
+    observation: observationReducer,
   },
   preloadedState,
 });
