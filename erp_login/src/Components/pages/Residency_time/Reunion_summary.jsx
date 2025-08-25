@@ -12,6 +12,10 @@ import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
 import { Alert } from "react-bootstrap";
 import Cookies from 'js-cookie';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    setReunionField, resetReunionSummary
+} from '../../../store/reunionSummarySlice.js';
 
 function Reunion_summary() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -25,11 +29,17 @@ function Reunion_summary() {
 
     const userType = Cookies.get('usertype');
 
-    const [formData, setFormData] = useState({
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.reunion);
+
+    const [formState, setFormData] = useState({
+        admission_no: '',
         rescue_name: '',
         date: '',
+        summary_attach: '',
         report: '',
-    })
+    });
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -43,7 +53,16 @@ function Reunion_summary() {
     }
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setReunionField({ field: name, value }));
+    };
+
+    const handleChange1 = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
     };
 
     const handleAdmissionChange = (e) => {
@@ -65,7 +84,7 @@ function Reunion_summary() {
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >=12) { // Adjust minimum length as needed
+        if (admission_no.trim().length >= 12) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
@@ -144,6 +163,30 @@ function Reunion_summary() {
 
     const summary_attachRef = useRef();
 
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionReunionInfo');
+            if (stored) {
+                const { admission_no: storedAdm } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionReunionInfo',
+                JSON.stringify({ admission_no })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -176,11 +219,13 @@ function Reunion_summary() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Reunion Summary Form submitted successfully!');
-            setFormData({
-                rescue_name: '',
-                date: '',
-                report: '',
-            })
+            dispatch(resetObservationData());
+            localStorage.removeItem('reunion');
+            // setFormData({
+            //     rescue_name: '',
+            //     date: '',
+            //     report: '',
+            // })
             setAdmissionNumber("");
             if (summary_attachRef.current) summary_attachRef.current.value = "";
         } catch (err) {
@@ -214,14 +259,12 @@ function Reunion_summary() {
             const response = await apiRoute.get(`/residency/getSummary/${admission_no}`);
             const data = response.data;
 
-            setFormData((formData) => ({
-                ...formData,
+            setFormData((formState) => ({
+                ...formState,
                 rescue_name: data.rescue_name || '',
-                date: data.date || '',
+                date: formatForInput(data.date || ''),
                 report: data.report || '',
             }));
-
-
 
             // Parse form7_attach image array
             let summaryAttachPath = [];
@@ -265,7 +308,7 @@ function Reunion_summary() {
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
 
-        return `${year}-${month}-${day}`; // ✅ format for <input type="date">
+        return `${day}-${month}-${year}`; // ✅ format for <input type="date">
     };
 
 
@@ -339,7 +382,7 @@ function Reunion_summary() {
         const mm = pad(dateObj.getMonth() + 1);
         const dd = pad(dateObj.getDate());
 
-        return `${yyyy}-${mm}-${dd}`;
+        return `${dd}-${mm}-${yyyy}`;
     };
 
     const handleShow = async (admission_no) => {
@@ -350,7 +393,7 @@ function Reunion_summary() {
             setFormData((formData) => ({
                 ...formData,
                 rescue_name: data.rescue_name || '',
-                date: data.date || '',
+                date: formatDateForInput(data.date || ''),
                 report: data.report || '',
             }));
 
@@ -398,9 +441,9 @@ function Reunion_summary() {
         e.preventDefault();
 
         const data = new FormData();
-        data.append('rescue_name', formData.rescue_name);
-        data.append('date', formData.date);
-        data.append('report', formData.report);
+        data.append('rescue_name', formState.rescue_name);
+        data.append('date', formState.date);
+        data.append('report', formState.report);
         data.append('summary_attach', files.summary_attach);
 
         // ✅ Only append summary_attach if it's a new file
@@ -428,6 +471,11 @@ function Reunion_summary() {
             alert('Update failed.');
         }
     };
+
+    const handleClearData = () => {
+        dispatch(resetReunionSummary());
+        setAdmissionNumber("");
+    }
 
 
     return (
@@ -510,6 +558,9 @@ function Reunion_summary() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
+                        <button type="button" className="btn btn-danger mx-1" onClick={handleClearData}>
+                            <i className="bi bi-x-circle" style={{ color: "white" }}></i>
+                        </button>
                     </Form.Group>
                 </Form>
                 <Row className='d-flex align-items-center justify-content-center'>
@@ -604,26 +655,16 @@ function Reunion_summary() {
                                 <Form.Label column sm="5" className='text-start'>
                                     Resident's Name :
                                 </Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="text"
-                                        name="rescue_name"
-                                        value={formData.rescue_name}
-                                        onChange={handleChange}
-                                        required />
+                                <Col sm="6" className='text-start' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                    {formState.rescue_name}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                 <Form.Label column sm="5" className='text-start'>
                                     Date :
                                 </Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="date"
-                                        name="date"
-                                        value={formatForInput(formData.date)}
-                                        onChange={handleChange}
-                                        required />
+                                <Col sm="6" className='text-start' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                    {formState.date}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1" controlId="formRescueName">
@@ -658,12 +699,9 @@ function Reunion_summary() {
                                     Report :
                                 </Form.Label>
                                 <Col sm="7">
-                                    <Form.Control
-                                        as="textarea"
-                                        name="report"
-                                        value={formData.report}
-                                        onChange={handleChange}
-                                        required />
+                                    <Col sm="6" className='text-start' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                        {formState.report}
+                                    </Col>
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -678,7 +716,7 @@ function Reunion_summary() {
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Doctor's visit Form</Modal.Title>
+                    <Modal.Title>Edit Reunion Summary Form</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
@@ -693,8 +731,8 @@ function Reunion_summary() {
                                             <Form.Control
                                                 type="text"
                                                 name="rescue_name"
-                                                value={formData.rescue_name}
-                                                onChange={handleChange}
+                                                value={formState.rescue_name}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -707,8 +745,8 @@ function Reunion_summary() {
                                             <Form.Control
                                                 type="date"
                                                 name="date"
-                                                value={formatDateForInput(formData.date)}
-                                                onChange={handleChange}
+                                                value={formState.date}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -809,8 +847,8 @@ function Reunion_summary() {
                                             <Form.Control
                                                 as="textarea"
                                                 name="report"
-                                                value={formData.report}
-                                                onChange={handleChange}
+                                                value={formState.report}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>

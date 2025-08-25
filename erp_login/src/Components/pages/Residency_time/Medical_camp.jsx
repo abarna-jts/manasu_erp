@@ -10,6 +10,10 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
 import { Alert } from "react-bootstrap";
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    setMedicalCampField, resetMedicalCamp
+} from '../../../store/medicalCampSlice.js';
 
 function Medical_camp() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -26,7 +30,11 @@ function Medical_camp() {
 
     const userType = Cookies.get('usertype');
 
-    const [formData, setFormData] = useState({
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.medical_camp);
+
+    const [formState, setFormData] = useState({
         camp_name: '',
         hospital_name: '',
         date: '',
@@ -38,8 +46,17 @@ function Medical_camp() {
     })
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setMedicalCampField({ field: name, value }));
     };
+
+    const handleChange1 = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    }
 
     useEffect(() => {
         getMedicalCamp();
@@ -79,16 +96,7 @@ function Medical_camp() {
             // console.log(response.formData);
             if (response.status === 200 || response.status === 201) {
                 alert('Form submitted successfully!');
-                setFormData({
-                    camp_name: '',
-                    hospital_name: '',
-                    date: '',
-                    camp_type: '',
-                    organised_by: '',
-                    participants: '',
-                    feedback: '',
-                    general_details: ''
-                })
+                dispatch(resetMedicalCamp());
                 handleClose(true);
                 getMedicalCamp();
             } else {
@@ -128,8 +136,8 @@ function Medical_camp() {
             const response = await apiRoute.get(`/residency/getMedicalCampID/${id}`);
             const data = response.data;
 
-            setFormData((formData) => ({
-                ...formData,
+            setFormData((formState) => ({
+                ...formState,
                 camp_name: data.camp_name || '',
                 hospital_name: data.hospital_name || '',
                 date: data.date || '',
@@ -230,7 +238,7 @@ function Medical_camp() {
         e.preventDefault();
 
         try {
-            const response = await apiRoute.put(`/residency/updateMedicalCamp/${id}`, formData);
+            const response = await apiRoute.put(`/residency/updateMedicalCamp/${id}`, formState);
             console.log(response.data);
 
             if (response.data.message === "Medical Camp updated successfully!") {
@@ -509,8 +517,19 @@ function Medical_camp() {
                                     </Form.Group>
                                 </Col>
 
-                                <div className="mt-3">
-                                    <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                <div className="mt-3 d-flex align-items-center justify-content-between">
+                                    <div className="offical_btn">
+                                        <Button variant='danger' className='m-1' onClick={() => dispatch(resetMedicalCamp())}>Clear All</Button>
+                                        <Button variant="secondary" onClick={handleClose}>
+                                            Close
+                                        </Button>
+                                    </div>
+
+                                    <div className="clear_btn">
+                                        <Button variant="success" className="m-1" type="submit">Submit</Button>
+                                        
+                                    </div>
+
                                 </div>
 
                             </Row>
@@ -539,8 +558,8 @@ function Medical_camp() {
                                     <Form.Control
                                         type="text"
                                         name="camp_name"
-                                        value={formData.camp_name}
-                                        onChange={handleChange}
+                                        value={formState.camp_name}
+                                        onChange={handleChange1}
                                         required />
                                 </Col>
                             </Form.Group>
@@ -552,8 +571,8 @@ function Medical_camp() {
                                     <Form.Control
                                         type="text"
                                         name="hospital_name"
-                                        value={formData.hospital_name}
-                                        onChange={handleChange}
+                                        value={formState.hospital_name}
+                                        onChange={handleChange1}
                                         required />
                                 </Col>
                             </Form.Group>
@@ -566,8 +585,8 @@ function Medical_camp() {
                                         type="date"
                                         name="date"
                                         max="9999-12-31"
-                                        value={formatDateForInput(formData.date)}
-                                        onChange={handleChange}
+                                        value={formatDateForInput(formState.date)}
+                                        onChange={handleChange1}
                                         required />
                                 </Col>
                             </Form.Group>
@@ -576,8 +595,8 @@ function Medical_camp() {
                                 <Col sm="7">
                                     <Form.Select
                                         name="camp_type"
-                                        value={formData.camp_type}
-                                        onChange={handleChange}
+                                        value={formState.camp_type}
+                                        onChange={handleChange1}
                                         required
                                     >
                                         <option value="">-- Select --</option>
@@ -595,8 +614,8 @@ function Medical_camp() {
                                         <Form.Control
                                             type="text"
                                             name="general_details"
-                                            value={formData.general_details || ''}
-                                            onChange={handleChange}
+                                            value={formState.general_details || ''}
+                                            onChange={handleChange1}
                                             placeholder="Enter details for General camp"
                                             required
                                         />
@@ -611,8 +630,8 @@ function Medical_camp() {
                                     <Form.Control
                                         type="text"
                                         name="organised_by"
-                                        value={formData.organised_by}
-                                        onChange={handleChange}
+                                        value={formState.organised_by}
+                                        onChange={handleChange1}
                                         required />
                                 </Col>
                             </Form.Group>
@@ -625,8 +644,8 @@ function Medical_camp() {
                                     <Form.Control
                                         type="text"
                                         name="participants"
-                                        value={formData.participants}
-                                        onChange={handleChange}
+                                        value={formState.participants}
+                                        onChange={handleChange1}
                                         required />
                                 </Col>
                             </Form.Group>
@@ -638,8 +657,8 @@ function Medical_camp() {
                                     <Form.Control
                                         as="textarea"
                                         name="feedback"
-                                        value={formData.feedback || "NULL"}
-                                        onChange={handleChange}
+                                        value={formState.feedback || "NULL"}
+                                        onChange={handleChange1}
                                         required />
                                 </Col>
                             </Form.Group>
@@ -666,8 +685,8 @@ function Medical_camp() {
                                             <Form.Control
                                                 type="text"
                                                 name="camp_name"
-                                                value={formData.camp_name}
-                                                onChange={handleChange}
+                                                value={formState.camp_name}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -679,8 +698,8 @@ function Medical_camp() {
                                             <Form.Control
                                                 type="text"
                                                 name="hospital_name"
-                                                value={formData.hospital_name}
-                                                onChange={handleChange}
+                                                value={formState.hospital_name}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -693,8 +712,8 @@ function Medical_camp() {
                                                 type="date"
                                                 name="date"
                                                 max="9999-12-31"
-                                                value={formatDateForInput(formData.date)}
-                                                onChange={handleChange}
+                                                value={formatDateForInput(formState.date)}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -703,8 +722,8 @@ function Medical_camp() {
                                         <Col sm="7">
                                             <Form.Select
                                                 name="camp_type"
-                                                value={formData.camp_type}
-                                                onChange={handleChange}
+                                                value={formState.camp_type}
+                                                onChange={handleChange1}
                                                 required
                                             >
                                                 <option value="">-- Select --</option>
@@ -722,8 +741,8 @@ function Medical_camp() {
                                                 <Form.Control
                                                     type="text"
                                                     name="general_details"
-                                                    value={formData.general_details || ''}
-                                                    onChange={handleChange}
+                                                    value={formState.general_details || ''}
+                                                    onChange={handleChange1}
                                                     placeholder="Enter details for General camp"
                                                     required
                                                 />
@@ -738,8 +757,8 @@ function Medical_camp() {
                                             <Form.Control
                                                 type="text"
                                                 name="organised_by"
-                                                value={formData.organised_by}
-                                                onChange={handleChange}
+                                                value={formState.organised_by}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -752,8 +771,8 @@ function Medical_camp() {
                                             <Form.Control
                                                 type="text"
                                                 name="participants"
-                                                value={formData.participants}
-                                                onChange={handleChange}
+                                                value={formState.participants}
+                                                onChange={handleChange1}
                                                 required />
                                         </Col>
                                     </Form.Group>
@@ -765,15 +784,15 @@ function Medical_camp() {
                                             <Form.Control
                                                 as="textarea"
                                                 name="feedback"
-                                                value={formData.feedback}
-                                                onChange={handleChange}
+                                                value={formState.feedback}
+                                                onChange={handleChange1}
                                             />
                                         </Col>
                                     </Form.Group>
                                 </Col>
 
                                 <div className="btn_footer d-flex align-items-center justify-content-end">
-                                    <Button variant="success" type="button" className="m-1" onClick={(e) => handleUpdate(e, formData.id)}>
+                                    <Button variant="success" type="button" className="m-1" onClick={(e) => handleUpdate(e, formState.id)}>
                                         Update
                                     </Button>
                                     <Button variant="secondary" onClick={handleClose1}>

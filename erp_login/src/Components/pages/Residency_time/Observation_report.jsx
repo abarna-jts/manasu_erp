@@ -15,7 +15,7 @@ import html2canvas from "html2canvas";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-    setObservationField, resetObservationData,
+    setObservationField, resetObservationData, setRecoveryPhoto
 } from '../../../store/observationSlice.js';
 
 function Observation_report() {
@@ -75,15 +75,25 @@ function Observation_report() {
     }
 
     const handleFileChange = (e) => {
-        setFiles({
-            ...files,
-            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
-        });
+        const files = Array.from(e.target.files);
+
+        // Save metadata in Redux
+        dispatch(setRecoveryPhoto(
+            files.map(f => ({
+                name: f.name,
+                size: f.size,
+                type: f.type,
+            }))
+        ));
+
+        // Keep actual File objects in local state for form submission
+        setFiles({ recovery_photo: files });
     };
+
 
     useEffect(() => {
         try {
-            const stored = localStorage.getItem('admissionInfo');
+            const stored = localStorage.getItem('admissionObservationInfo');
             if (stored) {
                 const { admission_no: storedAdm, date: storedName } = JSON.parse(stored);
                 if (storedAdm) setAdmissionNumber(storedAdm);
@@ -98,7 +108,7 @@ function Observation_report() {
     useEffect(() => {
         try {
             localStorage.setItem(
-                'admissionInfo',
+                'admissionObservationInfo',
                 JSON.stringify({ admission_no, rescueName })
             );
         } catch (e) {
@@ -147,7 +157,9 @@ function Observation_report() {
                 getConditionDetails();
                 dispatch(resetObservationData());
                 localStorage.removeItem('observation');
-                localStorage.removeItem('recovery_photo');
+                dispatch(setRecoveryPhoto(files));
+                // optional persistence
+                localStorage.setItem("recovery_photo", JSON.stringify(files));
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -266,7 +278,13 @@ function Observation_report() {
         }
     };
 
-
+    const formatDate1 = (dateString) => {
+        const date = new Date(dateString);
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
 
     useEffect(() => {
         getConditionDetails();
@@ -353,7 +371,7 @@ function Observation_report() {
 
             const parseDate = (dmy) => {
                 const [day, month, year] = dmy.split("-");
-                return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
             };
 
             // Update form fields
@@ -452,6 +470,13 @@ function Observation_report() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    const handleClearData = () => {
+        dispatch(resetObservationData());
+        setAdmissionNumber("");
+        setRescueName("");
+    }
+
 
     return (
         <>
@@ -655,14 +680,20 @@ function Observation_report() {
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="formAdmissionNo">
                                 <Form.Label>Admission No. <span style={{ color: 'red' }}>*</span></Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Enter Admission Number"
-                                    name="admission_no"
-                                    value={admission_no}
-                                    onChange={handleAdmissionChange}
-                                    required
-                                />
+                                <div className="form_flex d-flex align-items-center">
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Enter Admission Number"
+                                        name="admission_no"
+                                        value={admission_no}
+                                        onChange={handleAdmissionChange}
+                                        required
+                                    />
+                                    <div className="close_admission mx-2" onClick={handleClearData}>
+                                        <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                                    </div>
+                                </div>
+
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formResidentName">
@@ -896,46 +927,25 @@ function Observation_report() {
                 <Col md={12}>
                     <Form>
                         <Form.Group as={Row} className="mb-3" controlId="formAdmissionNo">
-                            <Form.Label column sm="4" className='text-start'>Admission No. : <span style={{ color: 'red' }}>*</span></Form.Label>
-                            <Col sm="6">
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Enter Admission Number"
-                                    name="admission_no"
-                                    value={EditData.admission_no}
-                                    onChange={handleInputChangeEdit}
-                                    required
-                                />
+                            <Form.Label column sm="4" className='text-start'>Admission No. : </Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
+                                {EditData.admission_no}
                             </Col>
 
                         </Form.Group>
 
                         <Form.Group as={Row} className="mb-3" controlId="formResidentName">
-                            <Form.Label column sm="4" className='text-start'>Resident Name : <span style={{ color: 'red' }}>*</span></Form.Label>
-                            <Col sm="6">
-                                <Form.Control
-                                    type="text"
-                                    name="resident_name"
-                                    placeholder="Enter Resident Name"
-                                    value={EditData.resident_name}
-                                    onChange={handleInputChangeEdit}
-                                    required
-                                />
+                            <Form.Label column sm="4" className='text-start'>Resident Name : </Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
+                                {EditData.resident_name}
                             </Col>
 
                         </Form.Group>
 
                         <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="4" className='text-start'>Date</Form.Label>
-                            <Col sm="6">
-                                <Form.Control
-                                    type="date"
-                                    name="date"
-                                    max="9999-12-31"
-                                    value={EditData.date}
-                                    onChange={handleInputChangeEdit}
-                                    required
-                                />
+                            <Form.Label column sm="4" className='text-start'>Date :</Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
+                                {EditData.date}
                             </Col>
 
                         </Form.Group>
@@ -988,14 +998,12 @@ function Observation_report() {
                         </Form.Group> */}
 
                         <Form.Group className="mb-3" as={Row}>
-                            <Form.Label column sm="4" className='text-start'>Follow Up : <span style={{ color: 'red' }}>*</span></Form.Label>
-                            <Col md={6}>
+                            <Form.Label column sm="4" className='text-start'>Follow Up : </Form.Label>
+                            <Col md={6} className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
                                 <div
                                     className="wrap-textarea"
                                     style={{
-                                        border: '1px solid #ccc',
-                                        padding: '8px',
-                                        borderRadius: "5px",
+                                        
                                         minHeight: '40px',
                                         whiteSpace: 'pre-wrap',
                                         wordWrap: 'break-word',

@@ -29,7 +29,7 @@ const observationSlice = createSlice({
         setRecoveryPhoto(state, action) {
             state.recovery_photo = action.payload;
             // save to localStorage so it survives refresh
-            localStorage.setItem("recovery_photo", JSON.stringify(action.payload));
+            // localStorage.setItem("recovery_photo", JSON.stringify(action.payload));
         },
         resetAll() {
             return initialState;

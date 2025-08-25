@@ -10,6 +10,10 @@ import 'react-date-range/dist/theme/default.css'; // theme css
 // import { addDays } from 'date-fns';
 import { Alert } from "react-bootstrap";
 import Cookies from 'js-cookie';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    setNurseRecordField, resetNurseRecord
+} from '../../../store/nurseRecordSlice.js';
 
 function Nurse_Record_sheet() {
     const [show, setShow] = useState(false);
@@ -26,7 +30,11 @@ function Nurse_Record_sheet() {
 
     const userType = Cookies.get('usertype');
 
-    const [formData, setFormData] = useState({
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.nurse_record);
+
+    const [formState, setFormData] = useState({
         admission_no: '',
         month: '',
         temperature: '',
@@ -37,8 +45,17 @@ function Nurse_Record_sheet() {
     });
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setNurseRecordField({ field: name, value }));
     };
+
+    const handleInputChange1 = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    }
 
 
     const apiRoute = axios.create({
@@ -64,14 +81,14 @@ function Nurse_Record_sheet() {
             alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
         }
-        
+
         try {
             const response = await apiRoute.post("/residency/nurse_record", formData);
             console.log(response);
 
             if (response.data.message === "Nurse Record Sheet Created Successfully") {
                 alert("Form submitted successfully!");
-
+                dispatch(resetNurseRecord());
                 // Reset the form
                 setFormData({
                     id: '',
@@ -172,7 +189,7 @@ function Nurse_Record_sheet() {
         e.preventDefault();
 
         try {
-            const response = await apiRoute.put(`/residency/updateRecords/${id}`, formData);
+            const response = await apiRoute.put(`/residency/updateRecords/${id}`, formState);
             console.log(response.data);
 
             if (response.data.message === "Nurse Record updated successfully!") {
@@ -198,6 +215,10 @@ function Nurse_Record_sheet() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    const handleClearData = () => { 
+        dispatch(resetNurseRecord());
+    }
 
     return (
         <>
@@ -339,19 +360,25 @@ function Nurse_Record_sheet() {
                     <Modal.Title>Enter your Record for this month</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div className="clear-btn d-flex align-items-end justify-content-end">
+                        <Button variant="secondary" onClick={handleClearData}>Clear All</Button>
+                    </div>
+                    
                     <Col md={12}>
+                    
                         <Form onSubmit={handleSubmit}>
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAdmissionNo">
                                         <Form.Label>Admission Number <span style={{ color: 'red' }}>*</span></Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="admission_no"
-                                            value={formData.admission_no}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
+                                            <Form.Control
+                                                type="number"
+                                                name="admission_no"
+                                                value={formData.admission_no}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
@@ -483,9 +510,9 @@ function Nurse_Record_sheet() {
                                         <Form.Label>Month <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Select
                                             name="currentMonth"
-                                            value={formData.currentMonth}
+                                            value={formState.currentMonth}
                                             onChange={(e) =>
-                                                setFormData({ ...formData, currentMonth: e.target.value })
+                                                setFormData({ ...formState, currentMonth: e.target.value })
                                             }
                                             required
                                         >
@@ -512,8 +539,8 @@ function Nurse_Record_sheet() {
                                             type="date"
                                             name="date"
                                             max="9999-12-31"
-                                            value={formData.date}
-                                            onChange={handleInputChange}
+                                            value={formState.date}
+                                            onChange={handleInputChange1}
                                             required
                                         />
                                     </Form.Group>
@@ -526,8 +553,8 @@ function Nurse_Record_sheet() {
                                         <Form.Control
                                             type="text"
                                             name="temperature"
-                                            value={formData.temperature}
-                                            onChange={handleInputChange}
+                                            value={formState.temperature}
+                                            onChange={handleInputChange1}
                                             required
                                         />
                                     </Form.Group>
@@ -538,8 +565,8 @@ function Nurse_Record_sheet() {
                                         <Form.Control
                                             type="text"
                                             name="bp"
-                                            value={formData.bp}
-                                            onChange={handleInputChange}
+                                            value={formState.bp}
+                                            onChange={handleInputChange1}
                                             required
                                         />
                                     </Form.Group>
@@ -554,8 +581,8 @@ function Nurse_Record_sheet() {
                                         <Form.Control
                                             type="number"
                                             name="pulse"
-                                            value={formData.pulse}
-                                            onChange={handleInputChange}
+                                            value={formState.pulse}
+                                            onChange={handleInputChange1}
                                             required
                                         />
                                     </Form.Group>
@@ -566,8 +593,8 @@ function Nurse_Record_sheet() {
                                         <Form.Control
                                             type="text"
                                             name="weight"
-                                            value={formData.weight}
-                                            onChange={handleInputChange}
+                                            value={formState.weight}
+                                            onChange={handleInputChange1}
                                             required
                                         />
                                     </Form.Group>
@@ -578,7 +605,7 @@ function Nurse_Record_sheet() {
 
 
                             <div className="btn_footer d-flex align-items-center justify-content-end">
-                                <Button variant="success" type="button" className="m-1" onClick={(e) => handleUpdate(e, formData.id)}>
+                                <Button variant="success" type="button" className="m-1" onClick={(e) => handleUpdate(e, formState.id)}>
                                     Submit
                                 </Button>
                                 <Button variant="secondary" onClick={handleClose1}>

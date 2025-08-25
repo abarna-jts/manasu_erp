@@ -5,21 +5,23 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    setDrVisitField, resetDrVisit
+} from '../../../store/drVisitSlice.js';
 
 function Dr_visit() {
-    const [formData, setFormData] = useState({
-        dr_name: '',
-        hospital_name: '',
-        date_time: '',
-        resident_examinite: '',
-        report: ''
-    })
+
+    const dispatch = useDispatch();
+    const formData = useSelector((state) => state.dr_visit);
+
 
     const userType = Cookies.get('usertype');
 
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setDrVisitField({ field: name, value }));
     };
 
     const apiRoute = axios.create({
@@ -35,14 +37,8 @@ function Dr_visit() {
 
             if (response.status === 200 || response.status === 201) {
                 alert('Form submitted successfully!');
-                setFormData({
-                    dr_name: '',
-                    hospital_name: '',
-                    date_time: '',
-                    resident_examinite: '',
-                    report: ''
-                })
-                
+                dispatch(resetDrVisit());
+
             } else {
                 alert('Error submitting form.');
             }
@@ -59,6 +55,11 @@ function Dr_visit() {
 
         navigate("/dr_visitView");
     }
+
+    const handleClearData = () => {
+        dispatch(resetDrVisit());
+    }
+
 
     return (
         <>
@@ -82,6 +83,7 @@ function Dr_visit() {
                 <Row className='d-flex flex-column align-items-center justify-content-center'>
                     <Col md={8} className='d-flex align-items-center justify-content-end mt-3'>
                         <Button type='button' className='btn btn-success' onClick={handleViewPage}>View All</Button>
+                        <Button type='button' className='btn btn-danger mx-3' onClick={handleClearData}>Clear All</Button>
                     </Col>
                     <Col md={8} className="consultant_box my-1">
                         <div className="consultant_details">

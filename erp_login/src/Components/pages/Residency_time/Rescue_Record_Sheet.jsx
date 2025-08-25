@@ -8,6 +8,10 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    setConsultationField, resetConsultation
+} from '../../../store/consultationSlice.js';
 
 function Rescue_Record_Sheet() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -31,19 +35,24 @@ function Rescue_Record_Sheet() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
-    const [formData, setFormData] = useState({
+    const [formState, setFormData] = useState({
         admission_no: '',
         resident_name: '',
         follow_up: '',
         date: '',
     });
 
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.consultation);
+
     const [files, setFiles] = useState({
         rescue_recovery_photo: null,
     });
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setConsultationField({ field: name, value }));
     };
 
     const handleFileChange = (e) => {
@@ -89,12 +98,7 @@ function Rescue_Record_Sheet() {
             });
 
             alert('Consultation Report Form submitted successfully!');
-            setFormData({
-                admission_no: '',
-                resident_name: '',
-                follow_up: '',
-                date: '',
-            })
+            dispatch(resetConsultation());
             setAdmissionNumber("");
             setRescueName("");
             handleClose(true);
@@ -160,8 +164,8 @@ function Rescue_Record_Sheet() {
                 return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
             };
 
-            setFormData((formData) => ({
-                ...formData,
+            setFormData((formState) => ({
+                ...formState,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
@@ -229,10 +233,10 @@ function Rescue_Record_Sheet() {
         e.preventDefault();
 
         const data = new FormData();
-        data.append('admission_no', formData.admission_no);
-        data.append('resident_name', formData.resident_name);
-        data.append('date', formData.date);
-        data.append('follow_up', formData.follow_up);
+        data.append('admission_no', formState.admission_no);
+        data.append('resident_name', formState.resident_name);
+        data.append('date', formState.date);
+        data.append('follow_up', formState.follow_up);
 
         // ✅ Only append recovery photo if it's a new file
         if (files.rescue_recovery_photo && files.rescue_recovery_photo.length > 0) {
@@ -241,7 +245,7 @@ function Rescue_Record_Sheet() {
             });
         }
         try {
-            const res = await apiRoute.post(`/residency/updateRescueCondition/${formData.admission_no}`, data, {
+            const res = await apiRoute.post(`/residency/updateRescueCondition/${formState.admission_no}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log(res.data);
@@ -298,8 +302,8 @@ function Rescue_Record_Sheet() {
             };
 
             // Update form fields
-            setFormData((formData) => ({
-                ...formData,
+            setFormData((formState) => ({
+                ...formState,
                 admission_no: data.admission_no || '',
                 resident_name: data.resident_name || '',
                 follow_up: data.follow_up || '',
@@ -393,6 +397,38 @@ function Rescue_Record_Sheet() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionConsultationInfo');
+            if (stored) {
+                const { admission_no: storedAdm, date: storedName } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+                if (storedName) setRescueName(storedName);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionConsultationInfo',
+                JSON.stringify({ admission_no, rescueName })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no, rescueName]);
+
+    const handleClearData = () => { 
+        setAdmissionNumber("");
+        setRescueName("");
+        dispatch(resetConsultation());
+    }
+
 
     return (
         <>
@@ -597,14 +633,20 @@ function Rescue_Record_Sheet() {
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="formAdmissionNo">
                                 <Form.Label>Admission No. <span style={{ color: 'red' }}>*</span></Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Enter Admission Number"
-                                    name="admission_no"
-                                    value={admission_no}
-                                    onChange={handleAdmissionChange}
-                                    required
-                                />
+                                <div className="form_flex d-flex align-items-center">
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Enter Admission Number"
+                                        name="admission_no"
+                                        value={admission_no}
+                                        onChange={handleAdmissionChange}
+                                        required
+                                    />
+                                    <div className="close_admission mx-2" onClick={handleClearData}>
+                                        <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                                    </div>
+                                </div>
+
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formResidentName">
@@ -680,7 +722,7 @@ function Rescue_Record_Sheet() {
                                     type="number"
                                     placeholder="Enter Admission Number"
                                     name="admission_no"
-                                    value={formData.admission_no}
+                                    value={formState.admission_no}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -692,7 +734,7 @@ function Rescue_Record_Sheet() {
                                     type="text"
                                     name="resident_name"
                                     placeholder="Enter Resident Name"
-                                    value={formData.resident_name}
+                                    value={formState.resident_name}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -704,7 +746,7 @@ function Rescue_Record_Sheet() {
                                     type="date"
                                     name="date"
                                     max="9999-12-31"
-                                    value={formData.date}
+                                    value={formState.date}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -800,7 +842,7 @@ function Rescue_Record_Sheet() {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={formData.follow_up}
+                                    value={formState.follow_up}
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     multiple
@@ -842,7 +884,7 @@ function Rescue_Record_Sheet() {
                                     type="number"
                                     placeholder="Enter Admission Number"
                                     name="admission_no"
-                                    value={formData.admission_no}
+                                    value={formState.admission_no}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -857,7 +899,7 @@ function Rescue_Record_Sheet() {
                                     type="text"
                                     name="resident_name"
                                     placeholder="Enter Resident Name"
-                                    value={formData.resident_name}
+                                    value={formState.resident_name}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -872,7 +914,7 @@ function Rescue_Record_Sheet() {
                                     type="date"
                                     name="date"
                                     max="9999-12-31"
-                                    value={formData.date}
+                                    value={formState.date}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -918,7 +960,7 @@ function Rescue_Record_Sheet() {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={formData.follow_up}
+                                    value={formState.follow_up}
                                     onChange={handleInputChange}
                                     name="follow_up"
                                     multiple

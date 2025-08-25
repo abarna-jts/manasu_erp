@@ -3,12 +3,24 @@ import admissionReducer from './admissionSlice';
 import psychiatricReducer from './psychiatricSlice';
 import MSEReducer from './MSESlice';
 import observationReducer from './observationSlice';
+import reunionSummaryReducer from './reunionSummarySlice';
+import consultationReducer from './consultationSlice';
+import nurseRecordReducer from './nurseRecordSlice';
+import drVisitReducer from './drVisitSlice';
+import medicalCampReducer from './medicalCampSlice';
+import prescriptionReducer from './prescriptionSlice';
 
 const STORAGE_KEYS = {
   admission: 'admissionState',
   psychiatric: 'psychiatricState',
   mse: 'mseState',
   observation: 'observationState',
+  reunion: 'reunionSummary',
+  consultation: 'consultationState',
+  nurse_record: 'nurseRecordState',
+  dr_visit: 'drVisitState',
+  medical_camp: 'medicalCampState',
+  prescription: 'prescriptionState',
 };
 
 // Load from localStorage
@@ -28,6 +40,12 @@ const loadState = () => {
     const psychiatricRaw = localStorage.getItem(STORAGE_KEYS.psychiatric);
     const MSERaw = localStorage.getItem(STORAGE_KEYS.mse);
     const ObservationRaw = localStorage.getItem(STORAGE_KEYS.observation);
+    const ReunionSummaryRaw = localStorage.getItem(STORAGE_KEYS.reunion);
+    const ConsultationRaw = localStorage.getItem(STORAGE_KEYS.consultation);
+    const nurseRecordRaw = localStorage.getItem(STORAGE_KEYS.nurse_record);
+    const drVisitRaw = localStorage.getItem(STORAGE_KEYS.dr_visit);
+    const medical_campRaw = localStorage.getItem(STORAGE_KEYS.medical_camp);
+    const prescriptionRaw = localStorage.getItem(STORAGE_KEYS.prescription);
 
     const parse = raw => {
       if (!raw) return undefined;
@@ -47,6 +65,12 @@ const loadState = () => {
       psychiatric: parse(psychiatricRaw),
       mse: parse(MSERaw),
       observation: parse(ObservationRaw),
+      reunion: parse(ReunionSummaryRaw),
+      consultation: parse(ConsultationRaw),
+      nurse_record: parse(nurseRecordRaw),
+      dr_visit: parse(drVisitRaw),
+      medical_camp: parse(medical_campRaw),
+      prescription: parse(prescriptionRaw),
     };
   } catch {
     return undefined;
@@ -80,6 +104,42 @@ const saveState = (state) => {
         JSON.stringify(makeStored(state.observation))
       );
     }
+    if (state.reunion !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.reunion,
+        JSON.stringify(makeStored(state.reunion))
+      );
+    }
+    if (state.consultation !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.consultation,
+        JSON.stringify(makeStored(state.consultation))
+      );
+    }
+    if (state.nurse_record !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.nurse_record,
+        JSON.stringify(makeStored(state.nurse_record))
+      );
+    }
+    if (state.dr_visit !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.dr_visit,
+        JSON.stringify(makeStored(state.dr_visit))
+      );
+    }
+    if (state.medical_camp !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.medical_camp,
+        JSON.stringify(makeStored(state.medical_camp))
+      );
+    }
+    if (state.prescription !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.prescription,
+        JSON.stringify(makeStored(state.prescription))
+      );
+    }
   } catch (error) {
     console.error('Error saving to localStorage:', error);
   }
@@ -93,6 +153,12 @@ const store = configureStore({
     psychiatric: psychiatricReducer,
     mse: MSEReducer,
     observation: observationReducer,
+    reunion: reunionSummaryReducer,
+    consultation: consultationReducer,
+    nurse_record: nurseRecordReducer,
+    dr_visit: drVisitReducer,
+    medical_camp: medicalCampReducer,
+    prescription: prescriptionReducer,
   },
   preloadedState,
 });
