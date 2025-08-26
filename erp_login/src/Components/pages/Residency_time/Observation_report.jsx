@@ -15,8 +15,12 @@ import html2canvas from "html2canvas";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-    setObservationField, resetObservationData, setRecoveryPhoto
-} from '../../../store/observationSlice.js';
+    loadPhotosFromStorage,
+    savePhotosToStorage,
+    resetObservationData,
+    setObservationField,
+} from "../../../store/observationSlice";
+import { loadRecoveryPhotos, clearRecoveryPhotos } from "../../../store/photoStorage";
 
 function Observation_report() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -49,6 +53,11 @@ function Observation_report() {
 
     const formData = useSelector((state) => state.observation);
 
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadPhotosFromStorage());
+    }, [dispatch]);
+
     const [EditData, setEditData] = useState({
         admission_no: '',
         resident_name: '',
@@ -74,21 +83,19 @@ function Observation_report() {
         }));
     }
 
+    // const handleFileChange = (e) => {
+    //     setFiles({
+    //         ...files,
+    //         [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+    //     });
+    // };
+
+    // Convert files to Base64 for storage in Redux/localStorage
     const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-
-        // Save metadata in Redux
-        dispatch(setRecoveryPhoto(
-            files.map(f => ({
-                name: f.name,
-                size: f.size,
-                type: f.type,
-            }))
-        ));
-
-        // Keep actual File objects in local state for form submission
-        setFiles({ recovery_photo: files });
+        const selectedFiles = Array.from(e.target.files);
+        dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
     };
+
 
 
     useEffect(() => {
@@ -125,7 +132,6 @@ function Observation_report() {
         }
 
         const trimmedAdNo = admission_no.trim();
-
         if (!/^\d{8,13}$/.test(trimmedAdNo)) {
             alert("Admission Number must be between 8 to 13 digits (numbers only).");
             return;
@@ -135,12 +141,13 @@ function Observation_report() {
         data.append('admission_no', admission_no);
         data.append('resident_name', rescueName);
         data.append('date', formData.date);
-        data.append('recovery_photo', files.recovery_photo);
         data.append('follow_up', formData.follow_up);
 
-        if (files.recovery_photo && files.recovery_photo.length > 0) {
-            files.recovery_photo.forEach(file => {
-                data.append('recovery_photo', file); // ✅ no []
+        // ✅ Get raw File objects directly from IndexedDB
+        const realFiles = await loadRecoveryPhotos();
+        if (realFiles && realFiles.length > 0) {
+            realFiles.forEach(file => {
+                data.append("recovery_photo", file);
             });
         }
 
@@ -148,6 +155,7 @@ function Observation_report() {
             const res = await apiRoute.post('/residency/create_observation_report', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+
             if (res.data.message === "Rescue Condition Created Successfully") {
                 alert("Observation Report Created Successfully");
 
@@ -155,11 +163,10 @@ function Observation_report() {
                 setAdmissionNumber("");
                 setRescueName("");
                 getConditionDetails();
+
+                // ✅ Reset Redux + IndexedDB
                 dispatch(resetObservationData());
-                localStorage.removeItem('observation');
-                dispatch(setRecoveryPhoto(files));
-                // optional persistence
-                localStorage.setItem("recovery_photo", JSON.stringify(files));
+                await clearRecoveryPhotos();
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -731,6 +738,50 @@ function Observation_report() {
 
                                 />
                             </Form.Group>
+                            {/* {files.recovery_photo && files.recovery_photo.length > 0 && (
+                                <div className="mt-2">
+                                    <h5>Selected Photos (preview):</h5>
+                                    <div className="d-flex flex-wrap gap-3">
+                                        {files.recovery_photo.map((file, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={URL.createObjectURL(file)}
+                                                alt={file.name}
+                                                style={{
+                                                    width: "120px",
+                                                    height: "120px",
+                                                    objectFit: "cover",
+                                                    borderRadius: "8px",
+                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )} */}
+
+                            {formData.recovery_photo.length > 0 && (
+                                <div className="mt-2">
+                                    <h5>Selected Photos :</h5>
+                                    <div className="d-flex flex-wrap gap-3">
+                                        {formData.recovery_photo.map((file, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={file.preview}
+                                                alt={file.name}
+                                                style={{
+                                                    width: "120px",
+                                                    height: "120px",
+                                                    objectFit: "cover",
+                                                    borderRadius: "8px",
+                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
 
                             <Form.Group className="mb-3" controlId="formFollowUp">
                                 <Form.Label>Follow Up <span style={{ color: 'red' }}>*</span></Form.Label>
@@ -928,7 +979,7 @@ function Observation_report() {
                     <Form>
                         <Form.Group as={Row} className="mb-3" controlId="formAdmissionNo">
                             <Form.Label column sm="4" className='text-start'>Admission No. : </Form.Label>
-                            <Col sm="6" className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
                                 {EditData.admission_no}
                             </Col>
 
@@ -936,7 +987,7 @@ function Observation_report() {
 
                         <Form.Group as={Row} className="mb-3" controlId="formResidentName">
                             <Form.Label column sm="4" className='text-start'>Resident Name : </Form.Label>
-                            <Col sm="6" className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
                                 {EditData.resident_name}
                             </Col>
 
@@ -944,7 +995,7 @@ function Observation_report() {
 
                         <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm="4" className='text-start'>Date :</Form.Label>
-                            <Col sm="6" className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
                                 {EditData.date}
                             </Col>
 
@@ -999,11 +1050,11 @@ function Observation_report() {
 
                         <Form.Group className="mb-3" as={Row}>
                             <Form.Label column sm="4" className='text-start'>Follow Up : </Form.Label>
-                            <Col md={6} className='text-start mr-5' style={{border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px"}}>
+                            <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
                                 <div
                                     className="wrap-textarea"
                                     style={{
-                                        
+
                                         minHeight: '40px',
                                         whiteSpace: 'pre-wrap',
                                         wordWrap: 'break-word',

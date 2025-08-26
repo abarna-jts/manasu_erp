@@ -13,18 +13,7 @@ const prescriptionState = {
     instruction: '',
     advice: '',
     follow_up: '',
-    rows: [
-        {
-            medicine: '',
-            medicine_type: '',
-            duration: '',
-            intake: '',
-            med_instruction: '',
-            morning: '',
-            afternoon: '',
-            night: '',
-        },
-    ],
+
 };
 
 const baseState = {
@@ -39,7 +28,7 @@ const initialState = {
 
 const prescriptionSlice = createSlice({
     name: 'prescription',
-    initialState: { ...baseState, ...prescriptionState },
+    initialState,
     reducers: {
         setPrescriptionField(state, { payload: { field, value } }) {
             state[field] = value;
@@ -52,36 +41,13 @@ const prescriptionSlice = createSlice({
                 state[f] = prescriptionState[f];
             });
         },
-
-        // 👇 rows actions
-        addRow(state) {
-            state.rows.push({
-                medicine: '',
-                medicine_type: '',
-                duration: '',
-                intake: '',
-                med_instruction: '',
-                morning: '',
-                afternoon: '',
-                night: '',
-            });
-        },
-        removeRow(state, { payload }) {
-            state.rows.splice(payload, 1);
-        },
-        updateRow(state, { payload: { index, field, value } }) {
-            state.rows[index][field] = value;
-        },
     },
 });
 
 export const {
     setPrescriptionField,
     resetAll,
-    resetPrescription,
-    addRow,
-    removeRow,
-    updateRow,
+    resetPrescription
 } = prescriptionSlice.actions;
 
 export default prescriptionSlice.reducer;

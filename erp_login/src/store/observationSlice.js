@@ -1,12 +1,44 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+    saveRecoveryPhotos,
+    loadRecoveryPhotos,
+    clearRecoveryPhotos,
+} from "./photoStorage";
 
-const savedPhoto = localStorage.getItem("recovery_photo");
 
 const observationState = {
-    follow_up: "",
-    date: "",
-    recovery_photo: savedPhoto ? JSON.parse(savedPhoto) : "",  // load on refresh
+    admission_no: '',
+    resident_name: '',
+    follow_up: '',
+    date: '',
 }
+
+export const loadPhotosFromStorage = createAsyncThunk(
+  "observation/loadPhotos",
+  async () => {
+    const files = await loadRecoveryPhotos();
+    return files.map((file) => ({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      preview: URL.createObjectURL(file), // preview only
+    }));
+  }
+);
+
+export const savePhotosToStorage = createAsyncThunk(
+  "observation/savePhotos",
+  async (files) => {
+    await saveRecoveryPhotos(files); // still save real File objects in IndexedDB
+    return files.map((file) => ({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      preview: URL.createObjectURL(file), // only store metadata + preview
+    }));
+  }
+);
+
 
 const baseState = {
     admission_no: '',
@@ -15,13 +47,15 @@ const baseState = {
 
 const initialState = {
     ...baseState,
-    ...observationState
+    ...observationState,
+    recovery_photo: [],
 }
 
 
 const observationSlice = createSlice({
     name: 'observation',
     initialState,
+    
     reducers: {
         setObservationField(state, { payload: { field, value } }) {
             state[field] = value;
@@ -38,8 +72,17 @@ const observationSlice = createSlice({
             Object.keys(observationState).forEach(f => {
                 state[f] = observationState[f];
             });
+            clearRecoveryPhotos();
         },
-
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(loadPhotosFromStorage.fulfilled, (state, action) => {
+                state.recovery_photo = action.payload;
+            })
+            .addCase(savePhotosToStorage.fulfilled, (state, action) => {
+                state.recovery_photo = action.payload;
+            });
     },
 });
 

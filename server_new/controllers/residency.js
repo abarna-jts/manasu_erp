@@ -3,6 +3,7 @@ import db from '../db.js';
 import { residencyAsync } from '../util/residentMulter.js';
 import fs from 'fs';
 import transporter from '../config/mailer.js';
+import path from 'path';
 
 const createRescueCondition = async (req, res) => {
   try {
@@ -545,30 +546,36 @@ const showObservationReport = async (req, res) => {
 const updateObservationReport = async (req, res) => {
   try {
     await residencyAsync(req, res);
-    const {
-      resident_name,
-      date,
-      follow_up,
-    } = req.body;
 
+    const { resident_name, date, follow_up } = req.body;
     const admission_no = req.params.admission_no;
 
+    // Collect new recovery photos (array of file paths)
     const newRecoveryPhoto = req.files?.['recovery_photo']
       ? req.files['recovery_photo'].map(file => `uploads/Resque_Condition_Images/${file.filename}`)
       : [];
 
-
-    // const newRecoveryPhoto = req.files['recovery_photo']
-    //   ? `uploads/Resque_Condition_Images/${req.files['recovery_photo'][0].filename}`
-    //   : null;
-
+    // Fetch existing record
     const [existingData] = await db.query(
       "SELECT recovery_photo FROM observation_report WHERE admission_no = ?",
       [admission_no]
     );
 
-    const existingRecoveryPath = existingData[0]?.recovery_photo;
-    const finalRecoveryPath = newRecoveryPhoto || existingRecoveryPath;
+    // Parse existing recovery photos safely
+    let existingRecoveryPaths = [];
+    if (existingData[0]?.recovery_photo) {
+      try {
+        existingRecoveryPaths = JSON.parse(existingData[0].recovery_photo);
+        if (!Array.isArray(existingRecoveryPaths)) {
+          existingRecoveryPaths = [existingRecoveryPaths];
+        }
+      } catch (e) {
+        existingRecoveryPaths = [existingData[0].recovery_photo];
+      }
+    }
+
+    // Decide final paths to save (new ones if uploaded, otherwise keep old)
+    const finalRecoveryPath = newRecoveryPhoto.length > 0 ? newRecoveryPhoto : existingRecoveryPaths;
 
     // Format date to dd-mm-yyyy
     const formatDate = (isoDate) => {
@@ -576,30 +583,33 @@ const updateObservationReport = async (req, res) => {
       if (isNaN(d)) return 'Invalid';
       return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
     };
-
     const obdateFormatted = formatDate(date);
 
+    // Update DB
     const updateQuery = `
-        UPDATE observation_report SET
-        resident_name=?,
+      UPDATE observation_report SET
+        resident_name = ?,
         date = ?,
         recovery_photo = ?,
         follow_up = ?
-        WHERE admission_no = ?`;
-
+      WHERE admission_no = ?
+    `;
     const values = [
       resident_name,
       obdateFormatted,
-      JSON.stringify(finalRecoveryPath || "NULL"),
+      JSON.stringify(finalRecoveryPath || []),
       follow_up,
       admission_no
     ];
 
-    const [updateResult] = await db.query(updateQuery, values);
-    // Delete old file if a new one was uploaded
-    if (newRecoveryPhoto && existingRecoveryPath) {
-      fs.unlink(existingRecoveryPath, (fsErr) => {
-        if (fsErr) console.warn("Failed to delete old photo:", fsErr);
+    await db.query(updateQuery, values);
+
+    // Delete old files only if new ones uploaded
+    if (newRecoveryPhoto.length > 0 && existingRecoveryPaths.length > 0) {
+      existingRecoveryPaths.forEach(oldPath => {
+        fs.unlink(oldPath, (fsErr) => {
+          if (fsErr) console.warn("Failed to delete old photo:", fsErr);
+        });
       });
     }
 
@@ -610,6 +620,7 @@ const updateObservationReport = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err });
   }
 };
+
 
 const showRescueCondition = async (req, res) => {
   const id = req.params.id;
@@ -648,7 +659,7 @@ const updateRescueCondition = async (req, res) => {
 
     let existingPhotos = [];
     try {
-      existingPhotos = JSON.parse(selectData[0].rescue_recovery_photo || '[]');
+      existingPhotos = JSON.parse(req.body.existingPhotos || '[]');
     } catch (e) {
       existingPhotos = [];
     }
@@ -1276,40 +1287,44 @@ const updateSummary = async (req, res) => {
   try {
     await residencyAsync(req, res);
 
-    const {
-      rescue_name,
-      date,
-      report,
-    } = req.body;
+    const { rescue_name, date, report } = req.body;
+    const admission_no = req.params.admission_no;
 
     const formatDate = (isoDate) => {
       if (!isoDate || typeof isoDate !== 'string') return null;
-
       const d = new Date(isoDate);
       if (isNaN(d.getTime())) return null;
-
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const dd = String(d.getDate()).padStart(2, '0');
       return `${yyyy}-${mm}-${dd}`;
     };
 
-
-    const admission_no = req.params.admission_no;
-
-
+    // Collect new upload
     const SummaryAttachPath = req.files?.['summary_attach']
       ? req.files['summary_attach'].map(file => `uploads/SummaryAttach/${file.filename}`)
       : [];
-    // const SummaryAttachPath = req.files?.['summary_attach']
-    //   ? `uploads/SummaryAttach/${req.files['summary_attach'][0].filename}`
-    //   : null;
 
-    const selectQuery = "SELECT summary_attach FROM reunion_summary WHERE admission_no = ?";
-    const [selectData] = await db.query(selectQuery, [admission_no]);
+    // Get existing
+    const [selectData] = await db.query(
+      "SELECT summary_attach FROM reunion_summary WHERE admission_no = ?",
+      [admission_no]
+    );
 
-    const existingSummaryPath = selectData[0]?.summary_attach;
-    const finalSummaryAttach = SummaryAttachPath || existingSummaryPath;
+    let existingSummaryPath = [];
+    if (selectData[0]?.summary_attach) {
+      try {
+        existingSummaryPath = JSON.parse(selectData[0].summary_attach);
+        if (!Array.isArray(existingSummaryPath)) {
+          existingSummaryPath = [existingSummaryPath];
+        }
+      } catch (e) {
+        existingSummaryPath = [selectData[0].summary_attach];
+      }
+    }
+
+    // Keep old if no new files uploaded
+    const finalSummaryAttach = SummaryAttachPath.length > 0 ? SummaryAttachPath : existingSummaryPath;
 
     const updateQuery = `
       UPDATE reunion_summary SET 
@@ -1323,7 +1338,7 @@ const updateSummary = async (req, res) => {
     const values = [
       rescue_name,
       formatDate(date),
-      JSON.stringify(finalSummaryAttach),
+      JSON.stringify(finalSummaryAttach || []),
       report,
       admission_no
     ];
@@ -1337,6 +1352,7 @@ const updateSummary = async (req, res) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
 
 
 export {

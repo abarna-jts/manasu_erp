@@ -9,6 +9,10 @@ import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    setPrescriptionField, resetPrescription
+} from '../../../store/prescriptionSlice.js';
 
 function Prescription_form() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -24,35 +28,62 @@ function Prescription_form() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
+    const dispatch = useDispatch();
+    const formData = useSelector((state) => state.prescription);
 
-    const [formData, setFormData] = useState({
-        admission_no: '',
-        rescue_name: '',
-        age: '',
-        op_no: '',
-        hospital_name: '',
-        department: '',
-        diagnosis: '',
-        masterHealthCheckup: '',
-        medical_type: '',
-        instruction: '',
-        advice: '',
-        follow_up: '',
+    // const [formData, setFormData] = useState({
+    //     admission_no: '',
+    //     rescue_name: '',
+    //     age: '',
+    //     op_no: '',
+    //     hospital_name: '',
+    //     department: '',
+    //     diagnosis: '',
+    //     masterHealthCheckup: '',
+    //     medical_type: '',
+    //     instruction: '',
+    //     advice: '',
+    //     follow_up: '',
 
+    // });
+
+    const [rows, setRows] = React.useState(() => {
+        try {
+            const saved = localStorage.getItem("rows");
+            return saved ? JSON.parse(saved) : [
+                {
+                    medicine: '',
+                    medicine_type: '',
+                    duration: '',
+                    intake: '',
+                    med_instruction: '',
+                    morning: '',
+                    afternoon: '',
+                    night: '',
+                },
+            ];
+        } catch (err) {
+            console.error("Failed to parse rows from localStorage", err);
+            return [
+                {
+                    medicine: '',
+                    medicine_type: '',
+                    duration: '',
+                    intake: '',
+                    med_instruction: '',
+                    morning: '',
+                    afternoon: '',
+                    night: '',
+                },
+            ];
+        }
     });
 
-    const [rows, setRows] = React.useState([
-        {
-            medicine: '',
-            medicine_type: '',
-            duration: '',
-            intake: '',
-            med_instruction: '',
-            morning: '',
-            afternoon: '',
-            night: '',
-        },
-    ]);
+
+    // Save to localStorage whenever rows change
+    React.useEffect(() => {
+        localStorage.setItem("rows", JSON.stringify(rows));
+    }, [rows]);
 
     const [viewData, setViewData] = useState({
         id: '',
@@ -91,13 +122,18 @@ function Prescription_form() {
     ];
 
 
+    // const handleInputChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData(prevData => ({
+    //         ...prevData,
+    //         [name]: value
+    //     }));
+    // };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
+        dispatch(setPrescriptionField({ field: name, value }));
+    }
 
     const handleInputChange1 = (e) => {
         const { name, value } = e.target;
@@ -108,21 +144,23 @@ function Prescription_form() {
     };
 
 
-
     const handleAdmissionChange = (e) => {
         setAdmissionNo(e.target.value);
     }
     const handleAddRow = () => {
-        setRows(prevRows => [...prevRows, {
-            medicine: '',
-            medicine_type: '',
-            duration: '',
-            intake: '',
-            med_instruction: '',
-            morning: '',
-            afternoon: '',
-            night: '',
-        }]);
+        setRows(prevRows => [
+            ...prevRows,
+            {
+                medicine: '',
+                medicine_type: '',
+                duration: '',
+                intake: '',
+                med_instruction: '',
+                morning: '',
+                afternoon: '',
+                night: '',
+            }
+        ]);
     };
 
     const handleAddRow1 = () => {
@@ -176,6 +214,7 @@ function Prescription_form() {
     const handleRemoveRow = (index) => {
         setRows(prevRows => prevRows.filter((_, i) => i !== index));
     };
+
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
@@ -226,16 +265,23 @@ function Prescription_form() {
         window.location.reload();
     }
 
+    // const handleCheckChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData((prev) => ({ ...prev, [name]: value }));
+    // };
+
     const handleCheckChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+        dispatch(setPrescriptionField({ field: name, value }));
+    }
 
     const handleRowChange = (index, e) => {
-        const updatedRows = [...rows];
         const { name, value } = e.target;
-        updatedRows[index][name] = value;
-        setRows(updatedRows);
+        setRows(prevRows => {
+            const updated = [...prevRows];
+            updated[index] = { ...updated[index], [name]: value };
+            return updated;
+        });
     };
 
 
@@ -294,22 +340,20 @@ function Prescription_form() {
         try {
             const res = await apiRoute.post('/residency/createPrescription', data);
             alert("Prescription and Medicine Summary Saved Successfully");
-
-            setFormData({
-                admission_no: '',
-                rescue_name: '',
-                age: '',
-                op_no: '',
-                hospital_name: '',
-                department: '',
-                diagnosis: '',
-                masterHealthCheckup: '',
-                medical_type: '',
-                instruction: '',
-                advice: '',
-                follow_up: '',
-            });
-
+            dispatch(resetPrescription());
+            setAdmissionNo('');
+            setRows([
+                {
+                    medicine: '',
+                    medicine_type: '',
+                    duration: '',
+                    intake: '',
+                    med_instruction: '',
+                    morning: '',
+                    afternoon: '',
+                    night: '',
+                }
+            ]);
             handleClose(true);
             getPrescriptionDetails();
         } catch (error) {
@@ -585,15 +629,42 @@ function Prescription_form() {
         }
     };
 
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionprescriptionInfo');
+            if (stored) {
+                const { admission_no: storedAdm } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNo(storedAdm);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
 
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionprescriptionInfo',
+                JSON.stringify({ admission_no })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no]);
+
+    // const handleMedicalTypeChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         [name]: value
+    //     }));
+    // };
 
     const handleMedicalTypeChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+        dispatch(setPrescriptionField({ field: name, value }));
+    }
 
     const handleMedicalTypeChange1 = (e) => {
         const { name, value } = e.target;

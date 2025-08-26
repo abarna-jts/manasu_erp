@@ -13,9 +13,15 @@ import manasu_logo from "../Admission/Manasu-Logo.png";
 import { Alert } from "react-bootstrap";
 import Cookies from 'js-cookie';
 import { useSelector, useDispatch } from 'react-redux';
+// import {
+//     setReunionField, resetReunionSummary
+// } from '../../../store/reunionSummarySlice.js';
 import {
+    loadPhotosFromStorage,
+    savePhotosToStorage,
     setReunionField, resetReunionSummary
-} from '../../../store/reunionSummarySlice.js';
+} from "../../../store/reunionSummarySlice.js";
+import { loadRecoveryPhotos, clearRecoveryPhotos, loadSummaryAttach } from "../../../store/photoStorage";
 
 function Reunion_summary() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -32,6 +38,11 @@ function Reunion_summary() {
     const dispatch = useDispatch();
 
     const formData = useSelector((state) => state.reunion);
+
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadPhotosFromStorage());
+    }, [dispatch]);
 
     const [formState, setFormData] = useState({
         admission_no: '',
@@ -74,12 +85,17 @@ function Reunion_summary() {
         }));
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange1 = (e) => {
         setFiles({
             ...files,
             [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
         });
     };
+
+    const handleFileChange = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
+    }
 
 
     // Automatically fetch data when admission number is typed
@@ -115,7 +131,7 @@ function Reunion_summary() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -125,7 +141,7 @@ function Reunion_summary() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -208,9 +224,17 @@ function Reunion_summary() {
         data.append('summary_attach', files.summary_attach);
         data.append('report', formData.report);
 
-        if (files.summary_attach && files.summary_attach.length > 0) {
-            files.summary_attach.forEach(file => {
-                data.append('summary_attach', file); // ✅ no []
+        // if (files.summary_attach && files.summary_attach.length > 0) {
+        //     files.summary_attach.forEach(file => {
+        //         data.append('summary_attach', file); // ✅ no []
+        //     });
+        // }
+
+        // ✅ Get raw File objects directly from IndexedDB
+        const realFiles = await loadSummaryAttach();
+        if (realFiles && realFiles.length > 0) {
+            realFiles.forEach(file => {
+                data.append("summary_attach", file);
             });
         }
 
@@ -219,7 +243,7 @@ function Reunion_summary() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Reunion Summary Form submitted successfully!');
-            dispatch(resetObservationData());
+            dispatch(resetReunionSummary());
             localStorage.removeItem('reunion');
             // setFormData({
             //     rescue_name: '',
@@ -227,6 +251,7 @@ function Reunion_summary() {
             //     report: '',
             // })
             setAdmissionNumber("");
+            await clearRecoveryPhotos();
             if (summary_attachRef.current) summary_attachRef.current.value = "";
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
@@ -272,14 +297,14 @@ function Reunion_summary() {
                 try {
                     const parsed = JSON.parse(data.summary_attach);
                     if (Array.isArray(parsed)) {
-                        summaryAttachPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        summaryAttachPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Summary Attachment:', err);
                     // Fallback: comma-separated string
                     summaryAttachPath = data.summary_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -308,7 +333,7 @@ function Reunion_summary() {
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
 
-        return `${day}-${month}-${year}`; // ✅ format for <input type="date">
+        return `${year}-${month}-${day}`; // ✅ format for <input type="date">
     };
 
 
@@ -404,7 +429,7 @@ function Reunion_summary() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -412,7 +437,7 @@ function Reunion_summary() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -608,7 +633,31 @@ function Reunion_summary() {
                                                     ref={summary_attachRef}
                                                     onChange={handleFileChange}
                                                     multiple />
+                                                    {formData.summary_attach && formData.summary_attach.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.summary_attach.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                             </Col>
+                                            
+
+
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-3 mt-3" controlId="formRescueName">
                                             <Form.Label column sm="5" className='text-start'>
@@ -833,7 +882,7 @@ function Reunion_summary() {
                                             <Form.Control
                                                 type="file"
                                                 accept=".jpg,.jpeg,.png"
-                                                onChange={handleFileChange}
+                                                onChange={handleFileChange1}
                                                 name="summary_attach"
                                                 multiple
                                             />

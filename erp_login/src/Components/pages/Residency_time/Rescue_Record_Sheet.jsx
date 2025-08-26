@@ -10,8 +10,14 @@ import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-    setConsultationField, resetConsultation
-} from '../../../store/consultationSlice.js';
+    loadPhotosFromStorage,
+    savePhotosToStorage,
+    resetConsultation,
+    setConsultationField,
+    setConsultationPhoto,
+} from "../../../store/consultationSlice.js";
+import { loadConsultationRecoveryPhoto, clearConsultationRecoveryPhoto } from "../../../store/photoStorage";
+
 
 function Rescue_Record_Sheet() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -46,7 +52,16 @@ function Rescue_Record_Sheet() {
 
     const formData = useSelector((state) => state.consultation);
 
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadPhotosFromStorage());
+    }, [dispatch]);
+
     const [files, setFiles] = useState({
+        rescue_recovery_photo: null,
+    });
+
+    const [editFiles, setEditFiles] = useState({
         rescue_recovery_photo: null,
     });
 
@@ -55,14 +70,17 @@ function Rescue_Record_Sheet() {
         dispatch(setConsultationField({ field: name, value }));
     };
 
-    const handleFileChange = (e) => {
-        setFiles({
-            ...files,
+    const handleFileChange1 = (e) => {
+        setEditFiles({
+            ...editFiles,
             [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
         });
     };
 
-
+    const handleFileChange = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -86,9 +104,17 @@ function Rescue_Record_Sheet() {
         data.append('rescue_recovery_photo', files.rescue_recovery_photo);
         data.append('follow_up', formData.follow_up);
 
-        if (files.rescue_recovery_photo && files.rescue_recovery_photo.length > 0) {
-            files.rescue_recovery_photo.forEach(file => {
-                data.append('rescue_recovery_photo', file); // ✅ no []
+        // if (files.rescue_recovery_photo && files.rescue_recovery_photo.length > 0) {
+        //     files.rescue_recovery_photo.forEach(file => {
+        //         data.append('rescue_recovery_photo', file); // ✅ no []
+        //     });
+        // }
+
+        // ✅ Get raw File objects directly from IndexedDB
+        const realFiles = await loadConsultationRecoveryPhoto();
+        if (realFiles && realFiles.length > 0) {
+            realFiles.forEach(file => {
+                data.append("rescue_recovery_photo", file);
             });
         }
 
@@ -101,6 +127,7 @@ function Rescue_Record_Sheet() {
             dispatch(resetConsultation());
             setAdmissionNumber("");
             setRescueName("");
+            await clearConsultationRecoveryPhoto();
             handleClose(true);
             getConditionDetails();
         } catch (err) {
@@ -180,7 +207,7 @@ function Rescue_Record_Sheet() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -188,7 +215,7 @@ function Rescue_Record_Sheet() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -201,8 +228,8 @@ function Rescue_Record_Sheet() {
             // const resrecovery_photoPath = data.rescue_recovery_photo ? `https://www.pahrultours.com/app2/${data.rescue_recovery_photo}` : null;
 
             // Set files state
-            setFiles((files) => ({
-                ...files,
+            setEditFiles((editFiles) => ({
+                ...editFiles,
                 rescue_recovery_photo: ConsultantPhoto,
             }));
 
@@ -214,6 +241,8 @@ function Rescue_Record_Sheet() {
             alert("Error to upload data");
         }
     }
+
+
 
     const downloadImage = (url, filename) => {
         fetch(url)
@@ -239,8 +268,8 @@ function Rescue_Record_Sheet() {
         data.append('follow_up', formState.follow_up);
 
         // ✅ Only append recovery photo if it's a new file
-        if (files.rescue_recovery_photo && files.rescue_recovery_photo.length > 0) {
-            files.rescue_recovery_photo.forEach(file => {
+        if (editFiles.rescue_recovery_photo && editFiles.rescue_recovery_photo.length > 0) {
+            editFiles.rescue_recovery_photo.forEach(file => {
                 data.append('rescue_recovery_photo', file); // ✅ no []
             });
         }
@@ -315,14 +344,14 @@ function Rescue_Record_Sheet() {
                 try {
                     const parsed = JSON.parse(data.rescue_recovery_photo);
                     if (Array.isArray(parsed)) {
-                        rescue_recovery_photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        rescue_recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     rescue_recovery_photoPath = data.rescue_recovery_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
             console.log(rescue_recovery_photoPath);
@@ -423,7 +452,7 @@ function Rescue_Record_Sheet() {
         }
     }, [admission_no, rescueName]);
 
-    const handleClearData = () => { 
+    const handleClearData = () => {
         setAdmissionNumber("");
         setRescueName("");
         dispatch(resetConsultation());
@@ -529,7 +558,7 @@ function Rescue_Record_Sheet() {
                                                         // fallback to original string
                                                     }
 
-                                                    const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
+                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
                                                     const filename = imagePath?.split("/").pop();
 
                                                     return imagePath ? (
@@ -681,6 +710,27 @@ function Rescue_Record_Sheet() {
                                     name="rescue_recovery_photo"
                                     multiple
                                 />
+                                {formData.rescue_recovery_photo.length > 0 && (
+                                    <div className="mt-2">
+                                        <h5>Selected Photos :</h5>
+                                        <div className="d-flex flex-wrap gap-3">
+                                            {formData.rescue_recovery_photo.map((file, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={file.preview}
+                                                    alt={file.name}
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formFollowUp">
@@ -753,10 +803,12 @@ function Rescue_Record_Sheet() {
                             </Form.Group>
 
                             <Form.Group className="mb-3">
-                                <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
+                                <Form.Label column sm="5" className='text-start'>
+                                    Attach Photos:
+                                </Form.Label>
                                 <Col sm="12">
-                                    {Array.isArray(files.rescue_recovery_photo) &&
-                                        files.rescue_recovery_photo.map((imgUrl, index) => {
+                                    {Array.isArray(editFiles.rescue_recovery_photo) &&
+                                        editFiles.rescue_recovery_photo.map((imgUrl, index) => {
                                             const filename = `rescue_recovery_photo_${index}.jpg`;
                                             return (
                                                 <div
@@ -790,7 +842,7 @@ function Rescue_Record_Sheet() {
                                                     />
 
                                                     <div className="image-overlay">
-                                                        {/* View icon */}
+                                                        {/* View */}
                                                         <a
                                                             href={imgUrl}
                                                             target="_blank"
@@ -801,7 +853,7 @@ function Rescue_Record_Sheet() {
                                                             <i className="fas fa-eye"></i>
                                                         </a>
 
-                                                        {/* Download icon */}
+                                                        {/* Download */}
                                                         <button
                                                             title="Download Image"
                                                             className="icon-button"
@@ -822,15 +874,19 @@ function Rescue_Record_Sheet() {
                                                         >
                                                             <i className="fas fa-download"></i>
                                                         </button>
+
+                                        
                                                     </div>
                                                 </div>
                                             );
                                         })}
+
+                                    {/* File input */}
                                     <Form.Control
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name="rescue_recovery_photo"
-                                        onChange={handleFileChange}
+                                        onChange={handleFileChange1}
                                         multiple
                                     />
                                 </Col>
