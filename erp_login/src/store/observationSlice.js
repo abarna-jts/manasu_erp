@@ -74,6 +74,9 @@ const observationSlice = createSlice({
             });
             clearRecoveryPhotos();
         },
+        clearObservationImages: (state) => {
+            state.recovery_photo = [];
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -92,6 +95,7 @@ export const {
     resetAll,
     resetObservationData,
     setRecoveryPhoto,
+    clearObservationImages
 } = observationSlice.actions;
 
 export default observationSlice.reducer;

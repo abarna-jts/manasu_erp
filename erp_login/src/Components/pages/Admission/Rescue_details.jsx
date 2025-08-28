@@ -194,11 +194,11 @@ function Rescue_details() {
                 ...formData,
                 referred_by: data.referred_by || '',
                 from_place: data.from_place || '',
-                date_time: data.date_time || '',
+                date_time: formatDateTime(data.date_time || ''),
                 police_memo: data.police_memo || '',
                 police_station: data.police_station || '',
                 information_public: data.information_public || '',
-                admission_date: data.admission_date || '',
+                admission_date: formatDate(data.admission_date || ''),
                 admission_no: data.admission_no || '',
                 rescue_name: data.rescue_name || '',
                 age: data.age || '',
@@ -669,11 +669,8 @@ function Rescue_details() {
                                     <Form.Label column sm="5">
                                         Date & Time :
                                     </Form.Label>
-                                    <Col sm="7">
-                                        <Form.Control
-                                            name="date_time"
-                                            value={formData.date_time}
-                                            onChange={handleInputChange} />
+                                    <Col sm="7 text-start" style={{ paddingTop: "7px", border: "1px solid #ced4da", borderRadius: "0.25rem", width:"53%", marginLeft:"15px" }}>
+                                        {formData.date_time }
                                     </Col>
                                 </Form.Group>
 
@@ -779,14 +776,11 @@ function Rescue_details() {
                                     </Col>
                                 </Form.Group>
                                 <Form.Group className="mb-1" controlId="formDate">
-                                    <Form.Label column sm="12">
+                                    <Form.Label column sm="8">
                                         Date :
                                     </Form.Label>
                                     <Col sm="12">
-                                        <Form.Control
-                                            name="date"
-                                            value={formData.admission_date}
-                                            onChange={handleInputChange} />
+                                        {formData.admission_date}
                                     </Col>
                                 </Form.Group>
                                 <Form.Group className="mb-1" controlId="formAdmissionNo">

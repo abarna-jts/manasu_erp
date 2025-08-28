@@ -70,6 +70,9 @@ const reunionSummarySlice = createSlice({
             });
             clearSummaryAttach();
         },
+        clearSummaryAttachImages: (state) => {
+            state.summary_attach = [];
+        },
 
     },
     extraReducers: (builder) => {
@@ -88,6 +91,7 @@ export const {
     resetAll,
     resetReunionSummary,
     setSummaryAttach,
+    clearSummaryAttachImages,
 } = reunionSummarySlice.actions;
 
 export default reunionSummarySlice.reducer;

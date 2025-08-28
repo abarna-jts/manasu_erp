@@ -152,7 +152,7 @@ function SCRB_form() {
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
 
-        return `${year}-${month}-${day}`;
+        return `${day}-${month}-${year}`;
     };
 
     const handleSubmit = async (e) => {
@@ -321,7 +321,7 @@ function SCRB_form() {
                 phone_no: data.phone_no || '',
                 rescue_name: data.rescue_name || '',
                 parent_name: data.parent_name || '',
-                found_date: data.found_date || '',
+                found_date: formatDateOnly(data.found_date || ''),
                 marital_status: data.marital_status || '',
                 language: data.language || '',
                 district: data.district || '',
@@ -1435,14 +1435,15 @@ function SCRB_form() {
                                         <td style={{ width: '35%' }}>
                                             <div className="row">
                                                 <div className="col-md-12">
-                                                    <input
+                                                    {formData.found_date}
+                                                    {/* <input
                                                         type="date"
                                                         name="date_time"
                                                         className="form-control text-center"
                                                         value={formatDateOnly(formData.found_date)}
                                                         onChange={handleInputChange}
                                                         readOnly // Or use onChange if it's editable
-                                                    />
+                                                    /> */}
                                                 </div>
                                             </div>
                                         </td>

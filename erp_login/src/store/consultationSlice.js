@@ -68,6 +68,9 @@ const consultationSlice = createSlice({
             });
             clearConsultationRecoveryPhoto();
         },
+        clearPhotos: (state) => {
+            state.rescue_recovery_photo = [];
+        },
 
     },
     extraReducers: (builder) => {
@@ -85,7 +88,8 @@ export const {
     setConsultationField,
     setConsultationPhoto,
     resetAll,
-    resetConsultation
+    resetConsultation,
+    clearPhotos
 } = consultationSlice.actions;
 
 export default consultationSlice.reducer;

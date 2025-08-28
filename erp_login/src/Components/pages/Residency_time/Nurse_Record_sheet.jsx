@@ -2,14 +2,17 @@ import React from 'react';
 import { Breadcrumb, Container, Row, Table, Button } from 'react-bootstrap';
 import { Col, Form, InputGroup } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DateRange } from 'react-date-range';
 import axios from 'axios';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css
 // import { addDays } from 'date-fns';
 import { Alert } from "react-bootstrap";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import Cookies from 'js-cookie';
+import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     setNurseRecordField, resetNurseRecord
@@ -23,6 +26,7 @@ function Nurse_Record_sheet() {
     const [nurse_record, setNurseRecord] = useState([]);
     const [show1, setShow1] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [previewRequested, setPreviewRequested] = useState(false);
     const itemsPerPage = 10;
 
 
@@ -216,9 +220,81 @@ function Nurse_Record_sheet() {
         setCurrentPage(1);
     }, [searchQuery]);
 
-    const handleClearData = () => { 
+    const handleClearData = () => {
         dispatch(resetNurseRecord());
     }
+
+    const ViewFormData = async (id) => {
+        try {
+            const response = await apiRoute.get(`/residency/getNurseRecordbyID/${id}`);
+            const data = response.data;
+
+            // Update form fields
+            setFormData({
+                id: data.id,
+                currentMonth: data.month || '',
+                date: data.date || '',
+                temperature: data.temperature || '',
+                bp: data.bp || '',
+                pulse: data.pulse || '',
+                weight: data.weight || ''
+            });
+            setPreviewRequested(true);
+        } catch (error) {
+            console.error("Error fetching form data:", error);
+            alert("Admission Number not found");
+        }
+    }
+    useEffect(() => {
+        if (previewRequested) {
+            // Delay slightly to allow DOM updates
+            setTimeout(() => {
+                generatePDF();
+                setPreviewRequested(false);
+            }, 100); // 100ms delay is often enough
+        }
+    }, [previewRequested]);
+
+    const formRef = useRef();
+
+    const generatePDF = async () => {
+        const input = formRef.current;
+        if (!input) {
+            console.error("Form reference is not defined");
+            return;
+        }
+
+        try {
+            const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/png");
+
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            while (heightLeft > 0) {
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    position = -imgHeight + heightLeft;
+                }
+            }
+
+            const pdfBlob = pdf.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, '_blank');
+        } catch (err) {
+            console.error("Error generating PDF:", err);
+            alert("Failed to generate PDF.");
+        }
+    };
 
     return (
         <>
@@ -309,6 +385,9 @@ function Nurse_Record_sheet() {
                                                 <td>{item.pulse}</td>
                                                 <td>{item.weight}</td>
                                                 <td>
+                                                    <button className="btn btn-success icon_details" onClick={() => ViewFormData(item.id)}>
+                                                        <i className="fas fa-eye"></i>
+                                                    </button>
                                                     <button className="btn btn-success icon_details" onClick={() => {
                                                         handleEditform(item.id);
                                                     }}>
@@ -352,9 +431,7 @@ function Nurse_Record_sheet() {
                 </Row>
             </Container>
 
-
-
-
+            
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Enter your Record for this month</Modal.Title>
@@ -363,21 +440,21 @@ function Nurse_Record_sheet() {
                     <div className="clear-btn d-flex align-items-end justify-content-end">
                         <Button variant="secondary" onClick={handleClearData}>Clear All</Button>
                     </div>
-                    
+
                     <Col md={12}>
-                    
+
                         <Form onSubmit={handleSubmit}>
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAdmissionNo">
                                         <Form.Label>Admission Number <span style={{ color: 'red' }}>*</span></Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                name="admission_no"
-                                                value={formData.admission_no}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
+                                        <Form.Control
+                                            type="number"
+                                            name="admission_no"
+                                            value={formData.admission_no}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
 
                                     </Form.Group>
                                 </Col>
@@ -495,6 +572,71 @@ function Nurse_Record_sheet() {
                     </Col>
                 </Modal.Body>
             </Modal>
+
+            <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>
+                <Row className="d-flex align-items-center justify-content-center mb-2">
+                    <Col md={3} className='d-flex align-items-center pdf_logo'>
+                        <img src={manasu_logo} className="pdf_logo" alt="" />
+
+                    </Col>
+                    <Col md={9}>
+                        <h4 className="text-center">Nursing Record Sheet – Resident Health & Medications</h4>
+                    </Col>
+                </Row>
+                <Col md={12}>
+                    <Form>
+                        <Form.Group as={Row} className="mb-3" controlId="formAdmissionNo">
+                            <Form.Label column sm="4" className='text-start'>Month : </Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                {formState.currentMonth}
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3" controlId="formResidentName">
+                            <Form.Label column sm="4" className='text-start'>Date : </Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                {formState.date}
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm="4" className='text-start'>Temperature :</Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                {formState.temperature}
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm="4" className='text-start'>BP :</Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                {formState.bp}
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm="4" className='text-start'>Pulse :</Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                {formState.pulse}
+                            </Col>
+
+                        </Form.Group>
+
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm="4" className='text-start'>Weight :</Form.Label>
+                            <Col sm="6" className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                {formState.weight}
+                            </Col>
+
+                        </Form.Group>
+                    </Form>
+                </Col>
+            </div>
+
+
 
             <Modal show={show1} onHide={handleClose1}>
                 <Modal.Header closeButton>

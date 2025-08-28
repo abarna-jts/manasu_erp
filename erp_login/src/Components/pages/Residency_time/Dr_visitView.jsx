@@ -104,7 +104,7 @@ function Dr_visitView() {
                 ...formData,
                 dr_name: data.dr_name || '',
                 hospital_name: data.hospital_name || '',
-                date_time: data.date_time || '',
+                date_time: formatForInput(data.date_time || ''),
                 resident_examinite: data.resident_examinite || '',
                 report: data.report || '',
             }));
@@ -385,14 +385,8 @@ function Dr_visitView() {
                                 <Form.Label column sm="5" className='text-start'>
                                     Date & Time :
                                 </Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="datetime-local"
-                                        name="date_time"
-                                        max={new Date().toISOString().slice(0, 16)}
-                                        value={formatForInput(formData.date_time)}
-                                        onChange={handleChange}
-                                        required />
+                                <Col sm="7 text-start" style={{ paddingTop: "7px", border: "1px solid #ced4da", borderRadius: "0.25rem", width: "55%", marginLeft: "13px" }}>
+                                    {formData.date_time ? formatDateTime(formData.date_time) : ''}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1" controlId="formRescueName">

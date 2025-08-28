@@ -84,63 +84,67 @@ function AllStudentDetails() {
     };
 
     const fetchFormData = async (id) => {
+
         try {
-
             const response = await apiRoute.get(`/formality/getStudentDet/${id}`);
-            const student = response.data.data[0]; // Access the first object in the 'data' array
-
-            const photoArray = JSON.parse(student.stud_photo || '[]');
-            const fullImageUrls = photoArray.map(path => `https://www.pahrultours.com/app2/${path}`);
-
-            setFormData((formData) => ({
-                ...formData,
-                stud_name: student.stud_name || '',
-                stud_id: student.stud_id || '',
-                department: student.department || '',
-                email: student.email || '',
-                phone: student.phone || '',
-                secondary_phone: student.secondary_phone || '',
-                field: student.field || '',
-                clg_name: student.clg_name || '',
-                duration: student.duration || '',
-                from_date: student.from_date ? student.from_date.slice(0, 10) : '', // format date
-                to_date: student.to_date ? student.to_date.slice(0, 10) : '',
-                supervisor_name: student.supervisor_name || '',
-                supervisor_email: student.supervisor_email || '',
-                supervisor_phone: student.supervisor_phone || '',
-                choose_intern: student.choose_intern || '',
-                stud_photo: fullImageUrls[0] || ''
-            }));
+            const data = response.data.data[0];
 
             let StudPhotoAll = [];
-            if (student.stud_photo) {
+            if (data.stud_photo) {
                 try {
-                    const parsed = JSON.parse(student.stud_photo);
+                    const parsed = JSON.parse(data.stud_photo);
                     if (Array.isArray(parsed)) {
-                        StudPhotoAll = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        StudPhotoAll = parsed.map((p) => `https://www.pahrultours.com/app2/${p}`);
+                    } else if (typeof parsed === "string") {
+                        StudPhotoAll = [`https://www.pahrultours.com/app2/${parsed}`];
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
-                    // Fallback: comma-separated string
-                    StudPhotoAll = student.stud_photo
-                        .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                    if (data.stud_photo.includes(",")) {
+                        StudPhotoAll = data.stud_photo
+                            .split(",")
+                            .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, "")}`);
+                    } else {
+                        StudPhotoAll = [`https://www.pahrultours.com/app2/${data.stud_photo.trim()}`];
+                    }
                 }
             }
 
-            console.log("Event Image Path", StudPhotoAll);
+            // Update form fields
+            setFormData((formData) => ({
+                ...formData,
+                stud_name: data.stud_name || '',
+                stud_id: data.stud_id || '',
+                department: data.department || '',
+                email: data.email || '',
+                phone: data.phone || '',
+                secondary_phone: data.secondary_phone || '',
+                field: data.field || '',
+                clg_name: data.clg_name || '',
+                duration: data.duration || '',
+                from_date: data.from_date ? data.from_date.slice(0, 10) : '', // format date
+                to_date: data.to_date ? data.to_date.slice(0, 10) : '',
+                supervisor_name: data.supervisor_name || '',
+                supervisor_email: data.supervisor_email || '',
+                supervisor_phone: data.supervisor_phone || '',
+                choose_intern: data.choose_intern || '',
+                stud_photo: StudPhotoAll[0] || ''
+            }));
 
+            
+            console.log(StudPhotoAll);
+            // Set files state
             setFiles((files) => ({
                 ...files,
-                stud_photo: StudPhotoAll
+                stud_photo: StudPhotoAll,
             }));
 
             setTimeout(() => {
                 generatePDF();
             }, 500);
-
         } catch (error) {
             console.error("Error fetching form data:", error);
+            alert("Admission Number not found");
         }
     }
 
@@ -154,7 +158,11 @@ function AllStudentDetails() {
         }
 
         try {
-            const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+            const canvas = await html2canvas(input, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            });
             const imgData = canvas.toDataURL("image/png");
 
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -519,24 +527,30 @@ function AllStudentDetails() {
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm="5" className='text-start'>Attach Photos:</Form.Label>
                                 <Col sm="7">
-                                    {Array.isArray(files.stud_photo) &&
+                                    {Array.isArray(files.stud_photo) && files.stud_photo.length > 0 ? (
                                         files.stud_photo.map((imgUrl, index) => (
                                             <img
                                                 key={index}
                                                 src={imgUrl}
-                                                alt={`stud_photo - ${index}`}
+                                                alt={`rescue recovery ${index + 1}`}
+                                                loading="lazy"
                                                 style={{
                                                     width: "100px",
-                                                    height: "100px",
-                                                    objectFit: "cover",
+                                                    height: "auto",
                                                     margin: "10px",
                                                     border: "1px solid #ccc",
                                                 }}
                                                 onError={(e) => {
-                                                    e.target.src = "/fallback-image.png";
+                                                    if (!e.target.dataset.errorHandled) {
+                                                        e.target.src = "/fallback-image.png";
+                                                        e.target.dataset.errorHandled = "true";
+                                                    }
                                                 }}
                                             />
-                                        ))}
+                                        ))
+                                    ) : (
+                                        <div style={{ padding: "10px", fontStyle: "italic" }}>No image</div>
+                                    )}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">

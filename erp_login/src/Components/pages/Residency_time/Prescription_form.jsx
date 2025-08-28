@@ -133,7 +133,7 @@ function Prescription_form() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         dispatch(setPrescriptionField({ field: name, value }));
-    }
+    };
 
     const handleInputChange1 = (e) => {
         const { name, value } = e.target;
@@ -674,7 +674,10 @@ function Prescription_form() {
         }));
     };
 
-
+    const handleClearData = () => {
+        dispatch(resetPrescription());
+        setAdmissionNo("");
+    }
 
     return (
         <div>
@@ -1205,7 +1208,8 @@ function Prescription_form() {
                         </table>
 
                         <Col md={12} className="mt-3 d-flex justify-content-center align-items-center">
-                            <Button variant="btn btn-primary" type='submit'>Save</Button>
+                            <Button variant="btn btn-primary mx-3" type='submit'>Save</Button>
+                            <Button variant="btn btn-secondary" type='submit' onClick={handleClearData}>Clear</Button>
                         </Col>
                     </Form>
 
@@ -1624,16 +1628,44 @@ function Prescription_form() {
                                             </td>
 
                                             <td>
-                                                <div className="input-group mb-2" style={{ width: 'auto', margin: 'auto' }}>
-                                                    {/* If medicine is 'ANY OTHER MEDICINE', show text input */}
-                                                    {med.medicine === 'ANY OTHER MEDICINE' ? (
-                                                        <>
+                                                <div className="input-group mb-2 d-flex" style={{ width: 'auto', margin: 'auto' }}>
+                                                    <div className="d-block" style={{ width: "70%" }}>
+                                                        {/* If medicine is 'ANY OTHER MEDICINE', show text input */}
+                                                        {med.medicine === 'ANY OTHER MEDICINE' ? (
+                                                            <>
+                                                                <select
+                                                                    className="form-select"
+                                                                    name="medicine"
+                                                                    value={med.medicine}
+                                                                    onChange={(e) => handleRowChange1(index, e)}
+                                                                >
+                                                                    <option value="" disabled hidden>Select Medicine</option>
+                                                                    {medicineOptions.map((opt, idx) => (
+                                                                        <option key={idx} value={opt}>{opt}</option>
+                                                                    ))}
+                                                                    <option value="ANY OTHER MEDICINE">ANY OTHER MEDICINE</option>
+                                                                </select>
+
+                                                                {/* Show text input for "other_medicine" */}
+                                                                <input
+                                                                    type="text"
+                                                                    name="other_medicine"
+                                                                    value={med.other_medicine || ''}
+                                                                    onChange={(e) => handleRowChange1(index, e)}
+                                                                    placeholder="Enter Medicine"
+                                                                    className="form-control"
+                                                                    required
+                                                                />
+                                                            </>
+                                                        ) : (
+                                                            // Show dropdown for normal medicine selection
                                                             <select
                                                                 className="form-select"
                                                                 name="medicine"
                                                                 value={med.medicine}
                                                                 onChange={(e) => handleRowChange1(index, e)}
-                                                                style={{ width: '45%' }}
+                                                                required
+                                                                
                                                             >
                                                                 <option value="" disabled hidden>Select Medicine</option>
                                                                 {medicineOptions.map((opt, idx) => (
@@ -1641,40 +1673,13 @@ function Prescription_form() {
                                                                 ))}
                                                                 <option value="ANY OTHER MEDICINE">ANY OTHER MEDICINE</option>
                                                             </select>
+                                                        )}
+                                                    </div>
 
-                                                            {/* Show text input for "other_medicine" */}
-                                                            <input
-                                                                type="text"
-                                                                name="other_medicine"
-                                                                value={med.other_medicine || ''}
-                                                                onChange={(e) => handleRowChange1(index, e)}
-                                                                placeholder="Enter Medicine"
-                                                                className="form-control"
-                                                                style={{ width: '45%' }}
-                                                                required
-                                                            />
-                                                        </>
-                                                    ) : (
-                                                        // Show dropdown for normal medicine selection
-                                                        <select
-                                                            className="form-select"
-                                                            name="medicine"
-                                                            value={med.medicine}
-                                                            onChange={(e) => handleRowChange1(index, e)}
-                                                            required
-                                                            style={{ width: '45%' }}
-                                                        >
-                                                            <option value="" disabled hidden>Select Medicine</option>
-                                                            {medicineOptions.map((opt, idx) => (
-                                                                <option key={idx} value={opt}>{opt}</option>
-                                                            ))}
-                                                            <option value="ANY OTHER MEDICINE">ANY OTHER MEDICINE</option>
-                                                        </select>
-                                                    )}
 
                                                     {/* Common dropdown for medicine_type */}
                                                     <select
-                                                        className="form-select"
+                                                        className="form-select medicine_unit"
                                                         name="medicine_type"
                                                         value={med.medicine_type}
                                                         onChange={(e) => handleRowChange1(index, e)}

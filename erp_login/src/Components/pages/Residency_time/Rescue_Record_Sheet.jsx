@@ -14,7 +14,7 @@ import {
     savePhotosToStorage,
     resetConsultation,
     setConsultationField,
-    setConsultationPhoto,
+    clearPhotos,
 } from "../../../store/consultationSlice.js";
 import { loadConsultationRecoveryPhoto, clearConsultationRecoveryPhoto } from "../../../store/photoStorage";
 
@@ -207,7 +207,7 @@ function Rescue_Record_Sheet() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -215,7 +215,7 @@ function Rescue_Record_Sheet() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -327,7 +327,7 @@ function Rescue_Record_Sheet() {
 
             const parseDate = (dmy) => {
                 const [day, month, year] = dmy.split("-");
-                return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
             };
 
             // Update form fields
@@ -344,14 +344,14 @@ function Rescue_Record_Sheet() {
                 try {
                     const parsed = JSON.parse(data.rescue_recovery_photo);
                     if (Array.isArray(parsed)) {
-                        rescue_recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        rescue_recovery_photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     rescue_recovery_photoPath = data.rescue_recovery_photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
             console.log(rescue_recovery_photoPath);
@@ -456,8 +456,8 @@ function Rescue_Record_Sheet() {
         setAdmissionNumber("");
         setRescueName("");
         dispatch(resetConsultation());
+        dispatch(clearPhotos());
     }
-
 
     return (
         <>
@@ -558,7 +558,7 @@ function Rescue_Record_Sheet() {
                                                         // fallback to original string
                                                     }
 
-                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
+                                                    const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
                                                     const filename = imagePath?.split("/").pop();
 
                                                     return imagePath ? (
@@ -710,9 +710,9 @@ function Rescue_Record_Sheet() {
                                     name="rescue_recovery_photo"
                                     multiple
                                 />
-                                {formData.rescue_recovery_photo.length > 0 && (
+                                {formData.rescue_recovery_photo && formData.rescue_recovery_photo.length > 0 && (
                                     <div className="mt-2">
-                                        <h5>Selected Photos :</h5>
+                                        <h5 className='text-start'>Selected Photos :</h5>
                                         <div className="d-flex flex-wrap gap-3">
                                             {formData.rescue_recovery_photo.map((file, idx) => (
                                                 <img
@@ -875,7 +875,7 @@ function Rescue_Record_Sheet() {
                                                             <i className="fas fa-download"></i>
                                                         </button>
 
-                                        
+
                                                     </div>
                                                 </div>
                                             );
@@ -965,15 +965,8 @@ function Rescue_Record_Sheet() {
 
                         <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm="4" className='text-start'>Date</Form.Label>
-                            <Col sm="6">
-                                <Form.Control
-                                    type="date"
-                                    name="date"
-                                    max="9999-12-31"
-                                    value={formState.date}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                            <Col sm="6 text-start" style={{ paddingTop: "7px", border: "1px solid #ced4da", borderRadius: "0.25rem", width: "47%", marginLeft: "13px" }}>
+                                {formState.date}
                             </Col>
 
                         </Form.Group>

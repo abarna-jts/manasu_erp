@@ -580,14 +580,8 @@ function Medical_camp() {
                                 <Form.Label column sm="5" className='text-start'>
                                     Date :
                                 </Form.Label>
-                                <Col sm="7">
-                                    <Form.Control
-                                        type="date"
-                                        name="date"
-                                        max="9999-12-31"
-                                        value={formatDateForInput(formState.date)}
-                                        onChange={handleChange1}
-                                        required />
+                                <Col sm="7 text-start" style={{ paddingTop: "7px", border: "1px solid #ced4da", borderRadius: "0.25rem", width: "54.8%", marginLeft: "13px" }}>
+                                    {formState.date ? formatDate(formState.date) : ''}
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} className="mb-3" controlId="formAdmissionNo">
