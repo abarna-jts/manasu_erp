@@ -796,8 +796,6 @@ function First_info_form() {
                 )}
             </div>
 
-
-
             {step === 1 && (
                 <Container className="first_info_form">
                     <Row>

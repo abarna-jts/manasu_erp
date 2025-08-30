@@ -22,6 +22,7 @@ import {
     setReunionField, resetReunionSummary, clearSummaryAttachImages
 } from "../../../store/reunionSummarySlice.js";
 import { clearRecoveryPhotos, loadSummaryAttach } from "../../../store/photoStorage";
+import imageCompression from 'browser-image-compression';
 
 function Reunion_summary() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -92,10 +93,42 @@ function Reunion_summary() {
         });
     };
 
-    const handleFileChange = (e) => {
-        const selectedFiles = Array.from(e.target.files);
-        dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
-    }
+    // const handleFileChange = (e) => {
+    //     const selectedFiles = Array.from(e.target.files);
+    //     dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
+    // }
+
+    const handleFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `Reunion_Summary_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            // ✅ Save all compressed files to Redux / storage
+            dispatch(savePhotosToStorage(compressedFiles));
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
+    };
 
 
     // Automatically fetch data when admission number is typed
@@ -131,7 +164,7 @@ function Reunion_summary() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -141,7 +174,7 @@ function Reunion_summary() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -297,14 +330,14 @@ function Reunion_summary() {
                 try {
                     const parsed = JSON.parse(data.summary_attach);
                     if (Array.isArray(parsed)) {
-                        summaryAttachPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        summaryAttachPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Summary Attachment:', err);
                     // Fallback: comma-separated string
                     summaryAttachPath = data.summary_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -429,7 +462,7 @@ function Reunion_summary() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -437,7 +470,7 @@ function Reunion_summary() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -634,29 +667,29 @@ function Reunion_summary() {
                                                     ref={summary_attachRef}
                                                     onChange={handleFileChange}
                                                     multiple />
-                                                    {formData.summary_attach && formData.summary_attach.length > 0 && (
-                                                <div className="mt-2">
-                                                    <h5 className='text-start'>Selected Photos :</h5>
-                                                    <div className="d-flex flex-wrap gap-3">
-                                                        {formData.summary_attach.map((file, idx) => (
-                                                            <img
-                                                                key={idx}
-                                                                src={file.preview}
-                                                                alt={file.name}
-                                                                style={{
-                                                                    width: "120px",
-                                                                    height: "120px",
-                                                                    objectFit: "cover",
-                                                                    borderRadius: "8px",
-                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                                                                }}
-                                                            />
-                                                        ))}
+                                                {formData.summary_attach && formData.summary_attach.length > 0 && (
+                                                    <div className="mt-2">
+                                                        <h5 className='text-start'>Selected Photos :</h5>
+                                                        <div className="d-flex flex-wrap gap-3">
+                                                            {formData.summary_attach.map((file, idx) => (
+                                                                <img
+                                                                    key={idx}
+                                                                    src={file.preview}
+                                                                    alt={file.name}
+                                                                    style={{
+                                                                        width: "120px",
+                                                                        height: "120px",
+                                                                        objectFit: "cover",
+                                                                        borderRadius: "8px",
+                                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                    }}
+                                                                />
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )}
                                             </Col>
-                                            
+
 
 
                                         </Form.Group>

@@ -17,7 +17,7 @@ import {
     clearPhotos,
 } from "../../../store/consultationSlice.js";
 import { loadConsultationRecoveryPhoto, clearConsultationRecoveryPhoto } from "../../../store/photoStorage";
-
+import imageCompression from 'browser-image-compression';
 
 function Rescue_Record_Sheet() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -70,6 +70,14 @@ function Rescue_Record_Sheet() {
         dispatch(setConsultationField({ field: name, value }));
     };
 
+    const handleInputChange1 = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
+
     const handleFileChange1 = (e) => {
         setEditFiles({
             ...editFiles,
@@ -77,10 +85,45 @@ function Rescue_Record_Sheet() {
         });
     };
 
-    const handleFileChange = (e) => {
-        const selectedFiles = Array.from(e.target.files);
-        dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
+    // const handleFileChange = (e) => {
+    //     const selectedFiles = Array.from(e.target.files);
+    //     dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
+    // };
+
+    const handleFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `recovery_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            // ✅ Save all compressed files to Redux / storage
+            dispatch(savePhotosToStorage(compressedFiles));
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
     };
+
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -207,7 +250,7 @@ function Rescue_Record_Sheet() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -215,7 +258,7 @@ function Rescue_Record_Sheet() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -344,16 +387,17 @@ function Rescue_Record_Sheet() {
                 try {
                     const parsed = JSON.parse(data.rescue_recovery_photo);
                     if (Array.isArray(parsed)) {
-                        rescue_recovery_photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        rescue_recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     rescue_recovery_photoPath = data.rescue_recovery_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
+
             console.log(rescue_recovery_photoPath);
             // Set files state
             setFiles((files) => ({
@@ -558,7 +602,7 @@ function Rescue_Record_Sheet() {
                                                         // fallback to original string
                                                     }
 
-                                                    const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
+                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
                                                     const filename = imagePath?.split("/").pop();
 
                                                     return imagePath ? (
@@ -655,7 +699,7 @@ function Rescue_Record_Sheet() {
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Enter Rescue Condition</Modal.Title>
+                    <Modal.Title>Enter Consultation Report</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
@@ -773,7 +817,7 @@ function Rescue_Record_Sheet() {
                                     placeholder="Enter Admission Number"
                                     name="admission_no"
                                     value={formState.admission_no}
-                                    onChange={handleInputChange}
+                                    onChange={handleInputChange1}
                                     required
                                 />
                             </Form.Group>
@@ -785,7 +829,7 @@ function Rescue_Record_Sheet() {
                                     name="resident_name"
                                     placeholder="Enter Resident Name"
                                     value={formState.resident_name}
-                                    onChange={handleInputChange}
+                                    onChange={handleInputChange1}
                                     required
                                 />
                             </Form.Group>
@@ -797,7 +841,7 @@ function Rescue_Record_Sheet() {
                                     name="date"
                                     max="9999-12-31"
                                     value={formState.date}
-                                    onChange={handleInputChange}
+                                    onChange={handleInputChange1}
                                     required
                                 />
                             </Form.Group>
@@ -899,7 +943,7 @@ function Rescue_Record_Sheet() {
                                     as="textarea"
                                     rows={3}
                                     value={formState.follow_up}
-                                    onChange={handleInputChange}
+                                    onChange={handleInputChange1}
                                     name="follow_up"
                                     multiple
 

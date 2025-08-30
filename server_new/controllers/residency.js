@@ -813,6 +813,7 @@ const getPrescriptionbyID = async (req, res) => {
       medical_type: results[0].medical_type,
       hospital_name: results[0].hospital_name,
       department: results[0].department,
+      diagnosis: results[0].diagnosis,
       masterHealthCheckup: results[0].masterHealthCheckup,
       phone_no: results[0].phone_no,
       instruction: results[0].instruction,
@@ -837,7 +838,7 @@ const getPrescriptionbyID = async (req, res) => {
     return res.status(500).json({ message: 'Database error' });
   }
 };
-
+   
 
 // Update individual prescriptions
 const updatePrescription = async (req, res) => {

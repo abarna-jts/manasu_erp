@@ -22,6 +22,7 @@ import {
     clearObservationImages
 } from "../../../store/observationSlice";
 import { loadRecoveryPhotos, clearRecoveryPhotos } from "../../../store/photoStorage";
+import imageCompression from 'browser-image-compression';
 
 function Observation_report() {
     const [condition_details, setConditionDetails] = useState([]);
@@ -92,11 +93,42 @@ function Observation_report() {
     // };
 
     // Convert files to Base64 for storage in Redux/localStorage
-    const handleFileChange = (e) => {
-        const selectedFiles = Array.from(e.target.files);
-        dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
-    };
+    // const handleFileChange = (e) => {
+    //     const selectedFiles = Array.from(e.target.files);
+    //     dispatch(savePhotosToStorage(selectedFiles)); // saves to IndexedDB + Redux
+    // };
 
+    const handleFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `Observation_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            // ✅ Save all compressed files to Redux / storage
+            dispatch(savePhotosToStorage(compressedFiles));
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
+    };
 
 
     useEffect(() => {
@@ -221,7 +253,7 @@ function Observation_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -229,7 +261,7 @@ function Observation_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -396,14 +428,14 @@ function Observation_report() {
                 try {
                     const parsed = JSON.parse(data.recovery_photo);
                     if (Array.isArray(parsed)) {
-                        recovery_photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     recovery_photoPath = data.recovery_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
             console.log(recovery_photoPath);
@@ -586,7 +618,7 @@ function Observation_report() {
                                                         // fallback to original string
                                                     }
 
-                                                    const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
+                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
                                                     const filename = imagePath?.split("/").pop();
 
                                                     return imagePath ? (

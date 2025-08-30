@@ -27,6 +27,8 @@ function Prescription_form() {
     const [medicalType, setMedicalType] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+    const [rescue_name, setRescueName] = useState("");
+    const [age, setRescueAge] = useState("");
 
     const dispatch = useDispatch();
     const formData = useSelector((state) => state.prescription);
@@ -46,6 +48,21 @@ function Prescription_form() {
     //     follow_up: '',
 
     // });
+
+    const [formState, setFormState] = useState({
+        admission_no: '',
+        rescue_name: '',
+        age: '',
+        op_no: '',
+        hospital_name: '',
+        department: '',
+        diagnosis: '',
+        masterHealthCheckup: '',
+        medical_type: '',
+        instruction: '',
+        advice: '',
+        follow_up: '',
+    });
 
     const [rows, setRows] = React.useState(() => {
         try {
@@ -231,7 +248,7 @@ function Prescription_form() {
             const fetchedData = response.data.data[0];
 
             // Preserve form values for fields user may have already filled
-            setFormData(prevData => ({
+            setFormState(prevData => ({
                 ...prevData,
                 rescue_name: fetchedData.rescue_name ?? prevData.rescue_name,
                 age: fetchedData.age ?? prevData.age,
@@ -240,6 +257,36 @@ function Prescription_form() {
         } catch (error) {
             console.error('Error fetching data', error);
             alert("Admission Number Not found");
+        }
+    };
+
+    useEffect(() => {
+        if (admission_no.trim() !== "") {
+            fetchRescueDetails(admission_no);
+        } else {
+            setRescueName("");
+            setRescueAge("");
+        }
+    }, [admission_no]);
+
+    const fetchRescueDetails = async (admission_no) => {
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_name) {
+
+                setRescueName(result.rescue_name || "");
+                setRescueAge(result.age || "");
+            } else {
+
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueName("");
+            setRescueAge("");
         }
     };
 
@@ -324,6 +371,8 @@ function Prescription_form() {
         const data = {
             ...formData,
             admission_no: trimmedAdNo,
+            rescue_name: rescue_name || formData.rescue_name,
+            age: age || formData.age,
             current_date: todayDate,
             medicine: getSubmittedMedicine(),
             medicine_type: flattenField('medicine_type'),
@@ -334,6 +383,8 @@ function Prescription_form() {
             afternoon: flattenField('afternoon'),
             night: flattenField('night'),
         };
+
+        console.log("Diagnosis:", data.diagnosis);
 
         console.log("Submitting data:", data);
 
@@ -516,6 +567,7 @@ function Prescription_form() {
                     console.log("Detected row-wise medicine format.");
                     setViewData({
                         ...data,
+                        diagnosis: data.diagnosis || '',
                         prescription_medicines: meds,
                     });
                 } else {
@@ -856,7 +908,7 @@ function Prescription_form() {
                                         <Form.Control type='text'
                                             placeholder='Name'
                                             name="rescue_name"
-                                            value={formData.rescue_name}
+                                            value={rescue_name || formData.rescue_name}
                                             onChange={handleInputChange}
                                             required />
                                     </Col>
@@ -871,7 +923,7 @@ function Prescription_form() {
                                         <Form.Control type='number'
                                             placeholder='Age'
                                             name='age'
-                                            value={formData.age}
+                                            value={age || formData.age}
                                             onChange={handleInputChange}
                                             required
                                         />
@@ -1665,7 +1717,7 @@ function Prescription_form() {
                                                                 value={med.medicine}
                                                                 onChange={(e) => handleRowChange1(index, e)}
                                                                 required
-                                                                
+
                                                             >
                                                                 <option value="" disabled hidden>Select Medicine</option>
                                                                 {medicineOptions.map((opt, idx) => (

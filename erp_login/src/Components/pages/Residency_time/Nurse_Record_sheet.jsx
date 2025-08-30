@@ -640,7 +640,7 @@ function Nurse_Record_sheet() {
 
             <Modal show={show1} onHide={handleClose1}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit your Record for this month</Modal.Title>
+                    <Modal.Title>Edit Nurse Record</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
