@@ -10,6 +10,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useNavigate } from 'react-router-dom';
+import imageCompression from 'browser-image-compression';
 
 function Reunion_Checklist() {
     // const [admission_no, setAdmissionNumber] = useState();
@@ -66,22 +67,80 @@ function Reunion_Checklist() {
 
     });
 
-    const handleChange = (e) => {
+    // const handleChange = (e) => {
+    //     const { name, value, files } = e.target;
+
+    //     if (e.target.type === 'file') {
+    //         setFormData(prev => ({
+    //             ...prev,
+    //             [name]: e.target.files, // Save entire FileList
+    //         }));
+    //         return;
+    //     } else {
+    //         setFormData((prevState) => ({
+    //             ...prevState,
+    //             [name]: value,
+    //         }));
+    //     }
+    // };
+
+    const handleChange = async (e) => {
         const { name, value, files } = e.target;
 
         if (e.target.type === 'file') {
-            setFormData(prev => ({
-                ...prev,
-                [name]: e.target.files, // Save entire FileList
-            }));
-            return;
-        } else {
+            const selectedFiles = Array.from(e.target.files);
+            if (!selectedFiles.length) return;
+            const options = {
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 1024,
+                useWebWorker: true,
+                fileType: "image/jpeg", // force JPEG output
+            };
+            try {
+                // Compress all images
+                const compressedFiles = await Promise.all(
+                    selectedFiles.map(async (file, idx) => {
+                        const compressed = await imageCompression(file, options);
+
+                        // ✅ Log original vs compressed
+                        console.log(`File ${idx + 1} Original:`, {
+                            name: file.name,
+                            size: (file.size / 1024).toFixed(2) + " KB",
+                            type: file.type,
+                        });
+                        console.log(`File ${idx + 1} Compressed:`, {
+                            name: `essential_${Date.now()}_${idx}.jpeg`,
+                            size: (compressed.size / 1024).toFixed(2) + " KB",
+                            type: compressed.type,
+                        });
+
+                        // Rename to avoid .blob
+                        const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                        return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                            type: compressed.type,
+                        });
+                    })
+                );
+                // setFormData(prev => ({
+                //     ...prev,
+                //     [name]: e.target.files, // Save entire FileList
+                // }));
+                setFormData((prev) => ({
+                    ...prev,
+                    [e.target.name]: compressedFiles // ✅ store compressed files
+                }));
+                console.log("✅ Final compressed files array:", compressedFiles);
+            } catch (e) {
+                console.error("Compression error:", e);
+            }
+
+        } else if (e.target.type === 'radio') {
             setFormData((prevState) => ({
                 ...prevState,
                 [name]: value,
             }));
         }
-    };
+    }
 
     const familyRequestLetterFileRef = useRef(null);
     const selfDeclarationFileRef = useRef(null);
@@ -304,7 +363,7 @@ function Reunion_Checklist() {
             const data = response.data;
 
             // Prefix file fields with server path
-            const getFilePath = (file) => file ? `https://www.pahrultours.com/app2/${file}` : null;
+            const getFilePath = (file) => file ? `http://localhost:5002/${file}` : null;
 
             // Update normal form fields
             setFormData((prevFormData) => ({
@@ -433,7 +492,7 @@ function Reunion_Checklist() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                    : `http://localhost:5002/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");
@@ -1476,7 +1535,7 @@ function Reunion_Checklist() {
 
                                 </li>
                             </ol>
-                                <Button type='submit' className='btn btn-success mb-5'>Submit</Button>
+                            <Button type='submit' className='btn btn-success mb-5'>Submit</Button>
 
                         </Form>
 

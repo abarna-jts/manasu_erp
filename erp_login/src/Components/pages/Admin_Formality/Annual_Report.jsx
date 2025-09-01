@@ -9,6 +9,7 @@ import { Alert } from "react-bootstrap";
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import imageCompression from 'browser-image-compression';
 
 function Annual_Report() {
     const [validated, setValidated] = useState(false);
@@ -239,11 +240,59 @@ function Annual_Report() {
         staff_photos: null
     });
 
-    const handleFileChange = (e) => {
-        setFiles({
-            ...files,
-            [e.target.name]: Array.from(e.target.files)  
-        });
+    // const handleFileChange = (e) => {
+    //     setFiles({
+    //         ...files,
+    //         [e.target.name]: Array.from(e.target.files)  
+    //     });
+    // };
+
+    const handleFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `Annual_report_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `Annual_report_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setFiles((prev) => ({
+                ...prev,
+                [event.target.name]: compressedFiles // ✅ store compressed files
+            }));
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
     };
 
 

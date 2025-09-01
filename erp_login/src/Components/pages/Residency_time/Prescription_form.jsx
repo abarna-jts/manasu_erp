@@ -809,7 +809,7 @@ function Prescription_form() {
                                     currentItems.map((item, index) => (
                                         <>
                                             <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                                <td>{indexOfFirstItem + index + 1}</td>
                                                 <td>{item.rescue_name}</td>
                                                 <td>{item.admission_no}</td>
                                                 <td>{item.op_no}</td>
@@ -920,7 +920,7 @@ function Prescription_form() {
                                         Age: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="6">
-                                        <Form.Control type='number'
+                                        <Form.Control type='text'
                                             placeholder='Age'
                                             name='age'
                                             value={age || formData.age}

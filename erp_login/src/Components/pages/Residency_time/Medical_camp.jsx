@@ -336,7 +336,7 @@ function Medical_camp() {
                             {currentItems.length > 0 ? (
                                 currentItems.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
+                                        <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{item.camp_name}</td>
                                         <td>{item.hospital_name}</td>
                                         <td>{formatDate(item.date)}</td>

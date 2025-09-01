@@ -260,7 +260,7 @@ function SCRB_Form2A_ALL() {
                                     {currentItems.length > 0 ? (
                                         currentItems.map((item, index) => (
                                             <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                                <td>{indexOfFirstItem + index + 1}</td>
                                                 <td>{item.admission_no || "null"}</td>
                                                 <td>{item.name_ngo || "null"}</td>
                                                 <td>{item.file_no || "null"}</td>

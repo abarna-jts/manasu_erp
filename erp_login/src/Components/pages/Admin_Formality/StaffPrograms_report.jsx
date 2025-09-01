@@ -135,14 +135,14 @@ function StaffPrograms_report() {
                 try {
                     const parsed = JSON.parse(data.staff_photos);
                     if (Array.isArray(parsed)) {
-                        StaffProgramImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        StaffProgramImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse staff_photos:', err);
                     // Fallback: comma-separated string
                     StaffProgramImage = data.staff_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -225,7 +225,7 @@ function StaffPrograms_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -233,7 +233,7 @@ function StaffPrograms_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -366,7 +366,7 @@ function StaffPrograms_report() {
                                     {currentItems.length > 0 ? (
                                         currentItems.map((item, index) => (
                                             <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                                <td>{indexOfFirstItem + index + 1}</td>
                                                 <td>{item.staff_name || "null"}</td>
                                                 <td>{formatDate(item.staff_date) || "null"}</td>
                                                 <td>{item.staff_place || "null"}</td>

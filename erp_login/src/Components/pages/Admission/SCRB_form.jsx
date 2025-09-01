@@ -14,6 +14,7 @@ import { saveAs } from 'file-saver';
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import imageCompression from 'browser-image-compression';
 
 function SCRB_form() {
     const [previewRequested, setPreviewRequested] = useState(false);
@@ -69,11 +70,58 @@ function SCRB_form() {
     };
 
 
-    const handleFileChange = (e) => {
-        setFiles({
-            ...files,
-            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
-        });
+    // const handleFileChange = (e) => {
+    //     setFiles({
+    //         ...files,
+    //         [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+    //     });
+    // };
+    const handleFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `essential_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setFiles((prev) => ({
+                ...prev,
+                [event.target.name]: compressedFiles // ✅ store compressed files
+            }));
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
     };
 
     const handleSearch = async () => {
@@ -94,7 +142,7 @@ function SCRB_form() {
                     try {
                         const parsedArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
                         if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${parsedArray[0]}`;
+                            imagePath = `http://localhost:5002/${parsedArray[0]}`;
                         }
                     } catch (parseErr) {
                         console.error("Failed to parse image array", parseErr);
@@ -108,7 +156,7 @@ function SCRB_form() {
 
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${cleanPath}`;
+                        : `http://localhost:5002/${cleanPath}`;
                 }
 
                 console.log("Final image path:", imagePath);
@@ -124,7 +172,7 @@ function SCRB_form() {
                 ...prev,
                 rescue_name: result.rescue_name || '',
                 father: result.father || '',
-                date_time: result.date_time || '',
+                date_time: formatDateOnly(result.date_time || ''),
                 rescue_status: result.rescue_status || '',
                 language1: result.language1 || '',
                 place: result.place || '',
@@ -152,7 +200,7 @@ function SCRB_form() {
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
 
-        return `${day}-${month}-${year}`;
+        return `${year}-${month}-${day}`;
     };
 
     const handleSubmit = async (e) => {
@@ -334,14 +382,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.old_photo);
                     if (Array.isArray(parsed)) {
-                        oldPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        oldPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     oldPhotoPath = data.old_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -350,14 +398,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.new_photo);
                     if (Array.isArray(parsed)) {
-                        newPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        newPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     newPhotoPath = data.new_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -366,14 +414,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.signature);
                     if (Array.isArray(parsed)) {
-                        signaturepath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        signaturepath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     signaturepath = data.signature
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -382,20 +430,20 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.seal);
                     if (Array.isArray(parsed)) {
-                        sealpath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        sealpath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     sealpath = data.seal
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
 
             // Base path for images
-            const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
+            const basePath = "http://localhost:5002/app2/uploads/form_2a";
 
             // Handle old and new photo paths correctly
             // const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2${data.old_photo}` : null;
@@ -456,7 +504,7 @@ function SCRB_form() {
     };
 
     const exportToExcel = (data) => {
-        const BASE_URL = "https://www.pahrultours.com/app2";
+        const BASE_URL = "http://localhost:5002/";
 
         if (!data || (Array.isArray(data) && data.length === 0)) {
             alert("Invalid data for Excel export.");
@@ -914,7 +962,7 @@ function SCRB_form() {
                                                             name="date_time"
                                                             max="9999-12-31"
                                                             className="form-control text-center"
-                                                            value={formatDateOnly(formData.date_time || '')}
+                                                            value={formData.date_time || ''}
                                                             onChange={handleInputChange}
                                                             required // Or use onChange if it's editable
                                                         />

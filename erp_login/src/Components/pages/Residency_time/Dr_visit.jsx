@@ -126,7 +126,7 @@ function Dr_visit() {
                                                     name="date_time"
                                                     value={formData.date_time}
                                                     onChange={handleChange}
-                                                    max="2025-07-08T17:30"
+                                                    max="9999-12-31T24:60"
                                                     required />
                                             </Col>
                                         </Form.Group>

@@ -375,7 +375,7 @@ function Nurse_Record_sheet() {
                                     currentItems.map((item, index) => (
                                         <>
                                             <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                                <td>{indexOfFirstItem + index + 1}</td>
                                                 <td>{item.admission_no}</td>
                                                 <td>{item.rescue_name}</td>
                                                 <td>{item.month}</td>

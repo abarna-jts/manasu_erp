@@ -136,14 +136,14 @@ function Programms_report() {
                 try {
                     const parsed = JSON.parse(data.programms_photos);
                     if (Array.isArray(parsed)) {
-                        ProgrammsImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        ProgrammsImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     ProgrammsImage = data.programms_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -230,7 +230,7 @@ function Programms_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -238,7 +238,7 @@ function Programms_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -303,7 +303,8 @@ function Programms_report() {
                     community_place: '',
                     community_rescue_count: '',
                     community_report: ''
-                })
+                });
+                fetchProgramsReport();
             } else {
                 alert('Error Updating form.');
             }
@@ -410,7 +411,7 @@ function Programms_report() {
                                     {currentItems.length > 0 ? (
                                         currentItems.map((item, index) => (
                                             <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                                <td>{indexOfFirstItem + index + 1}</td>
                                                 <td>{item.community_name || "null"}</td>
                                                 <td>{formatDate2(item.community_date) || "null"}</td>
                                                 <td>{item.clg_name || "null"}</td>

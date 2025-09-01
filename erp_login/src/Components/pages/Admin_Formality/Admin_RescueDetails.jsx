@@ -356,7 +356,7 @@ function Admin_RescueDetails() {
                                 {currentItems.length > 0 ? (
                                     currentItems.map((item, index) => (
                                         <tr key={item.id}>
-                                            <td>{index + 1}</td>
+                                            <td>{indexOfFirstItem + index + 1}</td>
                                             <td>{item.admission_no || "Null"}</td>
                                             <td>{item.rescue_name || "Null"}</td>
                                             <td>{item.discharge || "Null"}</td>

@@ -125,14 +125,14 @@ function Celebration_report() {
                 try {
                     const parsed = JSON.parse(data.celebration_photos);
                     if (Array.isArray(parsed)) {
-                        CelebrationImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        CelebrationImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     CelebrationImage = data.celebration_photos
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -229,7 +229,7 @@ function Celebration_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -237,7 +237,7 @@ function Celebration_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -383,7 +383,7 @@ function Celebration_report() {
                                     {currentItems.length > 0 ? (
                                         currentItems.map((item, index) => (
                                             <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                                <td>{indexOfFirstItem + index + 1}</td>
                                                 <td>{item.celebration_name || "null"}</td>
                                                 <td>{formatDate(item.celebration_date) || "null"}</td>
                                                 <td>{item.celebration_place || "null"}</td>

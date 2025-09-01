@@ -9,6 +9,7 @@ import html2canvas from "html2canvas";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import imageCompression from 'browser-image-compression';
 
 function Self_Declaration_form() {
     const [show, setShow] = useState(false);
@@ -27,11 +28,59 @@ function Self_Declaration_form() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
-    const handleFileChange = (e) => {
-        setFiles({
-            ...files,
-            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
-        });
+    // const handleFileChange = (e) => {
+    //     setFiles({
+    //         ...files,
+    //         [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+    //     });
+    // };
+
+    const handleFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `essential_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `Self_Declaration_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setFiles((prev) => ({
+                ...prev,
+                [event.target.name]: compressedFiles // ✅ store compressed files
+            }));
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
     };
 
     const handleInputChange = (e) => {
@@ -127,14 +176,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.signature);
                     if (Array.isArray(parsed)) {
-                        signaturePath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        signaturePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     signaturePath = data.signature
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -143,14 +192,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.photo);
                     if (Array.isArray(parsed)) {
-                        photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     photoPath = data.photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -159,14 +208,14 @@ function Self_Declaration_form() {
                 try {
                     const parsed = JSON.parse(data.handwritten_document);
                     if (Array.isArray(parsed)) {
-                        handwritten_documentPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        handwritten_documentPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     handwritten_documentPath = data.handwritten_document
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -299,7 +348,7 @@ function Self_Declaration_form() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -307,7 +356,7 @@ function Self_Declaration_form() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -425,7 +474,7 @@ function Self_Declaration_form() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -435,7 +484,7 @@ function Self_Declaration_form() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {

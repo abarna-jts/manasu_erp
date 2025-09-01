@@ -94,18 +94,18 @@ function AllStudentDetails() {
                 try {
                     const parsed = JSON.parse(data.stud_photo);
                     if (Array.isArray(parsed)) {
-                        StudPhotoAll = parsed.map((p) => `https://www.pahrultours.com/app2/${p}`);
+                        StudPhotoAll = parsed.map((p) => `http://localhost:5002/${p}`);
                     } else if (typeof parsed === "string") {
-                        StudPhotoAll = [`https://www.pahrultours.com/app2/${parsed}`];
+                        StudPhotoAll = [`http://localhost:5002/${parsed}`];
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     if (data.stud_photo.includes(",")) {
                         StudPhotoAll = data.stud_photo
                             .split(",")
-                            .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, "")}`);
+                            .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, "")}`);
                     } else {
-                        StudPhotoAll = [`https://www.pahrultours.com/app2/${data.stud_photo.trim()}`];
+                        StudPhotoAll = [`http://localhost:5002/${data.stud_photo.trim()}`];
                     }
                 }
             }
@@ -224,7 +224,7 @@ function AllStudentDetails() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -232,7 +232,7 @@ function AllStudentDetails() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -416,7 +416,7 @@ function AllStudentDetails() {
                                 {currentItems.length > 0 ? (
                                     currentItems.map((item, index) => (
                                         <tr key={item.id}>
-                                            <td>{index + 1}</td>
+                                            <td>{indexOfFirstItem + index + 1}</td>
                                             <td>{item.stud_id}</td>
                                             <td>{item.stud_name}</td>
                                             <td>{item.department}</td>

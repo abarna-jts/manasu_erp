@@ -304,7 +304,7 @@ function General_Appearance() {
                             {currentItems.length > 0 ? (
                                 currentItems.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
+                                        <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
                                         <td style={{ width: "8%" }}>{formatDateTime(item.date) || "Null"}</td>
                                         <td>{item.general_appearance || "Null"}</td>

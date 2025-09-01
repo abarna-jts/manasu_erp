@@ -133,14 +133,14 @@ function Edit_Rescue_details() {
           try {
             const parsed = JSON.parse(data.attach_policeMemo);
             if (Array.isArray(parsed)) {
-              policeMemoAttach = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+              policeMemoAttach = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
             }
           } catch (err) {
             console.warn('Failed to parse attach_policeMemo:', err);
             // Fallback: comma-separated string
             policeMemoAttach = data.attach_policeMemo
               .split(',')
-              .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
           }
         }
 
@@ -149,14 +149,14 @@ function Edit_Rescue_details() {
           try {
             const parsed = JSON.parse(data.rescue_image);
             if (Array.isArray(parsed)) {
-              RescueImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+              RescueImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
             }
           } catch (err) {
             console.warn('Failed to parse attach_policeMemo:', err);
             // Fallback: comma-separated string
             RescueImage = data.rescue_image
               .split(',')
-              .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
           }
         }
 
@@ -165,14 +165,14 @@ function Edit_Rescue_details() {
           try {
             const parsed = JSON.parse(data.govIdFile);
             if (Array.isArray(parsed)) {
-              govtFilePath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+              govtFilePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
             }
           } catch (err) {
             console.warn('Failed to parse govIdFile:', err);
             // Fallback: comma-separated string
             govtFilePath = data.govIdFile
               .split(',')
-              .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+              .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
           }
         }
 
@@ -408,24 +408,79 @@ function Edit_Rescue_details() {
                     </Form.Label>
                     <Col sm="8 d-flex flex-row align-items-center">
 
-                      {Array.isArray(files?.attach_policeMemo) &&
-                        files.attach_policeMemo.map((img, index) => (
-                          <img
-                            key={index}
-                            src={img}
-                            alt={`Police Memo ${index}`}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/fallback-image.png";
-                            }}
-                            style={{
-                              width: "100px",
-                              height: "auto",
-                              objectFit: "cover",
-                              marginRight: "10px"
-                            }}
-                          />
-                        ))}
+                      {Array.isArray(files.attach_policeMemo) &&
+                        files.attach_policeMemo.map((imgUrl, index) => {
+                          const filename = `attach_policeMemo${index}.jpg`;
+
+                          return (
+                            <div
+                              key={index}
+                              className="image-container"
+                              style={{
+                                position: "relative",
+                                width: "200px",
+                                height: "100px",
+                                margin: "10px",
+                                padding: "0px",
+                                display: "inline-block",
+                              }}
+                            >
+                              <img
+                                src={imgUrl}
+                                alt={`attach_policeMemo - ${index}`}
+                                loading="lazy"
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  border: "1px solid #ccc",
+                                  borderRadius: "4px",
+                                }}
+                                onError={(e) => {
+                                  if (!e.target.dataset.errorHandled) {
+                                    e.target.src = "/fallback-image.png";
+                                    e.target.dataset.errorHandled = "true";
+                                  }
+                                }}
+                              />
+
+                              <div className="image-overlay">
+                                {/* View icon */}
+                                <a
+                                  href={imgUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="View Image"
+                                  className="icon-button"
+                                >
+                                  <i className="fas fa-eye"></i>
+                                </a>
+
+                                {/* Download icon */}
+                                <button
+                                  title="Download Image"
+                                  className="icon-button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    fetch(imgUrl, { mode: "cors" })
+                                      .then((res) => res.blob())
+                                      .then((blob) => {
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement("a");
+                                        a.href = url;
+                                        a.download = filename;
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                      })
+                                      .catch(() => alert("Download failed."));
+                                  }}
+                                >
+                                  <i className="fas fa-download"></i>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
 
                       <Form.Control
                         type="file"
@@ -491,7 +546,7 @@ function Edit_Rescue_details() {
                         type='number'
                         value={formData.admission_no}
                         onChange={handleInputChange}
-                         />
+                      />
                     </Col>
                   </Form.Group>
                   <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">
@@ -501,24 +556,78 @@ function Edit_Rescue_details() {
                     <Col sm="7 d-flex flex-column align-items-center">
 
                       {Array.isArray(files.rescue_image) &&
-                        files.rescue_image.map((img, index) => (
-                          <img
-                            key={index}
-                            src={img}
-                            alt={`rescue_image ${index}`}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/fallback-image.png";
-                            }}
-                            style={{
-                              width: "100px",
-                              height: "auto",
-                              objectFit: "cover",
-                              marginRight: "10px",
-                              marginBottom: "10px"
-                            }}
-                          />
-                        ))}
+                        files.rescue_image.map((imgUrl, index) => {
+                          const filename = `rescue_image${index}.jpg`;
+
+                          return (
+                            <div
+                              key={index}
+                              className="image-container"
+                              style={{
+                                position: "relative",
+                                width: "100px",
+                                height: "100px",
+                                margin: "10px",
+                                padding: "0px",
+                                display: "inline-block",
+                              }}
+                            >
+                              <img
+                                src={imgUrl}
+                                alt={`rescue_image - ${index}`}
+                                loading="lazy"
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  border: "1px solid #ccc",
+                                  borderRadius: "4px",
+                                }}
+                                onError={(e) => {
+                                  if (!e.target.dataset.errorHandled) {
+                                    e.target.src = "/fallback-image.png";
+                                    e.target.dataset.errorHandled = "true";
+                                  }
+                                }}
+                              />
+
+                              <div className="image-overlay">
+                                {/* View icon */}
+                                <a
+                                  href={imgUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="View Image"
+                                  className="icon-button"
+                                >
+                                  <i className="fas fa-eye"></i>
+                                </a>
+
+                                {/* Download icon */}
+                                <button
+                                  title="Download Image"
+                                  className="icon-button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    fetch(imgUrl, { mode: "cors" })
+                                      .then((res) => res.blob())
+                                      .then((blob) => {
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement("a");
+                                        a.href = url;
+                                        a.download = filename;
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                      })
+                                      .catch(() => alert("Download failed."));
+                                  }}
+                                >
+                                  <i className="fas fa-download"></i>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
 
 
                       <Form.Control

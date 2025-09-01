@@ -8,6 +8,7 @@ import axios from "axios";
 import { Alert } from "react-bootstrap";
 import { useSelector, useDispatch } from 'react-redux';
 import { setField, resetAll } from '../../../store/admissionSlice.js';
+import imageCompression from 'browser-image-compression';
 
 function First_info_form() {
     const [admissionNumber, setAdmissionNo] = useState('');
@@ -21,8 +22,8 @@ function First_info_form() {
     // const [information_public, setInformationPulic] = useState('');
     const [admission_date, setAdmissionDate] = useState('');
     const [admission_no, setAdmisisonNo] = useState('');
-    const [rescue_image, setRescueImage] = useState(null);
-    const [attach_policeMemo, setAttachPoliceMemo] = useState(null);
+    const [rescue_image, setRescueImage] = useState([]);
+    const [attach_policeMemo, setAttachPoliceMemo] = useState([]);
     const [imagePreview, setImagePreview] = useState(null);
     const [govtImagePreview, setGovtImagePreview] = useState(null);
     const [isStep1Invalid, setIsStep1Invalid] = useState(false);
@@ -71,9 +72,54 @@ function First_info_form() {
 
     } = useSelector(state => state.admission);
 
-    const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-        setRescueImage(files);
+    // const handleImageChange = (e) => {
+    //     const files = Array.from(e.target.files);
+    //     setRescueImage(files);
+    // };
+
+    const handleImageChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `essential_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setRescueImage(compressedFiles);
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
     };
 
     // const handleMemoChange = (e) => {
@@ -84,17 +130,109 @@ function First_info_form() {
     //     }
     // }
 
-    const handleGovtIdFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        setGovIdFile(files);
+    // const handleGovtIdFileChange = (e) => {
+    //     const files = Array.from(e.target.files);
+    //     setGovIdFile(files);
 
-        const previewUrls = files.map((file) => URL.createObjectURL(file));
-        setGovtImagePreview(previewUrls);
-    }
-    const handleMemoChange = (e) => {
-        const files = Array.from(e.target.files);
-        setAttachPoliceMemo(files);
+    //     const previewUrls = files.map((file) => URL.createObjectURL(file));
+    //     setGovtImagePreview(previewUrls);
+    // }
+
+    const handleGovtIdFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `essential_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setGovIdFile(compressedFiles);
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
     };
+
+    // const handleMemoChange = (e) => {
+    //     const files = Array.from(e.target.files);
+    //     setAttachPoliceMemo(files);
+    // };
+
+    const handleMemoChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `essential_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setAttachPoliceMemo(compressedFiles);
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
+    };
+
     // const [rescue_name, setRescueName] = useState('');
     // const [age, setAge] = useState('');
     // const [rescue_status, setRescueStatus] = useState('');
@@ -142,7 +280,7 @@ function First_info_form() {
     // const [information, setInformation] = useState('');
     // const [govIdType, setGovIdType] = useState('');
     // const [govIdNumber, setGovIdNumber] = useState('');
-    const [govIdFile, setGovIdFile] = useState(null);
+    const [govIdFile, setGovIdFile] = useState([]);
     // const [articles_carried, setArticlesCarried] = useState('');
     // const [rescue_relationship, setRescueRelationship] = useState('');
     // const [f_member_name, setFMemberName] = useState('');
@@ -639,6 +777,10 @@ function First_info_form() {
         // formData.append('f_member_address', f_member_address);
 
 
+        // attach_policeMemo.forEach((file) => {
+        //     formData.append("attach_policeMemo", file);
+        // });
+
         attach_policeMemo.forEach((file) => {
             formData.append("attach_policeMemo", file);
         });
@@ -647,11 +789,14 @@ function First_info_form() {
             formData.append("rescue_image", file);
         });
 
-        if (formData.govIdFile) {
-            formData.govIdFile.forEach((file) =>
-                formData.append("govIdFile", file)
-            );
-        }
+        // if (formData.govIdFile) {
+        //     formData.govIdFile.forEach((file) =>
+        //         formData.append("govIdFile", file)
+        //     );
+        // }
+        govIdFile.forEach((file) => {
+            formData.append("govIdFile", file);
+        });
 
         // formData.append('rescue_image', rescue_image);
         // formData.append('attach_policeMemo', attach_policeMemo);
@@ -1124,7 +1269,7 @@ function First_info_form() {
                                                             multiple
                                                             onChange={handleGovtIdFileChange}
                                                         />
-                                                        {govIdFile && (
+                                                        {/* {govIdFile && (
                                                             <div className="mt-2 d-flex flex-wrap">
                                                                 {govtImagePreview.map((preview, index) => (
                                                                     <img
@@ -1143,7 +1288,7 @@ function First_info_form() {
                                                                     />
                                                                 ))}
                                                             </div>
-                                                        )}
+                                                        )} */}
                                                     </Col>
                                                 </Form.Group>
                                             </>

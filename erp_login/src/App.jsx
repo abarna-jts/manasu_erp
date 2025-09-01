@@ -154,12 +154,34 @@ function App() {
             />
 
             <Route
+              path='/scrb_formALL'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><SCRB_All_Details /></MainLayout>
+                ) : (
+                  <MainLayout><SCRB_All_Details /></MainLayout>
+                )
+              }
+            />
+
+            <Route
               path='/scrb_form2A'
               element={
                 userType === '1' || userType === '2' ? (
                   <MainLayout><SCRB_Form2A /></MainLayout>
                 ) : (
                   <MainLayout><SCRB_Form2A /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/scrb_form2aALL'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><SCRB_Form2A_ALL /></MainLayout>
+                ) : (
+                  <MainLayout><SCRB_Form2A_ALL /></MainLayout>
                 )
               }
             />
@@ -176,6 +198,17 @@ function App() {
             />
 
             <Route
+              path='/scrb_form2bALL'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><SCRB_Form2B_All /></MainLayout>
+                ) : (
+                  <MainLayout><SCRB_Form2B_All /></MainLayout>
+                )
+              }
+            />
+
+            <Route
               path='/scrb_form2C'
               element={
                 userType === '1' || userType === '2' ? (
@@ -187,12 +220,45 @@ function App() {
             />
 
             <Route
+              path='/scrb_form2cALL'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><SCRB_Form2C_All /></MainLayout>
+                ) : (
+                  <MainLayout><SCRB_Form2C_All /></MainLayout>
+                )
+              }
+            />
+
+            <Route
               path='/sample_form'
               element={
                 userType === '1' || userType === '2' ? (
                   <MainLayout><PDF_preview /></MainLayout>
                 ) : (
                   <MainLayout><PDF_preview /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/programs_report'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><Programms_report /></MainLayout>
+                ) : (
+                  <MainLayout><Programms_report /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/staffPrograms_report'
+              element={
+                userType === '1' || userType === '2' ? (
+                  <MainLayout><StaffPrograms_report /></MainLayout>
+                ) : (
+                  <MainLayout><StaffPrograms_report /></MainLayout>
                 )
               }
             />

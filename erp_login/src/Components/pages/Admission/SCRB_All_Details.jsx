@@ -336,7 +336,7 @@ function SCRB_All_Details() {
                                     {currentItems.length > 0 ? (
                                         currentItems.map((item, index) => (
                                             <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                                <td>{indexOfFirstItem + index + 1}</td>
                                                 <td>{item.admission_no || "null"}</td>
                                                 <td>{item.rescue_name || "null"}</td>
                                                 <td className='d-flex align-items-center justify-content-center'>

@@ -740,16 +740,17 @@ const createCommunityReport = async (req, res) => {
         const q = `INSERT INTO community_report(community_name, clg_name, clg_dept, resource_person, community_date, community_place, programms_photos, community_rescue_count, community_report)
                 VALUES (?,?,?,?,?,?,?,?,?)`;
         const values = [
-            community_date,
             community_name,
             clg_name,
             clg_dept,
             resource_person,
+            community_date,
             community_place,
             JSON.stringify(ProgrammsPhotoPath),
             community_rescue_count,
             community_report,
         ]
+            
 
         const [result] = await db.query(q, values);
 

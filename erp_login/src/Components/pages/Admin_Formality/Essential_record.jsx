@@ -11,6 +11,7 @@ import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import imageCompression from 'browser-image-compression';
 
 function Essential_record() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -59,12 +60,61 @@ function Essential_record() {
         udid_attach: null
     });
 
-    const handleFileChange = (e) => {
-        setFiles({
-            ...files,
-            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
-        });
+    // const handleFileChange = (e) => {
+    //     setFiles({
+    //         ...files,
+    //         [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+    //     });
+    // };
+
+    const handleFileChange = async (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
+        };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `essential_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setFiles((prev) => ({
+                ...prev,
+                [event.target.name]: compressedFiles // ✅ store compressed files
+            }));
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
     };
+
 
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -360,7 +410,7 @@ function Essential_record() {
 
             // Parse bank passbook image
             const passbookPath = data.bank_passbook
-                ? [`https://www.pahrultours.com/app2/${data.bank_passbook}`]
+                ? [`http://localhost:5002/${data.bank_passbook}`]
                 : [];
 
             // Parse form7_attach image array
@@ -369,14 +419,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.form7_attach);
                     if (Array.isArray(parsed)) {
-                        form7Paths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        form7Paths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     form7Paths = data.form7_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -385,14 +435,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.bank_passbook);
                     if (Array.isArray(parsed)) {
-                        bank_passbookPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        bank_passbookPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse bank passbook:', err);
                     // Fallback: comma-separated string
                     bank_passbookPath = data.bank_passbook
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -401,14 +451,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.attach_aadhar);
                     if (Array.isArray(parsed)) {
-                        attachAadharPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        attachAadharPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Aadhar Card:', err);
                     // Fallback: comma-separated string
                     attachAadharPath = data.attach_aadhar
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -417,14 +467,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.udid_attach);
                     if (Array.isArray(parsed)) {
-                        UDIDPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        UDIDPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse UDID Card:', err);
                     // Fallback: comma-separated string
                     UDIDPhotoPath = data.udid_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -529,7 +579,7 @@ function Essential_record() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -537,7 +587,7 @@ function Essential_record() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -733,7 +783,7 @@ function Essential_record() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -743,7 +793,7 @@ function Essential_record() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {

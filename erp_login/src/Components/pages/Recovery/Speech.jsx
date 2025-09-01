@@ -267,7 +267,7 @@ function Speech() {
                             {currentItems.length > 0 ? (
                                 currentItems.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
+                                        <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{item.admission_no || "Null"}</td>
                                         <td>{formatDateTime(item.date) || "Null"}</td>
                                         <td>{item.rate_quantity || "Null"}</td>

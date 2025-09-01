@@ -73,7 +73,7 @@ function Dr_visitView() {
         const minutes = String(date.getMinutes()).padStart(2, "0");
         const seconds = String(date.getSeconds()).padStart(2, "0");
 
-        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+        return `${day}-${month}-${year} / ${hours}:${minutes}:${seconds}`;
     };
 
     const formatForInput = (dateStr) => {
@@ -284,7 +284,7 @@ function Dr_visitView() {
                             {currentItems.length > 0 ? (
                                 currentItems.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
+                                        <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{item.dr_name}</td>
                                         <td>{item.hospital_name}</td>
                                         <td>{formatDateTime(item.date_time)}</td>
