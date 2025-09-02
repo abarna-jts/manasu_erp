@@ -20,7 +20,9 @@ function Family_Request_form() {
     const [files, setFiles] = useState({});
     const [previewRequested, setPreviewRequested] = useState(false);
     const [rescueImage, setRescueImage] = useState(null);
-    const [rescueName, setRescueName] = useState("");
+    const [rescue_name, setRescueName] = useState("");
+    const [age, setAge] = useState("");
+    const [phone_no, setPhoneNo] = useState("");
     const [error, setError] = useState("");
     const [formErrors, setFormErrors] = useState({});
     const [admissionNumberError, setAdmissionNumberError] = useState("");
@@ -239,6 +241,35 @@ function Family_Request_form() {
         }
     };
 
+    useEffect(() => {
+        if (admissionNumber.trim() !== "") {
+            fetchRescuePastDetails(admissionNumber);
+        } else {
+            setRescueName("");
+        }
+    }, [admissionNumber]);
+
+    const fetchRescuePastDetails = async (admissionNumber) => {
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admissionNumber}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_name) {
+
+                setRescueName(result.rescue_name || "");
+                setAge(result.age || "");
+                setPhoneNo(result.phone_no || "");
+            } else {
+
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueName("");
+        }
+    };
+
     const f_aadhar_cardRef = useRef(null);
     const f_ration_cardRef = useRef(null);
     const r_aadhar_cardRef = useRef(null);
@@ -279,8 +310,9 @@ function Family_Request_form() {
 
         const data = new FormData();
         data.append('admissionNumber', admissionNumber);
-        data.append('rescue_name', storeData.rescue_name);
-        data.append('f_member_age', storeData.f_member_age);
+        data.append('rescue_name', rescue_name);
+        data.append('age', age);
+        data.append('phone_no', phone_no);
         data.append('description', storeData.description);
         data.append('f_aadhar_card', files.f_aadhar_card);
         data.append('f_ration_card', files.f_ration_card);
@@ -289,6 +321,7 @@ function Family_Request_form() {
         data.append('govt_id', files.govt_id);
         data.append('rescue_relationship', storeData.rescue_relationship);
         data.append('f_member_name', storeData.f_member_name);
+        data.append('f_member_age', storeData.f_member_age);
         data.append('f_member_phone', storeData.f_member_phone);
         data.append('f_member_address', storeData.f_member_address);
         data.append('f_aadhar_card_no', storeData.f_aadhar_card_no);
@@ -337,7 +370,7 @@ function Family_Request_form() {
                     admission_no: '',
                     rescue_name: '',
                     age: '',
-                    gender: 'Male',
+                    gender: '',
                     phone_no: '',
                     rescue_relationship: '',
                     f_member_name: '',
@@ -352,6 +385,10 @@ function Family_Request_form() {
                     description: '',
                 })
                 setAdmissionNumber("");
+                setRescueName("");
+                setAge("");
+                setPhoneNo("");
+
                 if (f_aadhar_cardRef.current) f_aadhar_cardRef.current.value = "";
                 if (f_ration_cardRef.current) f_ration_cardRef.current.value = "";
                 if (r_aadhar_cardRef.current) r_aadhar_cardRef.current.value = "";
@@ -424,6 +461,8 @@ function Family_Request_form() {
             setRefData((refData) => ({
                 ...refData,
                 rescue_name: data.rescue_name || '',
+                age: data.age || '',
+                phone_no: data.phone_no || '',
                 f_member_age: data.age || '',
                 description: data.description || '',
                 family_relationship: data.family_relationship || '',
@@ -579,6 +618,8 @@ function Family_Request_form() {
             setFormData((formData) => ({
                 ...formData,
                 rescue_name: data.rescue_name || 'NULL',
+                age: data.age || 'NULL',
+                phone_no: data.phone_no || 'NULL',
                 f_member_age: data.age || 'NULL',
                 description: data.description || 'NULL',
                 family_relationship: data.family_relationship || 'NULL',
@@ -748,6 +789,9 @@ function Family_Request_form() {
                     gender: '',
                     phone_no: '',
                 })
+                setRescueName("");
+                setAge("");
+                setPhoneNo("");
                 setAdmissionNumber("");
                 if (f_aadhar_cardRef.current) f_aadhar_cardRef.current.value = "";
                 if (f_ration_cardRef.current) f_ration_cardRef.current.value = "";
@@ -866,11 +910,11 @@ function Family_Request_form() {
 
                                 <img
 
-                                    alt={rescueName || "Rescue Image"}
+                                    alt={rescue_name || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}
                                 />
-                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                {rescue_name && <h6 className="mb-2">{rescue_name}</h6>}
                             </div>
                         )}
                     </Col>
@@ -965,7 +1009,7 @@ function Family_Request_form() {
                                     <Form.Control
                                         name="rescue_name"
                                         type="text"
-                                        value={storeData.rescue_name}
+                                        value={rescue_name || ""}
                                         onChange={handleInputChange1}
                                         required
                                     />
@@ -979,7 +1023,7 @@ function Family_Request_form() {
                                     <Form.Control
                                         name="age"
                                         type='text'
-                                        value={storeData.age}
+                                        value={age || ""}
                                         onChange={handleInputChange1}
                                         required />
                                 </Col>
@@ -1006,8 +1050,8 @@ function Family_Request_form() {
                                 <Col sm="8">
                                     <Form.Control
                                         name="phone_no"
-                                        type='number'
-                                        value={storeData.phone_no}
+                                        type='text'
+                                        value={phone_no || ""}
                                         onChange={handleInputChange1}
                                         isInvalid={!!formErrors.phone_no}
                                         required />
@@ -1334,7 +1378,7 @@ function Family_Request_form() {
                                         <Form.Control
                                             name="age"
                                             type='text'
-                                            value={storeData.age || "NULL"}
+                                            value={refData.age}
                                             onChange={handleInputChange2}
                                             required />
                                     </Col>
@@ -1361,8 +1405,8 @@ function Family_Request_form() {
                                     <Col sm="8">
                                         <Form.Control
                                             name="phone_no"
-                                            type='number'
-                                            value={storeData.phone_no || "NULL"}
+                                            type='text'
+                                            value={refData.phone_no}
                                             onChange={handleInputChange2}
                                             required />
                                     </Col>
@@ -1744,7 +1788,7 @@ function Family_Request_form() {
                                                 <Form.Control
                                                     name="age"
                                                     type='text'
-                                                    value={storeData.age} // ✅ use formData here
+                                                    value={formData.age} // ✅ use formData here
                                                     onChange={handleInputChange1}
                                                     required
                                                 />
@@ -1772,8 +1816,8 @@ function Family_Request_form() {
                                             <Col sm="6">
                                                 <Form.Control
                                                     name="phone_no"
-                                                    type='number'
-                                                    value={storeData.phone_no}
+                                                    type='text'
+                                                    value={formData.phone_no}
                                                     onChange={handleInputChange1}
                                                     isInvalid={!!formErrors.phone_no}
                                                     required />
@@ -2072,7 +2116,7 @@ function Family_Request_form() {
                                         </Form.Group>
                                         <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                             <Form.Label column sm="6">
-                                                Aadhar Card No. (Resident): <span style={{ color: 'red' }}>*</span>
+                                                Aadhar Card No. (Resident): 
                                             </Form.Label>
                                             <Col sm="6">
                                                 <Form.Control

@@ -17,7 +17,8 @@ function Self_Declaration_form() {
     const [files, setFiles] = useState('');
     const [previewRequested, setPreviewRequested] = useState(false);
     const [rescueImage, setRescueImage] = useState(null);
-    const [rescueName, setRescueName] = useState("");
+    const [rescue_name, setRescueName] = useState("");
+    const [age, setAge] = useState("");
     const [error, setError] = useState("");
 
     const handleClose = () => setShow(false);
@@ -86,6 +87,9 @@ function Self_Declaration_form() {
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+    const handleInputChange1 = (e) => {
+        setEditData({ ...editData, [e.target.name]: e.target.value });
+    };
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
@@ -112,6 +116,12 @@ function Self_Declaration_form() {
     }
 
     const [formData, setFormData] = useState({
+        rescue_name: '',
+        age: '',
+        description: '',
+    })
+
+    const [editData, setEditData] = useState({
         rescue_name: '',
         age: '',
         description: '',
@@ -167,7 +177,7 @@ function Self_Declaration_form() {
             setFormData((formData) => ({
                 ...formData,
                 rescue_name: data.rescue_name || '',
-                f_member_age: data.age || '',
+                age: data.age || '',
                 description: data.description || '',
             }));
 
@@ -273,8 +283,8 @@ function Self_Declaration_form() {
 
         const data = new FormData();
         data.append('admission_no', admission_no);
-        data.append('rescue_name', formData.rescue_name);
-        data.append('age', formData.age);
+        data.append('rescue_name', rescue_name);
+        data.append('age', age);
         data.append('description', formData.description);
         data.append('handwritten_document', files.handwritten_document);
         data.append('signature', files.signature);
@@ -309,6 +319,8 @@ function Self_Declaration_form() {
                 description: '',
             })
             setAdmissionNumber("");
+            setRescueName("");
+            setAge("");
             if (handwritten_documentRef.current) handwritten_documentRef.current.value = "";
             if (signatureRef.current) signatureRef.current.value = "";
             if (photoRef.current) photoRef.current.value = "";
@@ -328,8 +340,8 @@ function Self_Declaration_form() {
             const response = await apiRoute.get(`/reunion/getSelfDeclaration/${admission_no}`);
             const data = response.data;
 
-            setFormData((formData) => ({
-                ...formData,
+            setEditData((editData) => ({
+                ...editData,
                 rescue_name: data.rescue_name || '',
                 age: data.age || '',
                 description: data.description || '',
@@ -400,9 +412,9 @@ function Self_Declaration_form() {
         e.preventDefault();
 
         const data = new FormData();
-        data.append('rescue_name', formData.rescue_name);
-        data.append('age', formData.age);
-        data.append('description', formData.description);
+        data.append('rescue_name', editData.rescue_name);
+        data.append('age', editData.age);
+        data.append('description', editData.description);
         data.append('signature', files.signature);
         data.append('handwritten_document', files.handwritten_document);
         data.append('photo', files.photo);
@@ -432,11 +444,13 @@ function Self_Declaration_form() {
             alert("Self Declaration Form Updated successfully");
             handleClose(true);
             setAdmissionNumber("");
-            setFormData({
+            setEditData({
                 rescue_name: '',
                 age: '',
                 description: '',
             })
+            setRescueName("");
+            setAge("");
             if (handwritten_documentRef.current) handwritten_documentRef.current.value = "";
             if (signatureRef.current) signatureRef.current.value = "";
             if (photoRef.current) photoRef.current.value = "";
@@ -490,21 +504,25 @@ function Self_Declaration_form() {
                 if (imagePath) {
                     setRescueImage(imagePath);
                     setRescueName(result.rescue_name || "");
+                    setAge(result.age || "");
                     setError("");
                 } else {
                     setRescueImage(null);
                     setRescueName("");
+                    setAge("");
                     setError("Image not found for this admission number");
                 }
             } else {
                 setRescueImage(null);
                 setRescueName("");
+                setAge("");
                 setError("Image not found for this admission number");
             }
         } catch (error) {
             console.error("Error fetching data", error);
             setRescueImage(null);
             setRescueName("");
+            setAge("");
             setError("Admission Number Not found");
         }
     };
@@ -516,6 +534,7 @@ function Self_Declaration_form() {
         } else {
             setRescueImage(null);
             setRescueName("");
+            setAge("");
             setError("");
         }
     }, [admission_no]);
@@ -544,11 +563,11 @@ function Self_Declaration_form() {
 
                                 <img
 
-                                    alt={rescueName || "Rescue Image"}
+                                    alt={rescue_name || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}
                                 />
-                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                {rescue_name && <h6 className="mb-2">{rescue_name}</h6>}
                             </div>
                         )}
                     </Col>
@@ -617,7 +636,7 @@ function Self_Declaration_form() {
                                             <Form.Control
                                                 type="text"
                                                 name="rescue_name"
-                                                value={formData.rescue_name}
+                                                value={rescue_name || formData.rescue_name}
                                                 onChange={handleInputChange}
                                                 required />
                                         </Col>
@@ -630,7 +649,7 @@ function Self_Declaration_form() {
                                             <Form.Control
                                                 type="text"
                                                 name="age"
-                                                value={formData.age}
+                                                value={age || formData.age}
                                                 onChange={handleInputChange}
                                                 required />
                                         </Col>
@@ -752,19 +771,7 @@ function Self_Declaration_form() {
                                     required />
                             </Col>
                         </Form.Group>
-                        <Form.Group as={Row} className="mb-1" controlId="formRescueName">
-                            <Form.Label column sm="4" className='text-start'>
-                                Description :
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleInputChange}
-                                    required />
-                            </Col>
-                        </Form.Group>
+                        
 
                         <Form.Group as={Row} className="mb-3 mt-3">
                             <Form.Label column sm="4" className='text-start'>
@@ -861,6 +868,19 @@ function Self_Declaration_form() {
                                 )}
                             </Col>
                         </Form.Group>
+                        <Form.Group as={Row} className="mb-1" controlId="formRescueName">
+                            <Form.Label column sm="4" className='text-start'>
+                                Description :
+                            </Form.Label>
+                            <Col sm="8">
+                                <Form.Control
+                                    type="text"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    required />
+                            </Col>
+                        </Form.Group>
 
                     </Row>
                     <Col md={12}>
@@ -892,8 +912,8 @@ function Self_Declaration_form() {
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
-                                            value={formData.rescue_name}
-                                            onChange={handleInputChange}
+                                            value={editData.rescue_name}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -905,8 +925,8 @@ function Self_Declaration_form() {
                                         <Form.Control
                                             type="text"
                                             name="age"
-                                            value={formData.age}
-                                            onChange={handleInputChange}
+                                            value={editData.age}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -1182,8 +1202,8 @@ function Self_Declaration_form() {
                                         <Form.Control
                                             type="text"
                                             name="description"
-                                            value={formData.description}
-                                            onChange={handleInputChange}
+                                            value={editData.description}
+                                            onChange={handleInputChange1}
                                         />
                                     </Col>
                                 </Form.Group>

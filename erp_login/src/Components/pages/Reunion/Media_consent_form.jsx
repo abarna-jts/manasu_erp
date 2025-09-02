@@ -17,7 +17,7 @@ function Media_consent_form() {
     const [previewRequested, setPreviewRequested] = useState(false);
     const [show, setShow] = useState(false);
     const [rescueImage, setRescueImage] = useState(null);
-    const [rescueName, setRescueName] = useState("");
+    const [rescue_name, setRescueName] = useState("");
     const [error, setError] = useState("");
     const [files, setFiles] = useState({});
 
@@ -25,7 +25,7 @@ function Media_consent_form() {
     const [submissionMessage, setSubmissionMessage] = useState("");
     const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => {setShow(false); setRescueName("");}
 
     const userType = Cookies.get('usertype');
 
@@ -34,6 +34,18 @@ function Media_consent_form() {
     });
 
     const [formData, setFormData] = useState({
+        rescue_name: '',
+        social_media_consent: '',
+        description: '',
+    })
+
+    const [editData, setEditData] = useState({
+        rescue_name: '',
+        social_media_consent: '',
+        description: '',
+    })
+
+    const [refData, setRefData] = useState({
         rescue_name: '',
         social_media_consent: '',
         description: '',
@@ -48,6 +60,14 @@ function Media_consent_form() {
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleInputChange1 = (e) => {
+        setEditData({ ...editData, [e.target.name]: e.target.value });
+    };
+
+    const handleInputChange2 = (e) => {
+        setRefData({ ...refData, [e.target.name]: e.target.value });
     };
 
     // Automatically fetch data when admission number is typed
@@ -72,6 +92,16 @@ function Media_consent_form() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleCheckChange1 = (e) => {
+        const { name, value } = e.target;
+        setEditData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleCheckChange2 = (e) => {
+        const { name, value } = e.target;
+        setRefData((prev) => ({ ...prev, [name]: value }));
+    };
+
     const ViewFormData = async () => {
 
         try {
@@ -79,8 +109,8 @@ function Media_consent_form() {
             const data = response.data;
 
             // Update form fields
-            setFormData((formData) => ({
-                ...formData,
+            setRefData((refData) => ({
+                ...refData,
                 admission_no: data.admission_no || '',
                 rescue_name: data.rescue_name || '',
                 social_media_consent: data.social_media_consent || '',
@@ -191,7 +221,7 @@ function Media_consent_form() {
 
         const data = new FormData();
         data.append('admission_no', admission_no);
-        data.append('rescue_name', formData.rescue_name);
+        data.append('rescue_name', rescue_name);
         data.append('social_media_consent', formData.social_media_consent);
         data.append('description', formData.description);
 
@@ -314,8 +344,8 @@ function Media_consent_form() {
             const response = await apiRoute.get(`/reunion/getMediaConsent/${admission_no}`);
             const data = response.data;
 
-            setFormData((formData) => ({
-                ...formData,
+            setEditData((editData) => ({
+                ...editData,
                 rescue_name: data.rescue_name || '',
                 social_media_consent: data.social_media_consent || '',
                 description: data.description || '',
@@ -378,9 +408,9 @@ function Media_consent_form() {
         e.preventDefault();
 
         const data = new FormData();
-        data.append('rescue_name', formData.rescue_name);
-        data.append('social_media_consent', formData.social_media_consent);
-        data.append('description', formData.description);
+        data.append('rescue_name', editData.rescue_name);
+        data.append('social_media_consent', editData.social_media_consent);
+        data.append('description', editData.description);
         data.append('scan_report', files.scan_report);
 
         if (files.scan_report && files.scan_report.length > 0) {
@@ -395,7 +425,7 @@ function Media_consent_form() {
             });
             alert("Media Consent Form Updated successfully");
             handleClose(true);
-            setFormData({
+            setEditData({
                 rescue_name: '',
                 social_media_consent: '',
                 description: '',
@@ -518,11 +548,11 @@ function Media_consent_form() {
                         {rescueImage && (
                             <div>
                                 <img
-                                    alt={rescueName || "Rescue Image"}
+                                    alt={rescue_name || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}
                                 />
-                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                {rescue_name && <h6 className="mb-2">{rescue_name}</h6>}
                             </div>
                         )}
                     </Col>
@@ -618,7 +648,7 @@ function Media_consent_form() {
                                             <Form.Control
                                                 type="text"
                                                 name="rescue_name"
-                                                value={formData.rescue_name}
+                                                value={rescue_name}
                                                 onChange={handleInputChange}
                                                 required />
                                         </Col>
@@ -715,8 +745,8 @@ function Media_consent_form() {
                                 <Form.Control
                                     type="text"
                                     name="rescue_name"
-                                    value={formData.rescue_name}
-                                    onChange={handleInputChange}
+                                    value={refData.rescue_name}
+                                    onChange={handleInputChange2}
                                     required />
                             </Col>
                         </Form.Group>
@@ -730,16 +760,16 @@ function Media_consent_form() {
                                     label="Yes"
                                     name="social_media_consent"
                                     value="Yes"
-                                    checked={formData.social_media_consent === 'Yes'}
-                                    onChange={handleCheckChange}
+                                    checked={refData.social_media_consent === 'Yes'}
+                                    onChange={handleCheckChange2}
                                 />
                                 <Form.Check
                                     type="radio"
                                     label="No"
                                     name="social_media_consent"
                                     value="No"
-                                    checked={formData.social_media_consent === 'No'}
-                                    onChange={handleCheckChange}
+                                    checked={refData.social_media_consent === 'No'}
+                                    onChange={handleCheckChange2}
                                 />
                             </Col>
                         </Form.Group>
@@ -777,7 +807,7 @@ function Media_consent_form() {
                                     as="textarea"
                                     rows={2}
                                     name="description"
-                                    value={formData.description}
+                                    value={refData.description}
                                     onChange={handleInputChange}
                                     required />
                             </Col>
@@ -812,8 +842,8 @@ function Media_consent_form() {
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
-                                            value={formData.rescue_name}
-                                            onChange={handleInputChange}
+                                            value={editData.rescue_name}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -827,16 +857,16 @@ function Media_consent_form() {
                                             label="Yes"
                                             name="social_media_consent"
                                             value="Yes"
-                                            checked={formData.social_media_consent === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.social_media_consent === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="social_media_consent"
                                             value="No"
-                                            checked={formData.social_media_consent === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.social_media_consent === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -938,8 +968,8 @@ function Media_consent_form() {
                                             as="textarea"
                                             rows={2}
                                             name="description"
-                                            value={formData.description}
-                                            onChange={handleInputChange}
+                                            value={editData.description}
+                                            onChange={handleInputChange1}
                                         />
                                     </Col>
                                 </Form.Group>

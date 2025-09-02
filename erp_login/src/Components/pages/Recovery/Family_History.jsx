@@ -164,7 +164,7 @@ function Family_History() {
                 family_dynamics: data.family_dynamics?.split(',').map(i => i.trim()) || [],
                 marriage_type: data.marriage_type?.split(',').map(i => i.trim()) || [],
                 family_history: data.family_history?.split(',').map(i => i.trim()) || [],
-                genetic_predisposition: data.genetic_predispositionv,
+                genetic_predisposition: data.genetic_predisposition,
                 family_changes: data.family_changes?.split(',').map(i => i.trim()) || [],
                 family_substance: data.family_substance || "NULL"
             }));

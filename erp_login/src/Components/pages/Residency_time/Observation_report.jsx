@@ -71,6 +71,9 @@ function Observation_report() {
         recovery_photo: null,
     });
 
+    const [editFiles, setEditFiles] = useState({
+        recovery_photo: null,
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -128,6 +131,13 @@ function Observation_report() {
         } catch (e) {
             console.error("Compression error:", e);
         }
+    };
+
+    const handleEditFileChange = async (e) => {
+        setEditFiles({
+            ...editFiles,
+            [e.target.name]: Array.from(e.target.files)  // Store all selected files as an array
+        });
     };
 
 
@@ -253,7 +263,7 @@ function Observation_report() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -261,7 +271,7 @@ function Observation_report() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -271,8 +281,8 @@ function Observation_report() {
             const RecoveryPhoto = parseImageField(data.recovery_photo);
 
             // Set files state
-            setFiles((files) => ({
-                ...files,
+            setEditFiles((editFiles) => ({
+                ...editFiles,
                 recovery_photo: RecoveryPhoto,
             }));
 
@@ -292,8 +302,14 @@ function Observation_report() {
         data.append('date', EditData.date);
         data.append('follow_up', EditData.follow_up);
 
-        if (files.recovery_photo && files.recovery_photo.length > 0) {
-            files.recovery_photo.forEach(file => {
+        // if (files.recovery_photo && files.recovery_photo.length > 0) {
+        //     files.recovery_photo.forEach(file => {
+        //         data.append('recovery_photo', file); // ✅ no []
+        //     });
+        // }
+
+        if (editFiles.recovery_photo && editFiles.recovery_photo.length > 0) {
+            editFiles.recovery_photo.forEach(file => {
                 data.append('recovery_photo', file); // ✅ no []
             });
         }
@@ -428,14 +444,14 @@ function Observation_report() {
                 try {
                     const parsed = JSON.parse(data.recovery_photo);
                     if (Array.isArray(parsed)) {
-                        recovery_photoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        recovery_photoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     recovery_photoPath = data.recovery_photo
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
             console.log(recovery_photoPath);
@@ -618,7 +634,7 @@ function Observation_report() {
                                                         // fallback to original string
                                                     }
 
-                                                    const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
+                                                    const fullUrl = `http://localhost:5002/${imagePath}`;
                                                     const filename = imagePath?.split("/").pop();
 
                                                     return imagePath ? (
@@ -845,7 +861,7 @@ function Observation_report() {
 
             <Modal show={editshow} onHide={handleEditClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Resident Observation & Progress Report</Modal.Title>
+                    <Modal.Title> Edit Resident Observation & Progress Report</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Col md={12}>
@@ -889,8 +905,8 @@ function Observation_report() {
                             <Form.Group className="mb-3">
                                 {/* <Form.Label column sm="5" className='text-start'>Resident Recovery Photo Attachment:</Form.Label> */}
                                 <Col sm="12">
-                                    {Array.isArray(files.recovery_photo) &&
-                                        files.recovery_photo.map((imgUrl, index) => {
+                                    {Array.isArray(editFiles.recovery_photo) &&
+                                        editFiles.recovery_photo.map((imgUrl, index) => {
                                             const filename = `recovery_photo${index}.jpg`;
 
                                             return (
@@ -965,7 +981,7 @@ function Observation_report() {
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
                                         name="recovery_photo"
-                                        onChange={handleFileChange}
+                                        onChange={handleEditFileChange}
                                         multiple
                                     />
                                 </Col>

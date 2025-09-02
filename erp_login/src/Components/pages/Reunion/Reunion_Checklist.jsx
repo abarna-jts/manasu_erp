@@ -19,6 +19,7 @@ function Reunion_Checklist() {
     const [rescueImage, setRescueImage] = useState(null);
     const [rescueName, setRescueName] = useState("");
     const [error, setError] = useState("");
+    const [admission_no, setAdmissionNumber] = useState('');
     const [formData, setFormData] = useState({
         admission_no: '',
         familyRequestLetter: '',
@@ -359,7 +360,7 @@ function Reunion_Checklist() {
 
     const ViewFormData = async () => {
         try {
-            const response = await apiRoute.get(`/reunion/get_checklist/${formData.admission_no}`);
+            const response = await apiRoute.get(`/reunion/get_checklist/${admission_no}`);
             const data = response.data;
 
             // Prefix file fields with server path
@@ -513,7 +514,7 @@ function Reunion_Checklist() {
 
     // Trigger when admission number changes
     useEffect(() => {
-        const adNo = String(formData.admission_no || '').trim();
+        const adNo = String(admission_no || '').trim();
 
         if (adNo !== "") {
             fetchRescueDetails(adNo);  // also pass trimmed value
@@ -522,7 +523,7 @@ function Reunion_Checklist() {
             setRescueName("");
             setError("");
         }
-    }, [formData.admission_no]);
+    }, [admission_no]);
 
 
     return (
@@ -568,15 +569,14 @@ function Reunion_Checklist() {
                             <InputGroup className="input-group-merge search-bar">
                                 <Form.Control
                                     type="text"
-                                    value={formData.admission_no}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, admission_no: e.target.value })
-                                    }
+                                    name='admission_no'
+                                    value={admission_no}
+                                    onChange={(e) => setAdmissionNumber(e.target.value)}
                                 />
                             </InputGroup>
                         </Col>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
-                            if (!formData.admission_no || String(formData.admission_no).trim() === '') {
+                            if (!admission_no || String(admission_no).trim() === '') {
                                 alert("Please enter admission number.");
                             } else {
                                 ViewFormData();
@@ -584,7 +584,7 @@ function Reunion_Checklist() {
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
                         {userType === "1" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
-                                if (!formData.admission_no.trim()) {
+                                if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
                                 } else {
                                     createFormData();
@@ -592,15 +592,15 @@ function Reunion_Checklist() {
                             }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
                         )}
                         <button type="button" className="btn btn-success mx-1" onClick={() => {
-                            if (!formData.admission_no.trim()) {
+                            if (!admission_no.trim()) {
                                 alert("Please enter admission number.");
                             } else {
-                                handleShow(formData.admission_no);
+                                handleShow(admission_no);
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {/* {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
-                                if (!formData.admission_no.trim()) {
+                                if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
                                 } else {
                                     // handleDelete(admission_no); 

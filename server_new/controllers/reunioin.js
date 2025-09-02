@@ -7,6 +7,8 @@ const createFamilyLetter = async (req, res) => {
         await ReunionAsync(req, res);
         const {
             rescue_name,
+            age,
+            phone_no,
             admissionNumber,
             f_member_age,
             description,
@@ -56,11 +58,12 @@ const createFamilyLetter = async (req, res) => {
         // const resrationCardPath = req.files['r_ration_card'] ? `uploads/Reunion/Family_Details/${req.files['r_ration_card'][0].filename}` : null;
         // const govt_idPath = req.files['govt_id'] ? `uploads/Reunion/Family_Details/${req.files['govt_id'][0].filename}` : null;
 
-        const q = "INSERT INTO family_request_form (admission_no,age,f_aadhar_card,f_ration_card,r_aadhar_card,r_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_phone,f_member_address,f_aadhar_card_no, f_ration_card_no,r_aadhar_card_no, r_ration_card_no, any_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const q = "INSERT INTO family_request_form (admission_no,age,phone_no,f_aadhar_card,f_ration_card,r_aadhar_card,r_ration_card,govt_id,description,rescue_name,family_relationship,f_member_name,f_member_age,f_member_phone,f_member_address,f_aadhar_card_no, f_ration_card_no,r_aadhar_card_no, r_ration_card_no, any_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         const values = [
             admissionNumber,
-            f_member_age,
+            age,
+            phone_no,
             JSON.stringify(aadharCardPath),
             JSON.stringify(rationCardPath),
             JSON.stringify(resaadharCardPath) || null,
@@ -70,6 +73,7 @@ const createFamilyLetter = async (req, res) => {
             rescue_name,
             rescue_relationship,
             f_member_name,
+            f_member_age,
             f_member_phone,
             f_member_address,
             f_aadhar_card_no,
@@ -84,6 +88,7 @@ const createFamilyLetter = async (req, res) => {
         sendDirectorMail({
             admissionNumber,
             rescue_name,
+            age, phone_no,
             rescue_relationship,
             f_member_name,
             f_member_phone,
@@ -120,6 +125,8 @@ const sendDirectorMail = async (form) => {
         <h2>Family Request Form – Discharge of Resident</h2>
         <p><strong>Admission No:</strong> ${form.admissionNumber}</p>
         <p><strong>Name:</strong> ${form.rescue_name}</p>
+        <p><strong>Age:</strong> ${form.age}</p>
+        <p><strong>Phone No.:</strong> ${form.phone_no}</p>
         <p><strong>Relationship:</strong> ${form.rescue_relationship}</p>
         <p><strong>Family Member Name:</strong> ${form.f_member_name}</p>
         <p><strong>Family Member Phone No.:</strong> ${form.f_member_phone}</p>

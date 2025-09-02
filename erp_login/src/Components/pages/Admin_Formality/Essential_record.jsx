@@ -18,19 +18,59 @@ function Essential_record() {
     const [previewRequested, setPreviewRequested] = useState(false);
     const [show, setShow] = useState(false);
     const [rescueImage, setRescueImage] = useState(null);
-    const [rescueName, setRescueName] = useState("");
+    const [rescue_name, setRescueName] = useState("");
     const [error, setError] = useState("");
     const [formErrors, setFormErrors] = useState({});
+
 
     //alert box values
     const [submissionMessage, setSubmissionMessage] = useState("");
     const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setShow(false);
+        setRescueName("");
+    }
 
     const userType = Cookies.get('usertype');
 
     const [formData, setFormData] = useState({
+        admission_no: '',
+        rescue_name: '',
+        aadhar_card: '',
+        udid_no: '',
+        disability_no: '',
+        voter_id: '',
+        form_7: '',
+        bank_name: '',
+        account_no: '',
+        ifsc_code: '',
+        insurance_provider: '',
+        policy_no: '',
+        validity_period: '',
+        other_gvt_scheme: '',
+        any_other: ''
+    })
+
+    const [editData, setEditData] = useState({
+        admission_no: '',
+        rescue_name: '',
+        aadhar_card: '',
+        udid_no: '',
+        disability_no: '',
+        voter_id: '',
+        form_7: '',
+        bank_name: '',
+        account_no: '',
+        ifsc_code: '',
+        insurance_provider: '',
+        policy_no: '',
+        validity_period: '',
+        other_gvt_scheme: '',
+        any_other: ''
+    })
+
+    const [refData, setRefData] = useState({
         admission_no: '',
         rescue_name: '',
         aadhar_card: '',
@@ -192,6 +232,43 @@ function Essential_record() {
         }));
     };
 
+    const handleInputChange1 = (e) => {
+        const { name, value } = e.target;
+        let updatedValue = value.toUpperCase();
+
+        // Custom formatting logic
+        if (name === "aadhar_card" && updatedValue !== "UNKNOWN") {
+            updatedValue = value.replace(/\D/g, '').slice(0, 12);
+            updatedValue = updatedValue.replace(/(.{4})/g, '$1 ').trim();
+        }
+
+        if (name === "udid_no" && updatedValue !== "UNKNOWN") {
+            updatedValue = updatedValue.replace(/[^A-Z0-9]/gi, '').slice(0, 20).toUpperCase();
+        }
+
+        if (name === "voter_id" && updatedValue !== "UNKNOWN") {
+            updatedValue = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+            if (updatedValue.length > 10) return;
+        }
+
+        if (name === "ifsc_code" && updatedValue !== "UNKNOWN") {
+            updatedValue = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+            if (updatedValue.length > 11) return;
+        }
+
+        // Set form data
+        setEditData(prev => ({
+            ...prev,
+            [name]: updatedValue
+        }));
+
+        // Validate and set error
+        const errorMsg = validateField(name, updatedValue);
+        setFormErrors(prev => ({
+            ...prev,
+            [name]: errorMsg
+        }));
+    };
 
 
     const handleCheckChange = (e) => {
@@ -213,6 +290,33 @@ function Essential_record() {
         } catch (error) {
             console.error('Error fetching data', error);
             alert("Admission Number Not found");
+        }
+    };
+
+    useEffect(() => {
+        if (admission_no.trim() !== "") {
+            fetchRescuePastDetails(admission_no);
+        } else {
+            setRescueName("");
+        }
+    }, [admission_no]);
+
+    const fetchRescuePastDetails = async (admission_no) => {
+        try {
+            const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
+            const result = response.data.data[0];
+            console.log("API Result:", result);
+
+            if (result && result.rescue_name) {
+
+                setRescueName(result.rescue_name || "");
+            } else {
+
+                setError("Image not found for this admission number");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+            setRescueName("");
         }
     };
 
@@ -268,8 +372,8 @@ function Essential_record() {
         // UDID Validation
         if (formData.udid_no && formData.udid_no !== "UNKNOWN") {
             const cleaned = formData.udid_no.replace(/[^A-Z0-9]/gi, '');
-            if (cleaned.length !== 20) {
-                alert("UDID must be exactly 20 alphanumeric characters or type UNKNOWN");
+            if (cleaned.length !== 18) {
+                alert("UDID must be exactly 18 alphanumeric characters or type UNKNOWN");
                 return;
             }
         }
@@ -294,7 +398,7 @@ function Essential_record() {
 
         const data = new FormData();
         data.append('admission_no', admission_no);
-        data.append('rescue_name', formData.rescue_name);
+        data.append('rescue_name', rescue_name);
         data.append('aadhar_card', formData.aadhar_card);
         data.append('udid_no', formData.udid_no);
         data.append('disability_no', formData.disability_no);
@@ -361,6 +465,7 @@ function Essential_record() {
                     any_other: ''
                 })
                 setAdmissionNumber("");
+                setRescueName("");
                 setFiles({
                     bank_passbook: null,
                     form7_attach: null,
@@ -389,8 +494,8 @@ function Essential_record() {
             const response = await apiRoute.get(`/formality/getEssentialRecord/${admission_no}`);
             const data = response.data;
 
-            setFormData((formData) => ({
-                ...formData,
+            setRefData((refData) => ({
+                ...refData,
                 admission_no: data.admission_no || '',
                 rescue_name: data.rescue_name || '',
                 aadhar_card: data.aadhar_card || '',
@@ -552,8 +657,8 @@ function Essential_record() {
             const data = response.data;
 
             // Set formData
-            setFormData((formData) => ({
-                ...formData,
+            setEditData((editData) => ({
+                ...editData,
                 admission_no: data.admission_no || '',
                 rescue_name: data.rescue_name || '',
                 aadhar_card: data.aadhar_card || '',
@@ -640,8 +745,8 @@ function Essential_record() {
     const handleUpdate = async (e, admission_no) => {
         e.preventDefault();
         // Aadhaar Validation
-        if (formData.aadhar_card && formData.aadhar_card !== "UNKNOWN") {
-            const digitsOnly = formData.aadhar_card.replace(/\D/g, '');
+        if (editData.aadhar_card && editData.aadhar_card !== "UNKNOWN") {
+            const digitsOnly = editData.aadhar_card.replace(/\D/g, '');
             if (digitsOnly.length !== 12) {
                 alert("Aadhaar number must be 12 digits or type UNKNOWN");
                 return;
@@ -649,17 +754,17 @@ function Essential_record() {
         }
 
         // UDID Validation
-        if (formData.udid_no && formData.udid_no !== "UNKNOWN") {
-            const cleaned = formData.udid_no.replace(/[^A-Z0-9]/gi, '');
-            if (cleaned.length !== 20) {
-                alert("UDID must be exactly 20 alphanumeric characters or type UNKNOWN");
+        if (editData.udid_no && editData.udid_no !== "UNKNOWN") {
+            const cleaned = editData.udid_no.replace(/[^A-Z0-9]/gi, '');
+            if (cleaned.length !== 18) {
+                alert("UDID must be exactly 18 alphanumeric characters or type UNKNOWN");
                 return;
             }
         }
 
         // Voter ID Validation
-        if (formData.voter_id && formData.voter_id !== "UNKNOWN") {
-            const cleaned = formData.voter_id.replace(/[^A-Za-z0-9]/g, '');
+        if (editData.voter_id && editData.voter_id !== "UNKNOWN") {
+            const cleaned = editData.voter_id.replace(/[^A-Za-z0-9]/g, '');
             if (!/^[A-Z]{3}[0-9]{7}$/.test(cleaned)) {
                 alert("Voter ID must be 3 letters followed by 7 digits or type UNKNOWN");
                 return;
@@ -667,8 +772,8 @@ function Essential_record() {
         }
 
         // IFSC Code Validation
-        if (formData.ifsc_code && formData.ifsc_code !== "UNKNOWN") {
-            const cleaned = formData.ifsc_code.replace(/[^A-Za-z0-9]/g, '');
+        if (editData.ifsc_code && editData.ifsc_code !== "UNKNOWN") {
+            const cleaned = editData.ifsc_code.replace(/[^A-Za-z0-9]/g, '');
             if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(cleaned)) {
                 alert("IFSC Code must follow format like SBIN0001234 or type UNKNOWN");
                 return;
@@ -676,22 +781,22 @@ function Essential_record() {
         }
 
         const data = new FormData();
-        data.append('rescue_name', formData.rescue_name);
-        data.append('aadhar_card', formData.aadhar_card);
-        data.append('udid_no', formData.udid_no);
-        data.append('disability_no', formData.disability_no);
-        data.append('voter_id', formData.voter_id);
-        data.append('form_7', formData.form_7);
+        data.append('rescue_name', editData.rescue_name);
+        data.append('aadhar_card', editData.aadhar_card);
+        data.append('udid_no', editData.udid_no);
+        data.append('disability_no', editData.disability_no);
+        data.append('voter_id', editData.voter_id);
+        data.append('form_7', editData.form_7);
         data.append('form7_attach', files.form7_attach);
-        data.append('bank_name', formData.bank_name);
-        data.append('account_no', formData.account_no);
-        data.append('ifsc_code', formData.ifsc_code);
+        data.append('bank_name', editData.bank_name);
+        data.append('account_no', editData.account_no);
+        data.append('ifsc_code', editData.ifsc_code);
         data.append('bank_passbook', files.bank_passbook);
-        data.append('insurance_provider', formData.insurance_provider);
-        data.append('policy_no', formData.policy_no);
-        data.append('validity_period', formData.validity_period);
-        data.append('other_gvt_scheme', formData.other_gvt_scheme);
-        data.append('any_other', formData.any_other);
+        data.append('insurance_provider', editData.insurance_provider);
+        data.append('policy_no', editData.policy_no);
+        data.append('validity_period', editData.validity_period);
+        data.append('other_gvt_scheme', editData.other_gvt_scheme);
+        data.append('any_other', editData.any_other);
 
         // Append multiple images for form7_attach
         if (files.form7_attach && files.form7_attach.length > 0) {
@@ -725,7 +830,7 @@ function Essential_record() {
             });
             alert('Updated successfully!');
             handleClose(true);
-            setFormData({
+            setEditData({
                 admission_no: '',
                 rescue_name: '',
                 aadhar_card: '',
@@ -742,6 +847,7 @@ function Essential_record() {
                 other_gvt_scheme: '',
                 any_other: ''
             })
+            setRescueName("");
             setAdmissionNumber("");
             // Clear the file input elements in the DOM
             if (bankPassbookRef.current) bankPassbookRef.current.value = "";
@@ -892,11 +998,11 @@ function Essential_record() {
                         {rescueImage && (
                             <div>
                                 <img
-                                    alt={rescueName || "Rescue Image"}
+                                    alt={rescue_name || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}
                                 />
-                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                {rescue_name && <h6 className="mb-2">{rescue_name}</h6>}
                             </div>
                         )}
                     </Col>
@@ -976,7 +1082,7 @@ function Essential_record() {
                                             <Form.Control
                                                 type="text"
                                                 name="rescue_name"
-                                                value={formData.rescue_name}
+                                                value={rescue_name || formData.rescue_name}
                                                 onChange={handleInputChange}
                                                 required />
                                         </Col>
@@ -1229,7 +1335,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="rescue_name"
-                                    value={formData.rescue_name}
+                                    value={refData.rescue_name}
                                     onChange={handleInputChange}
                                     required />
                             </Col>
@@ -1244,7 +1350,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="aadhar_card"
-                                    value={formData.aadhar_card}
+                                    value={refData.aadhar_card}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                     required
@@ -1282,7 +1388,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="udid_no"
-                                    value={formData.udid_no}
+                                    value={refData.udid_no}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
@@ -1320,7 +1426,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="disability_no"
-                                    value={formData.disability_no}
+                                    value={refData.disability_no}
                                     onChange={handleInputChange}
                                     accept=".pdf,.jpg,.jpeg,.png"
                                 />
@@ -1330,7 +1436,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="voter_id"
-                                    value={formData.voter_id}
+                                    value={refData.voter_id}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
@@ -1340,7 +1446,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="form_7"
-                                    value={formData.form_7}
+                                    value={refData.form_7}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
@@ -1387,7 +1493,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="bank_name"
-                                    value={formData.bank_name}
+                                    value={refData.bank_name}
                                     onChange={handleInputChange}
                                     className="mb-3"
                                 />
@@ -1397,7 +1503,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="number"
                                     name="account_no"
-                                    value={formData.account_no}
+                                    value={refData.account_no}
                                     onChange={handleInputChange}
                                     className="mb-3"
                                 />
@@ -1407,7 +1513,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="ifsc_code"
-                                    value={formData.ifsc_code}
+                                    value={refData.ifsc_code}
                                     onChange={handleInputChange}
                                     className="mb-5"
                                 />
@@ -1453,7 +1559,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="insurance_provider"
-                                    value={formData.insurance_provider}
+                                    value={refData.insurance_provider}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
@@ -1463,7 +1569,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="number"
                                     name="policy_no"
-                                    value={formData.policy_no}
+                                    value={refData.policy_no}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
@@ -1473,7 +1579,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="validity_period"
-                                    value={formData.validity_period}
+                                    value={refData.validity_period}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
@@ -1482,7 +1588,7 @@ function Essential_record() {
                                 <Form.Control
                                     type="text"
                                     name="other_gvt_scheme"
-                                    value={formData.other_gvt_scheme}
+                                    value={refData.other_gvt_scheme}
                                     onChange={handleInputChange}
                                     className="mb-2"
                                 />
@@ -1520,8 +1626,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
-                                            value={formData.rescue_name}
-                                            onChange={handleInputChange}
+                                            value={editData.rescue_name}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -1534,8 +1640,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="aadhar_card"
-                                            value={formData.aadhar_card}
-                                            onChange={handleInputChange}
+                                            value={editData.aadhar_card}
+                                            onChange={handleInputChange1}
                                             className={`mb-2 ${formErrors.aadhar_card ? 'is-invalid' : ''}`}
                                             required
                                         />
@@ -1636,8 +1742,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="udid_no"
-                                            value={formData.udid_no}
-                                            onChange={handleInputChange}
+                                            value={editData.udid_no}
+                                            onChange={handleInputChange1}
                                             className={`mb-2 ${formErrors.udid_no ? 'is-invalid' : ''}`}
                                             required /><br />
 
@@ -1739,8 +1845,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="disability_no"
-                                            value={formData.disability_no}
-                                            onChange={handleInputChange}
+                                            value={editData.disability_no}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -1753,8 +1859,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="voter_id"
-                                            value={formData.voter_id}
-                                            onChange={handleInputChange}
+                                            value={editData.voter_id}
+                                            onChange={handleInputChange1}
                                             className={`mb-2 ${formErrors.voter_id ? 'is-invalid' : ''}`}
                                             required />
 
@@ -1867,8 +1973,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="bank_name"
-                                            value={formData.bank_name}
-                                            onChange={handleInputChange}
+                                            value={editData.bank_name}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -1881,8 +1987,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="number"
                                             name="account_no"
-                                            value={formData.account_no}
-                                            onChange={handleInputChange}
+                                            value={editData.account_no}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -1895,8 +2001,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="ifsc_code"
-                                            value={formData.ifsc_code}
-                                            onChange={handleInputChange}
+                                            value={editData.ifsc_code}
+                                            onChange={handleInputChange1}
                                             className={`mb-2 ${formErrors.ifsc_code ? 'is-invalid' : ''}`}
                                             required
                                         />
@@ -2008,8 +2114,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="insurance_provider"
-                                            value={formData.insurance_provider}
-                                            onChange={handleInputChange}
+                                            value={editData.insurance_provider}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -2022,8 +2128,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="policy_no"
-                                            value={formData.policy_no}
-                                            onChange={handleInputChange}
+                                            value={editData.policy_no}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -2036,8 +2142,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="validity_period"
-                                            value={formData.validity_period}
-                                            onChange={handleInputChange}
+                                            value={editData.validity_period}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -2050,8 +2156,8 @@ function Essential_record() {
                                         <Form.Control
                                             type="text"
                                             name="other_gvt_scheme"
-                                            value={formData.other_gvt_scheme}
-                                            onChange={handleInputChange}
+                                            value={editData.other_gvt_scheme}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>

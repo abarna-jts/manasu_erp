@@ -535,7 +535,7 @@ function Nurse_Record_sheet() {
                                     <Form.Group className="mb-3" controlId="formResidentName">
                                         <Form.Label>Pulse <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
-                                            type="number"
+                                            type="text"
                                             name="pulse"
                                             value={formData.pulse}
                                             onChange={handleInputChange}
@@ -721,7 +721,7 @@ function Nurse_Record_sheet() {
                                     <Form.Group className="mb-3" controlId="formResidentName">
                                         <Form.Label>Pulse <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Form.Control
-                                            type="number"
+                                            type="text"
                                             name="pulse"
                                             value={formState.pulse}
                                             onChange={handleInputChange1}

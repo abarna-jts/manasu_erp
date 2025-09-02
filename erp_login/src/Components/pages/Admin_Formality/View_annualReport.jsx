@@ -247,6 +247,7 @@ function View_annualReport() {
                     outing_rescue_count: '',
                     outing_report: '',
                 });
+                fetchEventReport();
             } else {
                 alert('Error Updating form.');
             }

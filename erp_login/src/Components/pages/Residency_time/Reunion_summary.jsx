@@ -29,7 +29,7 @@ function Reunion_summary() {
     const [previewRequested, setPreviewRequested] = useState(false);
     const [files, setFiles] = useState('');
     const [rescueImage, setRescueImage] = useState(null);
-    const [rescueName, setRescueName] = useState("");
+    const [rescue_name, setRescueName] = useState("");
     const [error, setError] = useState("");
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -164,7 +164,7 @@ function Reunion_summary() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -174,7 +174,7 @@ function Reunion_summary() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -252,7 +252,7 @@ function Reunion_summary() {
 
         const data = new FormData();
         data.append('admission_no', admission_no);
-        data.append('rescue_name', formData.rescue_name);
+        data.append('rescue_name', rescue_name || formData.rescue_name);
         data.append('date', formData.date);
         data.append('summary_attach', files.summary_attach);
         data.append('report', formData.report);
@@ -330,14 +330,14 @@ function Reunion_summary() {
                 try {
                     const parsed = JSON.parse(data.summary_attach);
                     if (Array.isArray(parsed)) {
-                        summaryAttachPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        summaryAttachPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Summary Attachment:', err);
                     // Fallback: comma-separated string
                     summaryAttachPath = data.summary_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -462,7 +462,7 @@ function Reunion_summary() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -470,7 +470,7 @@ function Reunion_summary() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -559,11 +559,11 @@ function Reunion_summary() {
                         {rescueImage && (
                             <div>
                                 <img
-                                    alt={rescueName || "Rescue Image"}
+                                    alt={rescue_name || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}
                                 />
-                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                {rescue_name && <h6 className="mb-2">{rescue_name}</h6>}
                             </div>
                         )}
                     </Col>
@@ -636,7 +636,7 @@ function Reunion_summary() {
                                                 <Form.Control
                                                     type="text"
                                                     name="rescue_name"
-                                                    value={formData.rescue_name}
+                                                    value={rescue_name || formData.rescue_name}
                                                     onChange={handleChange}
                                                     required />
                                             </Col>

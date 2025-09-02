@@ -1479,7 +1479,7 @@ function Prescription_form() {
                                         Age:
                                     </Form.Label>
                                     <Col sm="6">
-                                        <Form.Control type='number'
+                                        <Form.Control type='text'
                                             placeholder='Age'
                                             name='age'
                                             value={viewData.age}

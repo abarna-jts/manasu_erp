@@ -3,6 +3,7 @@ import { Breadcrumb, Col, Container, Form, Row, Button } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import imageCompression from 'browser-image-compression';
 
 function Edit_ReunionChecklist() {
     const [formData, setFormData] = useState({
@@ -53,22 +54,80 @@ function Edit_ReunionChecklist() {
 
     });
 
-    const handleChange = (e) => {
-        const { name, type, files, value } = e.target;
+    // const handleChange = (e) => {
+    //     const { name, type, files, value } = e.target;
 
-        if (type === "file") {
-            // Convert FileList to Array
-            setFormData((prev) => ({
-                ...prev,
-                [name]: Array.from(files),
-            }));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
+    //     if (type === "file") {
+    //         // Convert FileList to Array
+    //         setFormData((prev) => ({
+    //             ...prev,
+    //             [name]: Array.from(files),
+    //         }));
+    //     } else {
+    //         setFormData((prev) => ({
+    //             ...prev,
+    //             [name]: value,
+    //         }));
+    //     }
+    // };
+
+    const handleChange = async (e) => {
+        const { name, value, files, type } = e.target;
+
+        if (e.target.type === 'file') {
+            const selectedFiles = Array.from(e.target.files);
+            if (!selectedFiles.length) return;
+            const options = {
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 1024,
+                useWebWorker: true,
+                fileType: "image/jpeg", // force JPEG output
+            };
+            try {
+                // Compress all images
+                const compressedFiles = await Promise.all(
+                    selectedFiles.map(async (file, idx) => {
+                        const compressed = await imageCompression(file, options);
+
+                        // ✅ Log original vs compressed
+                        console.log(`File ${idx + 1} Original:`, {
+                            name: file.name,
+                            size: (file.size / 1024).toFixed(2) + " KB",
+                            type: file.type,
+                        });
+                        console.log(`File ${idx + 1} Compressed:`, {
+                            name: `essential_${Date.now()}_${idx}.jpeg`,
+                            size: (compressed.size / 1024).toFixed(2) + " KB",
+                            type: compressed.type,
+                        });
+
+                        // Rename to avoid .blob
+                        const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                        return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                            type: compressed.type,
+                        });
+                    })
+                );
+                // setFormData(prev => ({
+                //     ...prev,
+                //     [name]: e.target.files, // Save entire FileList
+                // }));
+                setFormData((prev) => ({
+                    ...prev,
+                    [e.target.name]: compressedFiles // ✅ store compressed files
+                }));
+                console.log("✅ Final compressed files array:", compressedFiles);
+            } catch (e) {
+                console.error("Compression error:", e);
+            }
+
+        } else if (e.target.type === 'radio') {
+            setFormData((prevState) => ({
+                ...prevState,
                 [name]: value,
             }));
         }
-    };
+    }
 
 
     const { admission_no } = useParams();
@@ -384,8 +443,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.familyRequestLetterFile) && formData.familyRequestLetterFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.familyRequestLetterFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -400,16 +470,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -478,8 +546,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.selfDeclarationFile) && formData.selfDeclarationFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.selfDeclarationFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -494,16 +573,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -567,8 +644,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.mediaConsentFile) && formData.mediaConsentFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.mediaConsentFile.map((filePath, index) => {
-                                                            const fullUrl = `http://localhost:5002/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -583,16 +671,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -661,8 +747,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.familyIDproofFile) && formData.familyIDproofFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.familyIDproofFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -677,16 +774,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -748,8 +843,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.residentIDproofFile) && formData.residentIDproofFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.residentIDproofFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -764,16 +870,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -834,8 +938,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.aadharCardFile) && formData.aadharCardFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.aadharCardFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -850,16 +965,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -921,8 +1034,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.udidCardFile) && formData.udidCardFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.udidCardFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -937,16 +1061,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1007,8 +1129,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.disabilityCertificateFile) && formData.disabilityCertificateFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.disabilityCertificateFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1023,16 +1156,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1094,8 +1225,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.bankPassbookFile) && formData.bankPassbookFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.bankPassbookFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1110,16 +1252,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1180,8 +1320,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.healthInsuranceFile) && formData.healthInsuranceFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.healthInsuranceFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1196,16 +1347,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1272,8 +1421,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.medicalReportFile) && formData.medicalReportFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.medicalReportFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1288,22 +1448,21 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
                                                                 </a>
                                                             );
                                                         })}
+
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted">Null</div>
@@ -1358,8 +1517,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.dischargeSummaryFile) && formData.dischargeSummaryFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.dischargeSummaryFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1374,16 +1544,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1444,9 +1612,20 @@ function Edit_ReunionChecklist() {
                                             <Col md="4" className='d-flex'>
                                                 {Array.isArray(formData.medicationsFile) && formData.medicationsFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
-                                                        {formData.medicationsFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                        {formData.mediaConsentFile.map((filePath, index) => {
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1461,16 +1640,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1535,8 +1712,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.ClothesFile) && formData.ClothesFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.ClothesFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1551,16 +1739,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1622,8 +1808,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.possessionsRecoveredFile) && formData.possessionsRecoveredFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.possessionsRecoveredFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1638,16 +1835,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1708,8 +1903,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.dischargeAllowanceFile) && formData.dischargeAllowanceFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.dischargeAllowanceFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1724,16 +1930,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1794,8 +1998,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.travelExpensesFile) && formData.travelExpensesFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.travelExpensesFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1810,16 +2025,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1880,8 +2093,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.copyOfdischargeSummaryFile) && formData.copyOfdischargeSummaryFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.copyOfdischargeSummaryFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1896,16 +2120,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -1971,8 +2193,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.travelSafetyLetterFile) && formData.travelSafetyLetterFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.travelSafetyLetterFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -1987,16 +2220,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -2057,8 +2288,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.reunionPhotoFile) && formData.reunionPhotoFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.reunionPhotoFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -2073,16 +2315,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}
@@ -2148,8 +2388,19 @@ function Edit_ReunionChecklist() {
                                                 {Array.isArray(formData.witnessSignatureFile) && formData.witnessSignatureFile.length > 0 ? (
                                                     <div className="mt-2 d-flex align-items-center justify-content-between">
                                                         {formData.witnessSignatureFile.map((filePath, index) => {
-                                                            const fullUrl = `https://www.pahrultours.com/app2/${filePath}`;
-                                                            const filename = filePath?.split('/').pop();
+                                                            let filename;
+                                                            let fullUrl;
+
+                                                            if (typeof filePath === "string") {
+                                                                // case: filePath is a string URL from backend
+                                                                filename = filePath.split("/").pop();
+                                                                fullUrl = `http://localhost:5002/${filePath}`;
+                                                            } else if (filePath instanceof File) {
+                                                                // case: filePath is a File object from file input
+                                                                filename = filePath.name;
+                                                                fullUrl = URL.createObjectURL(filePath);
+                                                            }
+
                                                             return (
                                                                 <a
                                                                     key={index}
@@ -2164,16 +2415,14 @@ function Edit_ReunionChecklist() {
                                                                             .then((res) => res.blob())
                                                                             .then((blob) => {
                                                                                 const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
+                                                                                const a = document.createElement("a");
                                                                                 a.href = url;
-                                                                                a.download = filename || 'image.jpg';
+                                                                                a.download = filename || "image.jpg";
                                                                                 a.click();
                                                                                 window.URL.revokeObjectURL(url);
-
-                                                                                // Open in new tab after download
-                                                                                window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                                                                                window.open(fullUrl, "_blank", "noopener,noreferrer");
                                                                             })
-                                                                            .catch(() => alert('Download failed.'));
+                                                                            .catch(() => alert("Download failed."));
                                                                     }}
                                                                 >
                                                                     View {index + 1}

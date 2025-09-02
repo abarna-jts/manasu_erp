@@ -377,9 +377,17 @@ const updateEssentialRecords = async (req, res) => {
             ? req.files['form7_attach'].map((f) => `uploads/Rescue_Images/${f.filename}`)
             : null;
 
+        const newAadharCardAttach = req.files['attach_aadhar']
+            ? req.files['attach_aadhar'].map((f) => `uploads/Rescue_Images/${f.filename}`)
+            : null;
+
+        const newUdidForm7Attach = req.files['udid_attach']
+            ? req.files['udid_attach'].map((f) => `uploads/Rescue_Images/${f.filename}`)
+            : null;
+
         // Get existing file paths
         const [selectRows] = await db.query(
-            "SELECT bank_passbook, form7_attach FROM essential_records WHERE admission_no = ?",
+            "SELECT bank_passbook, form7_attach, attach_aadhar, udid_attach FROM essential_records WHERE admission_no = ?",
             [admission_no]
         );
 
@@ -388,8 +396,10 @@ const updateEssentialRecords = async (req, res) => {
         }
 
         const existingBankPassbook = selectRows[0]?.bank_passbook;
-
         const existingForm7Attach = selectRows[0]?.form7_attach;
+        const existingAadharAttach = selectRows[0]?.attach_aadhar;
+        const existingUdidAttach = selectRows[0]?.udid_attach;
+
         const finalForm7Attach = newForm7Attach
             ? JSON.stringify(newForm7Attach)
             : existingForm7Attach;
@@ -398,11 +408,21 @@ const updateEssentialRecords = async (req, res) => {
             ? JSON.stringify(newBankPassbook)
             : existingBankPassbook;
 
+        const finalAadharAttach = newAadharCardAttach
+            ? JSON.stringify(newAadharCardAttach)
+            : existingAadharAttach;
+
+        const finalUDIDForm = newUdidForm7Attach
+            ? JSON.stringify(newUdidForm7Attach)
+            : existingUdidAttach;
+
         const updateQuery = `
           UPDATE essential_records SET 
             rescue_name = ?, 
             aadhar_card = ?, 
-            udid_no = ?, 
+            udid_no = ?,
+            attach_aadhar = ?,
+            udid_attach = ?, 
             disability_no = ?,
             voter_id = ?,
             form_7 = ?,
@@ -421,6 +441,8 @@ const updateEssentialRecords = async (req, res) => {
             rescue_name,
             aadhar_card,
             udid_no,
+            finalAadharAttach,
+            finalUDIDForm,
             disability_no,
             voter_id,
             form_7,
@@ -456,6 +478,22 @@ const updateEssentialRecords = async (req, res) => {
                 await fs.unlink(existingForm7Attach);
             } catch (fsErr) {
                 console.warn("Failed to delete old form 7 attachment:", fsErr.message);
+            }
+        }
+
+        if (newAadharCardAttach && existingAadharAttach && existingAadharAttach !== newAadharCardAttach) {
+            try {
+                await fs.unlink(existingAadharAttach);
+            } catch (fsErr) {
+                console.warn("Failed to delete old Aadhar Card attachment:", fsErr.message);
+            }
+        }
+
+        if (newUdidForm7Attach && existingUdidAttach && existingUdidAttach !== newUdidForm7Attach) {
+            try {
+                await fs.unlink(existingUdidAttach);
+            } catch (fsErr) {
+                console.warn("Failed to delete old Udid attachment:", fsErr.message);
             }
         }
 
@@ -750,7 +788,7 @@ const createCommunityReport = async (req, res) => {
             community_rescue_count,
             community_report,
         ]
-            
+
 
         const [result] = await db.query(q, values);
 
@@ -1765,15 +1803,15 @@ const updateEventDetail = async (req, res) => {
 
         const EventPath = req.files['event_photos']
             ? req.files['event_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
-            : null;
+            : JSON.parse(existing[0].event_photos || "[]");
 
         const AwarnessPath = req.files['awarness_photos']
             ? req.files['awarness_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
-            : null;
+            : JSON.parse(existing[0].awarness_photos || "[]");
 
         const OutingPath = req.files['outing_photos']
             ? req.files['outing_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
-            : null;
+            : JSON.parse(existing[0].outing_photos || "[]");
 
         // const EventPath = req.files['event_photos']
         //     ? req.files['event_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
@@ -1865,9 +1903,18 @@ const updateCelebrationDetail = async (req, res) => {
             return res.status(400).json({ message: "Missing ID" });
         }
 
+        const [existing] = await db.query("SELECT celebration_photos FROM celebration_report WHERE id = ?", [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: "No record found with provided ID" });
+        }
+
+        // const celebrationPath = req.files['celebration_photos']
+        //     ? req.files['celebration_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+        //     : null;
+
         const celebrationPath = req.files['celebration_photos']
-            ? req.files['celebration_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
-            : null;
+            ? req.files['celebration_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
+            : JSON.parse(existing[0].celebration_photos || "[]");
 
         const usquery = `UPDATE celebration_report SET
                     celebration_name = ?,
@@ -1917,9 +1964,18 @@ const updateProgrambyID = async (req, res) => {
             return res.status(400).json({ message: "Missing ID" });
         }
 
+        const [existing] = await db.query("SELECT programms_photos FROM community_report WHERE id = ?", [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: "No record found with provided ID" });
+        }
+
+        // const CommunityPhotoPath = req.files['programms_photos']
+        //     ? req.files['programms_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+        //     : null;
+
         const CommunityPhotoPath = req.files['programms_photos']
-            ? req.files['programms_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
-            : null;
+            ? req.files['programms_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
+            : JSON.parse(existing[0].programms_photos || "[]");
 
         const usquery = `UPDATE community_report SET
                     community_name = ?,
@@ -1970,9 +2026,18 @@ const updateStaffProgrambyID = async (req, res) => {
             return res.status(400).json({ message: "Missing ID" });
         }
 
+        const [existing] = await db.query("SELECT staff_photos FROM staff_report WHERE id = ?", [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: "No record found with provided ID" });
+        }
+
+        // const StaffPhotoPath = req.files['staff_photos']
+        //     ? req.files['staff_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
+        //     : null;
+
         const StaffPhotoPath = req.files['staff_photos']
-            ? req.files['staff_photos'].map(f => `uploads/Event_Photos/${f.filename}`)
-            : null;
+            ? req.files['staff_photos'].map((f) => `uploads/Event_Photos/${f.filename}`)
+            : JSON.parse(existing[0].staff_photos || "[]");
 
         const usquery = `UPDATE staff_report SET
                     staff_name = ?,

@@ -17,13 +17,28 @@ function Formality_declaration() {
     const [previewRequested, setPreviewRequested] = useState(false);
     const [error, setError] = useState("");
     const [rescueImage, setRescueImage] = useState(null);
-    const [rescueName, setRescueName] = useState("");
+    const [rescue_name, setRescueName] = useState("");
+    const [age, setAge] = useState("");
 
     const userType = Cookies.get('usertype');
 
     const handleClose = () => setShow(false);
 
     const [formData, setFormData] = useState({
+        admission_no: '',
+        rescue_name: '',
+        age: '',
+        medicine_provided: '',
+        toiletries_provided: '',
+        dress_provided: '',
+        travel_expenses: '',
+        welfare_expenses: '',
+        medical_prescription: '',
+        discharge_summary: '',
+        travel_letter: ''
+    })
+
+    const [editData, setEditData] = useState({
         admission_no: '',
         rescue_name: '',
         age: '',
@@ -45,9 +60,18 @@ function Formality_declaration() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleInputChange1 = (e) => {
+        setEditData({ ...editData, [e.target.name]: e.target.value });
+    };
+
     const handleCheckChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleCheckChange1 = (e) => {
+        const { name, value } = e.target;
+        setEditData((prev) => ({ ...prev, [name]: value }));
     };
 
     const fetchRescueDetails = async (admission_no) => {
@@ -82,21 +106,25 @@ function Formality_declaration() {
                 if (imagePath) {
                     setRescueImage(imagePath);
                     setRescueName(result.rescue_name || "");
+                    setAge(result.age || "");
                     setError("");
                 } else {
                     setRescueImage(null);
                     setRescueName("");
+                    setAge("");
                     setError("Image not found for this admission number");
                 }
             } else {
                 setRescueImage(null);
                 setRescueName("");
+                setAge("");
                 setError("Image not found for this admission number");
             }
         } catch (error) {
             console.error("Error fetching data", error);
             setRescueImage(null);
             setRescueName("");
+            setAge("");
             setError("Admission Number Not found");
         }
     };
@@ -195,7 +223,9 @@ function Formality_declaration() {
         console.log("Trimmed Admission No:", trimmedAdNo);
         const payload = {
             ...formData,
-            admission_no
+            admission_no,
+            rescue_name: rescue_name,
+            age: age
         }
         try {
             const res = await apiRoute.post('/formality/createDeclaration', payload);
@@ -214,6 +244,8 @@ function Formality_declaration() {
                 travel_letter: ''
             })
             setAdmissionNumber("");
+            setRescueName("");
+            setAge("");
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
                 alert(err.response.data.message);
@@ -310,8 +342,8 @@ function Formality_declaration() {
             const response = await apiRoute.get(`/formality/getFormalityForm/${admission_no}`);
             const data = response.data;
 
-            setFormData((formData) => ({
-                ...formData,
+            setEditData((editData) => ({
+                ...editData,
                 rescue_name: data.rescue_name || '',
                 age: data.age || '',
                 admission_no: data.admission_no || '',
@@ -335,12 +367,12 @@ function Formality_declaration() {
     const handleUpdate = async (e, admission_no) => {
         e.preventDefault();
         try {
-            const response = await apiRoute.put(`/formality/updateFormalityForm/${admission_no}`, formData);
+            const response = await apiRoute.put(`/formality/updateFormalityForm/${admission_no}`, editData);
             console.log(response.data);
             if (response.status === 200) {
                 alert('Form Updated successfully!');
                 handleClose(true);
-                setFormData({
+                setEditData({
                     admission_no: '',
                     rescue_name: '',
                     age: '',
@@ -354,6 +386,8 @@ function Formality_declaration() {
                     travel_letter: ''
                 })
                 setAdmissionNumber("");
+                setRescueName("");
+                setAge("");
             } else {
                 alert('Error Updating form.');
             }
@@ -362,18 +396,7 @@ function Formality_declaration() {
             alert('There was an error Updating the form.');
         }
     };
-
-    const handleDelete = async (admission_no) => {
-        alert("Are you sure want to delete");
-        try {
-            const response = await apiRoute.delete(`/formality/deleteFormalityForm/${admission_no}`);
-            console.log(response);
-            alert("Self Declaration Form Deleted successfully");
-        } catch (error) {
-            console.error('Failed to delete item:', error);
-        }
-    };
-
+    
 
     return (
         <>
@@ -400,11 +423,11 @@ function Formality_declaration() {
 
                                 <img
 
-                                    alt={rescueName || "Rescue Image"}
+                                    alt={rescue_name || "Rescue Image"}
                                     style={{ width: "100px", height: "100px" }}
                                     src={rescueImage}
                                 />
-                                {rescueName && <h6 className="mb-2">{rescueName}</h6>}
+                                {rescue_name && <h6 className="mb-2">{rescue_name}</h6>}
                             </div>
                         )}
                     </Col>
@@ -449,15 +472,15 @@ function Formality_declaration() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {/* {userType === "2" && (
-                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                        {userType === "2" && (
+                            <button type="button" className="btn btn-danger mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
                                 } else {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )} */}
+                        )}
                     </Form.Group>
                 </Form>
                 <Row className='d-flex align-items-center justify-content-center'>
@@ -473,7 +496,7 @@ function Formality_declaration() {
                                             <Form.Control
                                                 type="text"
                                                 name="rescue_name"
-                                                value={formData.rescue_name}
+                                                value={rescue_name || formData.rescue_name}
                                                 onChange={handleInputChange}
                                                 required />
                                         </Col>
@@ -486,7 +509,7 @@ function Formality_declaration() {
                                             <Form.Control
                                                 type="text"
                                                 name="age"
-                                                value={formData.age}
+                                                value={age || formData.age}
                                                 onChange={handleInputChange}
                                                 required />
                                         </Col>
@@ -956,8 +979,8 @@ function Formality_declaration() {
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
-                                            value={formData.rescue_name}
-                                            onChange={handleInputChange}
+                                            value={editData.rescue_name}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -969,8 +992,8 @@ function Formality_declaration() {
                                         <Form.Control
                                             type="text"
                                             name="age"
-                                            value={formData.age}
-                                            onChange={handleInputChange}
+                                            value={editData.age}
+                                            onChange={handleInputChange1}
                                             required />
                                     </Col>
                                 </Form.Group>
@@ -984,15 +1007,15 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="medicine_provided"
                                             value="Yes"
-                                            checked={formData.medicine_provided === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.medicine_provided === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="medicine_provided"
-                                            checked={formData.medicine_provided === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.medicine_provided === 'No'}
+                                            onChange={handleCheckChange1}
                                             value="No"
                                         />
                                     </Col>
@@ -1007,16 +1030,16 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="toiletries_provided"
                                             value="Yes"
-                                            checked={formData.toiletries_provided === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.toiletries_provided === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="toiletries_provided"
                                             value="No"
-                                            checked={formData.toiletries_provided === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.toiletries_provided === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -1030,16 +1053,16 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="dress_provided"
                                             value="Yes"
-                                            checked={formData.dress_provided === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.dress_provided === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="dress_provided"
                                             value="No"
-                                            checked={formData.dress_provided === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.dress_provided === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -1054,16 +1077,16 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="travel_expenses"
                                             value="Yes"
-                                            checked={formData.travel_expenses === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.travel_expenses === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="travel_expenses"
                                             value="No"
-                                            checked={formData.travel_expenses === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.travel_expenses === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -1077,16 +1100,16 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="welfare_expenses"
                                             value="Yes"
-                                            checked={formData.welfare_expenses === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.welfare_expenses === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="welfare_expenses"
                                             value="No"
-                                            checked={formData.welfare_expenses === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.welfare_expenses === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -1100,16 +1123,16 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="medical_prescription"
                                             value="Yes"
-                                            checked={formData.medical_prescription === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.medical_prescription === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="medical_prescription"
                                             value="No"
-                                            checked={formData.medical_prescription === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.medical_prescription === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -1123,16 +1146,16 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="discharge_summary"
                                             value="Yes"
-                                            checked={formData.discharge_summary === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.discharge_summary === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="discharge_summary"
                                             value="No"
-                                            checked={formData.discharge_summary === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.discharge_summary === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -1146,16 +1169,16 @@ function Formality_declaration() {
                                             label="Yes"
                                             name="travel_letter"
                                             value="Yes"
-                                            checked={formData.travel_letter === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.travel_letter === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="travel_letter"
                                             value="No"
-                                            checked={formData.travel_letter === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={editData.travel_letter === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>

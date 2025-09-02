@@ -293,6 +293,7 @@ function Celebration_report() {
                     celebration_report: '',
                     celebration_rescue_count: ''
                 })
+                fetchCelebrationReport();
             } else {
                 alert('Error Updating form.');
             }

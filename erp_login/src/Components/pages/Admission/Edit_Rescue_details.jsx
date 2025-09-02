@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import imageCompression from 'browser-image-compression';
 
 function Edit_Rescue_details() {
   const [formData, setFormData] = useState({
@@ -196,12 +197,60 @@ function Edit_Rescue_details() {
     fetchDetails();
   }, [id]);
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: [...files] // store multiple files as array
-    }));
+  // const handleFileChange = (e) => {
+  //   const { name, files } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: [...files] 
+  //   }));
+  // };
+
+  const handleFileChange = async (event) => {
+    const selectedFiles = Array.from(event.target.files);
+    if (!selectedFiles.length) return;
+
+    const options = {
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 1024,
+      useWebWorker: true,
+      fileType: "image/jpeg", // force JPEG output
+    };
+
+    try {
+      // Compress all images
+      const compressedFiles = await Promise.all(
+        selectedFiles.map(async (file, idx) => {
+          const compressed = await imageCompression(file, options);
+
+          // ✅ Log original vs compressed
+          console.log(`File ${idx + 1} Original:`, {
+            name: file.name,
+            size: (file.size / 1024).toFixed(2) + " KB",
+            type: file.type,
+          });
+          console.log(`File ${idx + 1} Compressed:`, {
+            name: `essential_${Date.now()}_${idx}.jpeg`,
+            size: (compressed.size / 1024).toFixed(2) + " KB",
+            type: compressed.type,
+          });
+
+          // Rename to avoid .blob
+          const ext = compressed.type.split("/")[1]; // e.g. jpeg
+          return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+            type: compressed.type,
+          });
+        })
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        [event.target.name]: compressedFiles // ✅ store compressed files
+      }));
+
+      console.log("✅ Final compressed files array:", compressedFiles);
+    } catch (e) {
+      console.error("Compression error:", e);
+    }
   };
 
 
@@ -342,766 +391,835 @@ function Edit_Rescue_details() {
         <Row >
           <Col md={12}>
             <Form onSubmit={handleSubmit}>
-              <Row>
-                <Col md={8}>
-                  <h5 className="pdfsub_heading">Rescue Details:</h5>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
-                    <Form.Label column sm="4">
-                      Rescued / Referred by :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="referred_by"
-                        type="text"
-                        value={formData.referred_by}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
-                    <Form.Label column sm="4">
-                      Taken From (Rescue Place) :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="from_place"
-                        type='text'
-                        value={formData.from_place}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
+              <Row className='d-flex align-items-start justify-content-between'>
+                <div className="first_column col-md-8">
+                  <Col md={12}>
+                    <h5 className="pdfsub_heading">Rescue Details:</h5>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">
+                      <Form.Label column sm="4">
+                        Rescued / Referred by :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="referred_by"
+                          type="text"
+                          value={formData.referred_by}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formTakenFrom">
+                      <Form.Label column sm="4">
+                        Taken From (Rescue Place) :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="from_place"
+                          type='text'
+                          value={formData.from_place}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
 
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
-                    <Form.Label column sm="4">
-                      Date & Time :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="date_time"
-                        type='datetime-local'
-                        max={new Date().toISOString().slice(0, 16)}
-                        value={formatDateTimeLocal(formData.date_time)}// Make sure `rescueDate` is a valid date string
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formDateTime">
+                      <Form.Label column sm="4">
+                        Date & Time :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="date_time"
+                          type='datetime-local'
+                          max={new Date().toISOString().slice(0, 16)}
+                          value={formatDateTimeLocal(formData.date_time)}// Make sure `rescueDate` is a valid date string
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
 
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
-                    <Form.Label column sm="4">
-                      Police Memo :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="police_memo"
-                        type='text'
-                        value={formData.police_memo}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
+                      <Form.Label column sm="4">
+                        Police Memo :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="police_memo"
+                          type='text'
+                          value={formData.police_memo}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
 
-                  <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">
-                    <Form.Label column sm="4">
-                      Copy of Police Memo :
-                    </Form.Label>
-                    <Col sm="8 d-flex flex-row align-items-center">
+                    <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">
+                      <Form.Label column sm="4">
+                        Copy of Police Memo :
+                      </Form.Label>
+                      <Col sm="8 d-flex flex-row align-items-center">
 
-                      {Array.isArray(files.attach_policeMemo) &&
-                        files.attach_policeMemo.map((imgUrl, index) => {
-                          const filename = `attach_policeMemo${index}.jpg`;
+                        {Array.isArray(files.attach_policeMemo) &&
+                          files.attach_policeMemo.map((imgUrl, index) => {
+                            const filename = `attach_policeMemo${index}.jpg`;
 
-                          return (
-                            <div
-                              key={index}
-                              className="image-container"
-                              style={{
-                                position: "relative",
-                                width: "200px",
-                                height: "100px",
-                                margin: "10px",
-                                padding: "0px",
-                                display: "inline-block",
-                              }}
-                            >
-                              <img
-                                src={imgUrl}
-                                alt={`attach_policeMemo - ${index}`}
-                                loading="lazy"
+                            return (
+                              <div
+                                key={index}
+                                className="image-container"
                                 style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "4px",
+                                  position: "relative",
+                                  width: "200px",
+                                  height: "100px",
+                                  margin: "10px",
+                                  padding: "0px",
+                                  display: "inline-block",
                                 }}
-                                onError={(e) => {
-                                  if (!e.target.dataset.errorHandled) {
-                                    e.target.src = "/fallback-image.png";
-                                    e.target.dataset.errorHandled = "true";
-                                  }
-                                }}
-                              />
-
-                              <div className="image-overlay">
-                                {/* View icon */}
-                                <a
-                                  href={imgUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="View Image"
-                                  className="icon-button"
-                                >
-                                  <i className="fas fa-eye"></i>
-                                </a>
-
-                                {/* Download icon */}
-                                <button
-                                  title="Download Image"
-                                  className="icon-button"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    fetch(imgUrl, { mode: "cors" })
-                                      .then((res) => res.blob())
-                                      .then((blob) => {
-                                        const url = window.URL.createObjectURL(blob);
-                                        const a = document.createElement("a");
-                                        a.href = url;
-                                        a.download = filename;
-                                        a.click();
-                                        window.URL.revokeObjectURL(url);
-                                      })
-                                      .catch(() => alert("Download failed."));
+                              >
+                                <img
+                                  src={imgUrl}
+                                  alt={`attach_policeMemo - ${index}`}
+                                  loading="lazy"
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px",
                                   }}
-                                >
-                                  <i className="fas fa-download"></i>
-                                </button>
+                                  onError={(e) => {
+                                    if (!e.target.dataset.errorHandled) {
+                                      e.target.src = "/fallback-image.png";
+                                      e.target.dataset.errorHandled = "true";
+                                    }
+                                  }}
+                                />
+
+                                <div className="image-overlay">
+                                  {/* View icon */}
+                                  <a
+                                    href={imgUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="View Image"
+                                    className="icon-button"
+                                  >
+                                    <i className="fas fa-eye"></i>
+                                  </a>
+
+                                  {/* Download icon */}
+                                  <button
+                                    title="Download Image"
+                                    className="icon-button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      fetch(imgUrl, { mode: "cors" })
+                                        .then((res) => res.blob())
+                                        .then((blob) => {
+                                          const url = window.URL.createObjectURL(blob);
+                                          const a = document.createElement("a");
+                                          a.href = url;
+                                          a.download = filename;
+                                          a.click();
+                                          window.URL.revokeObjectURL(url);
+                                        })
+                                        .catch(() => alert("Download failed."));
+                                    }}
+                                  >
+                                    <i className="fas fa-download"></i>
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
 
-                      <Form.Control
-                        type="file"
-                        name="attach_policeMemo"
-                        multiple
-                        accept=".jpg,.jpeg,.png"
-                        onChange={handleFileChange}
-                      />
-                    </Col>
-                  </Form.Group>
-
+                        <Form.Control
+                          type="file"
+                          name="attach_policeMemo"
+                          multiple
+                          accept=".jpg,.jpeg,.png"
+                          onChange={handleFileChange}
+                        />
+                      </Col>
+                    </Form.Group>
 
 
 
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceStation">
-                    <Form.Label column sm="4">
-                      Police Station :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="police_station"
-                        type='text'
-                        value={formData.police_station}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
 
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
-                    <Form.Label column sm="4">
-                      Information from Public / Spot :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="information_public"
-                        type='text'
-                        value={formData.information_public}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                </Col>
-                <Col md={4}>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceStation">
+                      <Form.Label column sm="4">
+                        Police Station :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="police_station"
+                          type='text'
+                          value={formData.police_station}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
 
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formAdmissionNo">
-                    <Form.Label column sm="5">
-                      Admission Date :
-                    </Form.Label>
-                    <Col sm="7">
-                      <Form.Control
-                        name="admission_date"
-                        type='date'
-                        value={formatDateOnly(formData.admission_date)}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                    <Form.Label column sm="5">
-                      Admission Number :
-                    </Form.Label>
-                    <Col sm="7">
-                      <Form.Control
-                        name="admission_no"
-                        type='number'
-                        value={formData.admission_no}
-                        onChange={handleInputChange}
-                      />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">
-                    <Form.Label column sm="5">
-                      Rescue Image :
-                    </Form.Label>
-                    <Col sm="7 d-flex flex-column align-items-center">
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                      <Form.Label column sm="4">
+                        Information from Public / Spot :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="information_public"
+                          type='text'
+                          value={formData.information_public}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                  </Col>
 
-                      {Array.isArray(files.rescue_image) &&
-                        files.rescue_image.map((imgUrl, index) => {
-                          const filename = `rescue_image${index}.jpg`;
+                  <Col md={12}>
+                    <h5 className="pdfsub_heading">Resident's Details:</h5>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formRescueName">
+                      <Form.Label column sm="4">
+                        Name at the time of Rescue :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="rescue_name"
+                          type='text'
+                          value={formData.rescue_name}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formAge">
+                      <Form.Label column sm="4">
+                        Approximate age :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="age"
+                          type='text'
+                          value={formData.age}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
 
-                          return (
-                            <div
-                              key={index}
-                              className="image-container"
-                              style={{
-                                position: "relative",
-                                width: "100px",
-                                height: "100px",
-                                margin: "10px",
-                                padding: "0px",
-                                display: "inline-block",
-                              }}
+                    <Row className="d-flex mb-1">
+                      <Col md={7}>
+                        <Form.Group as={Row} className="mb-1 text-start" controlId="formStatus">
+                          <Form.Label column sm="7">
+                            Status :
+                          </Form.Label>
+                          <Col sm="5">
+                            <Form.Select
+                              name="rescue_status"
+                              value={formData.rescue_status}
+                              onChange={handleInputChange}
+                              required
                             >
-                              <img
-                                src={imgUrl}
-                                alt={`rescue_image - ${index}`}
-                                loading="lazy"
+                              <option value="">-- Select --</option>
+                              <option value="Single">Single</option>
+                              <option value="Married">Married</option>
+                            </Form.Select>
+                          </Col>
+                        </Form.Group>
+                      </Col>
+                      <Col md={5}>
+                        <Form.Group as={Row} className="mb-1 text-start" controlId="formReligion">
+                          <Form.Label column sm="6">
+                            Religion :
+                          </Form.Label>
+                          <Col sm="6">
+                            <Form.Control
+                              name="religion"
+                              type='text'
+                              value={formData.religion}
+                              onChange={handleInputChange}
+                              required />
+                          </Col>
+                        </Form.Group>
+                      </Col>
+
+
+                    </Row>
+                    <Form.Group as={Row} className="mb-2 text-start" controlId="formLanguage">
+                      <Form.Label column sm="4">Known Languages:</Form.Label>
+                      <Col sm="8" className="d-flex gap-2">
+                        <Form.Control
+                          type="text"
+                          placeholder="Language 1"
+                          value={formData.language1}
+                          onChange={(e) => setLanguage1(e.target.value)}
+                          required
+                        />
+                        <Form.Control
+                          type="text"
+                          placeholder="Language 2"
+                          value={formData.language2}
+                          onChange={(e) => setLanguage2(e.target.value)}
+                        />
+                        <Form.Control
+                          type="text"
+                          placeholder="Language 3"
+                          value={formData.language3}
+                          onChange={(e) => setLanguage3(e.target.value)}
+                        />
+                      </Col>
+                    </Form.Group>
+
+
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formEducation">
+                      <Form.Label column sm="4">
+                        Education :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="education"
+                          type='text'
+                          value={formData.education}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                  </Col>
+                  <Col md={12}>
+                    <h5 className="pdfsub_heading">Family Details:</h5>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formFather">
+                      <Form.Label column sm="4">
+                        Father :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="father"
+                          type='text'
+                          value={formData.father}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formMother">
+                      <Form.Label column sm="4">
+                        Mother :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="mother"
+                          type='text'
+                          value={formData.mother}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formanyother">
+                      <Form.Label column sm="4">
+                        Any other Relationship:
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="other_relation"
+                          type='text'
+                          value={formData.other_relation}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formPlace">
+                      <Form.Label column sm="4">
+                        Address :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="place"
+                          type='text'
+                          value={formData.place}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formContactNo">
+                      <Form.Label column sm="4">
+                        Contact Number :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="phone_no"
+                          type='text'
+                          value={formData.phone_no}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                  </Col>
+                  <Col md={12}>
+                    <h5 className="pdfsub_heading">Physical Appearance:</h5>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formClothing">
+                      <Form.Label column sm="4">
+                        Clothing :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="clothing"
+                          type='text'
+                          value={formData.clothing}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formDressColor">
+                      <Form.Label column sm="4">
+                        Dress Color :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="dress_code"
+                          type='text'
+                          value={formData.dress_code}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formComplexion">
+                      <Form.Label column sm="4">
+                        Complexion :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="complexion"
+                          type='text'
+                          value={formData.complexion}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formIdentificationMark">
+                      <Form.Label column sm="4">
+                        Indentification Mark :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="indentification_mark"
+                          type='text'
+                          value={formData.indentification_mark}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formTatoo">
+                      <Form.Label column sm="4">
+                        Tattoo :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="tattoo"
+                          type='text'
+                          value={formData.tattoo}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formWound">
+                      <Form.Label column sm="4">
+                        Any Wound/ infection :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="wound_infection"
+                          type='text'
+                          value={formData.wound_infection}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Row>
+
+                      <Col md={6}>
+                        <Form.Group as={Row} className="mb-1 text-start" controlId="formHeight">
+                          <Form.Label column sm="8">
+                            Height :
+                          </Form.Label>
+                          <Col sm="4">
+                            <Form.Control
+                              name="height"
+                              type='text'
+                              value={formData.height}
+                              onChange={handleInputChange}
+                              required />
+                          </Col>
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group as={Row} className="mb-1 text-start" controlId="formWeight">
+                          <Form.Label column sm="4">
+                            Weight :
+                          </Form.Label>
+                          <Col sm="8">
+                            <Form.Control
+                              name="weight"
+                              type='text'
+                              value={formData.weight}
+                              onChange={handleInputChange}
+                              required />
+                          </Col>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formThingsCarried">
+                      <Form.Label column sm="4">
+                        Things carried :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          name="things_carried"
+                          type='text'
+                          value={formData.things_carried}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formRemark">
+                      <Form.Label column sm="4">
+                        Remark :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          as="textarea"
+                          name="remark"
+                          type='text'
+                          value={formData.remark || 'null'}
+                          onChange={handleInputChange} />
+                      </Col>
+                    </Form.Group>
+                  </Col>
+                  <Col md={12}>
+                    <h5 className="pdfsub_heading">Initial Psychological Assessment:</h5>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formSymptoms">
+                      <Form.Label column sm="4">
+                        Mental status :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          as="textarea"
+                          name="mental_status"
+                          type='text'
+                          value={formData.mental_status}
+                          rows={2}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formIntimated">
+                      <Form.Label column sm="4">
+                        Cognitive Behavior :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          as="textarea"
+                          name="behaviour"
+                          type='text'
+                          value={formData.behaviour}
+                          rows={2}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                      <Form.Label column sm="4">
+                        Communication Ability :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          as="textarea"
+                          name="community_ability"
+                          type='text'
+                          value={formData.community_ability}
+                          rows={2}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                      <Form.Label column sm="4">
+                        Self-Care Capacity :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          as="textarea"
+                          name="self_careCapacity"
+                          type='text'
+                          value={formData.self_careCapacity}
+                          rows={2}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
+                      <Form.Label column sm="4">
+                        Diagnosis :
+                      </Form.Label>
+                      <Col sm="8">
+                        <Form.Control
+                          as="textarea"
+                          name="diagnosis"
+                          type='text'
+                          value={formData.diagnosis}
+                          rows={2}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                    </Form.Group>
+                  </Col>
+                </div>
+                <div className="second_column col-md-4">
+                  <Col md={12}>
+
+                    <Form.Group as={Row} className="mb-1 text-start" controlId="formAdmissionNo">
+                      <Form.Label column sm="5">
+                        Admission Date :
+                      </Form.Label>
+                      <Col sm="7">
+                        <Form.Control
+                          name="admission_date"
+                          type='date'
+                          value={formatDateOnly(formData.admission_date)}
+                          onChange={handleInputChange}
+                          required />
+                      </Col>
+                      <Form.Label column sm="5">
+                        Admission Number :
+                      </Form.Label>
+                      <Col sm="7">
+                        <Form.Control
+                          name="admission_no"
+                          type='number'
+                          value={formData.admission_no}
+                          onChange={handleInputChange}
+                        />
+                      </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} controlId="formFile" className="mb-3 text-start">
+                      <Form.Label column sm="5">
+                        Rescue Image :
+                      </Form.Label>
+                      <Col sm="7 d-flex align-items-center">
+
+                        {Array.isArray(files.rescue_image) &&
+                          files.rescue_image.map((imgUrl, index) => {
+                            const filename = `rescue_image${index}.jpg`;
+
+                            return (
+                              <div
+                                key={index}
+                                className="image-container"
                                 style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "4px",
+                                  position: "relative",
+                                  width: "100px",
+                                  height: "100px",
+                                  margin: "10px",
+                                  padding: "0px",
+                                  display: "inline-block",
                                 }}
-                                onError={(e) => {
-                                  if (!e.target.dataset.errorHandled) {
-                                    e.target.src = "/fallback-image.png";
-                                    e.target.dataset.errorHandled = "true";
-                                  }
-                                }}
-                              />
-
-                              <div className="image-overlay">
-                                {/* View icon */}
-                                <a
-                                  href={imgUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="View Image"
-                                  className="icon-button"
-                                >
-                                  <i className="fas fa-eye"></i>
-                                </a>
-
-                                {/* Download icon */}
-                                <button
-                                  title="Download Image"
-                                  className="icon-button"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    fetch(imgUrl, { mode: "cors" })
-                                      .then((res) => res.blob())
-                                      .then((blob) => {
-                                        const url = window.URL.createObjectURL(blob);
-                                        const a = document.createElement("a");
-                                        a.href = url;
-                                        a.download = filename;
-                                        a.click();
-                                        window.URL.revokeObjectURL(url);
-                                      })
-                                      .catch(() => alert("Download failed."));
+                              >
+                                <img
+                                  src={imgUrl}
+                                  alt={`rescue_image - ${index}`}
+                                  loading="lazy"
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px",
                                   }}
-                                >
-                                  <i className="fas fa-download"></i>
-                                </button>
+                                  onError={(e) => {
+                                    if (!e.target.dataset.errorHandled) {
+                                      e.target.src = "/fallback-image.png";
+                                      e.target.dataset.errorHandled = "true";
+                                    }
+                                  }}
+                                />
+
+                                <div className="image-overlay">
+                                  {/* View icon */}
+                                  <a
+                                    href={imgUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="View Image"
+                                    className="icon-button"
+                                  >
+                                    <i className="fas fa-eye"></i>
+                                  </a>
+
+                                  {/* Download icon */}
+                                  <button
+                                    title="Download Image"
+                                    className="icon-button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      fetch(imgUrl, { mode: "cors" })
+                                        .then((res) => res.blob())
+                                        .then((blob) => {
+                                          const url = window.URL.createObjectURL(blob);
+                                          const a = document.createElement("a");
+                                          a.href = url;
+                                          a.download = filename;
+                                          a.click();
+                                          window.URL.revokeObjectURL(url);
+                                        })
+                                        .catch(() => alert("Download failed."));
+                                    }}
+                                  >
+                                    <i className="fas fa-download"></i>
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
 
 
-                      <Form.Control
-                        type="file"
-                        name="rescue_image"
-                        accept=".jpg,.jpeg,.png"
-                        onChange={handleFileChange}
-                        multiple
-                      />
-                    </Col>
-                  </Form.Group>
 
-                  <Form.Group className="mb-3 text-start">
-                    <Form.Label column sm={12}>Government ID Type:</Form.Label>
-                    <Col sm={12}>
-                      <Form.Select
-                        name="govIdType"
-                        value={formData.govIdType}
-                        onChange={(e) =>
-                          setFormData({ ...formData, govIdType: e.target.value })
-                        }
-                        required>
-                        <option value="">Select ID Type</option>
-                        <option value="NA">Not Available</option>
-                        <option value="Aadhar">Aadhar Card</option>
-                        <option value="PAN">PAN Card</option>
-                        <option value="Voter">Voter ID</option>
-                        <option value="Driving">Driving License</option>
-                        <option value="Passport">Passport</option>
-                      </Form.Select>
-                    </Col>
-                  </Form.Group>
-
-                  {/* Show only if govIdType is not NA or empty */}
-                  {formData.govIdType !== 'NA' && formData.govIdType !== '' && (
-                    <>
-                      <Form.Control
-                        type="text"
-                        placeholder={`Enter ${formData.govIdType} number`}
-                        value={formData.govIdNumber}
-                        onChange={(e) =>
-                          setFormData({ ...formData, govIdNumber: e.target.value })
-                        }
-                      />
-
-
-                      <Form.Group className="mb-3 text-start">
-                        <Form.Label column sm={12}>Upload {formData.govIdType} File:</Form.Label>
-                        <Col sm={12}>
+                      </Col>
+                      <div className="d-flex align-items-end justify-content-end">
+                        <Col sm="7">
                           <Form.Control
                             type="file"
-                            accept=".pdf,image/*"
-                            onChange={(e) =>
-                              setFormData({ ...formData, govIdFile: e.target.files[0] })
-                            }
+                            name="rescue_image"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleFileChange}
                             multiple
                           />
-                          {Array.isArray(files.govIdFile) &&
-                            files.govIdFile.map((img, index) => (
-                              <img
-                                key={index}
-                                src={img}
-                                alt={`govIdFile ${index}`}
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = "/fallback-image.png";
-                                }}
-                                style={{
-                                  width: "100px",
-                                  height: "auto",
-                                  objectFit: "cover",
-                                  marginRight: "10px"
-                                }}
-                              />
-                            ))}
                         </Col>
-                      </Form.Group>
-                    </>
-                  )}
-
-                </Col>
-                <Col md={8}>
-                  <h5 className="pdfsub_heading">Resident's Details:</h5>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formRescueName">
-                    <Form.Label column sm="4">
-                      Name at the time of Rescue :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="rescue_name"
-                        type='text'
-                        value={formData.rescue_name}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formAge">
-                    <Form.Label column sm="4">
-                      Approximate age :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="age"
-                        type='text'
-                        value={formData.age}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-
-                  <Row className="d-flex mb-1">
-                    <Col md={7}>
-                      <Form.Group as={Row} className="mb-1 text-start" controlId="formStatus">
-                        <Form.Label column sm="7">
-                          Status :
-                        </Form.Label>
-                        <Col sm="5">
-                          <Form.Select
-                            name="rescue_status"
-                            value={formData.rescue_status}
-                            onChange={handleInputChange}
-                            required
-                          >
-                            <option value="">-- Select --</option>
-                            <option value="Single">Single</option>
-                            <option value="Married">Married</option>
-                          </Form.Select>
-                        </Col>
-                      </Form.Group>
-                    </Col>
-                    <Col md={5}>
-                      <Form.Group as={Row} className="mb-1 text-start" controlId="formReligion">
-                        <Form.Label column sm="6">
-                          Religion :
-                        </Form.Label>
-                        <Col sm="6">
-                          <Form.Control
-                            name="religion"
-                            type='text'
-                            value={formData.religion}
-                            onChange={handleInputChange}
-                            required />
-                        </Col>
-                      </Form.Group>
-                    </Col>
+                      </div>
 
 
-                  </Row>
-                  <Form.Group as={Row} className="mb-2 text-start" controlId="formLanguage">
-                    <Form.Label column sm="4">Known Languages:</Form.Label>
-                    <Col sm="8" className="d-flex gap-2">
-                      <Form.Control
-                        type="text"
-                        placeholder="Language 1"
-                        value={formData.language1}
-                        onChange={(e) => setLanguage1(e.target.value)}
-                        required
-                      />
-                      <Form.Control
-                        type="text"
-                        placeholder="Language 2"
-                        value={formData.language2}
-                        onChange={(e) => setLanguage2(e.target.value)}
-                      />
-                      <Form.Control
-                        type="text"
-                        placeholder="Language 3"
-                        value={formData.language3}
-                        onChange={(e) => setLanguage3(e.target.value)}
-                      />
-                    </Col>
-                  </Form.Group>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3 text-start">
+                      <Form.Label column sm={12}>Government ID Type:</Form.Label>
+                      <Col sm={12}>
+                        <Form.Select
+                          name="govIdType"
+                          value={formData.govIdType}
+                          onChange={(e) =>
+                            setFormData({ ...formData, govIdType: e.target.value })
+                          }
+                          required>
+                          <option value="">Select ID Type</option>
+                          <option value="NA">Not Available</option>
+                          <option value="Aadhar">Aadhar Card</option>
+                          <option value="PAN">PAN Card</option>
+                          <option value="Voter">Voter ID</option>
+                          <option value="Driving">Driving License</option>
+                          <option value="Passport">Passport</option>
+                        </Form.Select>
+                      </Col>
+                    </Form.Group>
+
+                    {/* Show only if govIdType is not NA or empty */}
+                    {formData.govIdType !== 'NA' && formData.govIdType !== '' && (
+                      <>
+                        <Form.Control
+                          type="text"
+                          placeholder={`Enter ${formData.govIdType} number`}
+                          value={formData.govIdNumber}
+                          onChange={(e) =>
+                            setFormData({ ...formData, govIdNumber: e.target.value })
+                          }
+                        />
 
 
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formEducation">
-                    <Form.Label column sm="4">
-                      Education :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="education"
-                        type='text'
-                        value={formData.education}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                </Col>
-                <Col md={8}>
-                  <h5 className="pdfsub_heading">Family Details:</h5>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formFather">
-                    <Form.Label column sm="4">
-                      Father :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="father"
-                        type='text'
-                        value={formData.father}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formMother">
-                    <Form.Label column sm="4">
-                      Mother :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="mother"
-                        type='text'
-                        value={formData.mother}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formanyother">
-                    <Form.Label column sm="4">
-                      Any other Relationship:
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="other_relation"
-                        type='text'
-                        value={formData.other_relation}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formPlace">
-                    <Form.Label column sm="4">
-                      Address :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="place"
-                        type='text'
-                        value={formData.place}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formContactNo">
-                    <Form.Label column sm="4">
-                      Contact Number :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="phone_no"
-                        type='text'
-                        value={formData.phone_no}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                </Col>
-                <Col md={8}>
-                  <h5 className="pdfsub_heading">Physical Appearance:</h5>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formClothing">
-                    <Form.Label column sm="4">
-                      Clothing :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="clothing"
-                        type='text'
-                        value={formData.clothing}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formDressColor">
-                    <Form.Label column sm="4">
-                      Dress Color :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="dress_code"
-                        type='text'
-                        value={formData.dress_code}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formComplexion">
-                    <Form.Label column sm="4">
-                      Complexion :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="complexion"
-                        type='text'
-                        value={formData.complexion}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formIdentificationMark">
-                    <Form.Label column sm="4">
-                      Indentification Mark :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="indentification_mark"
-                        type='text'
-                        value={formData.indentification_mark}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formTatoo">
-                    <Form.Label column sm="4">
-                      Tattoo :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="tattoo"
-                        type='text'
-                        value={formData.tattoo}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formWound">
-                    <Form.Label column sm="4">
-                      Any Wound/ infection :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="wound_infection"
-                        type='text'
-                        value={formData.wound_infection}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Row>
+                        <Form.Group className="mb-3 text-start">
+                          <Form.Label column sm={12}>Upload {formData.govIdType} File:</Form.Label>
+                          <Col sm={12}>
+                            <Form.Control
+                              type="file"
+                              accept=".pdf,image/*"
+                              onChange={(e) =>
+                                setFormData({ ...formData, govIdFile: Array.from(e.target.files) })
+                              }
 
-                    <Col md={6}>
-                      <Form.Group as={Row} className="mb-1 text-start" controlId="formHeight">
-                        <Form.Label column sm="8">
-                          Height :
-                        </Form.Label>
-                        <Col sm="4">
-                          <Form.Control
-                            name="height"
-                            type='text'
-                            value={formData.height}
-                            onChange={handleInputChange}
-                            required />
-                        </Col>
-                      </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                      <Form.Group as={Row} className="mb-1 text-start" controlId="formWeight">
-                        <Form.Label column sm="4">
-                          Weight :
-                        </Form.Label>
-                        <Col sm="8">
-                          <Form.Control
-                            name="weight"
-                            type='text'
-                            value={formData.weight}
-                            onChange={handleInputChange}
-                            required />
-                        </Col>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formThingsCarried">
-                    <Form.Label column sm="4">
-                      Things carried :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        name="things_carried"
-                        type='text'
-                        value={formData.things_carried}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formRemark">
-                    <Form.Label column sm="4">
-                      Remark :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        as="textarea"
-                        name="remark"
-                        type='text'
-                        value={formData.remark || 'null'}
-                        onChange={handleInputChange} />
-                    </Col>
-                  </Form.Group>
-                </Col>
-                <Col md={8}>
-                  <h5 className="pdfsub_heading">Initial Psychological Assessment:</h5>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formSymptoms">
-                    <Form.Label column sm="4">
-                      Mental status :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        as="textarea"
-                        name="mental_status"
-                        type='text'
-                        value={formData.mental_status}
-                        rows={2}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formIntimated">
-                    <Form.Label column sm="4">
-                      Cognitive Behavior :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        as="textarea"
-                        name="behaviour"
-                        type='text'
-                        value={formData.behaviour}
-                        rows={2}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
-                    <Form.Label column sm="4">
-                      Communication Ability :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        as="textarea"
-                        name="community_ability"
-                        type='text'
-                        value={formData.community_ability}
-                        rows={2}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
-                    <Form.Label column sm="4">
-                      Self-Care Capacity :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        as="textarea"
-                        name="self_careCapacity"
-                        type='text'
-                        value={formData.self_careCapacity}
-                        rows={2}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} className="mb-1 text-start" controlId="formInformation">
-                    <Form.Label column sm="4">
-                      Diagnosis :
-                    </Form.Label>
-                    <Col sm="8">
-                      <Form.Control
-                        as="textarea"
-                        name="diagnosis"
-                        type='text'
-                        value={formData.diagnosis}
-                        rows={2}
-                        onChange={handleInputChange}
-                        required />
-                    </Col>
-                  </Form.Group>
-                </Col>
+                              multiple
+                            />
+                            {Array.isArray(files.govIdFile) &&
+                              files.govIdFile.map((imgUrl, index) => {
+                                const filename = `govIdFile${index}.jpg`;
+
+                                return (
+                                  <div
+                                    key={index}
+                                    className="image-container"
+                                    style={{
+                                      position: "relative",
+                                      width: "100px",
+                                      height: "100px",
+                                      margin: "10px",
+                                      padding: "0px",
+                                      display: "inline-block",
+                                    }}
+                                  >
+                                    <img
+                                      src={imgUrl}
+                                      alt={`govIdFile - ${index}`}
+                                      loading="lazy"
+                                      style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                        border: "1px solid #ccc",
+                                        borderRadius: "4px",
+                                      }}
+                                      onError={(e) => {
+                                        if (!e.target.dataset.errorHandled) {
+                                          e.target.src = "/fallback-image.png";
+                                          e.target.dataset.errorHandled = "true";
+                                        }
+                                      }}
+                                    />
+
+                                    <div className="image-overlay">
+                                      {/* View icon */}
+                                      <a
+                                        href={imgUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title="View Image"
+                                        className="icon-button"
+                                      >
+                                        <i className="fas fa-eye"></i>
+                                      </a>
+
+                                      {/* Download icon */}
+                                      <button
+                                        title="Download Image"
+                                        className="icon-button"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          fetch(imgUrl, { mode: "cors" })
+                                            .then((res) => res.blob())
+                                            .then((blob) => {
+                                              const url = window.URL.createObjectURL(blob);
+                                              const a = document.createElement("a");
+                                              a.href = url;
+                                              a.download = filename;
+                                              a.click();
+                                              window.URL.revokeObjectURL(url);
+                                            })
+                                            .catch(() => alert("Download failed."));
+                                        }}
+                                      >
+                                        <i className="fas fa-download"></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                          </Col>
+                        </Form.Group>
+                      </>
+                    )}
+
+                  </Col>
+                </div>
+
 
               </Row>
               <Button type="submit" className='btn btn-success mb-5 mt-3'>Update</Button>

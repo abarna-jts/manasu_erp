@@ -430,7 +430,6 @@ function Admin_RescueDetails() {
                     <Col md={12}>
                         <Form className='rescue_details' onSubmit={handleSubmit}>
                             <Row>
-
                                 <Form.Group as={Row} className="mb-1">
                                     <Form.Label column sm="6" className='text-start'>
                                         Admission No :
@@ -447,7 +446,7 @@ function Admin_RescueDetails() {
 
                                 <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                     <Form.Label column sm="6" className='text-start'>
-                                        Rescue Name :
+                                        Resident Name :
                                     </Form.Label>
                                     <Col sm="6" className='d-flex align-items-center'>
                                         <Form.Control

@@ -651,26 +651,38 @@ const updateRescueCondition = async (req, res) => {
 
     const admission_no = req.params.admission_no;
 
-    // Step 1: Fetch existing photo array
-    const [selectData] = await db.query("SELECT rescue_recovery_photo FROM rescue_condition WHERE admission_no = ?", [admission_no]);
-    if (selectData.length === 0) {
-      return res.status(404).json({ message: "Rescue Condition not found" });
-    }
-
-    let existingPhotos = [];
-    try {
-      existingPhotos = JSON.parse(req.body.existingPhotos || '[]');
-    } catch (e) {
-      existingPhotos = [];
-    }
-
-    // Step 2: Get new uploaded photos
     const newPhotos = req.files?.['rescue_recovery_photo']
       ? req.files['rescue_recovery_photo'].map(file => `uploads/Resque_Condition_Images/${file.filename}`)
       : [];
 
-    // Step 3: Combine old and new photos
-    const finalPhotoArray = [...existingPhotos, ...newPhotos];
+    // Fetch existing record
+    const [existingData] = await db.query(
+      "SELECT rescue_recovery_photo FROM rescue_condition WHERE admission_no = ?",
+      [admission_no]
+    );
+
+    let existingRescueRecoveryPaths = [];
+    if (existingData[0]?.rescue_recovery_photo) {
+      try {
+        existingRescueRecoveryPaths = JSON.parse(existingData[0].rescue_recovery_photo);
+        if (!Array.isArray(existingRescueRecoveryPaths)) {
+          existingRescueRecoveryPaths = [existingRescueRecoveryPaths];
+        }
+      } catch (e) {
+        existingRescueRecoveryPaths = [existingData[0].rescue_recovery_photo];
+      }
+    }
+
+    // Decide final paths to save (new ones if uploaded, otherwise keep old)
+    const finalRescueRecoveryPath = newPhotos.length > 0 ? newPhotos : existingRescueRecoveryPaths;
+
+    // Format date to dd-mm-yyyy
+    const formatDate = (isoDate) => {
+      const d = new Date(isoDate);
+      if (isNaN(d)) return 'Invalid';
+      return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+    };
+    const obdateRescueFormatted = formatDate(date);
 
     const updateQuery = `
       UPDATE rescue_condition SET
@@ -681,25 +693,26 @@ const updateRescueCondition = async (req, res) => {
       WHERE admission_no = ?
     `;
 
-    const formatDate = (isoDate) => {
-      const d = new Date(isoDate);
-      return isNaN(d) ? 'Invalid' : `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
-    };
-
     const values = [
       resident_name,
-      formatDate(date),
-      JSON.stringify(finalPhotoArray),
+      obdateRescueFormatted,
+      JSON.stringify(finalRescueRecoveryPath || []),
       follow_up,
       admission_no
     ];
 
-    const [result] = await db.query(updateQuery, values);
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "No rescue condition found with this admission number" });
+    await db.query(updateQuery, values);
+
+    // Delete old files only if new ones uploaded
+    if (newPhotos.length > 0 && existingRescueRecoveryPaths.length > 0) {
+      existingRescueRecoveryPaths.forEach(oldPath => {
+        fs.unlink(oldPath, (fsErr) => {
+          if (fsErr) console.warn("Failed to delete old photo:", fsErr);
+        });
+      });
     }
 
-    res.status(200).json({ message: "Rescue Condition updated successfully" });
+    res.status(200).json({ message: "Observation updated successfully" });
 
   } catch (err) {
     console.error('Error updating rescue condition:', err);
@@ -838,7 +851,7 @@ const getPrescriptionbyID = async (req, res) => {
     return res.status(500).json({ message: 'Database error' });
   }
 };
-   
+
 
 // Update individual prescriptions
 const updatePrescription = async (req, res) => {
