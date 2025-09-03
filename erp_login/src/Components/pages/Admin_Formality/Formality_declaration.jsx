@@ -396,7 +396,24 @@ function Formality_declaration() {
             alert('There was an error Updating the form.');
         }
     };
-    
+
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/movetoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            setAdmissionNumber("");
+            setRescueName("");
+            setAge("");
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
+
 
     return (
         <>

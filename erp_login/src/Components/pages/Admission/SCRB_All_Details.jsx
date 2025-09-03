@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 function SCRB_All_Details() {
     const [scrbForm2List, setScrbForm2List] = useState([]);
@@ -254,6 +255,8 @@ function SCRB_All_Details() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const userType = Cookies.get('usertype');
+
     const navigate = useNavigate();
 
     const gotoSCRBForm2A = () => {
@@ -268,6 +271,21 @@ function SCRB_All_Details() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/SCRBForm2toRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            fetchSCRBForm2Report();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
 
     return (
         <>
@@ -478,14 +496,14 @@ function SCRB_All_Details() {
                                                     >
                                                         <i className="fas fa-edit"></i>
                                                     </Button>
-                                                    {/* {userType === "2" && (
-                                                            <Button
-                                                                className="btn btn-danger icon_details"
-                                                                onClick={() => handleDelete(item.id)}
-                                                            >
-                                                                <i className="fas fa-trash"></i>
-                                                            </Button>
-                                                        )} */}
+                                                    {userType === "2" && (
+                                                        <Button
+                                                            className="btn btn-danger icon_details"
+                                                            onClick={() => handleDelete(item.admission_no)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </Button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))

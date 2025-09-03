@@ -207,18 +207,20 @@ function Rescue_Record_Sheet() {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     };
 
-    // const handleDelete = async (id) => {
-    //     alert("Are you sure want to delete");
-    //     try {
-    //         const response = await apiRoute.delete(`https://www.pahrultours.com/app2/residency/delete_condition_details/${id}`);
-    //         console.log(response);
-    //         alert("First Form Details Deleted successfully");
-    //         // Refresh data after deletion
-    //         getConditionDetails(); // if this function fetches updated student list
-    //     } catch (error) {
-    //         console.error('Failed to delete item:', error);
-    //     }
-    // };
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/ConsultationtoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            getConditionDetails();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
 
     const handleEdiShow = async (id) => {
         try {
@@ -661,7 +663,15 @@ function Rescue_Record_Sheet() {
                                                 <button className="btn btn-secondary icon_details" onClick={() => handleEdiShow(item.id)}>
                                                     <i className="fas fa-edit"></i>
                                                 </button>
-
+                                                {userType === "2" && (
+                                                    <button className="btn btn-danger icon_details"
+                                                        onClick={() => {
+                                                            handleDelete(item.admission_no);
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-trash"></i>
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))

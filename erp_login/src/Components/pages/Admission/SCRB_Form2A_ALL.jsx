@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 function SCRB_Form2A_ALL() {
     const [scrbForm2AList, setScrbForm2AList] = useState([]);
@@ -158,6 +159,8 @@ function SCRB_Form2A_ALL() {
         if (type === 'face') setFace(updater);
     };
 
+    const userType = Cookies.get('usertype');
+
 
     const rows = [
         { id: 1, category: 'Abandoned', complexion: 'Dark', face: 'Dimpled Cheek' },
@@ -192,6 +195,21 @@ function SCRB_Form2A_ALL() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/SCRBForm2AtoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            fetchSCRBForm2AReport();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
 
     return (
         <div>
@@ -275,6 +293,14 @@ function SCRB_Form2A_ALL() {
                                                     >
                                                         <i className="fas fa-edit"></i>
                                                     </Button>
+                                                    {userType === "2" && (
+                                                        <Button
+                                                            className="btn btn-danger icon_details"
+                                                            onClick={() => handleDelete(item.admission_no)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </Button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))

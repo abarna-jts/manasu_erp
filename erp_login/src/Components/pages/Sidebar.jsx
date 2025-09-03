@@ -28,7 +28,8 @@ import {
   faClipboardList,
   faChartLine,
   faUserGraduate,
-  faNotesMedical
+  faNotesMedical,
+  faTrash
 } from "@fortawesome/free-solid-svg-icons";
 
 import { Nav, Badge, Button, Accordion } from "react-bootstrap";
@@ -305,6 +306,9 @@ const Sidebar = () => {
 
                 {/* Internship Form */}
                 <NavItem title="Intern Information" to="/internship_form" icon={faUserGraduate} onAnyClick={handleCloseAccordion}/>
+
+                {/* Recycle Bin */}
+                <NavItem title="Recycle Bin" to="/recycle_bin" icon={faTrash} onAnyClick={handleCloseAccordion}/>
 
                 {/* <NavItem title="User Permission" to="/user_permission" icon={faUsers} onAnyClick={handleCloseAccordion}/> */}
 

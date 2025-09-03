@@ -460,18 +460,6 @@ function Self_Declaration_form() {
         }
     };
 
-    const handleDelete = async (admission_no) => {
-        alert("Are you sure want to delete");
-        try {
-            const response = await apiRoute.delete(`/reunion/deleteSelfDecl/${admission_no}`);
-            console.log(response);
-            alert("Self Declaration Form Deleted successfully");
-            window.location.reload();
-        } catch (error) {
-            console.error('Failed to delete item:', error);
-        }
-    };
-
     const fetchRescueDetails = async (admission_no) => {
         try {
             const response = await apiRoute.get(`/admision/get_scrbform2data/${admission_no}`);
@@ -538,6 +526,23 @@ function Self_Declaration_form() {
             setError("");
         }
     }, [admission_no]);
+
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/SelfDeclarationRecycleCycle/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            setAdmissionNumber("");
+            setRescueName("");
+            setAge("");
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
 
     return (
         <>
@@ -612,7 +617,7 @@ function Self_Declaration_form() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {/* {userType === "2" && (
+                        {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
@@ -620,7 +625,7 @@ function Self_Declaration_form() {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )} */}
+                        )}
                     </Form.Group>
                 </Form>
                 <Row className='d-flex align-items-center justify-content-center'>

@@ -525,6 +525,21 @@ function Reunion_Checklist() {
         }
     }, [admission_no]);
 
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/DischargeSummarytoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            setAdmissionNumber("");
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
+
 
     return (
         <>
@@ -598,15 +613,15 @@ function Reunion_Checklist() {
                                 handleShow(admission_no);
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {/* {userType === "2" && (
-                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                        {userType === "2" && (
+                            <button type="button" className="btn btn-danger mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
                                 } else {
-                                    // handleDelete(admission_no); 
+                                    handleDelete(admission_no); 
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )} */}
+                        )}
                     </Form.Group>
                 </Form>
             </Container>

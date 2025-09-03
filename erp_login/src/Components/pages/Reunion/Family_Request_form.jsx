@@ -810,16 +810,21 @@ function Family_Request_form() {
     };
 
 
-    const handleDelete = async (admissionNumber) => {
-        alert("Are you sure want to delete");
+    const handleDelete = async (admission_no) => {
         try {
-            const response = await apiRoute.delete(`/reunion/deleteFamilyRequest/${admissionNumber}`);
-            console.log(response);
-            alert("First Form Details Deleted successfully");
-            // Refresh data after deletion
-            getRescueDetails(); // if this function fetches updated student list
-        } catch (error) {
-            console.error('Failed to delete item:', error);
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/FamReqFormtoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            setAdmissionNumber("");
+            setRescueName("");
+            setAge("");
+            setPhoneNo("");
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
         }
     };
 
@@ -959,7 +964,7 @@ function Family_Request_form() {
                                 handleShow(admissionNumber); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {/* {userType === "2" && (
+                        {userType === "2" && (
                             <button type="button" className="btn btn-success mx-1" onClick={() => {
                                 if (!admissionNumber.trim()) {
                                     alert("Please enter admission number.");
@@ -967,7 +972,7 @@ function Family_Request_form() {
                                     handleDelete(admissionNumber); // Fetch & populate data before generating PDF
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )} */}
+                        )}
                     </Form.Group>
                 </Form>
 

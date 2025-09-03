@@ -77,6 +77,7 @@ import SCRB_Form2A_ALL from './Components/pages/Admission/SCRB_Form2A_ALL';
 import SCRB_Form2B_All from './Components/pages/Admission/SCRB_Form2B_All';
 import SCRB_Form2C_All from './Components/pages/Admission/SCRB_Form2C_All';
 import PDF_preview from './Components/pages/Admission/PDF_preview';
+import Recycle_bin from './Components/pages/Admin_Formality/Recycle_bin';
 
 function App() {
 
@@ -753,6 +754,16 @@ function App() {
                   <MainLayout><Judgement /></MainLayout>
                 ) : (
                   <MainLayout><Judgement /></MainLayout>
+                )
+              }
+            />
+
+            <Route
+              path='/recycle_bin'
+              element={ userType === '2' ? (
+                  <MainLayout><Recycle_bin /></MainLayout>
+                ) : (
+                  <MainLayout><Recycle_bin /></MainLayout>
                 )
               }
             />

@@ -271,15 +271,18 @@ function Admin_RescueDetails() {
         }
     };
 
-    const handleDelete = async (id) => {
-        alert("Are you sure want to delete");
+    const handleDelete = async (admission_no) => {
         try {
-            const response = await apiRoute.delete(`/formality/deleteDischargeSummary/${id}`);
-            console.log(response);
-            alert("Discharge Summary Deleted successfully");
-            window.location.reload();
-        } catch (error) {
-            console.error('Failed to delete item:', error);
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/DischargeDetailstoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            getRerportDetail();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
         }
     };
 
@@ -379,15 +382,15 @@ function Admin_RescueDetails() {
                                                         handleEditform(item.id);
                                                     }}
                                                 ><i className="fas fa-edit"></i> </button>
-                                                {/* {userType === "2" && (
+                                                {userType === "2" && (
                                                     <button className="btn btn-danger icon_details"
                                                         onClick={() => {
-                                                            handleDelete(item.id);
+                                                            handleDelete(item.admission_no);
                                                         }}
                                                     >
                                                         <i className="fas fa-trash"></i>
                                                     </button>
-                                                )} */}
+                                                )}
                                             </td>
                                         </tr>
                                     ))

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 function SCRB_Form2B_All() {
     const [scrbForm2BList, setScrbForm2BList] = useState([]);
@@ -23,6 +24,8 @@ function SCRB_Form2B_All() {
         mole: '',
         height: ''
     });
+
+    const userType = Cookies.get('usertype');
 
     const handleClose = () => setShow(false);
 
@@ -204,6 +207,21 @@ function SCRB_Form2B_All() {
         setCurrentPage(1);
     }, [searchQuery]);
 
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/SCRBForm2BtoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            fetchSCRBForm2BReport();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
+
     return (
         <>
             <Container fluid>
@@ -286,6 +304,14 @@ function SCRB_Form2B_All() {
                                                     >
                                                         <i className="fas fa-edit"></i>
                                                     </Button>
+                                                    {userType === "2" && (
+                                                        <Button
+                                                            className="btn btn-danger icon_details"
+                                                            onClick={() => handleDelete(item.admission_no)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </Button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))

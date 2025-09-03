@@ -349,6 +349,7 @@ function AllStudentDetails() {
     const [files, setFiles] = useState({
         stud_photo: null
     });
+    
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;

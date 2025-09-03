@@ -11,6 +11,7 @@ import FormalityRoutes from './routes/formality.js';
 import recoveryRoutes from './routes/recovery.js';
 import residencyRoutes from './routes/residency.js';
 import { authenticateToken } from './middleware/auth.js';
+import deleteRoutes from './routes/remove_recycle.js';
 
 // Load environment variables
 dotenv.config();
@@ -76,6 +77,7 @@ app.use('/reunion', ReunionRoutes);
 app.use('/formality', FormalityRoutes);
 app.use('/recovery',recoveryRoutes);
 app.use('/residency',residencyRoutes);
+app.use('/remove', deleteRoutes);
 // app.use('/api/student', studentRoutes);
 // app.use('/api/auth', authRoute);
 

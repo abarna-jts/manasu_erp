@@ -25,7 +25,7 @@ function Media_consent_form() {
     const [submissionMessage, setSubmissionMessage] = useState("");
     const [messageType, setMessageType] = useState(""); // 'success' or 'danger'
 
-    const handleClose = () => {setShow(false); setRescueName("");}
+    const handleClose = () => { setShow(false); setRescueName(""); }
 
     const userType = Cookies.get('usertype');
 
@@ -272,52 +272,52 @@ function Media_consent_form() {
     // };
 
     const handleImageUpload = async (event) => {
-            const selectedFiles = Array.from(event.target.files);
-            if (!selectedFiles.length) return;
-    
-            const options = {
-                maxSizeMB: 0.5,
-                maxWidthOrHeight: 1024,
-                useWebWorker: true,
-                fileType: "image/jpeg", // force JPEG output
-            };
-    
-            try {
-                // Compress all images
-                const compressedFiles = await Promise.all(
-                    selectedFiles.map(async (file, idx) => {
-                        const compressed = await imageCompression(file, options);
-    
-                        // ✅ Log original vs compressed
-                        console.log(`File ${idx + 1} Original:`, {
-                            name: file.name,
-                            size: (file.size / 1024).toFixed(2) + " KB",
-                            type: file.type,
-                        });
-                        console.log(`File ${idx + 1} Compressed:`, {
-                            name: `essential_${Date.now()}_${idx}.jpeg`,
-                            size: (compressed.size / 1024).toFixed(2) + " KB",
-                            type: compressed.type,
-                        });
-    
-                        // Rename to avoid .blob
-                        const ext = compressed.type.split("/")[1]; // e.g. jpeg
-                        return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
-                            type: compressed.type,
-                        });
-                    })
-                );
-    
-                setFiles((prev) => ({
-                    ...prev,
-                    [event.target.name]: compressedFiles // ✅ store compressed files
-                }));
-    
-                console.log("✅ Final compressed files array:", compressedFiles);
-            } catch (e) {
-                console.error("Compression error:", e);
-            }
+        const selectedFiles = Array.from(event.target.files);
+        if (!selectedFiles.length) return;
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+            fileType: "image/jpeg", // force JPEG output
         };
+
+        try {
+            // Compress all images
+            const compressedFiles = await Promise.all(
+                selectedFiles.map(async (file, idx) => {
+                    const compressed = await imageCompression(file, options);
+
+                    // ✅ Log original vs compressed
+                    console.log(`File ${idx + 1} Original:`, {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + " KB",
+                        type: file.type,
+                    });
+                    console.log(`File ${idx + 1} Compressed:`, {
+                        name: `essential_${Date.now()}_${idx}.jpeg`,
+                        size: (compressed.size / 1024).toFixed(2) + " KB",
+                        type: compressed.type,
+                    });
+
+                    // Rename to avoid .blob
+                    const ext = compressed.type.split("/")[1]; // e.g. jpeg
+                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                        type: compressed.type,
+                    });
+                })
+            );
+
+            setFiles((prev) => ({
+                ...prev,
+                [event.target.name]: compressedFiles // ✅ store compressed files
+            }));
+
+            console.log("✅ Final compressed files array:", compressedFiles);
+        } catch (e) {
+            console.error("Compression error:", e);
+        }
+    };
 
     // const handleShow = async (admission_no) => {
     //     try {
@@ -439,14 +439,18 @@ function Media_consent_form() {
     }
 
     const handleDelete = async (admission_no) => {
-        alert("Are you sure want to delete");
         try {
-            const response = await apiRoute.delete(`/reunion/deleteMediaConsent/${admission_no}`);
-            console.log(response);
-            alert("Media Consent Form Deleted successfully");
-            window.location.reload();
-        } catch (error) {
-            console.error('Failed to delete item:', error);
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/MediaConsenttoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            setAdmissionNumber("");
+            setRescueName("");
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
         }
     };
 
@@ -597,15 +601,15 @@ function Media_consent_form() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {/* {userType === "2" && (
-                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                        {userType === "2" && (
+                            <button type="button" className="btn btn-danger mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
                                 } else {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )} */}
+                        )}
                     </Form.Group>
                 </Form>
 

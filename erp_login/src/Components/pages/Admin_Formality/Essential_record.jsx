@@ -861,15 +861,18 @@ function Essential_record() {
     };
 
     const handleDelete = async (admission_no) => {
-        alert("Are you sure want to delete");
         try {
-            const response = await apiRoute.delete(`/formality/deleteEssentailRecord/${admission_no}`);
-            console.log(response);
-            alert("Resident Document Form Deleted successfully");
-            // Refresh data after deletion
-            getRescueDetails(); // if this function fetches updated student list
-        } catch (error) {
-            console.error('Failed to delete item:', error);
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/EssentialRectoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            setAdmissionNumber("");
+            setRescueName("");
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
         }
     };
 
@@ -1047,7 +1050,7 @@ function Essential_record() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        {/* {userType === "2" && (
+                        {userType === "2" && (
                             <button type="button" className="btn btn-danger mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
@@ -1055,7 +1058,7 @@ function Essential_record() {
                                     handleDelete(admission_no); // Fetch & populate data before generating PDF
                                 }
                             }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
-                        )} */}
+                        )}
                     </Form.Group>
                 </Form>
 

@@ -1116,7 +1116,9 @@ function Prescription_form() {
                                                 </Col>
                                                 <Col md={7}>
                                                     {' '}
-                                                    <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow(i)}>-</button>
+                                                    <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow(i)}
+                                                        disabled={rows.length === 1} // disable when only one row
+                                                    >-</button>
                                                 </Col>
                                             </Row>
                                         </td>
@@ -1674,7 +1676,8 @@ function Prescription_form() {
                                                     </Col>
                                                     <Col md={7}>
                                                         {' '}
-                                                        <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow1(index)}>-</button>
+                                                        <button type="button" className="btn btn-sm btn-danger remove" onClick={() => handleRemoveRow1(index)}
+                                                            disabled={viewData.prescription_medicines.length === 1}>-</button>
                                                     </Col>
                                                 </Row>
                                             </td>
