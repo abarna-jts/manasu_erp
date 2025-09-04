@@ -15,7 +15,7 @@ const moveToRecycleBin = async (req, res) => {
 
         const record = results[0];
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "formality_declaration", JSON.stringify(record)]
         );
 
@@ -43,7 +43,7 @@ const MediaConsenttoRecycleBin = async (req, res) => {
 
         const record = results[0];
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "media_consent", JSON.stringify(record)]
         );
 
@@ -71,7 +71,7 @@ const SelfDeclarationRecycleCycle = async (req, res) => {
 
         const record = results[0];
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "self_declaration", JSON.stringify(record)]
         );
 
@@ -99,7 +99,7 @@ const FamReqFormtoRecycleBin = async (req, res) => {
 
         const record = results[0];
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "family_request_form", JSON.stringify(record)]
         );
 
@@ -127,7 +127,7 @@ const EssentialRectoRecycleBin = async (req, res) => {
 
         const record = results[0];
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "essential_records", JSON.stringify(record)]
         );
 
@@ -155,7 +155,7 @@ const DischargeSummarytoRecycleBin = async (req, res) => {
 
         const record = results[0];
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "discharge_checklist", JSON.stringify(record)]
         );
 
@@ -186,7 +186,7 @@ const DischargeDetailstoRecycleBin = async (req, res) => {
 
         // 2. Insert into recycle_bin
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "discharge_summary", JSON.stringify(record)]
         );
 
@@ -219,7 +219,7 @@ const SCRBForm2toRecycleBin = async (req, res) => {
 
         // 2. Insert into recycle_bin
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "form_2", JSON.stringify(record)]
         );
 
@@ -252,7 +252,7 @@ const SCRBForm2AtoRecycleBin = async (req, res) => {
 
         // 2. Insert into recycle_bin
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "form_2a", JSON.stringify(record)]
         );
 
@@ -284,7 +284,7 @@ const SCRBForm2BtoRecycleBin = async (req, res) => {
 
         // 2. Insert into recycle_bin
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "form_2b", JSON.stringify(record)]
         );
 
@@ -316,7 +316,7 @@ const SCRBForm2CtoRecycleBin = async (req, res) => {
 
         // 2. Insert into recycle_bin
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "form_2c", JSON.stringify(record)]
         );
 
@@ -330,7 +330,7 @@ const SCRBForm2CtoRecycleBin = async (req, res) => {
     }
 }
 
-const RescueDetailtoRecycleBin = async (req, res) =>{
+const RescueDetailtoRecycleBin = async (req, res) => {
     const { admission_no } = req.params;
 
     try {
@@ -348,7 +348,7 @@ const RescueDetailtoRecycleBin = async (req, res) =>{
 
         // 2. Insert into recycle_bin
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "first_information", JSON.stringify(record)]
         );
 
@@ -362,7 +362,7 @@ const RescueDetailtoRecycleBin = async (req, res) =>{
     }
 }
 
-const ConsultationtoRecycleBin = async (req, res) =>{
+const ConsultationtoRecycleBin = async (req, res) => {
     const { admission_no } = req.params;
 
     try {
@@ -380,12 +380,270 @@ const ConsultationtoRecycleBin = async (req, res) =>{
 
         // 2. Insert into recycle_bin
         await db.query(
-            "INSERT INTO recycle_bin (admission_no, source_table, data) VALUES (?, ?, ?)",
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "rescue_condition", JSON.stringify(record)]
         );
 
         // 3. Delete from original table
         await db.query("DELETE FROM rescue_condition WHERE admission_no = ?", [admission_no]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const DrVisittoRecycleBin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.query("SELECT * FROM dr_visit WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+
+        const record = rows[0];
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [id, "dr_visit", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM dr_visit WHERE id = ?", [id]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+
+const NurseRecordtoRecycleBin = async (req, res) => {
+    const { admission_no } = req.params;
+
+    try {
+        // 1. Fetch record
+        const [rows] = await db.query(
+            "SELECT * FROM nurse_record WHERE admission_no = ?",
+            [admission_no]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Not found" });
+        }
+
+        const record = rows[0];
+
+        // 2. Insert into recycle_bin
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [admission_no, "nurse_record", JSON.stringify(record)]
+        );
+
+        // 3. Delete from original table
+        await db.query("DELETE FROM nurse_record WHERE admission_no = ?", [admission_no]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const PrescriptiontoRecycleBin = async (req, res) => {
+    const { admission_no } = req.params;
+
+    try {
+        // 1. Fetch record
+        const [rows] = await db.query(
+            "SELECT * FROM prescription_medicines WHERE admission_no = ?",
+            [admission_no]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Not found" });
+        }
+
+        const record = rows[0];
+
+        // 2. Insert into recycle_bin
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [admission_no, "prescription_medicines", JSON.stringify(record)]
+        );
+
+        // 3. Delete from original table
+        await db.query("DELETE FROM prescription_medicines WHERE admission_no = ?", [admission_no]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const InternShiptoRecycleBin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.query("SELECT * FROM internship_form WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+
+        const record = rows[0];
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [id, "internship_form", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM internship_form WHERE id = ?", [id]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const MedicalCamptoRecycleBin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.query("SELECT * FROM medical_camp WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+
+        const record = rows[0];
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [id, "medical_camp", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM medical_camp WHERE id = ?", [id]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const EventReporttoRecycleBin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.query("SELECT * FROM event_report WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+
+        const record = rows[0];
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [id, "event_report", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM event_report WHERE id = ?", [id]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const CelebrationtoRecycleBin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.query("SELECT * FROM celebration_report WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+
+        const record = rows[0];
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [id, "celebration_report", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM celebration_report WHERE id = ?", [id]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const CommunityReporttoRecycleBin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.query("SELECT * FROM community_report WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+
+        const record = rows[0];
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [id, "community_report", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM community_report WHERE id = ?", [id]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const StaffProgramtoRecycleBin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.query("SELECT * FROM staff_report WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+
+        const record = rows[0];
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [id, "staff_report", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM staff_report WHERE id = ?", [id]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const observationReportToRecBin = async (req, res) =>{
+    const { admission_no } = req.params;
+
+    try {
+        // 1. Fetch record
+        const [rows] = await db.query(
+            "SELECT * FROM observation_report WHERE admission_no = ?",
+            [admission_no]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Not found" });
+        }
+
+        const record = rows[0];
+
+        // 2. Insert into recycle_bin
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [admission_no, "observation_report", JSON.stringify(record)]
+        );
+
+        // 3. Delete from original table
+        await db.query("DELETE FROM observation_report WHERE admission_no = ?", [admission_no]);
 
         res.json({ message: "Moved to recycle bin successfully" });
     } catch (err) {
@@ -406,47 +664,35 @@ const getRecycleBin = async (req, res) => {
 };
 
 const restoreRecycleBin = async (req, res) => {
-    const { admission_no } = req.params;
+    const { id } = req.params; // recycle_bin.id
 
     try {
-        // 1. Get record from recycle_bin
-        const [rows] = await db.query(
-            "SELECT * FROM recycle_bin WHERE admission_no = ?",
-            [admission_no]
-        );
-        if (rows.length === 0)
-            return res.status(404).json({ error: "Not found in recycle bin" });
+        const [rows] = await db.query("SELECT * FROM recycle_bin WHERE id = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ error: "Not found in recycle bin" });
 
         const recycleRecord = rows[0];
-        const { source_table, id, data } = recycleRecord;
+        const { source_table, data } = recycleRecord;
 
-        // 2. Parse JSON safely
-        let parsedData;
+        let record;
         try {
-            parsedData = JSON.parse(data);
-            if (!Array.isArray(parsedData)) {
-                parsedData = [parsedData]; // make it iterable
-            }
+            record = JSON.parse(data);
         } catch (e) {
             return res.status(400).json({ error: "Invalid data format in recycle_bin" });
         }
 
-        // 3. Insert back into original table
-        for (const record of parsedData) {
-            delete record.id; // prevent conflict if original has auto-increment id
-            await db.query(`INSERT INTO ${source_table} SET ?`, record);
-        }
+        // remove auto id fields to prevent duplicate issues
+        delete record.id;
 
-        // 4. Remove from recycle_bin
+        await db.query(`INSERT INTO ${source_table} SET ?`, record);
+
         await db.query("DELETE FROM recycle_bin WHERE id = ?", [id]);
 
-        res.json({ message: "Restored successfully" });
+        res.json({ message: `Restored to ${source_table} successfully` });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
-
 
 
 export {
@@ -458,5 +704,8 @@ export {
     FamReqFormtoRecycleBin,
     EssentialRectoRecycleBin, DischargeSummarytoRecycleBin, DischargeDetailstoRecycleBin,
     SCRBForm2toRecycleBin, SCRBForm2AtoRecycleBin, SCRBForm2BtoRecycleBin, SCRBForm2CtoRecycleBin,
-    RescueDetailtoRecycleBin, ConsultationtoRecycleBin
+    RescueDetailtoRecycleBin, ConsultationtoRecycleBin, DrVisittoRecycleBin,
+    NurseRecordtoRecycleBin, PrescriptiontoRecycleBin, InternShiptoRecycleBin,
+    MedicalCamptoRecycleBin, EventReporttoRecycleBin, CelebrationtoRecycleBin,
+    CommunityReporttoRecycleBin, StaffProgramtoRecycleBin,observationReportToRecBin
 };

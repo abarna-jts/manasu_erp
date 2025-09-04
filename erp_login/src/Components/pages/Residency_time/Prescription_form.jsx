@@ -731,6 +731,21 @@ function Prescription_form() {
         setAdmissionNo("");
     }
 
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/PrescriptiontoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            getPrescriptionDetails();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
+
     return (
         <div>
             <Container fluid>
@@ -822,14 +837,16 @@ function Prescription_form() {
                                                     }}>
                                                         <i className="fas fa-eye"></i>
                                                     </button>
-                                                    <button className="btn btn-primary icon_details" onClick={() => {
+                                                    <button className="btn btn-secondary icon_details" onClick={() => {
                                                         handleEditform(item.id);
                                                     }}>
                                                         <i className="fas fa-edit"></i>
                                                     </button>
-                                                    {/* <button className="btn btn-danger icon_details">
-                                                        <i className="fas fa-trash"></i>
-                                                    </button> */}
+                                                    {userType === "2" && (
+                                                        <button className="btn btn-danger icon_details"
+                                                            onClick={() => handleDelete(item.admission_no)}
+                                                        ><i className="fas fa-trash"></i></button>
+                                                    )}
                                                 </td>
                                             </tr>
 
@@ -1262,7 +1279,7 @@ function Prescription_form() {
                         </table>
 
                         <Col md={12} className="mt-3 d-flex justify-content-center align-items-center">
-                            <Button variant="btn btn-primary mx-3" type='submit'>Save</Button>
+                            <Button variant="btn btn-success mx-3" type='submit'>Save</Button>
                             <Button variant="btn btn-secondary" type='submit' onClick={handleClearData}>Clear</Button>
                         </Col>
                     </Form>

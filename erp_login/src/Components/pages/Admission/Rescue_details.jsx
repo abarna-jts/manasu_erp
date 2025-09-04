@@ -574,7 +574,7 @@ function Rescue_details() {
                                     <td>{item.from_place}</td>
                                     <td>{formatDateTime(item.date_time)}</td>
                                     {userType === "2" && (
-                                        <td>{item.resident_status}</td>
+                                        <td>{item.resident_status || "NULL"}</td>
                                     )}
                                     {userType === "1" && (
                                         <td>

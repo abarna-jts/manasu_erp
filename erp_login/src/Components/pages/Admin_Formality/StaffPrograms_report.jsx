@@ -302,6 +302,21 @@ function StaffPrograms_report() {
         setCurrentPage(1);
     }, [searchQuery]);
 
+    const handleDelete = async (id) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/StaffProgramtoRecycleBin/${id}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            fetchStaffProgramsReport();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
+
     return (
         <>
             <Container fluid>
@@ -384,14 +399,14 @@ function StaffPrograms_report() {
                                                     >
                                                         <i className="fas fa-edit"></i>
                                                     </Button>
-                                                    {/* {userType === "2" && (
-                                                            <Button
-                                                                className="btn btn-danger icon_details"
-                                                                onClick={() => handleDelete(item.id)}
-                                                            >
-                                                                <i className="fas fa-trash"></i>
-                                                            </Button>
-                                                        )} */}
+                                                    {userType === "2" && (
+                                                        <Button
+                                                            className="btn btn-danger icon_details"
+                                                            onClick={() => handleDelete(item.id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </Button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))

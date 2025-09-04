@@ -48,11 +48,11 @@ function Recycle_bin() {
         setCurrentPage(1);
     }, [searchQuery]);
 
-    const handleRestore = async (admission_no) => {
+    const handleRestore = async (id) => {
         try {
             const confirmDelete = window.confirm("Are you sure you want to restore this record?");
             if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
-            const res = await apiRoute.post(`remove/restoreRecycleBin/${admission_no}`);
+            const res = await apiRoute.post(`remove/restoreRecycleBin/${id}`);
             alert("Record restored successfully ✅");
             // refresh recycle bin table
             fetchRecycleReport();
@@ -105,7 +105,7 @@ function Recycle_bin() {
                         <thead>
                             <tr>
                                 <th>S.No</th>
-                                <th>Admission No.</th>
+                                <th>Admission No. / ID</th>
                                 <th>Form Name</th>
                                 <th>Datas</th>
                                 <th>Action</th>
@@ -116,13 +116,13 @@ function Recycle_bin() {
                                 currentItems.map((item, index) => (
                                     <tr key={item.id}>
                                         <td>{indexOfFirstItem + index + 1}</td>
-                                        <td>{item.admission_no}</td>
+                                        <td>{item.ref_id}</td>
                                         <td>{item.source_table}</td>
                                         <td>{item.data}</td>
                                         <td>
                                             <button
                                                 className="btn btn-secondary icon_details mx-1"
-                                                onClick={() => handleRestore(item.admission_no)}
+                                                onClick={() => handleRestore(item.id)}
                                             >
                                                 <i className="fas fa-undo"></i> {/* Restore Icon */}
                                             </button>

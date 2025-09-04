@@ -235,6 +235,21 @@ function Developmental_History() {
         setCurrentPage(1);
     }, [searchQuery]);
 
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/social_remover/DevistoryToRecBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            getVisitDetails();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
+
     return (
         <>
             <Container fluid>
@@ -309,17 +324,17 @@ function Developmental_History() {
                                                 <i className="fas fa-eye"></i>
                                             </button>
                                             {userType === "4" && (
-                                                <button className="btn btn-primary icon_details"
+                                                <button className="btn btn-secondary icon_details"
                                                     onClick={() => {
                                                         handleEditform(item.id);
                                                     }}
                                                 ><i className="fas fa-edit"></i> </button>
                                             )}
-                                            {/* {userType === "2" && (
-                                                                    <button className="btn btn-danger icon_details"
-                                                                        onClick={() => handleDelete(item.id)}
-                                                                    ><i className="fas fa-trash"></i></button>
-                                                                )} */}
+                                            {userType === "2" && (
+                                                <button className="btn btn-danger icon_details"
+                                                    onClick={() => handleDelete(item.admission_no)}
+                                                ><i className="fas fa-trash"></i></button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

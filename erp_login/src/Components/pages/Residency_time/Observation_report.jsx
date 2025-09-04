@@ -374,18 +374,20 @@ function Observation_report() {
         return `${day}-${month}-${year}`;
     };
 
-    // const handleDelete = async (id) => {
-    //     alert("Are you sure want to delete");
-    //     try {
-    //         const response = await apiRoute.delete(`residency/delete_condition_details/${id}`);
-    //         console.log(response);
-    //         alert("First Form Details Deleted successfully");
-    //         // Refresh data after deletion
-    //         getConditionDetails(); // if this function fetches updated student list
-    //     } catch (error) {
-    //         console.error('Failed to delete item:', error);
-    //     }
-    // };
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/social_remover/observationReportToRecBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            getConditionDetails();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
 
     const handleAdmissionChange = (e) => {
         setAdmissionNumber(e.target.value);
@@ -689,12 +691,12 @@ function Observation_report() {
                                                 <button className="btn btn-success icon_details" onClick={() => ViewFormData(item.id)}>
                                                     <i className="fas fa-eye"></i>
                                                 </button>
-                                                <button className="btn btn-success icon_details" onClick={() => handleEdiShow(item.id)}>
+                                                <button className="btn btn-secondary icon_details" onClick={() => handleEdiShow(item.id)}>
                                                     <i className="fas fa-edit"></i>
                                                 </button>
-                                                {/* <button className="btn btn-danger icon_details" onClick={() => handleDelete(item.id)}>
+                                                <button className="btn btn-danger icon_details" onClick={() => handleDelete(item.admission_no)}>
                                                     <i className="fas fa-trash"></i>
-                                                </button> */}
+                                                </button>
                                             </td>
                                         </tr>
                                     ))

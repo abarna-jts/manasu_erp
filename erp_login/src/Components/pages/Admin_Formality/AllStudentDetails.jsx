@@ -131,7 +131,7 @@ function AllStudentDetails() {
                 stud_photo: StudPhotoAll[0] || ''
             }));
 
-            
+
             console.log(StudPhotoAll);
             // Set files state
             setFiles((files) => ({
@@ -349,7 +349,7 @@ function AllStudentDetails() {
     const [files, setFiles] = useState({
         stud_photo: null
     });
-    
+
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -359,6 +359,21 @@ function AllStudentDetails() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    const handleDelete = async (id) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/remove/InternShiptoRecycleBin/${id}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            getStudentDetails();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
 
     return (
         <>
@@ -438,11 +453,11 @@ function AllStudentDetails() {
                                                         handleEditform(item.id);
                                                     }}
                                                 ><i className="fas fa-edit"></i> </button>
-                                                {/* {userType === "2" && (
+                                                {userType === "2" && (
                                                     <button className="btn btn-danger icon_details"
                                                         onClick={() => handleDelete(item.id)}
                                                     ><i className="fas fa-trash"></i></button>
-                                                )} */}
+                                                )}
                                             </td>
                                         </tr>
                                     ))

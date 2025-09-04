@@ -230,6 +230,21 @@ function Cheif_complaint() {
         setCurrentPage(1);
     }, [searchQuery]);
 
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/social_remover/CheifComplainttoRecycleBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            getVisitDetails();
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
+
     return (
         <div>
             <Container fluid>
@@ -314,11 +329,11 @@ function Cheif_complaint() {
                                                     }}
                                                 ><i className="fas fa-edit"></i> </button>
                                             )}
-                                            {/* {userType === "2" && (
-                                                            <button className="btn btn-danger icon_details"
-                                                                onClick={() => handleDelete(item.id)}
-                                                            ><i className="fas fa-trash"></i></button>
-                                                        )} */}
+                                            {userType === "2" && (
+                                                <button className="btn btn-danger icon_details"
+                                                    onClick={() => handleDelete(item.admission_no)}
+                                                ><i className="fas fa-trash"></i></button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
