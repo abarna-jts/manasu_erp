@@ -364,7 +364,7 @@ function Reunion_Checklist() {
             const data = response.data;
 
             // Prefix file fields with server path
-            const getFilePath = (file) => file ? `http://localhost:5002/${file}` : null;
+            const getFilePath = (file) => file ? `https://www.pahrultours.com/app2/${file}` : null;
 
             // Update normal form fields
             setFormData((prevFormData) => ({
@@ -493,7 +493,7 @@ function Reunion_Checklist() {
             if (result && result.rescue_image) {
                 const imagePath = result.rescue_image.startsWith("http")
                     ? result.rescue_image
-                    : `http://localhost:5002/${result.rescue_image}`;
+                    : `https://www.pahrultours.com/app2/${result.rescue_image}`;
 
                 setRescueImage(imagePath);
                 setRescueName(result.rescue_name || "");

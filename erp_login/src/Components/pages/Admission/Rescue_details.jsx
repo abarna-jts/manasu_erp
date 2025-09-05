@@ -247,14 +247,14 @@ function Rescue_details() {
                 try {
                     const parsed = JSON.parse(data.attach_policeMemo);
                     if (Array.isArray(parsed)) {
-                        policeMemoAttach = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        policeMemoAttach = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse attach_policeMemo:', err);
                     // Fallback: comma-separated string
                     policeMemoAttach = data.attach_policeMemo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -263,14 +263,14 @@ function Rescue_details() {
                 try {
                     const parsed = JSON.parse(data.rescue_image);
                     if (Array.isArray(parsed)) {
-                        RescueImage = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        RescueImage = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse attach_policeMemo:', err);
                     // Fallback: comma-separated string
                     RescueImage = data.rescue_image
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -279,19 +279,19 @@ function Rescue_details() {
                 try {
                     const parsed = JSON.parse(data.govIdFile);
                     if (Array.isArray(parsed)) {
-                        govtFilePath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        govtFilePath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse govIdFile:', err);
                     // Fallback: comma-separated string
                     govtFilePath = data.govIdFile
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
             // Base path for images
-            const basePath = "http://localhost:5002/uploads/Rescue_Images";
+            const basePath = "https://www.pahrultours.com/app2/uploads/Rescue_Images";
             // const RescueImage = data.rescue_image ? `https://www.pahrultours.com/app2/${data.rescue_image}` : null;
             // const govtFilePath = data.govIdFile ? `https://www.pahrultours.com/app2/${data.govIdFile}` : null;
             // const FamilyAadharCard = data.f_aadhar_card ? `https://www.pahrultours.com/app2/${data.f_aadhar_card}` : null;
@@ -518,7 +518,7 @@ function Rescue_details() {
                                                 // use directly
                                             }
 
-                                            const fullUrl = `http://localhost:5002/${imagePath}`;
+                                            const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
                                             const filename = imagePath?.split('/').pop(); // Extract filename from path
 
                                             return imagePath ? (

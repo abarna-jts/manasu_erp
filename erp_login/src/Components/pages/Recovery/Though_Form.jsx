@@ -300,7 +300,7 @@ function Though_Form() {
                                             )}
                                             {userType === "2" && (
                                                 <button className="btn btn-danger icon_details"
-                                                    onClick={() => handleDelete(item.id)}
+                                                    onClick={() => handleDelete(item.admission_no)}
                                                 ><i className="fas fa-trash"></i></button>
                                             )}
                                         </td>

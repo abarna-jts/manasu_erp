@@ -139,7 +139,7 @@ function SCRB_All_Details() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -147,7 +147,7 @@ function SCRB_All_Details() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -370,7 +370,7 @@ function SCRB_All_Details() {
                                                             // fallback to original string
                                                         }
 
-                                                        const fullUrl = `http://localhost:5002/${imagePath}`;
+                                                        const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
                                                         const filename = imagePath?.split("/").pop();
 
                                                         return imagePath ? (
@@ -436,7 +436,7 @@ function SCRB_All_Details() {
                                                             // use directly
                                                         }
 
-                                                        const fullUrl = `http://localhost:5002/${imagePath}`;
+                                                        const fullUrl = `https://www.pahrultours.com/app2/${imagePath}`;
                                                         const filename = imagePath?.split('/').pop(); // Extract filename from path
 
                                                         return imagePath ? (

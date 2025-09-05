@@ -3,7 +3,7 @@ import { Breadcrumb, Container, Row, Form, Button, InputGroup, Table } from 'rea
 import { Col } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPlus, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPlus, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import { useRef } from "react";
@@ -164,7 +164,7 @@ function Reunion_summary() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `http://localhost:5002/${imageArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -174,7 +174,7 @@ function Reunion_summary() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${result.rescue_image}`;
+                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -330,14 +330,14 @@ function Reunion_summary() {
                 try {
                     const parsed = JSON.parse(data.summary_attach);
                     if (Array.isArray(parsed)) {
-                        summaryAttachPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        summaryAttachPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Summary Attachment:', err);
                     // Fallback: comma-separated string
                     summaryAttachPath = data.summary_attach
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -462,7 +462,7 @@ function Reunion_summary() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `http://localhost:5002/${p.replace(/"/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -470,7 +470,7 @@ function Reunion_summary() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
+                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -536,6 +536,22 @@ function Reunion_summary() {
         dispatch(clearSummaryAttachImages());
     }
 
+    const handleDelete = async (admission_no) => {
+        try {
+            const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
+            const res = await apiRoute.delete(`/social_remover/ReunionSummaryToRecBin/${admission_no}`);
+            console.log(res.data);
+            alert("Moved to recycle bin");
+            setAdmissionNumber("");
+            setRescueName("");
+            setRescueImage("");
+            // refresh table
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting");
+        }
+    };
 
     return (
         <>
@@ -594,6 +610,9 @@ function Reunion_summary() {
                                 />
                             </InputGroup>
                         </Col>
+                        <div className="close_admission mx-2" onClick={handleClearData}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter admission number.");
@@ -617,9 +636,16 @@ function Reunion_summary() {
                                 handleShow(admission_no); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
-                        <button type="button" className="btn btn-danger mx-1" onClick={handleClearData}>
-                            <i className="bi bi-x-circle" style={{ color: "white" }}></i>
-                        </button>
+                        {userType === "2" && (
+                            <button type="button" className="btn btn-danger mx-1" onClick={() => {
+                                if (!admission_no.trim()) {
+                                    alert("Please enter admission number.");
+                                } else {
+                                    handleDelete(admission_no); // Fetch & populate data before generating PDF
+                                }
+                            }}><FontAwesomeIcon icon={faTrash} className="me-0" /></button>
+                        )}
+                        
                     </Form.Group>
                 </Form>
                 <Row className='d-flex align-items-center justify-content-center'>

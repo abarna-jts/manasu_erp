@@ -61,6 +61,52 @@ function Recycle_bin() {
             alert("Error restoring record ❌");
         }
     };
+    const sourceNameMapping = {
+        first_information: "Resident Rescue Details",
+        essential_records: "Resident Document Information Form",
+        form_2: "SCRB Form2",
+        form_2a: "SCRB Form2A",
+        form_2b: "SCRB Form2B",
+        form_2c: "SCRB Form2C",
+        rescue_condition: "Consultation Report by Doctor",
+        dr_visit: "Doctor’s Visit Details",
+        nurse_record: "Nursing Record Sheet – Resident Health & Medications",
+        prescription_medicines: "Nurse Prescription Form",
+        medical_camp: "Medical Camp Report",
+        observation_report: "Resident Observation & Progress Report – Social Worker",
+        basic_detail: "Psychiatric Demographic Information",
+        cheif_complaint: "Psychiatric The Chief Complaint",
+        presenting_problems: "Psychiatric Presenting Problems",
+        psy_history: "Psychiatric HISTORY",
+        medical_history: "Psychiatric Medical History",
+        familyhis_data: "Psychiatric Family History",
+        social_history: "Psychiatric Social History",
+        development_history: "Psychiatric Developmental History",
+        substance_use: "Psychiatric Substance Use History",
+        suicidal_data: "Psychiatric Suicidal and Homicidal Ideation",
+        general_appearance: "MSE General Appearance and Behaviour",
+        speech: "MSE Speech",
+        mood_affect: "MSE Mood and Affect",
+        though_form: "MSE Though",
+        perception: "MSE Perception",
+        conginition: "MSE Cognition or Neuropsychiatric Assessment",
+        judgement: "MSE Judgement",
+        insight: "MSE Insight",
+        reunion_summary: "Reunion Summary",
+        family_request_form: "Family Request Letter",
+        self_declaration: "Self Declaration Form",
+        media_consent: "Media Consent",
+        formality_declaration: "Resident's Possessions and Document Handover Form",
+        discharge_checklist: "Resident Discharge Summary and Checklist",
+        event_report: "Resident Activities and Events Report Detail",
+        celebration_report: "Celebration Events Report Detail",
+        community_report: "Community Programs Report Detail",
+        staff_report: "Staff Programs Report Detail",
+        discharge_summary: "Resident's Discharge Information",
+        internship_form: "Internship Student Details",
+        patient_info: "Patient Information",
+        // add more mappings here
+    };
 
 
     return (
@@ -117,8 +163,25 @@ function Recycle_bin() {
                                     <tr key={item.id}>
                                         <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{item.ref_id}</td>
-                                        <td>{item.source_table}</td>
-                                        <td>{item.data}</td>
+                                        <td>{sourceNameMapping[item.source_table] || item.source_table}</td>
+                                        <td>
+                                            {(() => {
+                                                try {
+                                                    const parsedData = JSON.parse(item.data); // convert string to object
+                                                    return Object.entries(parsedData)
+                                                        .slice(0, 5) // take only first 5 items
+                                                        .map(([key, value]) => (
+                                                            <div key={key}>
+                                                                <strong>{key}:</strong> {value}
+                                                            </div>
+                                                        ));
+                                                } catch (e) {
+                                                    return item.data; // fallback if not JSON
+                                                }
+                                            })()}
+                                        </td>
+
+
                                         <td>
                                             <button
                                                 className="btn btn-secondary icon_details mx-1"

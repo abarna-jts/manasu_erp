@@ -142,7 +142,7 @@ function SCRB_form() {
                     try {
                         const parsedArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
                         if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-                            imagePath = `http://localhost:5002/${parsedArray[0]}`;
+                            imagePath = `https://www.pahrultours.com/app2/${parsedArray[0]}`;
                         }
                     } catch (parseErr) {
                         console.error("Failed to parse image array", parseErr);
@@ -156,7 +156,7 @@ function SCRB_form() {
 
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `http://localhost:5002/${cleanPath}`;
+                        : `https://www.pahrultours.com/app2/${cleanPath}`;
                 }
 
                 console.log("Final image path:", imagePath);
@@ -382,14 +382,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.old_photo);
                     if (Array.isArray(parsed)) {
-                        oldPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        oldPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     oldPhotoPath = data.old_photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -398,14 +398,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.new_photo);
                     if (Array.isArray(parsed)) {
-                        newPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        newPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     newPhotoPath = data.new_photo
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -414,14 +414,14 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.signature);
                     if (Array.isArray(parsed)) {
-                        signaturepath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        signaturepath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     signaturepath = data.signature
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -430,20 +430,20 @@ function SCRB_form() {
                 try {
                     const parsed = JSON.parse(data.seal);
                     if (Array.isArray(parsed)) {
-                        sealpath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
+                        sealpath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse signature:', err);
                     // Fallback: comma-separated string
                     sealpath = data.seal
                         .split(',')
-                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
 
             // Base path for images
-            const basePath = "http://localhost:5002/app2/uploads/form_2a";
+            const basePath = "https://www.pahrultours.com/app2/uploads/form_2a";
 
             // Handle old and new photo paths correctly
             // const oldPhotoPath = data.old_photo ? `https://www.pahrultours.com/app2${data.old_photo}` : null;
@@ -504,7 +504,7 @@ function SCRB_form() {
     };
 
     const exportToExcel = (data) => {
-        const BASE_URL = "http://localhost:5002/";
+        const BASE_URL = "https://www.pahrultours.com/app2/";
 
         if (!data || (Array.isArray(data) && data.length === 0)) {
             alert("Invalid data for Excel export.");

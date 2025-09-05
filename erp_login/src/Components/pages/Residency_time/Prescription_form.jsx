@@ -956,7 +956,7 @@ function Prescription_form() {
                                         Out Patient No: <span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="7">
-                                        <Form.Control type='number'
+                                        <Form.Control type='text'
                                             placeholder='OP No.'
                                             name='op_no'
                                             value={formData.op_no}
@@ -1517,7 +1517,7 @@ function Prescription_form() {
                                         Out Patient No:
                                     </Form.Label>
                                     <Col sm="7">
-                                        <Form.Control type='number'
+                                        <Form.Control type='text'
                                             placeholder='OP No.'
                                             name='op_no'
                                             value={viewData.op_no}

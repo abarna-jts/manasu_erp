@@ -1,35 +1,55 @@
+
 import db from "../db.js";
 
 const restoreRecycleBin = async (req, res) => {
-    const { id } = req.params; // recycle_bin.id
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.query("SELECT * FROM recycle_bin WHERE id = ?", [id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Not found in recycle bin" });
+
+    const recycleRecord = rows[0];
+    const { source_table, data } = recycleRecord;
+
+    let record;
+    try {
+      record = JSON.parse(data);
+    } catch (e) {
+      return res.status(400).json({ error: "Invalid data format in recycle_bin" });
+    }
+
+    // ✅ Remove old id
+    delete record.id;
+
+    // ✅ Normalize ISO date strings → MySQL format
+    Object.keys(record).forEach((key) => {
+      if (record[key] && typeof record[key] === "string" && record[key].includes("T")) {
+        const dateObj = new Date(record[key]);
+        if (!isNaN(dateObj.getTime())) {
+          const pad = (n) => (n < 10 ? "0" + n : n);
+          record[key] =
+            `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ` +
+            `${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
+        }
+      }
+    });
 
     try {
-        const [rows] = await db.query("SELECT * FROM recycle_bin WHERE id = ?", [id]);
-        if (rows.length === 0) return res.status(404).json({ error: "Not found in recycle bin" });
-
-        const recycleRecord = rows[0];
-        const { source_table, data } = recycleRecord;
-
-        let record;
-        try {
-            record = JSON.parse(data);
-        } catch (e) {
-            return res.status(400).json({ error: "Invalid data format in recycle_bin" });
-        }
-
-        // remove auto id fields to prevent duplicate issues
-        delete record.id;
-
-        await db.query(`INSERT INTO ${source_table} SET ?`, record);
-
-        await db.query("DELETE FROM recycle_bin WHERE id = ?", [id]);
-
-        res.json({ message: `Restored to ${source_table} successfully` });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Server error" });
+      await db.query(`INSERT INTO ${source_table} SET ?`, record);
+    } catch (dbErr) {
+      console.error("DB Insert Error:", dbErr);
+      return res.status(500).json({ error: "DB Insert Failed", details: dbErr.message });
     }
+
+    await db.query("DELETE FROM recycle_bin WHERE id = ?", [id]);
+
+    res.json({ message: `Restored to ${source_table} successfully` });
+  } catch (err) {
+    console.error("Server Error:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
+  }
 };
+
 
 const BasicDetailToRecBin = async (req, res) => {
     const { admission_no } = req.params;
@@ -45,6 +65,15 @@ const BasicDetailToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "basic_detail", JSON.stringify(record)]
@@ -74,6 +103,13 @@ const observationReportToRecBin = async (req, res) =>{
         }
 
         const record = rows[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
 
         // 2. Insert into recycle_bin
         await db.query(
@@ -105,6 +141,15 @@ const CheifComplainttoRecycleBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "cheif_complaint", JSON.stringify(record)]
@@ -133,6 +178,15 @@ const PresentingPrbtoRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "presenting_problems", JSON.stringify(record)]
@@ -161,6 +215,15 @@ const PsyHistoryToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "psy_history", JSON.stringify(record)]
@@ -189,6 +252,15 @@ const MedHistoryToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "medical_history", JSON.stringify(record)]
@@ -217,6 +289,15 @@ const FamHistoryToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "familyhis_data", JSON.stringify(record)]
@@ -245,6 +326,15 @@ const socialHistoryToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "social_history", JSON.stringify(record)]
@@ -273,6 +363,15 @@ const DevistoryToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "development_history", JSON.stringify(record)]
@@ -301,6 +400,15 @@ const SubstanceHistoryToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "substance_use", JSON.stringify(record)]
@@ -329,6 +437,15 @@ const suicidialUseToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+        
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "suicidal_data", JSON.stringify(record)]
@@ -357,6 +474,15 @@ const GeneralAppyToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "general_appearance", JSON.stringify(record)]
@@ -385,6 +511,14 @@ const SpeechToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+        
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "speech", JSON.stringify(record)]
@@ -413,6 +547,13 @@ const MoodAffectToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "mood_affect", JSON.stringify(record)]
@@ -441,6 +582,15 @@ const ThoughToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "though_form", JSON.stringify(record)]
@@ -469,6 +619,13 @@ const PreceptionToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "perception", JSON.stringify(record)]
@@ -497,6 +654,13 @@ const CognitionToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "conginition", JSON.stringify(record)]
@@ -525,6 +689,13 @@ const JudgementToRecBin = async (req, res) => {
         }
 
         const record = results[0];
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
         await db.query(
             "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
             [admission_no, "judgement", JSON.stringify(record)]
@@ -539,9 +710,81 @@ const JudgementToRecBin = async (req, res) => {
     }
 }
 
+const InsightToRecBin = async (req, res) => {
+    const { admission_no } = req.params;
+
+    try {
+        const results = await db.query(
+            "SELECT * FROM judgement WHERE admission_no = ?",
+            [admission_no]
+        );
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Not found" });
+        }
+
+        const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [admission_no, "judgement", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM judgement WHERE admission_no = ?", [admission_no]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+const ReunionSummaryToRecBin = async(req, res) =>{
+    const { admission_no } = req.params;
+
+    try {
+        const results = await db.query(
+            "SELECT * FROM reunion_summary WHERE admission_no = ?",
+            [admission_no]
+        );
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Not found" });
+        }
+
+        const record = results[0];
+
+        // Convert Date objects to MySQL DATETIME string before saving
+        Object.keys(record).forEach((key) => {
+            if (record[key] instanceof Date) {
+                record[key] = record[key].toISOString().slice(0, 19).replace("T", " ");
+            }
+        });
+
+        await db.query(
+            "INSERT INTO recycle_bin (ref_id, source_table, data) VALUES (?, ?, ?)",
+            [admission_no, "reunion_summary", JSON.stringify(record)]
+        );
+
+        await db.query("DELETE FROM reunion_summary WHERE admission_no = ?", [admission_no]);
+
+        res.json({ message: "Moved to recycle bin successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
 export {
     restoreRecycleBin, BasicDetailToRecBin, observationReportToRecBin, CheifComplainttoRecycleBin,
     PresentingPrbtoRecBin, PsyHistoryToRecBin, MedHistoryToRecBin, FamHistoryToRecBin, socialHistoryToRecBin,
     DevistoryToRecBin, SubstanceHistoryToRecBin, suicidialUseToRecBin,GeneralAppyToRecBin, SpeechToRecBin,MoodAffectToRecBin,
-    ThoughToRecBin, PreceptionToRecBin, CognitionToRecBin, JudgementToRecBin
+    ThoughToRecBin, PreceptionToRecBin, CognitionToRecBin, JudgementToRecBin, InsightToRecBin, ReunionSummaryToRecBin
 }

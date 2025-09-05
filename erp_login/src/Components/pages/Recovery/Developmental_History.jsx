@@ -239,7 +239,8 @@ function Developmental_History() {
         try {
             const confirmDelete = window.confirm("Are you sure you want to delete this record?");
             if (!confirmDelete) return; // if user clicks 'Cancel', do nothing
-            const res = await apiRoute.delete(`/social_remover/DevistoryToRecBin/${admission_no}`);
+            const res = await apiRoute.delete(`/social_remover/
+                /${admission_no}`);
             console.log(res.data);
             alert("Moved to recycle bin");
             getVisitDetails();

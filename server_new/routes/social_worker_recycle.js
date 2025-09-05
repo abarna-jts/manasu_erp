@@ -4,7 +4,7 @@ import { restoreRecycleBin, BasicDetailToRecBin, observationReportToRecBin,
     MedHistoryToRecBin, FamHistoryToRecBin, socialHistoryToRecBin, DevistoryToRecBin,
     SubstanceHistoryToRecBin, suicidialUseToRecBin, GeneralAppyToRecBin, SpeechToRecBin,
     MoodAffectToRecBin, ThoughToRecBin, PreceptionToRecBin, CognitionToRecBin,
-    JudgementToRecBin
+    JudgementToRecBin, InsightToRecBin, ReunionSummaryToRecBin
  } from "../controllers/social_worker_recycle.js";
 
 const router = express.Router();
@@ -63,5 +63,11 @@ router.delete("/CognitionToRecBin/:admission_no", CognitionToRecBin);
 
 //judgement
 router.delete("/JudgementToRecBin/:admission_no", JudgementToRecBin);
+
+//insight
+router.delete("/InsightToRecBin/:admission_no", InsightToRecBin);
+
+//reunion summary
+router.delete("/ReunionSummaryToRecBin/:admission_no", ReunionSummaryToRecBin);
 
 export default router;
