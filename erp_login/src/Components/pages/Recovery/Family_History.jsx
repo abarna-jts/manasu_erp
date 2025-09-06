@@ -319,7 +319,7 @@ function Family_History() {
                                                 <i className="fas fa-eye"></i>
                                             </button>
                                             {userType === "4" && (
-                                                <button className="btn btn-primary icon_details"
+                                                <button className="btn btn-secondary icon_details"
                                                     onClick={() => {
                                                         handleEditform(item.id);
                                                     }}

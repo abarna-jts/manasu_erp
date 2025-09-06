@@ -168,18 +168,21 @@ function Recycle_bin() {
                                             {(() => {
                                                 try {
                                                     const parsedData = JSON.parse(item.data); // convert string to object
-                                                    return Object.entries(parsedData)
-                                                        .slice(0, 5) // take only first 5 items
-                                                        .map(([key, value]) => (
-                                                            <div key={key}>
-                                                                <strong>{key}:</strong> {value}
-                                                            </div>
-                                                        ));
+                                                    // Filter out the 'id' key
+                                                    const entries = Object.entries(parsedData)
+                                                        .filter(([key]) => key !== 'id'&& key !=='admission_no') // exclude 'id'
+                                                        .slice(0, 5); // take first 5 items after filtering
+                                                    return entries.map(([key, value]) => (
+                                                        <div key={key}>
+                                                            <strong>{key}:</strong> {value}
+                                                        </div>
+                                                    ));
                                                 } catch (e) {
                                                     return item.data; // fallback if not JSON
                                                 }
                                             })()}
                                         </td>
+
 
 
                                         <td>

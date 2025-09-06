@@ -1845,7 +1845,7 @@ function Prescription_form() {
                         </table>
 
                         <Col md={12} className="mt-3 d-flex justify-content-center align-items-center">
-                            <Button variant="btn btn-primary" type='submit' onClick={handleUpdate}>Update</Button>
+                            <Button variant="btn btn-success" type='submit' onClick={handleUpdate}>Update</Button>
                         </Col>
                     </Form>
 

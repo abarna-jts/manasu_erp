@@ -257,14 +257,14 @@ function Dr_consultants() {
                                 fetchFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faEye} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
                                 alert("Please enter admission number.");
                             } else {
                                 createFormData(); // Fetch & populate data before generating PDF
                             }
                         }}><FontAwesomeIcon icon={faPlus} className="me-0" /></button>
-                        <button type="button" className="btn btn-primary mx-1" onClick={() => {
+                        <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
                                 alert("Please enter admission number.");
                             } else {

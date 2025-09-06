@@ -343,8 +343,8 @@ function SCRB_All_Details() {
                                         <th>S.No</th>
                                         <th>Admission No.</th>
                                         <th>Rescue Name</th>
-                                        <td>Old Photo</td>
                                         <td>New Photo</td>
+                                        <td>Old Photo</td>
                                         <th>File No.</th>
                                         <th>Name of the NGO</th>
                                         <th>Action</th>

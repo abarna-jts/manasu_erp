@@ -448,7 +448,7 @@ function AllStudentDetails() {
                                                 >
                                                     <i className="fas fa-eye"></i>
                                                 </button>
-                                                <button className="btn btn-primary icon_details"
+                                                <button className="btn btn-secondary icon_details"
                                                     onClick={() => {
                                                         handleEditform(item.id);
                                                     }}

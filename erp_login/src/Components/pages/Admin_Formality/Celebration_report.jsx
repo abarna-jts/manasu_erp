@@ -412,7 +412,7 @@ function Celebration_report() {
                                                         <i className="fas fa-eye"></i>
                                                     </Button>
                                                     <Button
-                                                        className="btn btn-primary icon_details"
+                                                        className="btn btn-secondary icon_details"
                                                         onClick={() => handleEditform(item.id)}
                                                     >
                                                         <i className="fas fa-edit"></i>

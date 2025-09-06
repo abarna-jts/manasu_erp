@@ -476,7 +476,7 @@ function Prescription_demo() {
                                                     }}>
                                                         <i className="fas fa-eye"></i>
                                                     </button>
-                                                    <button className="btn btn-primary icon_details" onClick={() => {
+                                                    <button className="btn btn-secondary icon_details" onClick={() => {
                                                         handleEditform(item.id);
                                                     }}>
                                                         <i className="fas fa-edit"></i>
@@ -852,7 +852,7 @@ function Prescription_demo() {
                         </table>
 
                         <Col md={12} className="mt-3 d-flex justify-content-center align-items-center">
-                            <Button variant="btn btn-primary" type='submit'>Save</Button>
+                            <Button variant="btn btn-secondary" type='submit'>Save</Button>
                         </Col>
                     </Form>
 

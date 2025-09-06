@@ -618,7 +618,7 @@ function Self_Declaration_form() {
                             }
                         }}><FontAwesomeIcon icon={faEdit} className="me-0" /></button>
                         {userType === "2" && (
-                            <button type="button" className="btn btn-success mx-1" onClick={() => {
+                            <button type="button" className="btn btn-danger mx-1" onClick={() => {
                                 if (!admission_no.trim()) {
                                     alert("Please enter admission number.");
                                 } else {
