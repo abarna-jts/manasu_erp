@@ -1057,7 +1057,7 @@ function Rescue_Record_Sheet() {
 
                         <Form.Group as={Row} className="mb-3" controlId="formFollowUp">
                             <Form.Label column sm="4" className='text-start'>Follow Up : <span style={{ color: 'red' }}>*</span></Form.Label>
-                            <Col sm="6">
+                            {/* <Col sm="6">
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
@@ -1067,6 +1067,22 @@ function Rescue_Record_Sheet() {
                                     multiple
 
                                 />
+                            </Col> */}
+                            <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                <div
+                                    className="wrap-textarea"
+                                    style={{
+
+                                        minHeight: '40px',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        textAlign: "justify"
+                                    }}
+                                >
+                                    {formState.follow_up}
+                                </div>
+
                             </Col>
 
                         </Form.Group>

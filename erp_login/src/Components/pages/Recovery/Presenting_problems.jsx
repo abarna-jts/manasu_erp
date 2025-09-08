@@ -428,12 +428,28 @@ function Presenting_problems() {
                     </li>
                     <Form.Group className="mb-3" as={Row}>
                         <Form.Label column sm="4" className='text-start'>History of Presenting Illness:</Form.Label>
-                        <Col sm="8">
+                        {/* <Col sm="8">
                             <Form.Control as="textarea" rows={2}
                                 name='history_presenting'
                                 value={presentingData.history_presenting}
                                 onChange={handleInputChange}
                                 required />
+                        </Col> */}
+                        <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {presentingData.history_presenting}
+                            </div>
+
                         </Col>
 
                     </Form.Group>
@@ -516,7 +532,7 @@ function Presenting_problems() {
 
                     <Form.Group className="mb-3" as={Row}>
                         <Form.Label column sm="4" className='text-start'>Appetite and Weight Changes: </Form.Label>
-                        <Col md={8}>
+                        {/* <Col md={8}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -525,17 +541,49 @@ function Presenting_problems() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {presentingData.appetite_weight}
+                            </div>
+
                         </Col>
                     </Form.Group>
 
                     <Form.Group className="mb-3" as={Row}>
                         <Form.Label column sm="4" className='text-start'>Energy Level: </Form.Label>
-                        <Col md={8}>
+                        {/* <Col md={8}>
                             <Form.Control as="textarea" rows={2}
                                 name='energy_level'
                                 value={presentingData.energy_level}
                                 onChange={handleInputChange}
                                 required />
+                        </Col> */}
+                        <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {presentingData.energy_level}
+                            </div>
+
                         </Col>
 
                     </Form.Group>
@@ -546,45 +594,110 @@ function Presenting_problems() {
 
                     <Form.Group className="mb-3" as={Row}>
                         <Form.Label column sm="4" className='text-start'>Occupational or Academic Functioning: </Form.Label>
-                        <Col md={8}>
+                        {/* <Col md={8}>
                             <Form.Control as="textarea" rows={2}
                                 name='occupation_academic'
                                 value={presentingData.occupation_academic}
                                 onChange={handleInputChange}
                                 required />
                         </Col>
+                         */}
+                        <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {presentingData.occupation_academic}
+                            </div>
+
+                        </Col>
                     </Form.Group>
 
                     <Form.Group className="mb-3" as={Row} >
                         <Form.Label column sm="4" className='text-start'>Interpersonal Relationships: </Form.Label>
-                        <Col md={8}>
+                        {/* <Col md={8}>
                             <Form.Control as="textarea" rows={2}
                                 name='interpersonal_relationship'
                                 value={presentingData.interpersonal_relationship}
                                 onChange={handleInputChange}
                                 required />
+                        </Col> */}
+                        <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {presentingData.interpersonal_relationship}
+                            </div>
+
                         </Col>
                     </Form.Group>
 
                     <Form.Group className="mb-3" as={Row} >
                         <Form.Label column sm="4" className='text-start'>Self-Care and Activities of Daily Living: </Form.Label>
-                        <Col md={8}>
+                        {/* <Col md={8}>
                             <Form.Control as="textarea" rows={2}
                                 name='selfCare_activity'
                                 value={presentingData.selfCare_activity}
                                 onChange={handleInputChange}
                                 required />
+                        </Col> */}
+                        <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {presentingData.selfCare_activity}
+                            </div>
+
                         </Col>
                     </Form.Group>
 
                     <Form.Group className="mb-3" as={Row} >
                         <Form.Label column sm="4" className='text-start'>Recreational Activities: </Form.Label>
-                        <Col md={8}>
+                        {/* <Col md={8}>
                             <Form.Control as="textarea" rows={2}
                                 name='recreation_activity'
                                 value={presentingData.recreation_activity}
                                 onChange={handleInputChange}
                                 required />
+
+                        </Col> */}
+                        <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {presentingData.recreation_activity}
+                            </div>
 
                         </Col>
                     </Form.Group>

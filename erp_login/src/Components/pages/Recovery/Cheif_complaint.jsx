@@ -486,23 +486,48 @@ function Cheif_complaint() {
 
                     <Form.Group as={Row} className="mb-2 text-start" >
                         <Form.Label column sm="4">Identify Triggers: </Form.Label>
-                        <Col sm="8">
+                        {/* <Col sm="8">
                             <Form.Control type="text"
                                 name='identify_trigger'
                                 value={chiefData.identify_trigger}
                                 onChange={handleInputChange}
                                 required />
+                        </Col> */}
+                        <Col sm={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {chiefData.identify_trigger}
+                            </div>
+
                         </Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-2 text-start" >
                         <Form.Label column sm="4">Life Changes and Stressors: </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='life_changes'
-                                value={chiefData.life_changes}
-                                onChange={handleInputChange}
-                                required />
+                        <Col sm={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {chiefData.life_changes}
+                            </div>
+
                         </Col>
                     </Form.Group>
 
@@ -512,34 +537,61 @@ function Cheif_complaint() {
 
                     <Form.Group as={Row} className="mb-2 text-start" >
                         <Form.Label column sm="4">Biological:</Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='biological'
-                                value={chiefData.biological}
-                                onChange={handleInputChange}
-                                required />
+                        <Col sm={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {chiefData.biological}
+                            </div>
+
                         </Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-2 text-start" >
                         <Form.Label column sm="4">Psychological:  </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='psychological'
-                                value={chiefData.psychological}
-                                onChange={handleInputChange}
-                                required />
+                        <Col sm={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {chiefData.psychological}
+                            </div>
+
                         </Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-2 text-start" >
                         <Form.Label column sm="4">Social / Environmental: </Form.Label>
-                        <Col sm="8">
-                            <Form.Control type="text"
-                                name='social_environment'
-                                value={chiefData.social_environment}
-                                onChange={handleInputChange}
-                                required />
+                        <Col sm={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {chiefData.social_environment}
+                            </div>
+
                         </Col>
                     </Form.Group>
                 </Form>

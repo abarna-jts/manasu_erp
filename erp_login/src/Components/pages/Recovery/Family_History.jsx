@@ -359,7 +359,7 @@ function Family_History() {
                         >
                             <i className="fas fa-chevron-right"></i>
                         </button>
-                    </div>+
+                    </div>
                 </Row>
             </Container>
             <div ref={formRef} style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff", padding: "20px", width: "210mm" }}>

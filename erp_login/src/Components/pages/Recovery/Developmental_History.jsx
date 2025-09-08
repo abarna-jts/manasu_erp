@@ -406,7 +406,7 @@ function Developmental_History() {
                                 <h5>Prenatal Factors: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -415,6 +415,22 @@ function Developmental_History() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.prenatal_factors}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -423,15 +439,21 @@ function Developmental_History() {
                                 <h5>Birth Details: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='birth_details'
-                                value={developmentalData.birth_details}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.birth_details}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -440,15 +462,21 @@ function Developmental_History() {
                                 <h5>Birth Order: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='birth_order'
-                                value={developmentalData.birth_order}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.birth_order}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -457,15 +485,21 @@ function Developmental_History() {
                                 <h5>Number of Siblings: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='siblings_number'
-                                value={developmentalData.siblings_number}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.siblings_number}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -474,15 +508,21 @@ function Developmental_History() {
                                 <h5>Attachment and Bonding: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='bonding_attachment'
-                                value={developmentalData.bonding_attachment}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.bonding_attachment}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -491,15 +531,21 @@ function Developmental_History() {
                                 <h5>Developmental Milestones: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='milestones_development'
-                                value={developmentalData.milestones_development}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.milestones_development}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -508,15 +554,21 @@ function Developmental_History() {
                                 <h5>Childhood Illnesses and Injuries: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='childhood_illness'
-                                value={developmentalData.childhood_illness}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.childhood_illness}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -525,15 +577,21 @@ function Developmental_History() {
                                 <h5>Siblings and Relationships: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='siblings_relationship'
-                                value={developmentalData.siblings_relationship}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.siblings_relationship}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -542,15 +600,21 @@ function Developmental_History() {
                                 <h5>Parenting Styles: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='parenting_style'
-                                value={developmentalData.parenting_style}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.parenting_style}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -559,15 +623,21 @@ function Developmental_History() {
                                 <h5>Learning Challenges: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='learning_challenge'
-                                value={developmentalData.learning_challenge}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.learning_challenge}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -576,15 +646,21 @@ function Developmental_History() {
                                 <h5>Pubertal Development: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='pubertal_development'
-                                value={developmentalData.pubertal_development}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {developmentalData.pubertal_development}
+                            </div>
+
                         </Col>
                     </Form.Group>
                 </Form>

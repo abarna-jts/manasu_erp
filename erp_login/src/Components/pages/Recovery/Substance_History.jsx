@@ -402,7 +402,7 @@ function Substance_History() {
                                 <h5>Types of Substances Used: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -411,6 +411,22 @@ function Substance_History() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.substance_use}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -419,15 +435,21 @@ function Substance_History() {
                                 <h5>Age of Onset: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='age_onset'
-                                value={substanceData.age_onset}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.age_onset}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -436,15 +458,21 @@ function Substance_History() {
                                 <h5>Frequency : </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='frequency'
-                                value={substanceData.frequency}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.frequency}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -453,15 +481,21 @@ function Substance_History() {
                                 <h5>Quantity  : </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='quantity'
-                                value={substanceData.quantity}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.quantity}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -470,15 +504,21 @@ function Substance_History() {
                                 <h5>Motivations for Use  : </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='motivation_use'
-                                value={substanceData.motivation_use}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.motivation_use}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -487,15 +527,21 @@ function Substance_History() {
                                 <h5>Environmental Triggers  : </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='environmental_trigger'
-                                value={substanceData.environmental_trigger}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.environmental_trigger}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -504,15 +550,21 @@ function Substance_History() {
                                 <h5>Impact on Occupational or Academic Functioning :  </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='impact_occupation'
-                                value={substanceData.impact_occupation}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.impact_occupation}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -521,15 +573,21 @@ function Substance_History() {
                                 <h5>Impact on Interpersonal Relationships :  </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='impact_interpersonal'
-                                value={substanceData.impact_interpersonal}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.impact_interpersonal}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -538,15 +596,21 @@ function Substance_History() {
                                 <h5>Legal or Financial Consequences :  </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='financial_consequences'
-                                value={substanceData.financial_consequences}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.financial_consequences}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -555,15 +619,21 @@ function Substance_History() {
                                 <h5>Craving intensity :  </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='craving_intensity'
-                                value={substanceData.craving_intensity}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.craving_intensity}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -572,15 +642,21 @@ function Substance_History() {
                                 <h5>Previous Treatment Attempts :  </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='previous_treatment'
-                                value={substanceData.previous_treatment}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.previous_treatment}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -589,15 +665,21 @@ function Substance_History() {
                                 <h5>Relapse History :  </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='relapse_history'
-                                value={substanceData.relapse_history}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {substanceData.relapse_history}
+                            </div>
+
                         </Col>
                     </Form.Group>
                 </Form>

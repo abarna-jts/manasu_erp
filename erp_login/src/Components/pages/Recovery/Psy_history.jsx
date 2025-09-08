@@ -444,7 +444,7 @@ function Psy_history() {
                                 <h5>Previous Psychiatric Diagnoses: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -453,6 +453,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.psychiatric_diagnoses}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -461,7 +477,7 @@ function Psy_history() {
                                 <h5>Treatment History: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -470,6 +486,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.treatment_history}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <li className='icon-li text-start'>
@@ -556,34 +588,62 @@ function Psy_history() {
                         <h5>Psychiatric Hospitalizations: </h5>
                     </li>
                     <Row>
-                        <Col sm={4}>
+                        <Col sm={6}>
                             <Form.Group>
                                 <Form.Label className='text-start'>
                                     Reasons :
                                 </Form.Label>
-                                <Form.Control
+                                {/* <Form.Control
                                     as="textarea"
                                     rows={2}
                                     name='hospitalisation_reason'
                                     value={psyHistoryData.hospitalisation_reason}
                                     onChange={handleInputChange}
                                     required
-                                />
+                                /> */}
+                                <div
+                                    className="wrap-textarea"
+                                    style={{
+
+                                        minHeight: '40px',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        textAlign: "justify",
+                                        border: "1px solid #ccc", padding: "8px", borderRadius: "5px"
+                                    }}
+                                >
+                                    {psyHistoryData.hospitalisation_reason}
+                                </div>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
+                        <Col sm={6}>
                             <Form.Group>
                                 <Form.Label className='text-start'>
                                     Duration and the Outcomes :
                                 </Form.Label>
-                                <Form.Control
+                                {/* <Form.Control
                                     as="textarea"
                                     rows={2}
                                     name='duration'
                                     value={psyHistoryData.duration}
                                     onChange={handleInputChange}
                                     required
-                                />
+                                /> */}
+                                <div
+                                    className="wrap-textarea"
+                                    style={{
+
+                                        minHeight: '40px',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        textAlign: "justify",
+                                        border: "1px solid #ccc", padding: "8px", borderRadius: "5px"
+                                    }}
+                                >
+                                    {psyHistoryData.duration}
+                                </div>
                             </Form.Group>
                         </Col>
                     </Row>
@@ -593,7 +653,7 @@ function Psy_history() {
                                 <h5>Crisis Episodes: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -602,6 +662,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px"}}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.crisis_episodes}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -610,7 +686,7 @@ function Psy_history() {
                                 <h5>Family Members with Mental Health Diagnoses: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -619,6 +695,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.fm_mentalHealth}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -627,7 +719,7 @@ function Psy_history() {
                                 <h5>Significant Life Events and Stressors: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -636,6 +728,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px"}}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.significant_life}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -644,7 +752,7 @@ function Psy_history() {
                                 <h5>Chronic Stressors: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -653,6 +761,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px"}}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.chronic_stressors}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -661,7 +785,7 @@ function Psy_history() {
                                 <h5>Exploration of Trauma: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -670,6 +794,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px"}}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.trauma_exploration}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -678,7 +818,7 @@ function Psy_history() {
                                 <h5>Others Exploration of Trauma: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -687,6 +827,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px"}}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.other_exploration || "Null"}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -695,7 +851,7 @@ function Psy_history() {
                                 <h5>Legal Involvement: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -704,6 +860,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px"}}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.legal_environment}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -712,7 +884,7 @@ function Psy_history() {
                                 <h5>Others Legal Involvement: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -721,6 +893,22 @@ function Psy_history() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px"}}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {psyHistoryData.other_legalEnvironment || "Null"}
+                            </div>
+
                         </Col>
                     </Form.Group>
 

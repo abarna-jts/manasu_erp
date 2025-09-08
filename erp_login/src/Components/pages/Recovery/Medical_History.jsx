@@ -409,7 +409,7 @@ function Medical_History() {
                                 <h5>Disability Status (Physical or Psychological): </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -418,6 +418,22 @@ function Medical_History() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.disability_status}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -426,7 +442,7 @@ function Medical_History() {
                                 <h5>Chronic Medical Conditions: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -435,6 +451,22 @@ function Medical_History() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.chronic_medical}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -443,15 +475,21 @@ function Medical_History() {
                                 <h5>Acute Health Concerns: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='acute_health'
-                                value={medicalData.acute_health}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.acute_health}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -460,15 +498,21 @@ function Medical_History() {
                                 <h5>Medication (Duration and Outcomes): </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='medication'
-                                value={medicalData.medication}
-                                onChange={handleInputChange}
-                                required
-                            />
+                       <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.medication}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -477,15 +521,21 @@ function Medical_History() {
                                 <h5>Medication Allergies: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='medication_allergies'
-                                value={medicalData.medication_allergies}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.medication_allergies}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -494,15 +544,21 @@ function Medical_History() {
                                 <h5>Other Allergies or Sensitivities: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='other_allergy'
-                                value={medicalData.other_allergy}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.other_allergy}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -511,15 +567,21 @@ function Medical_History() {
                                 <h5>Significant Medical Events: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='significant_medical'
-                                value={medicalData.significant_medical}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.significant_medical}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -528,15 +590,21 @@ function Medical_History() {
                                 <h5>Traumatic Injuries: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='traumatic_injuries'
-                                value={medicalData.traumatic_injuries}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.traumatic_injuries}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -545,15 +613,21 @@ function Medical_History() {
                                 <h5>Sexual Health: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='sexual_health'
-                                value={medicalData.sexual_health}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {medicalData.sexual_health}
+                            </div>
+
                         </Col>
                     </Form.Group>
                 </Form>

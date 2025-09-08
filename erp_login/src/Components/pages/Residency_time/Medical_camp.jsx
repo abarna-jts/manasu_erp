@@ -662,13 +662,29 @@ function Medical_camp() {
                                 <Form.Label column sm="5" className='text-start'>
                                     Feedback :
                                 </Form.Label>
-                                <Col sm="7">
+                                {/* <Col sm="7">
                                     <Form.Control
                                         as="textarea"
                                         name="feedback"
                                         value={formState.feedback || "NULL"}
                                         onChange={handleChange1}
                                         required />
+                                </Col> */}
+                                <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                    <div
+                                        className="wrap-textarea"
+                                        style={{
+
+                                            minHeight: '40px',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            textAlign: "justify"
+                                        }}
+                                    >
+                                        {formState.feedback || "NULL"}
+                                    </div>
+
                                 </Col>
                             </Form.Group>
                         </Col>

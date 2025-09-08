@@ -379,7 +379,7 @@ function Suicidal_Data() {
                                 <h5>History of Suicide Attempts: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
+                        {/* <Col md={6}>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -388,6 +388,22 @@ function Suicidal_Data() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </Col> */}
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {suicidalData.suicide_history}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -396,15 +412,21 @@ function Suicidal_Data() {
                                 <h5>Triggers and Stressors: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='triggers_stressors'
-                                value={suicidalData.triggers_stressors}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {suicidalData.triggers_stressors}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -413,15 +435,21 @@ function Suicidal_Data() {
                                 <h5>History of Homicidal Ideation: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='homicidal_ideation'
-                                value={suicidalData.homicidal_ideation}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {suicidalData.homicidal_ideation}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -430,15 +458,21 @@ function Suicidal_Data() {
                                 <h5>Target and Method: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='target_method'
-                                value={suicidalData.target_method}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {suicidalData.target_method}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -447,15 +481,21 @@ function Suicidal_Data() {
                                 <h5>Immediate Threat: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='immediate_threat'
-                                value={suicidalData.immediate_threat}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {suicidalData.immediate_threat}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -464,15 +504,21 @@ function Suicidal_Data() {
                                 <h5>Necessity of Emergency Response: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='emergency_response'
-                                value={suicidalData.emergency_response}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {suicidalData.emergency_response}
+                            </div>
+
                         </Col>
                     </Form.Group>
                     <Form.Group className="mb-3" as={Row}>
@@ -481,15 +527,21 @@ function Suicidal_Data() {
                                 <h5>Hospitalization Required: </h5>
                             </li>
                         </Form.Label>
-                        <Col md={6}>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name='hospital_required'
-                                value={suicidalData.hospital_required}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px" }}>
+                            <div
+                                className="wrap-textarea"
+                                style={{
+
+                                    minHeight: '40px',
+                                    whiteSpace: 'pre-wrap',
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    textAlign: "justify"
+                                }}
+                            >
+                                {suicidalData.hospital_required}
+                            </div>
+
                         </Col>
                     </Form.Group>
                 </Form>

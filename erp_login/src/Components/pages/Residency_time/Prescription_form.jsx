@@ -514,17 +514,36 @@ function Prescription_form() {
             return;
         }
 
-        const canvas = await html2canvas(input, { scale: 2 });
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        try {
+            const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/png");
 
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            while (heightLeft > 0) {
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    position = -imgHeight + heightLeft;
+                }
+            }
+
+            const pdfBlob = pdf.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, '_blank');
+        } catch (err) {
+            console.error("Error generating PDF:", err);
+            alert("Failed to generate PDF.");
+        }
     };
 
     const handleEditform = async (id) => {
@@ -1054,7 +1073,7 @@ function Prescription_form() {
                                         >
                                             <option value="" disabled hidden>Select Type</option>
                                             <option value="General">General</option>
-                                            <option value="Psychiatrist">Psychiatrist</option>
+                                            <option value="Psychiatric">Psychiatric</option>
                                         </Form.Select>
                                     </Col>
                                 </Form.Group>
@@ -1306,7 +1325,7 @@ function Prescription_form() {
                                 <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Admission No.:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Admission No.:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.admission_no} />
                                             </Col>
@@ -1314,7 +1333,7 @@ function Prescription_form() {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Resident's Name:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Resident's Name:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.rescue_name} />
                                             </Col>
@@ -1325,7 +1344,7 @@ function Prescription_form() {
 
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Age:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Age:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.age} />
                                             </Col>
@@ -1333,7 +1352,7 @@ function Prescription_form() {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Out Patient No.:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Out Patient No.:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.op_no} />
                                             </Col>
@@ -1343,7 +1362,7 @@ function Prescription_form() {
                                 <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Hospital Name:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Hospital Name:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.hospital_name} />
                                             </Col>
@@ -1351,7 +1370,7 @@ function Prescription_form() {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Department:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Department:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.department} />
                                             </Col>
@@ -1361,7 +1380,7 @@ function Prescription_form() {
                                 <Row>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Diagnosis:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Diagnosis:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={viewData.diagnosis} />
                                             </Col>
@@ -1369,7 +1388,7 @@ function Prescription_form() {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Date:</Form.Label>
+                                            <Form.Label column sm="5" className='text-start'>Date:</Form.Label>
                                             <Col sm="7">
                                                 <Form.Control readOnly value={formatDate(viewData.created_date)} />
                                             </Col>
@@ -1378,30 +1397,74 @@ function Prescription_form() {
 
                                 </Row>
                                 <Row>
-                                    <Col md={6}>
+                                    <Col md={12}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Instruction:</Form.Label>
-                                            <Col sm="7">
+                                            <Form.Label column sm="3" className='text-start mr-5'>Instruction:</Form.Label>
+                                            {/* <Col sm="7">
                                                 <Form.Control as="textarea" rows={1} readOnly value={viewData.instruction} />
+                                            </Col> */}
+                                            <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                                <div
+                                                    className="wrap-textarea"
+                                                    style={{
+
+                                                        minHeight: '40px',
+                                                        whiteSpace: 'pre-wrap',
+                                                        wordWrap: 'break-word',
+                                                        overflowWrap: 'break-word',
+                                                        textAlign: "justify"
+                                                    }}
+                                                >
+                                                    {viewData.instruction}
+                                                </div>
+
                                             </Col>
                                         </Form.Group>
                                     </Col>
-                                    <Col md={6}>
+                                </Row>
+                                <Row>
+                                    <Col md={12}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Advice:</Form.Label>
-                                            <Col sm="7">
-                                                <Form.Control as="textarea" rows={1} readOnly value={viewData.advice} />
+                                            <Form.Label column sm="3" className='text-start'>Advice:</Form.Label>
+                                            <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                                <div
+                                                    className="wrap-textarea"
+                                                    style={{
+
+                                                        minHeight: '40px',
+                                                        whiteSpace: 'pre-wrap',
+                                                        wordWrap: 'break-word',
+                                                        overflowWrap: 'break-word',
+                                                        textAlign: "justify"
+                                                    }}
+                                                >
+                                                    {viewData.advice}
+                                                </div>
+
                                             </Col>
                                         </Form.Group>
                                     </Col>
 
                                 </Row>
                                 <Row>
-                                    <Col md={6}>
+                                    <Col md={12}>
                                         <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="5">Follow Up:</Form.Label>
-                                            <Col sm="7">
-                                                <Form.Control as="textarea" rows={1} readOnly value={viewData.follow_up} />
+                                            <Form.Label column sm="3" className='text-start'>Follow Up:</Form.Label>
+                                            <Col md={8} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                                <div
+                                                    className="wrap-textarea"
+                                                    style={{
+
+                                                        minHeight: '40px',
+                                                        whiteSpace: 'pre-wrap',
+                                                        wordWrap: 'break-word',
+                                                        overflowWrap: 'break-word',
+                                                        textAlign: "justify"
+                                                    }}
+                                                >
+                                                    {viewData.follow_up}
+                                                </div>
+
                                             </Col>
                                         </Form.Group>
                                     </Col>
@@ -1615,7 +1678,7 @@ function Prescription_form() {
                                         >
                                             <option value="" disabled hidden>Select Type</option>
                                             <option value="General">General</option>
-                                            <option value="Psychiatrist">Psychiatrist</option>
+                                            <option value="Psychiatric">Psychiatric</option>
                                         </Form.Select>
                                     </Col>
                                 </Form.Group>

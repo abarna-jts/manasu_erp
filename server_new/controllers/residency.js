@@ -911,8 +911,6 @@ const updatePrescription = async (req, res) => {
   }
 };
 
-
-
 const createDrVisit = async (req, res) => {
   const {
     dr_name,

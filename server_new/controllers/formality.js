@@ -1557,7 +1557,7 @@ const updateStudentDetail = async (req, res) => {
         const {
             stud_name, stud_id, department, email, phone, secondary_phone,
             field, other_field, supervisor_name, supervisor_email, supervisor_phone,
-            clg_name, duration, from_date, to_date
+            clg_name, duration, from_date, to_date, choose_intern
         } = req.body;
 
 
@@ -1592,13 +1592,14 @@ const updateStudentDetail = async (req, res) => {
                     clg_name = ?, 
                     duration = ?, 
                     from_date = ?, 
-                    to_date = ?
+                    to_date = ?, 
+                    choose_intern = ?
                     WHERE id= ?`;
 
 
         const values = [
             stud_name, stud_id, JSON.stringify(studentPhotoPath), email, phone, secondary_phone, field, other_field, supervisor_name,
-            supervisor_email, supervisor_phone, department, clg_name, duration, from_date, to_date, id
+            supervisor_email, supervisor_phone, department, clg_name, duration, from_date, to_date, choose_intern, id
         ];
 
         const [result] = await db.query(usquery, values);

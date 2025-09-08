@@ -877,7 +877,7 @@ function Edit_Rescue_details() {
                     </Form.Group>
                     <Form.Group as={Row} className="mb-1 text-start" controlId="formRemark">
                       <Form.Label column sm="4">
-                        Remark :
+                        Notes :
                       </Form.Label>
                       <Col sm="8">
                         <Form.Control

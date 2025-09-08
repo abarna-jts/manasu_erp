@@ -30,6 +30,7 @@ function AllStudentDetails() {
         phone: '',
         secondary_phone: '',
         field: '',
+        other_field: '',
         clg_name: '',
         duration: '',
         from_date: '',
@@ -279,8 +280,6 @@ function AllStudentDetails() {
                     formDataToSend.append('stud_photo', files.stud_photo);
                 }
             }
-
-
 
             const response = await apiRoute.put(
                 `/formality/updateStudentDetail/${id}`,
@@ -775,7 +774,7 @@ function AllStudentDetails() {
                                 <Form.Label column sm="5">
                                     Why did you choose MANASU for your internship?
                                 </Form.Label>
-                                <Col sm="6">
+                                {/* <Col sm="6">
                                     <Form.Control
                                         as="textarea" rows={3}
                                         name="choose_intern"
@@ -784,6 +783,22 @@ function AllStudentDetails() {
                                         onChange={handleInputChange}
                                         required
                                     />
+                                </Col> */}
+                                <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                    <div
+                                        className="wrap-textarea"
+                                        style={{
+
+                                            minHeight: '40px',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            textAlign: "justify"
+                                        }}
+                                    >
+                                        {formData.choose_intern}
+                                    </div>
+
                                 </Col>
                             </Form.Group>
 

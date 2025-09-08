@@ -680,8 +680,8 @@ function Rescue_details() {
                                     <Form.Label column sm="5">
                                         Date & Time :
                                     </Form.Label>
-                                    <Col sm="7 text-start" style={{ paddingTop: "7px", border: "1px solid #ced4da", borderRadius: "0.25rem", width:"53%", marginLeft:"15px" }}>
-                                        {formData.date_time }
+                                    <Col sm="7 text-start" style={{ paddingTop: "7px", border: "1px solid #ced4da", borderRadius: "0.25rem", width: "53%", marginLeft: "15px" }}>
+                                        {formData.date_time}
                                     </Col>
                                 </Form.Group>
 
@@ -1145,12 +1145,29 @@ function Rescue_details() {
                                     <Form.Label column sm="4">
                                         Notes :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    {/* <Col sm="8">
                                         <Form.Control
                                             as="textarea"
                                             name="remark"
                                             value={formData.remark || "null"}
                                             onChange={handleInputChange} />
+                                    </Col> */}
+
+                                    <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                        <div
+                                            className="wrap-textarea"
+                                            style={{
+
+                                                minHeight: '40px',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word',
+                                                overflowWrap: 'break-word',
+                                                textAlign: "justify"
+                                            }}
+                                        >
+                                            {formData.remark || "null"}
+                                        </div>
+
                                     </Col>
                                 </Form.Group>
 
@@ -1161,65 +1178,137 @@ function Rescue_details() {
                                     <Form.Label column sm="4">
                                         Mental status :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    {/* <Col sm="8">
                                         <Form.Control
                                             as="textarea"
                                             name="mental_status"
                                             rows={1}
                                             value={formData.mental_status}
                                             onChange={handleInputChange} />
+                                    </Col> */}
+                                    <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                        <div
+                                            className="wrap-textarea"
+                                            style={{
+
+                                                minHeight: '40px',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word',
+                                                overflowWrap: 'break-word',
+                                                textAlign: "justify"
+                                            }}
+                                        >
+                                            {formData.mental_status || "null"}
+                                        </div>
+
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formIntimated">
                                     <Form.Label column sm="4">
                                         Cognitive Behavior :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    {/* <Col sm="8">
                                         <Form.Control
                                             as="textarea"
                                             name="behaviour"
                                             rows={1}
                                             value={formData.behaviour}
                                             onChange={handleInputChange} />
+                                    </Col> */}
+                                    <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                        <div
+                                            className="wrap-textarea"
+                                            style={{
+
+                                                minHeight: '40px',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word',
+                                                overflowWrap: 'break-word',
+                                                textAlign: "justify"
+                                            }}
+                                        >
+                                            {formData.behaviour || "null"}
+                                        </div>
+
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formInformation">
                                     <Form.Label column sm="4">
                                         Communication Ability :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    {/* <Col sm="8">
                                         <Form.Control
                                             as="textarea"
                                             rows={1}
                                             name="community_ability"
                                             value={formData.community_ability}
                                             onChange={handleInputChange} />
+                                    </Col> */}
+                                    <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                        <div
+                                            className="wrap-textarea"
+                                            style={{
+
+                                                minHeight: '40px',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word',
+                                                overflowWrap: 'break-word',
+                                                textAlign: "justify"
+                                            }}
+                                        >
+                                            {formData.community_ability || "null"}
+                                        </div>
+
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formInformation">
                                     <Form.Label column sm="4">
                                         Self-Care Capacity :
                                     </Form.Label>
-                                    <Col sm="8">
+                                    {/* <Col sm="8">
                                         <Form.Control
                                             as="textarea"
                                             rows={1}
                                             name="self_careCapacity"
                                             value={formData.self_careCapacity}
                                             onChange={handleInputChange} />
+                                    </Col> */}
+                                    <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                        <div
+                                            className="wrap-textarea"
+                                            style={{
+
+                                                minHeight: '40px',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word',
+                                                overflowWrap: 'break-word',
+                                                textAlign: "justify"
+                                            }}
+                                        >
+                                            {formData.self_careCapacity || "null"}
+                                        </div>
+
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formInformation">
                                     <Form.Label column sm="4">
                                         Diagnosis :
                                     </Form.Label>
-                                    <Col sm="8">
-                                        <Form.Control
-                                            as="textarea"
-                                            rows={1}
-                                            name="diagnosis"
-                                            value={formData.diagnosis}
-                                            onChange={handleInputChange} />
+                                    <Col md={6} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                        <div
+                                            className="wrap-textarea"
+                                            style={{
+
+                                                minHeight: '40px',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word',
+                                                overflowWrap: 'break-word',
+                                                textAlign: "justify"
+                                            }}
+                                        >
+                                            {formData.diagnosis || "null"}
+                                        </div>
+
                                     </Col>
                                 </Form.Group>
 
