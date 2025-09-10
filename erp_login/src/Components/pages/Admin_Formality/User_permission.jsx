@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, InputGroup, Button, Table } from 'react-boot
 import { Breadcrumb } from '@themesberg/react-bootstrap';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 function User_permission() {
   const [userDetails, setUserDetails] = useState([]);
@@ -69,7 +70,7 @@ function User_permission() {
             <div className="d-block mb-4 mb-xl-0 form_2A_breadcrumb">
               <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                 <Breadcrumb.Item></Breadcrumb.Item>
-                <Breadcrumb.Item>Home</Breadcrumb.Item>
+                <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                 <Breadcrumb.Item active>Director</Breadcrumb.Item>
               </Breadcrumb>
               <h6 className="breadcrumb_title">User Permission</h6>

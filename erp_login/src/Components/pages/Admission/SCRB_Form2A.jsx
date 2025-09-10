@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { Link } from 'react-router-dom';
 
 function SCRB_Form2A() {
   const [admission_no, setAdmissionNumber] = useState('');
@@ -392,7 +393,7 @@ function SCRB_Form2A() {
             <div className="d-block mb-4 mb-xl-0 form_2A_breadcrumb">
               <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                 <Breadcrumb.Item></Breadcrumb.Item>
-                <Breadcrumb.Item>Home</Breadcrumb.Item>
+                <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                 <Breadcrumb.Item active>Admission</Breadcrumb.Item>
               </Breadcrumb>
               <h6 className="breadcrumb_title">SCRB Form</h6>

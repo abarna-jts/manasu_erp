@@ -11,6 +11,7 @@ import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import imageCompression from 'browser-image-compression';
+import { Link } from 'react-router-dom';
 
 function Media_consent_form() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -537,7 +538,7 @@ function Media_consent_form() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Reunion</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Media Consent</h6>
@@ -806,7 +807,7 @@ function Media_consent_form() {
                             <Form.Label column sm="4" className='text-start'>
                                 Description :
                             </Form.Label>
-                            <Col sm="8">
+                            {/* <Col sm="8">
                                 <Form.Control
                                     as="textarea"
                                     rows={2}
@@ -814,6 +815,22 @@ function Media_consent_form() {
                                     value={refData.description}
                                     onChange={handleInputChange}
                                     required />
+                            </Col> */}
+                            <Col md={7} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                <div
+                                    className="wrap-textarea"
+                                    style={{
+
+                                        minHeight: '40px',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        textAlign: "justify"
+                                    }}
+                                >
+                                    {refData.description}
+                                </div>
+
                             </Col>
                         </Form.Group>
                         <Col md={12}>

@@ -10,6 +10,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { Link } from 'react-router-dom';
 
 function Rescue_details() {
     const [rescue_details, setRescueDetails] = useState([]);
@@ -434,7 +435,7 @@ function Rescue_details() {
                 <div className="d-block mb-4 mb-xl-0 px-4 ">
                     <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                         <Breadcrumb.Item></Breadcrumb.Item>
-                        <Breadcrumb.Item>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                         <Breadcrumb.Item active>Rescue Details</Breadcrumb.Item>
                     </Breadcrumb>
                     <h6 className="breadcrumb_title">Rescue Details</h6>

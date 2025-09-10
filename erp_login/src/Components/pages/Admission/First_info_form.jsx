@@ -9,6 +9,7 @@ import { Alert } from "react-bootstrap";
 import { useSelector, useDispatch } from 'react-redux';
 import { setField, resetAll } from '../../../store/admissionSlice.js';
 import imageCompression from 'browser-image-compression';
+import { Link } from 'react-router-dom';
 
 function First_info_form() {
     const [admissionNumber, setAdmissionNo] = useState('');
@@ -885,7 +886,7 @@ function First_info_form() {
                 <div className="d-block mb-4 mb-xl-0 px-4 ">
                     <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                         <Breadcrumb.Item></Breadcrumb.Item>
-                        <Breadcrumb.Item>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                         <Breadcrumb.Item active>Admission</Breadcrumb.Item>
                     </Breadcrumb>
                     <h6 className="breadcrumb_title">Resident Intake Form</h6>

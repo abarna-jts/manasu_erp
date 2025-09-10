@@ -17,6 +17,7 @@ import {
     setField, resetDemographics, resetCheifState, resetPresentationState, resetPsychiatricState,
     resetMedicalState, resetFamilyState, resetSocialState, resetDevelopmentState, resetSubstanceState, resetSuicidialState
 } from '../../../store/psychiatricSlice.js';
+import { Link } from 'react-router-dom';
 
 function Psychiatrics_form() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -1115,7 +1116,7 @@ function Psychiatrics_form() {
                 <div className="d-block mb-4 mb-xl-0 px-4 ">
                     <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                         <Breadcrumb.Item></Breadcrumb.Item>
-                        <Breadcrumb.Item>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                         <Breadcrumb.Item active>Recovery</Breadcrumb.Item>
                     </Breadcrumb>
                     <h6 className="breadcrumb_title">Social Worker</h6>

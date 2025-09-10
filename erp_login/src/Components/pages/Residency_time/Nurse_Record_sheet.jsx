@@ -14,6 +14,7 @@ import html2canvas from "html2canvas";
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { useSelector, useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 import {
     setNurseRecordField, resetNurseRecord
 } from '../../../store/nurseRecordSlice.js';
@@ -318,7 +319,7 @@ function Nurse_Record_sheet() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Residency Time</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Record Sheet</h6>

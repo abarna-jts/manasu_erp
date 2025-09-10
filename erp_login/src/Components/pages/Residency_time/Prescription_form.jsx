@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
     setPrescriptionField, resetPrescription
 } from '../../../store/prescriptionSlice.js';
+import { Link } from 'react-router-dom';
 
 function Prescription_form() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -748,6 +749,19 @@ function Prescription_form() {
     const handleClearData = () => {
         dispatch(resetPrescription());
         setAdmissionNo("");
+        setRows([                       // Reset the medicine table to one empty row
+        {
+            medicine: '',
+            other_medicine: '',
+            medicine_type: '',
+            duration: '',
+            intake: '',
+            med_instruction: '',
+            morning: '',
+            afternoon: '',
+            night: ''
+        }
+    ]);
     }
 
     const handleDelete = async (admission_no) => {
@@ -772,7 +786,7 @@ function Prescription_form() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Residency Time</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Record Sheet</h6>
@@ -972,7 +986,7 @@ function Prescription_form() {
                             <Col md={4}>
                                 <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
                                     <Form.Label column sm="5" style={{ paddingRight: "5px" }}>
-                                        Out Patient No: <span style={{ color: 'red' }}>*</span>
+                                        Out Patient No:<span style={{ color: 'red' }}>*</span>
                                     </Form.Label>
                                     <Col sm="7">
                                         <Form.Control type='text'

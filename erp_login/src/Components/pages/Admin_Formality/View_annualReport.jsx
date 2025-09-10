@@ -10,6 +10,7 @@ import Cookies from 'js-cookie';
 import manasu_logo from "../Admission/Manasu-Logo.png";
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
+import { Link } from 'react-router-dom';
 
 function View_annualReport() {
     const [report_details, setReportDetail] = useState([]);
@@ -445,7 +446,7 @@ function View_annualReport() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Admin Formality</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Report</h6>

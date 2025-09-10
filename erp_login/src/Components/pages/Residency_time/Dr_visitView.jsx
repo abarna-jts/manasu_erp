@@ -9,6 +9,7 @@ import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/Manasu-Logo.png";
 import Modal from 'react-bootstrap/Modal';
 import { Alert } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 
 function Dr_visitView() {
     const [visitDetails, setVisitDetails] = useState([]);
@@ -242,7 +243,7 @@ function Dr_visitView() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Residency Time</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Dr_visit</h6>

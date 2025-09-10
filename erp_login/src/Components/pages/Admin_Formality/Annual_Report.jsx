@@ -10,6 +10,7 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import imageCompression from 'browser-image-compression';
+import { Link } from 'react-router-dom';
 
 function Annual_Report() {
     const [validated, setValidated] = useState(false);
@@ -686,7 +687,7 @@ function Annual_Report() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Admin Formality</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Report</h6>

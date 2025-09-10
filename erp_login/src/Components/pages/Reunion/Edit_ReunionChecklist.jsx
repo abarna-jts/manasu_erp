@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import imageCompression from 'browser-image-compression';
+import { Link } from 'react-router-dom';
 
 function Edit_ReunionChecklist() {
     const [formData, setFormData] = useState({
@@ -375,7 +376,7 @@ function Edit_ReunionChecklist() {
                 <div className="d-block mb-4 mb-xl-0 px-4 ">
                     <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                         <Breadcrumb.Item></Breadcrumb.Item>
-                        <Breadcrumb.Item>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                     </Breadcrumb>
                     <h6 className="breadcrumb_title">Reunion Checklist</h6>
 

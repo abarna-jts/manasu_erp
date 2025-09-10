@@ -11,6 +11,7 @@ import manasu_logo from "../Admission/Manasu-Logo.png";
 import { useLocation } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
+import { Link } from 'react-router-dom';
 
 function Celebration_report() {
     const [celebration_details, setCelebrationDetail] = useState([]);
@@ -339,7 +340,7 @@ function Celebration_report() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Admin Formality</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Report</h6>
@@ -575,14 +576,29 @@ function Celebration_report() {
                         <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm="5" className='text-start'>Celebration Report :</Form.Label>
                             <Col sm="7">
-                                <Form.Control
+                                {/* <Form.Control
                                     as="textarea"
                                     name="celebration_report"
                                     rows={3}
                                     value={celebrationData.celebration_report}
                                     onChange={handleInputChange1}
                                     required
-                                />
+                                /> */}
+                                <div
+                                        className="wrap-textarea"
+                                        style={{
+                                            border: '1px solid #ccc',
+                                            padding: '8px',
+                                            borderRadius: "5px",
+                                            minHeight: '40px',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            textAlign: "justify"
+                                        }}
+                                    >
+                                        {celebrationData.celebration_report}
+                                    </div>
                             </Col>
                         </Form.Group>
 

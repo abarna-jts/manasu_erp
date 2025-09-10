@@ -11,6 +11,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { id } from 'date-fns/locale';
+import { Link } from 'react-router-dom';
 
 function Director_essentialRecord() {
     const [show, setShow] = useState(false);
@@ -276,7 +277,7 @@ function Director_essentialRecord() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Admin Formality</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Records</h6>

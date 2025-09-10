@@ -3,6 +3,7 @@ import { Breadcrumb, Col, Container, Form, Row, Button } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 function Edit_Annual_Report() {
 
@@ -130,7 +131,7 @@ function Edit_Annual_Report() {
                 <div className="d-block mb-4 mb-xl-0 px-4 ">
                     <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                         <Breadcrumb.Item></Breadcrumb.Item>
-                        <Breadcrumb.Item>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                     </Breadcrumb>
                     <h6 className="breadcrumb_title">Annual Report</h6>
 

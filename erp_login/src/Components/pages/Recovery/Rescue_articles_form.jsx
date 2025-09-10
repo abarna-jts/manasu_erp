@@ -9,6 +9,7 @@ import jsPDF from "jspdf";
 import Modal from 'react-bootstrap/Modal';
 import html2canvas from "html2canvas";
 import manasu_logo from "../Admission/manasu_logo.png";
+import { Link } from 'react-router-dom';
 
 function Rescue_articles_form() {
   const [admission_no, setAdmissionNumber] = useState('');
@@ -285,7 +286,7 @@ function Rescue_articles_form() {
           <Col md={2} className='text-start'>
             <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
               <Breadcrumb.Item></Breadcrumb.Item>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
               <Breadcrumb.Item active>Recovery</Breadcrumb.Item>
             </Breadcrumb>
             <h6 className="breadcrumb_title">Articles Form</h6>

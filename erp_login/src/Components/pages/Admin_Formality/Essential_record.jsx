@@ -12,6 +12,7 @@ import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import imageCompression from 'browser-image-compression';
+import { Link } from 'react-router-dom';
 
 function Essential_record() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -987,7 +988,7 @@ function Essential_record() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0 mobile_breadcrumb" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Admin Formality</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Records</h6>

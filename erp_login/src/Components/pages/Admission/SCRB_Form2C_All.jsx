@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import { Link } from 'react-router-dom';
 
 function SCRB_Form2C_All() {
     const [scrbForm2CList, setScrbForm2CList] = useState([]);
@@ -211,7 +212,7 @@ function SCRB_Form2C_All() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Admission</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">SCRB Form</h6>

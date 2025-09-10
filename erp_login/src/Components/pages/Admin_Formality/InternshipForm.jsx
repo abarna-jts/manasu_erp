@@ -6,7 +6,7 @@ import { Alert } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import imageCompression from 'browser-image-compression';
-
+import { Link } from 'react-router-dom';
 function InternshipForm() {
     const [formData, setFormData] = useState({
         stud_name: '',
@@ -199,7 +199,7 @@ function InternshipForm() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Reunion</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Internship</h6>

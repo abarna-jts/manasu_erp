@@ -10,6 +10,7 @@ import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import imageCompression from 'browser-image-compression';
+import { Link } from 'react-router-dom';
 
 function Self_Declaration_form() {
     const [show, setShow] = useState(false);
@@ -551,7 +552,7 @@ function Self_Declaration_form() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Reunion</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Self Declaration</h6>
@@ -776,7 +777,7 @@ function Self_Declaration_form() {
                                     required />
                             </Col>
                         </Form.Group>
-                        
+
 
                         <Form.Group as={Row} className="mb-3 mt-3">
                             <Form.Label column sm="4" className='text-start'>
@@ -877,13 +878,29 @@ function Self_Declaration_form() {
                             <Form.Label column sm="4" className='text-start'>
                                 Description :
                             </Form.Label>
-                            <Col sm="8">
+                            {/* <Col sm="8">
                                 <Form.Control
                                     type="text"
                                     name="description"
                                     value={formData.description}
                                     onChange={handleInputChange}
                                     required />
+                            </Col> */}
+                            <Col md={7} className='text-start mr-5' style={{ border: "1px solid #ccc", padding: "8px", borderRadius: "5px", margin: "13px" }}>
+                                <div
+                                    className="wrap-textarea"
+                                    style={{
+
+                                        minHeight: '40px',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        textAlign: "justify"
+                                    }}
+                                >
+                                    {formData.description}
+                                </div>
+
                             </Col>
                         </Form.Group>
 

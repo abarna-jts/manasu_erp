@@ -9,6 +9,7 @@ import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { Link } from 'react-router-dom';
 
 function Prescription_demo() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -397,7 +398,7 @@ function Prescription_demo() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
                             <Breadcrumb.Item active>Residency Time</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Record Sheet</h6>
