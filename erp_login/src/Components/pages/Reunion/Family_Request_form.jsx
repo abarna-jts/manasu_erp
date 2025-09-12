@@ -14,6 +14,26 @@ import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import imageCompression from 'browser-image-compression';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    loadFamAadharFromStorage,
+    loadFamRationFromStorage,
+    loadResAadharFromStorage,
+    loadResRationFromStorage,
+    loadGovtIDFromStorage,
+    saveFamAadharToStorage,
+    saveFamRationToStorage,
+    saveResAadharToStorage,
+    saveResRationToStorage,
+    saveGovtIDToStorage,
+    setFamilyReqField,
+    resetFamilyReqData,
+    clearFamilyReqImages
+} from "../../../store/familyReqSlice";
+import {
+    loadFamAadharCard, loadFamRationCard, loadResAadharCard, loadResRationCard, loadGovtID, clearFamAadharCard,
+    clearFamRationCard, clearResAadharCard, clearResRationCard, clearGovtID
+} from "../../../store/photoStorage";
 
 function Family_Request_form() {
     const [show, setShow] = useState(false);
@@ -77,24 +97,39 @@ function Family_Request_form() {
         description: '',
     })
 
-    const [storeData, setStoreData] = useState({
-        admission_no: '',
-        rescue_name: '',
-        age: '',
-        gender: 'Male',
-        phone_no: '',
-        rescue_relationship: '',
-        f_member_name: '',
-        f_member_age: '',
-        f_member_address: '',
-        f_member_phone: '',
-        f_aadhar_card_no: '',
-        f_ration_card_no: '',
-        r_aadhar_card_no: '',
-        r_ration_card_no: '',
-        any_other: '',
-        description: '',
-    })
+    const dispatch = useDispatch();
+
+    const storeData = useSelector((state) => state.family_request);
+
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadFamAadharFromStorage());
+        dispatch(loadFamRationFromStorage());
+        dispatch(loadResAadharFromStorage());
+        dispatch(loadResRationFromStorage());
+        dispatch(loadGovtIDFromStorage());
+    }, [dispatch]);
+
+    // const [storeData, setStoreData] = useState({
+    //     admission_no: '',
+    //     rescue_name: '',
+    //     age: '',
+    //     gender: 'Male',
+    //     phone_no: '',
+    //     rescue_relationship: '',
+    //     f_member_name: '',
+    //     f_member_age: '',
+    //     f_member_address: '',
+    //     f_member_phone: '',
+    //     f_aadhar_card_no: '',
+    //     f_ration_card_no: '',
+    //     r_aadhar_card_no: '',
+    //     r_ration_card_no: '',
+    //     any_other: '',
+    //     description: '',
+    // })
+
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -156,10 +191,7 @@ function Family_Request_form() {
             }));
         }
 
-        setStoreData(prev => ({
-            ...prev,
-            [name]: updatedValue
-        }));
+        dispatch(setFamilyReqField({ field: name, value: updatedValue }));
     };
 
 
@@ -176,7 +208,8 @@ function Family_Request_form() {
     // };
 
     const handleFileChange = async (event) => {
-        const selectedFiles = Array.from(event.target.files);
+        const { name, files } = event.target;
+        const selectedFiles = Array.from(files);
         if (!selectedFiles.length) return;
 
         const options = {
@@ -187,41 +220,52 @@ function Family_Request_form() {
         };
 
         try {
-            // Compress all images
             const compressedFiles = await Promise.all(
                 selectedFiles.map(async (file, idx) => {
+                    console.log(`Original file ${file.name}: ${(file.size / 1024).toFixed(2)} KB`);
                     const compressed = await imageCompression(file, options);
+                    console.log(`Compressed file ${file.name}: ${(compressed.size / 1024).toFixed(2)} KB`);
 
-                    // ✅ Log original vs compressed
-                    console.log(`File ${idx + 1} Original:`, {
-                        name: file.name,
-                        size: (file.size / 1024).toFixed(2) + " KB",
-                        type: file.type,
-                    });
-                    console.log(`File ${idx + 1} Compressed:`, {
-                        name: `essential_${Date.now()}_${idx}.jpeg`,
-                        size: (compressed.size / 1024).toFixed(2) + " KB",
-                        type: compressed.type,
-                    });
-
-                    // Rename to avoid .blob
                     const ext = compressed.type.split("/")[1]; // e.g. jpeg
-                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                    const newFile = new File([compressed], `Family_Request_${Date.now()}_${idx}.${ext}`, {
                         type: compressed.type,
                     });
+
+                    return {
+                        name: newFile.name,
+                        size: newFile.size,
+                        type: newFile.type,
+                        preview: URL.createObjectURL(newFile) // ✅ Create preview URL
+                    };
                 })
             );
 
-            setFiles((prev) => ({
-                ...prev,
-                [event.target.name]: compressedFiles // ✅ store compressed files
-            }));
-
-            console.log("✅ Final compressed files array:", compressedFiles);
+            // Dispatch only to the relevant field based on input name
+            switch (name) {
+                case "f_aadhar_card":
+                    dispatch(saveFamAadharToStorage(compressedFiles));
+                    break;
+                case "f_ration_card":
+                    dispatch(saveFamRationToStorage(compressedFiles));
+                    break;
+                case "r_aadhar_card":
+                    dispatch(saveResAadharToStorage(compressedFiles));
+                    break;
+                case "r_ration_card":
+                    dispatch(saveResRationToStorage(compressedFiles));
+                    break;
+                case "govt_id":
+                    dispatch(saveGovtIDToStorage(compressedFiles));
+                    break;
+                default:
+                    console.warn("Unknown file input name:", name);
+                    break;
+            }
         } catch (e) {
             console.error("Compression error:", e);
         }
     };
+
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
@@ -229,6 +273,7 @@ function Family_Request_form() {
             fetchFormData();
         }
     }, [admissionNumber]);
+
 
     const fetchFormData = async () => {
         try {
@@ -249,6 +294,33 @@ function Family_Request_form() {
             setRescueName("");
         }
     }, [admissionNumber]);
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionFamilyReqInfo');
+            if (stored) {
+                const { admissionNumber: storedAdm, rescue_name: storedName, age: storedAge, phone_no: storedPhoneNo } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+                if (storedName) setRescueName(storedName);
+                if (storedAge) setRescueName(storedAge);
+                if (storedPhoneNo) setRescueName(storedPhoneNo);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionFamilyReqInfo',
+                JSON.stringify({ admissionNumber, rescue_name })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admissionNumber, rescue_name]);
 
     const fetchRescuePastDetails = async (admissionNumber) => {
         try {
@@ -325,39 +397,74 @@ function Family_Request_form() {
         data.append('f_member_age', storeData.f_member_age);
         data.append('f_member_phone', storeData.f_member_phone);
         data.append('f_member_address', storeData.f_member_address);
-        data.append('f_aadhar_card_no', storeData.f_aadhar_card_no);
-        data.append('f_ration_card_no', storeData.f_ration_card_no);
-        data.append('r_aadhar_card_no', storeData.r_aadhar_card_no);
-        data.append('r_ration_card_no', storeData.r_ration_card_no);
+        data.append('f_aadhar_card_no', storeData.f_aadhar_card_no || "NULL");
+        data.append('f_ration_card_no', storeData.f_ration_card_no || "NULL");
+        data.append('r_aadhar_card_no', storeData.r_aadhar_card_no || "NULL");
+        data.append('r_ration_card_no', storeData.r_ration_card_no || "NULL");
         data.append('any_other', storeData.any_other);
 
-        if (files.f_aadhar_card && files.f_aadhar_card.length > 0) {
-            files.f_aadhar_card.forEach(file => {
-                data.append('f_aadhar_card', file); // ✅ no []
+        // if (files.f_aadhar_card && files.f_aadhar_card.length > 0) {
+        //     files.f_aadhar_card.forEach(file => {
+        //         data.append('f_aadhar_card', file); // ✅ no []
+        //     });
+        // }
+
+        const FamAadharrealFiles = await loadFamAadharCard();
+        if (FamAadharrealFiles && FamAadharrealFiles.length > 0) {
+            FamAadharrealFiles.forEach(file => {
+                data.append("f_aadhar_card", file);
             });
         }
 
-        if (files.f_ration_card && files.f_ration_card.length > 0) {
-            files.f_ration_card.forEach(file => {
-                data.append('f_ration_card', file); // ✅ no []
+        // if (files.f_ration_card && files.f_ration_card.length > 0) {
+        //     files.f_ration_card.forEach(file => {
+        //         data.append('f_ration_card', file); // ✅ no []
+        //     });
+        // }
+
+        const FamRationrealFiles = await loadFamRationCard();
+        if (FamRationrealFiles && FamRationrealFiles.length > 0) {
+            FamRationrealFiles.forEach(file => {
+                data.append("f_ration_card", file);
             });
         }
 
-        if (files.r_aadhar_card && files.r_aadhar_card.length > 0) {
-            files.r_aadhar_card.forEach(file => {
-                data.append('r_aadhar_card', file); // ✅ no []
+        // if (files.r_aadhar_card && files.r_aadhar_card.length > 0) {
+        //     files.r_aadhar_card.forEach(file => {
+        //         data.append('r_aadhar_card', file); // ✅ no []
+        //     });
+        // }
+
+        const ResAadharrealFiles = await loadResAadharCard();
+        if (ResAadharrealFiles && ResAadharrealFiles.length > 0) {
+            ResAadharrealFiles.forEach(file => {
+                data.append("r_aadhar_card", file);
             });
         }
 
-        if (files.r_ration_card && files.r_ration_card.length > 0) {
-            files.r_ration_card.forEach(file => {
-                data.append('r_ration_card', file); // ✅ no []
+        // if (files.r_ration_card && files.r_ration_card.length > 0) {
+        //     files.r_ration_card.forEach(file => {
+        //         data.append('r_ration_card', file); // ✅ no []
+        //     });
+        // }
+
+        const ResRationrealFiles = await loadResRationCard();
+        if (ResRationrealFiles && ResRationrealFiles.length > 0) {
+            ResRationrealFiles.forEach(file => {
+                data.append("r_ration_card", file);
             });
         }
 
-        if (files.govt_id && files.govt_id.length > 0) {
-            files.govt_id.forEach(file => {
-                data.append('govt_id', file); // ✅ no []
+        // if (files.govt_id && files.govt_id.length > 0) {
+        //     files.govt_id.forEach(file => {
+        //         data.append('govt_id', file); // ✅ no []
+        //     });
+        // }
+
+        const GovtIDrealFiles = await loadGovtID();
+        if (GovtIDrealFiles && GovtIDrealFiles.length > 0) {
+            GovtIDrealFiles.forEach(file => {
+                data.append("govt_id", file);
             });
         }
 
@@ -367,29 +474,17 @@ function Family_Request_form() {
             });
             if (res.data.message === "Family Request Letter Form Created Successfully") {
                 alert("Family Request Form Submitted Successfully");
-                setStoreData({
-                    admission_no: '',
-                    rescue_name: '',
-                    age: '',
-                    gender: '',
-                    phone_no: '',
-                    rescue_relationship: '',
-                    f_member_name: '',
-                    f_member_age: '',
-                    f_member_address: '',
-                    f_member_phone: '',
-                    f_aadhar_card_no: '',
-                    f_ration_card_no: '',
-                    r_aadhar_card_no: '',
-                    r_ration_card_no: '',
-                    any_other: '',
-                    description: '',
-                })
+
                 setAdmissionNumber("");
                 setRescueName("");
                 setAge("");
                 setPhoneNo("");
-
+                dispatch(resetFamilyReqData());
+                clearFamAadharCard();
+                clearFamRationCard();
+                clearResAadharCard();
+                clearResRationCard();
+                clearGovtID();
                 if (f_aadhar_cardRef.current) f_aadhar_cardRef.current.value = "";
                 if (f_ration_cardRef.current) f_ration_cardRef.current.value = "";
                 if (r_aadhar_cardRef.current) r_aadhar_cardRef.current.value = "";
@@ -631,6 +726,7 @@ function Family_Request_form() {
                 f_ration_card_no: data.f_ration_card_no || 'NULL',
                 r_aadhar_card_no: data.r_aadhar_card_no || 'NULL',
                 r_ration_card_no: data.r_ration_card_no || 'NULL',
+                any_other: data.any_other || "NULL"
             }));
 
             // Helper function to parse image paths
@@ -724,6 +820,7 @@ function Family_Request_form() {
         data.append('r_aadhar_card', files.r_aadhar_card);
         data.append('r_ration_card', files.r_ration_card);
         data.append('govt_id', files.govt_id);
+        data.append('any_other', formData.any_other);
         if (files.f_aadhar_card && files.f_aadhar_card.length > 0) {
             files.f_aadhar_card.forEach(file => {
                 data.append('f_aadhar_card', file); // ✅ no []
@@ -891,6 +988,21 @@ function Family_Request_form() {
         }
     }, [admissionNumber]);
 
+    const handleClearData = () => {
+        dispatch(resetFamilyReqData()); // Reset text fields
+        setAdmissionNumber("");
+        setRescueName("");
+        setAge("");
+        setPhoneNo("");
+        dispatch(clearFamilyReqImages()); // Clear file states
+
+        // Also clear files from IndexedDB storage
+        clearFamAadharCard();
+        clearFamRationCard();
+        clearResAadharCard();
+        clearResRationCard();
+        clearGovtID();
+    };
 
     return (
         <div>
@@ -942,6 +1054,9 @@ function Family_Request_form() {
                                 />
                             </InputGroup>
                         </Col>
+                        <div className="close_admission mx-2" onClick={handleClearData}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admissionNumber.trim()) {
                                 alert("Please enter admission number.");
@@ -1151,7 +1266,7 @@ function Family_Request_form() {
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Aadhar Card Number (Relation): <span style={{ color: 'red' }}>*</span>
+                                    Aadhar Card Number (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -1159,7 +1274,7 @@ function Family_Request_form() {
                                         name='f_aadhar_card_no'
                                         value={storeData.f_aadhar_card_no}
                                         onChange={handleInputChange1}
-                                        required />
+                                    />
                                     {formErrors.f_aadhar_card_no && (
                                         <div className="text-danger small mt-1">
                                             {formErrors.f_aadhar_card_no}
@@ -1180,10 +1295,31 @@ function Family_Request_form() {
                                         multiple
                                         onChange={handleFileChange} />
                                 </Col>
+                                {storeData.f_aadhar_card && storeData.f_aadhar_card.length > 0 && (
+                                    <div className="mt-2">
+                                        <h5 className='text-start'>Selected Photos :</h5>
+                                        <div className="d-flex flex-wrap gap-3">
+                                            {storeData.f_aadhar_card.map((file, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={file.preview}
+                                                    alt={file.name}
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
-                                    Ration Card Number (Relation): <span style={{ color: 'red' }}>*</span>
+                                    Ration Card Number (Relation):
                                 </Form.Label>
                                 <Col sm="8">
                                     <Form.Control
@@ -1191,7 +1327,7 @@ function Family_Request_form() {
                                         name="f_ration_card_no"
                                         value={storeData.f_ration_card_no}
                                         onChange={handleInputChange1}
-                                        required />
+                                    />
                                     {/* {formErrors.f_ration_card_no && (
                                         <div className="text-danger small mt-1">
                                             {formErrors.f_ration_card_no}
@@ -1212,6 +1348,28 @@ function Family_Request_form() {
                                         ref={f_ration_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
+
+                                {storeData.f_ration_card && storeData.f_ration_card.length > 0 && (
+                                    <div className="mt-2">
+                                        <h5 className='text-start'>Selected Photos :</h5>
+                                        <div className="d-flex flex-wrap gap-3">
+                                            {storeData.f_ration_card.map((file, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={file.preview}
+                                                    alt={file.name}
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
@@ -1246,6 +1404,27 @@ function Family_Request_form() {
                                         ref={r_aadhar_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
+                                {storeData.r_aadhar_card && storeData.r_aadhar_card.length > 0 && (
+                                    <div className="mt-2">
+                                        <h5 className='text-start'>Selected Photos :</h5>
+                                        <div className="d-flex flex-wrap gap-3">
+                                            {storeData.r_aadhar_card.map((file, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={file.preview}
+                                                    alt={file.name}
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
@@ -1278,6 +1457,27 @@ function Family_Request_form() {
                                         ref={r_ration_cardRef}
                                         onChange={handleFileChange} />
                                 </Col>
+                                {storeData.r_ration_card && storeData.r_ration_card.length > 0 && (
+                                    <div className="mt-2">
+                                        <h5 className='text-start'>Selected Photos :</h5>
+                                        <div className="d-flex flex-wrap gap-3">
+                                            {storeData.r_ration_card.map((file, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={file.preview}
+                                                    alt={file.name}
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">
                                 <Form.Label column sm="4">
@@ -1305,6 +1505,27 @@ function Family_Request_form() {
                                         multiple
                                         onChange={handleFileChange} />
                                 </Col>
+                                {storeData.govt_id && storeData.govt_id.length > 0 && (
+                                    <div className="mt-2">
+                                        <h5 className='text-start'>Selected Photos :</h5>
+                                        <div className="d-flex flex-wrap gap-3">
+                                            {storeData.govt_id.map((file, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={file.preview}
+                                                    alt={file.name}
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formPoliceMemo">

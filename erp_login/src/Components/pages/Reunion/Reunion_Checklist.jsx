@@ -169,12 +169,12 @@ function Reunion_Checklist() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.admission_no || formData.admission_no.trim() === '') {
+        if (!admission_no || admission_no.trim() === '') {
             alert("Admission Number is required.");
             return;
         }
 
-        const trimmedAdNo = formData.admission_no.trim();
+        const trimmedAdNo = admission_no.trim();
 
         if (!/^\d{8,13}$/.test(trimmedAdNo)) {
             alert("Admission Number must be between 8 to 13 digits (numbers only).");

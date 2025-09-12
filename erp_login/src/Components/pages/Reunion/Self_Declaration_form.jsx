@@ -681,7 +681,7 @@ function Self_Declaration_form() {
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Signature : <span style={{ color: 'red' }}>*</span>
+                                            Signature : 
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -690,8 +690,7 @@ function Self_Declaration_form() {
                                                 ref={signatureRef}
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
-                                                multiple
-                                                required />
+                                                multiple />
                                         </Col>
                                     </Form.Group>
 

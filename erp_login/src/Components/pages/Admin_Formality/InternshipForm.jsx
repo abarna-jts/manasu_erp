@@ -253,7 +253,7 @@ function InternshipForm() {
                                 <Col sm="8">
                                     <Form.Control
                                         name="stud_id"
-                                        type="number"
+                                        type="text"
                                         value={formData.stud_id}
                                         onChange={handleInputChange}
                                         required

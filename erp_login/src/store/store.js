@@ -9,6 +9,8 @@ import nurseRecordReducer from './nurseRecordSlice';
 import drVisitReducer from './drVisitSlice';
 import medicalCampReducer from './medicalCampSlice';
 import prescriptionReducer from './prescriptionSlice';
+import essentialReducer from './essentialSlice';
+import familyReqReducer from './familyReqSlice';
 
 const STORAGE_KEYS = {
   admission: 'admissionState',
@@ -21,6 +23,8 @@ const STORAGE_KEYS = {
   dr_visit: 'drVisitState',
   medical_camp: 'medicalCampState',
   prescription: 'prescriptionState',
+  essential: 'essentialState',
+  family_request: 'familyRequestState'
 };
 
 // Load from localStorage
@@ -46,6 +50,8 @@ const loadState = () => {
     const drVisitRaw = localStorage.getItem(STORAGE_KEYS.dr_visit);
     const medical_campRaw = localStorage.getItem(STORAGE_KEYS.medical_camp);
     const prescriptionRaw = localStorage.getItem(STORAGE_KEYS.prescription);
+    const essentialRaw = localStorage.getItem(STORAGE_KEYS.essential);
+    const familyReqRaw = localStorage.getItem(STORAGE_KEYS.family_request);
 
     const parse = raw => {
       if (!raw) return undefined;
@@ -71,6 +77,8 @@ const loadState = () => {
       dr_visit: parse(drVisitRaw),
       medical_camp: parse(medical_campRaw),
       prescription: parse(prescriptionRaw),
+      essential: parse(essentialRaw),
+      family_request: parse(familyReqRaw)
     };
   } catch {
     return undefined;
@@ -140,6 +148,18 @@ const saveState = (state) => {
         JSON.stringify(makeStored(state.prescription))
       );
     }
+    if (state.essential !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.essential,
+        JSON.stringify(makeStored(state.essential))
+      );
+    }
+    if (state.family_request !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.family_request,
+        JSON.stringify(makeStored(state.family_request))
+      );
+    }
   } catch (error) {
     console.error('Error saving to localStorage:', error);
   }
@@ -159,6 +179,8 @@ const store = configureStore({
     dr_visit: drVisitReducer,
     medical_camp: medicalCampReducer,
     prescription: prescriptionReducer,
+    essential: essentialReducer,
+    family_request: familyReqReducer,
   },
   preloadedState,
 });

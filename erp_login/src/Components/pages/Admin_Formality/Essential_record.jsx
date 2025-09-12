@@ -12,7 +12,25 @@ import Cookies from 'js-cookie';
 import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import imageCompression from 'browser-image-compression';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import {
+    loadBankPassbookFromStorage,
+    loadAadharAttachFromStorage,
+    loadForm7AttachFromStorage,
+    loadUdidAttachFromStorage,
+    saveBankPassbookToStorage,
+    saveAadharAttachToStorage,
+    saveForm7AttachToStorage,
+    saveUdidAttachToStorage,
+    setEssentialField,
+    resetEssentialData,
+    clearEssentialImages
+} from "../../../store/essentialSlice";
+import {
+    loadBankPassbook, loadAadharAttach, loadForm7Attachment, loadUdidAttach, clearBankPassbook,
+    clearAadharAttach, clearForm7Attachment, clearUdidAttach
+} from "../../../store/photoStorage";
 
 function Essential_record() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -35,23 +53,35 @@ function Essential_record() {
 
     const userType = Cookies.get('usertype');
 
-    const [formData, setFormData] = useState({
-        admission_no: '',
-        rescue_name: '',
-        aadhar_card: '',
-        udid_no: '',
-        disability_no: '',
-        voter_id: '',
-        form_7: '',
-        bank_name: '',
-        account_no: '',
-        ifsc_code: '',
-        insurance_provider: '',
-        policy_no: '',
-        validity_period: '',
-        other_gvt_scheme: '',
-        any_other: ''
-    })
+    // const [formData, setFormData] = useState({
+    //     admission_no: '',
+    //     rescue_name: '',
+    //     aadhar_card: '',
+    //     udid_no: '',
+    //     disability_no: '',
+    //     voter_id: '',
+    //     form_7: '',
+    //     bank_name: '',
+    //     account_no: '',
+    //     ifsc_code: '',
+    //     insurance_provider: '',
+    //     policy_no: '',
+    //     validity_period: '',
+    //     other_gvt_scheme: '',
+    //     any_other: ''
+    // })
+
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.essential);
+
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadAadharAttachFromStorage());
+        dispatch(loadBankPassbookFromStorage());
+        dispatch(loadForm7AttachFromStorage());
+        dispatch(loadUdidAttachFromStorage());
+    }, [dispatch]);
 
     const [editData, setEditData] = useState({
         admission_no: '',
@@ -109,7 +139,8 @@ function Essential_record() {
     // };
 
     const handleFileChange = async (event) => {
-        const selectedFiles = Array.from(event.target.files);
+        const { name, files } = event.target;
+        const selectedFiles = Array.from(files);
         if (!selectedFiles.length) return;
 
         const options = {
@@ -120,46 +151,124 @@ function Essential_record() {
         };
 
         try {
-            // Compress all images
+            // Compress all images and log sizes
             const compressedFiles = await Promise.all(
                 selectedFiles.map(async (file, idx) => {
+                    console.log(`Original file ${file.name}: ${(file.size / 1024).toFixed(2)} KB`);
+
                     const compressed = await imageCompression(file, options);
 
-                    // ✅ Log original vs compressed
-                    console.log(`File ${idx + 1} Original:`, {
-                        name: file.name,
-                        size: (file.size / 1024).toFixed(2) + " KB",
-                        type: file.type,
-                    });
-                    console.log(`File ${idx + 1} Compressed:`, {
-                        name: `essential_${Date.now()}_${idx}.jpeg`,
-                        size: (compressed.size / 1024).toFixed(2) + " KB",
-                        type: compressed.type,
-                    });
+                    console.log(`Compressed file ${file.name}: ${(compressed.size / 1024).toFixed(2)} KB`);
 
                     // Rename to avoid .blob
                     const ext = compressed.type.split("/")[1]; // e.g. jpeg
-                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                    return new File([compressed], `Essential_${Date.now()}_${idx}.${ext}`, {
                         type: compressed.type,
                     });
                 })
             );
 
-            setFiles((prev) => ({
-                ...prev,
-                [event.target.name]: compressedFiles // ✅ store compressed files
-            }));
-
-            console.log("✅ Final compressed files array:", compressedFiles);
+            // Dispatch only to the relevant field based on input name
+            switch (name) {
+                case "attach_aadhar":
+                    dispatch(saveAadharAttachToStorage(compressedFiles));
+                    break;
+                case "bank_passbook":
+                    dispatch(saveBankPassbookToStorage(compressedFiles));
+                    break;
+                case "form7_attach":
+                    dispatch(saveForm7AttachToStorage(compressedFiles));
+                    break;
+                case "udid_attach":
+                    dispatch(saveUdidAttachToStorage(compressedFiles));
+                    break;
+                default:
+                    console.warn("Unknown file input name:", name);
+                    break;
+            }
         } catch (e) {
             console.error("Compression error:", e);
         }
     };
 
 
+    // const handleFileChange = async (event) => {
+    //     const selectedFiles = Array.from(event.target.files);
+    //     if (!selectedFiles.length) return;
+
+    //     const options = {
+    //         maxSizeMB: 0.5,
+    //         maxWidthOrHeight: 1024,
+    //         useWebWorker: true,
+    //         fileType: "image/jpeg", // force JPEG output
+    //     };
+
+    //     try {
+    //         // Compress all images
+    //         const compressedFiles = await Promise.all(
+    //             selectedFiles.map(async (file, idx) => {
+    //                 const compressed = await imageCompression(file, options);
+
+    //                 // ✅ Log original vs compressed
+    //                 console.log(`File ${idx + 1} Original:`, {
+    //                     name: file.name,
+    //                     size: (file.size / 1024).toFixed(2) + " KB",
+    //                     type: file.type,
+    //                 });
+    //                 console.log(`File ${idx + 1} Compressed:`, {
+    //                     name: `essential_${Date.now()}_${idx}.jpeg`,
+    //                     size: (compressed.size / 1024).toFixed(2) + " KB",
+    //                     type: compressed.type,
+    //                 });
+
+    //                 // Rename to avoid .blob
+    //                 const ext = compressed.type.split("/")[1]; // e.g. jpeg
+    //                 return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+    //                     type: compressed.type,
+    //                 });
+    //             })
+    //         );
+
+    //         setFiles((prev) => ({
+    //             ...prev,
+    //             [event.target.name]: compressedFiles // ✅ store compressed files
+    //         }));
+
+    //         console.log("✅ Final compressed files array:", compressedFiles);
+    //     } catch (e) {
+    //         console.error("Compression error:", e);
+    //     }
+    // };
+
+
     const apiRoute = axios.create({
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionEssentialInfo');
+            if (stored) {
+                const { admission_no: storedAdm, rescue_name: storedName } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+                if (storedName) setRescueName(storedName);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionEssentialInfo',
+                JSON.stringify({ admission_no, rescue_name })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no, rescue_name]);
 
     const validateField = (name, value) => {
         let error = "";
@@ -220,10 +329,12 @@ function Essential_record() {
         }
 
         // Set form data
-        setFormData(prev => ({
-            ...prev,
-            [name]: updatedValue
-        }));
+        // setFormData(prev => ({
+        //     ...prev,
+        //     [name]: updatedValue
+        // }));
+
+        dispatch(setEssentialField({ field: name, value: updatedValue }));
 
         // Validate and set error
         const errorMsg = validateField(name, updatedValue);
@@ -416,29 +527,57 @@ function Essential_record() {
         data.append('other_gvt_scheme', formData.other_gvt_scheme);
         data.append('any_other', formData.any_other);
 
-        if (files.form7_attach && files.form7_attach.length > 0) {
-            files.form7_attach.forEach(file => {
-                data.append('form7_attach', file); // ✅ no []
+        // if (files.form7_attach && files.form7_attach.length > 0) {
+        //     files.form7_attach.forEach(file => {
+        //         data.append('form7_attach', file); // ✅ no []
+        //     });
+        // }
+
+        const form7realFiles = await loadForm7Attachment();
+        if (form7realFiles && form7realFiles.length > 0) {
+            form7realFiles.forEach(file => {
+                data.append("form7_attach", file);
             });
         }
 
-        if (files.bank_passbook && files.bank_passbook.length > 0) {
-            files.bank_passbook.forEach(file => {
-                data.append('bank_passbook', file); // ✅ no []
+        const realFiles = await loadBankPassbook();
+        if (realFiles && realFiles.length > 0) {
+            realFiles.forEach(file => {
+                data.append("bank_passbook", file);
             });
         }
 
-        if (files.attach_aadhar && files.attach_aadhar.length > 0) {
-            files.attach_aadhar.forEach(file => {
-                data.append('attach_aadhar', file); // ✅ no []
+        // if (files.bank_passbook && files.bank_passbook.length > 0) {
+        //     files.bank_passbook.forEach(file => {
+        //         data.append('bank_passbook', file); // ✅ no []
+        //     });
+        // }
+
+        const AadharrealFiles = await loadAadharAttach();
+        if (AadharrealFiles && AadharrealFiles.length > 0) {
+            AadharrealFiles.forEach(file => {
+                data.append("attach_aadhar", file);
             });
         }
 
-        if (files.udid_attach && files.udid_attach.length > 0) {
-            files.udid_attach.forEach(file => {
-                data.append('udid_attach', file); // ✅ no []
+        // if (files.attach_aadhar && files.attach_aadhar.length > 0) {
+        //     files.attach_aadhar.forEach(file => {
+        //         data.append('attach_aadhar', file); // ✅ no []
+        //     });
+        // }
+
+        const UDIDrealFiles = await loadUdidAttach();
+        if (UDIDrealFiles && UDIDrealFiles.length > 0) {
+            UDIDrealFiles.forEach(file => {
+                data.append("udid_attach", file);
             });
         }
+
+        // if (files.udid_attach && files.udid_attach.length > 0) {
+        //     files.udid_attach.forEach(file => {
+        //         data.append('udid_attach', file); // ✅ no []
+        //     });
+        // }
 
         try {
             const res = await apiRoute.post('/formality/createRecords', data, {
@@ -448,29 +587,14 @@ function Essential_record() {
             if (res.data.message === "Essential Records Form Created Successfully") {
 
                 alert("Form Created Successfully");
-                setFormData({
-                    admission_no: '',
-                    rescue_name: '',
-                    aadhar_card: '',
-                    udid_no: '',
-                    disability_no: '',
-                    voter_id: '',
-                    form_7: '',
-                    bank_name: '',
-                    account_no: '',
-                    ifsc_code: '',
-                    insurance_provider: '',
-                    policy_no: '',
-                    validity_period: '',
-                    other_gvt_scheme: '',
-                    any_other: ''
-                })
+
                 setAdmissionNumber("");
                 setRescueName("");
-                setFiles({
-                    bank_passbook: null,
-                    form7_attach: null,
-                })
+                dispatch(resetEssentialData());
+                clearAadharAttach();
+                clearBankPassbook();
+                clearForm7Attachment();
+                clearUdidAttach();
                 // Clear the file input elements in the DOM
                 if (bankPassbookRef.current) bankPassbookRef.current.value = "";
                 if (form7AttachRef.current) form7AttachRef.current.value = "";
@@ -516,7 +640,7 @@ function Essential_record() {
 
             // Parse bank passbook image
             const passbookPath = data.bank_passbook
-                ? [`https://www.pahrultours.com/app2/${data.bank_passbook}`]
+                ? [`http://localhost:5002/${data.bank_passbook}`]
                 : [];
 
             // Parse form7_attach image array
@@ -525,14 +649,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.form7_attach);
                     if (Array.isArray(parsed)) {
-                        form7Paths = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        form7Paths = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse form7_attach:', err);
                     // Fallback: comma-separated string
                     form7Paths = data.form7_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -541,14 +665,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.bank_passbook);
                     if (Array.isArray(parsed)) {
-                        bank_passbookPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        bank_passbookPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse bank passbook:', err);
                     // Fallback: comma-separated string
                     bank_passbookPath = data.bank_passbook
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -557,14 +681,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.attach_aadhar);
                     if (Array.isArray(parsed)) {
-                        attachAadharPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        attachAadharPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse Aadhar Card:', err);
                     // Fallback: comma-separated string
                     attachAadharPath = data.attach_aadhar
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -573,14 +697,14 @@ function Essential_record() {
                 try {
                     const parsed = JSON.parse(data.udid_attach);
                     if (Array.isArray(parsed)) {
-                        UDIDPhotoPath = parsed.map((p) => `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`);
+                        UDIDPhotoPath = parsed.map((p) => `http://localhost:5002/${p.replace(/"/g, '')}`);
                     }
                 } catch (err) {
                     console.warn('Failed to parse UDID Card:', err);
                     // Fallback: comma-separated string
                     UDIDPhotoPath = data.udid_attach
                         .split(',')
-                        .map((p) => `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`);
+                        .map((p) => `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`);
                 }
             }
 
@@ -598,7 +722,6 @@ function Essential_record() {
             alert("Admission Number not found");
         }
     };
-
 
 
     useEffect(() => {
@@ -685,7 +808,7 @@ function Essential_record() {
                         const parsed = JSON.parse(fieldData);
                         if (Array.isArray(parsed)) {
                             paths = parsed.map((p) =>
-                                `https://www.pahrultours.com/app2/${p.replace(/"/g, '')}`
+                                `http://localhost:5002/${p.replace(/"/g, '')}`
                             );
                         }
                     } catch (err) {
@@ -693,7 +816,7 @@ function Essential_record() {
                         paths = fieldData
                             .split(',')
                             .map((p) =>
-                                `https://www.pahrultours.com/app2/${p.trim().replace(/^"|"$/g, '')}`
+                                `http://localhost:5002/${p.trim().replace(/^"|"$/g, '')}`
                             );
                     }
                 }
@@ -893,7 +1016,7 @@ function Essential_record() {
                         const imageArray = JSON.parse(result.rescue_image.replace(/&quot;/g, '"'));
 
                         if (Array.isArray(imageArray) && imageArray.length > 0) {
-                            imagePath = `https://www.pahrultours.com/app2/${imageArray[0]}`;
+                            imagePath = `http://localhost:5002/${imageArray[0]}`;
                         }
                     } catch (parseError) {
                         console.error("Error parsing image array:", parseError);
@@ -903,7 +1026,7 @@ function Essential_record() {
                     // It's a single image path
                     imagePath = result.rescue_image.startsWith("http")
                         ? result.rescue_image
-                        : `https://www.pahrultours.com/app2/${result.rescue_image}`;
+                        : `http://localhost:5002/${result.rescue_image}`;
                 }
 
                 if (imagePath) {
@@ -981,6 +1104,20 @@ function Essential_record() {
         }
     }, [admission_no]);
 
+    const handleClearData = () => {
+        dispatch(resetEssentialData()); // Reset text fields
+        setAdmissionNumber("");
+        setRescueName("");
+        dispatch(clearEssentialImages()); // Clear file states
+
+        // Also clear files from IndexedDB storage
+        clearAadharAttach();
+        clearBankPassbook();
+        clearForm7Attachment();
+        clearUdidAttach();
+    };
+
+
     return (
         <>
             <Container fluid>
@@ -988,7 +1125,7 @@ function Essential_record() {
                     <Col md={2} className='text-start'>
                         <Breadcrumb className="d-none d-md-inline-block mb-0 mobile_breadcrumb" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
                             <Breadcrumb.Item></Breadcrumb.Item>
-                            <Breadcrumb.Item><Link to="/dashboard">Home</Link></Breadcrumb.Item>
+                            <Breadcrumb.Item>Home</Breadcrumb.Item>
                             <Breadcrumb.Item active>Admin Formality</Breadcrumb.Item>
                         </Breadcrumb>
                         <h6 className="breadcrumb_title">Records</h6>
@@ -1028,6 +1165,9 @@ function Essential_record() {
                                 />
                             </InputGroup>
                         </Col>
+                        <div className="close_admission mx-2" onClick={handleClearData}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter admission number.");
@@ -1119,6 +1259,30 @@ function Essential_record() {
                                                 multiple
                                             />
 
+                                            {formData.attach_aadhar && formData.attach_aadhar.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.attach_aadhar.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+
+
                                             {/* UDID */}
                                             <Form.Label className="mb-1">UDID Card Number (Unique Disability ID):  <span style={{ color: 'red' }}>*</span></Form.Label>
                                             <Form.Control
@@ -1140,6 +1304,29 @@ function Essential_record() {
                                                 ref={UDIDAttachRef}
                                                 multiple
                                             />
+
+                                            {formData.udid_attach && formData.udid_attach.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.udid_attach.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
 
                                             {/* Disability Passport */}
                                             <Form.Label className="mb-1">Disability Certificate No. & Issuing Authority:  <span style={{ color: 'red' }}>*</span></Form.Label>
@@ -1188,6 +1375,29 @@ function Essential_record() {
                                                 ref={form7AttachRef}
                                                 required
                                             />
+
+                                            {formData.form7_attach && formData.form7_attach.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.form7_attach.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                         </Col>
                                     </Form.Group>
 
@@ -1241,6 +1451,28 @@ function Essential_record() {
                                                 multiple
                                                 ref={bankPassbookRef}
                                             />
+
+                                            {formData.bank_passbook && formData.bank_passbook.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.bank_passbook.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Col>
                                     </Form.Group>
 
