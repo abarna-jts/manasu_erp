@@ -11,6 +11,9 @@ import medicalCampReducer from './medicalCampSlice';
 import prescriptionReducer from './prescriptionSlice';
 import essentialReducer from './essentialSlice';
 import familyReqReducer from './familyReqSlice';
+import selfDeclarationReducer from './selfDeclarationSlice';
+import mediaConsentReducer from './mediaConsentSlice';
+import handOverReducer from './handOverSlice';
 
 const STORAGE_KEYS = {
   admission: 'admissionState',
@@ -24,7 +27,10 @@ const STORAGE_KEYS = {
   medical_camp: 'medicalCampState',
   prescription: 'prescriptionState',
   essential: 'essentialState',
-  family_request: 'familyRequestState'
+  family_request: 'familyRequestState',
+  self_declaration: 'self_declaration',
+  media_consent: 'media_consent',
+  handOver: 'handOver',
 };
 
 // Load from localStorage
@@ -52,6 +58,9 @@ const loadState = () => {
     const prescriptionRaw = localStorage.getItem(STORAGE_KEYS.prescription);
     const essentialRaw = localStorage.getItem(STORAGE_KEYS.essential);
     const familyReqRaw = localStorage.getItem(STORAGE_KEYS.family_request);
+    const selfDeclarationRaw = localStorage.getItem(STORAGE_KEYS.self_declaration);
+    const mediaConsentRaw = localStorage.getItem(STORAGE_KEYS.media_consent);
+    const handOverRaw = localStorage.getItem(STORAGE_KEYS.handOver);
 
     const parse = raw => {
       if (!raw) return undefined;
@@ -78,7 +87,10 @@ const loadState = () => {
       medical_camp: parse(medical_campRaw),
       prescription: parse(prescriptionRaw),
       essential: parse(essentialRaw),
-      family_request: parse(familyReqRaw)
+      family_request: parse(familyReqRaw),
+      self_declaration: parse(selfDeclarationRaw),
+      media_consent: parse(mediaConsentRaw),
+      handOver: parse(handOverRaw)
     };
   } catch {
     return undefined;
@@ -160,6 +172,24 @@ const saveState = (state) => {
         JSON.stringify(makeStored(state.family_request))
       );
     }
+    if (state.self_declaration !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.self_declaration,
+        JSON.stringify(makeStored(state.self_declaration))
+      );
+    }
+    if (state.media_consent !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.media_consent,
+        JSON.stringify(makeStored(state.media_consent))
+      );
+    }
+    if (state.handOver !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.handOver,
+        JSON.stringify(makeStored(state.handOver))
+      );
+    }
   } catch (error) {
     console.error('Error saving to localStorage:', error);
   }
@@ -181,6 +211,9 @@ const store = configureStore({
     prescription: prescriptionReducer,
     essential: essentialReducer,
     family_request: familyReqReducer,
+    self_declaration: selfDeclarationReducer,
+    media_consent: mediaConsentReducer,
+    handOver: handOverReducer
   },
   preloadedState,
 });

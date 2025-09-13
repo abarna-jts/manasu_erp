@@ -10,7 +10,23 @@ import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import imageCompression from 'browser-image-compression';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import {
+    loadHandWrittenDocFromStorage,
+    loadSignatureFromStorage,
+    loadSelfPhotoFromStorage,
+    saveHandWrittenDocToStorage,
+    saveSignatureToStorage,
+    saveSelfPhotoFromStorage,
+    setselfDeclarationField,
+    resetSelfDeclarationData,
+    clearSelfDeclationImages
+} from "../../../store/selfDeclarationSlice";
+import {
+    loadHandwritten_document, loadSignature, loadSelfphoto, clearHandwritten_document,
+    clearSignature, clearSelfphoto
+} from "../../../store/photoStorage";
 
 function Self_Declaration_form() {
     const [show, setShow] = useState(false);
@@ -38,7 +54,8 @@ function Self_Declaration_form() {
     // };
 
     const handleFileChange = async (event) => {
-        const selectedFiles = Array.from(event.target.files);
+        const { name, files } = event.target;
+        const selectedFiles = Array.from(files);
         if (!selectedFiles.length) return;
 
         const options = {
@@ -49,22 +66,14 @@ function Self_Declaration_form() {
         };
 
         try {
-            // Compress all images
+            // Compress all images and log sizes
             const compressedFiles = await Promise.all(
                 selectedFiles.map(async (file, idx) => {
+                    console.log(`Original file ${file.name}: ${(file.size / 1024).toFixed(2)} KB`);
+
                     const compressed = await imageCompression(file, options);
 
-                    // ✅ Log original vs compressed
-                    console.log(`File ${idx + 1} Original:`, {
-                        name: file.name,
-                        size: (file.size / 1024).toFixed(2) + " KB",
-                        type: file.type,
-                    });
-                    console.log(`File ${idx + 1} Compressed:`, {
-                        name: `essential_${Date.now()}_${idx}.jpeg`,
-                        size: (compressed.size / 1024).toFixed(2) + " KB",
-                        type: compressed.type,
-                    });
+                    console.log(`Compressed file ${file.name}: ${(compressed.size / 1024).toFixed(2)} KB`);
 
                     // Rename to avoid .blob
                     const ext = compressed.type.split("/")[1]; // e.g. jpeg
@@ -74,22 +83,35 @@ function Self_Declaration_form() {
                 })
             );
 
-            setFiles((prev) => ({
-                ...prev,
-                [event.target.name]: compressedFiles // ✅ store compressed files
-            }));
-
-            console.log("✅ Final compressed files array:", compressedFiles);
+            // Dispatch only to the relevant field based on input name
+            switch (name) {
+                case "handwritten_document":
+                    dispatch(saveHandWrittenDocToStorage(compressedFiles));
+                    break;
+                case "signature":
+                    dispatch(saveSignatureToStorage(compressedFiles));
+                    break;
+                case "photo":
+                    dispatch(saveSelfPhotoFromStorage(compressedFiles));
+                    break;
+                default:
+                    console.warn("Unknown file input name:", name);
+                    break;
+            }
         } catch (e) {
             console.error("Compression error:", e);
         }
     };
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setselfDeclarationField({ field: name, value }));
     };
     const handleInputChange1 = (e) => {
         setEditData({ ...editData, [e.target.name]: e.target.value });
+    };
+    const handleInputChange2 = (e) => {
+        setRefData({ ...refdata, [e.target.name]: e.target.value });
     };
 
     // Automatically fetch data when admission number is typed
@@ -98,6 +120,32 @@ function Self_Declaration_form() {
             fetchFormData();
         }
     }, [admission_no]);
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionSelfDeclarationInfo');
+            if (stored) {
+                const { admission_no: storedAdm, rescue_name: storedName, age: storedAge } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+                if (storedName) setRescueName(storedName);
+                if (storedAge) setAge(storedAge);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionSelfDeclarationInfo',
+                JSON.stringify({ admission_no, rescue_name, age })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no, rescue_name, age]);
 
     const fetchFormData = async () => {
         try {
@@ -116,13 +164,30 @@ function Self_Declaration_form() {
         }
     }
 
-    const [formData, setFormData] = useState({
+    // const [formData, setFormData] = useState({
+    //     rescue_name: '',
+    //     age: '',
+    //     description: '',
+    // })
+
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.self_declaration);
+
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadHandWrittenDocFromStorage());
+        dispatch(loadSignatureFromStorage());
+        dispatch(loadSelfPhotoFromStorage());
+    }, [dispatch]);
+
+    const [editData, setEditData] = useState({
         rescue_name: '',
         age: '',
         description: '',
     })
 
-    const [editData, setEditData] = useState({
+    const [refdata, setRefData] = useState({
         rescue_name: '',
         age: '',
         description: '',
@@ -175,8 +240,8 @@ function Self_Declaration_form() {
             const data = response.data;
 
             // Update form fields
-            setFormData((formData) => ({
-                ...formData,
+            setRefData((refData) => ({
+                ...refData,
                 rescue_name: data.rescue_name || '',
                 age: data.age || '',
                 description: data.description || '',
@@ -291,21 +356,42 @@ function Self_Declaration_form() {
         data.append('signature', files.signature);
         data.append('photo', files.photo);
 
-        if (files.handwritten_document && files.handwritten_document.length > 0) {
-            files.handwritten_document.forEach(file => {
-                data.append('handwritten_document', file); // ✅ no []
+        // if (files.handwritten_document && files.handwritten_document.length > 0) {
+        //     files.handwritten_document.forEach(file => {
+        //         data.append('handwritten_document', file); // ✅ no []
+        //     });
+        // }
+
+        const realFiles = await loadHandwritten_document();
+        if (realFiles && realFiles.length > 0) {
+            realFiles.forEach(file => {
+                data.append("handwritten_document", file);
             });
         }
 
-        if (files.signature && files.signature.length > 0) {
-            files.signature.forEach(file => {
-                data.append('signature', file); // ✅ no []
+        // if (files.signature && files.signature.length > 0) {
+        //     files.signature.forEach(file => {
+        //         data.append('signature', file); // ✅ no []
+        //     });
+        // }
+
+        const sigrealFiles = await loadSignature();
+        if (sigrealFiles && sigrealFiles.length > 0) {
+            sigrealFiles.forEach(file => {
+                data.append("signature", file);
             });
         }
 
-        if (files.photo && files.photo.length > 0) {
-            files.photo.forEach(file => {
-                data.append('photo', file); // ✅ no []
+        // if (files.photo && files.photo.length > 0) {
+        //     files.photo.forEach(file => {
+        //         data.append('photo', file); // ✅ no []
+        //     });
+        // }
+
+        const photorealFiles = await loadSelfphoto();
+        if (photorealFiles && photorealFiles.length > 0) {
+            photorealFiles.forEach(file => {
+                data.append("photo", file);
             });
         }
 
@@ -314,17 +400,17 @@ function Self_Declaration_form() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Self Declaration Form Created Successfully!');
-            setFormData({
-                rescue_name: '',
-                age: '',
-                description: '',
-            })
+
             setAdmissionNumber("");
             setRescueName("");
             setAge("");
-            if (handwritten_documentRef.current) handwritten_documentRef.current.value = "";
-            if (signatureRef.current) signatureRef.current.value = "";
-            if (photoRef.current) photoRef.current.value = "";
+            dispatch(resetSelfDeclarationData());
+            clearHandwritten_document();
+            clearSignature();
+            clearSelfphoto();
+            // if (handwritten_documentRef.current) handwritten_documentRef.current.value = "";
+            // if (signatureRef.current) signatureRef.current.value = "";
+            // if (photoRef.current) photoRef.current.value = "";
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
                 alert(err.response.data.message);
@@ -545,6 +631,19 @@ function Self_Declaration_form() {
         }
     };
 
+    const handleClearData = () => {
+        dispatch(resetSelfDeclarationData()); // Reset text fields
+        setAdmissionNumber("");
+        setRescueName("");
+        setAge("");
+        dispatch(clearSelfDeclationImages()); // Clear file states
+
+        // Also clear files from IndexedDB storage
+        clearHandwritten_document();
+        clearSignature();
+        clearSelfphoto();
+    };
+
     return (
         <>
             <Container fluid>
@@ -595,6 +694,9 @@ function Self_Declaration_form() {
                                 />
                             </InputGroup>
                         </Col>
+                        <div className="close_admission mx-2" onClick={handleClearData}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter admission number.");
@@ -647,6 +749,7 @@ function Self_Declaration_form() {
                                                 required />
                                         </Col>
                                     </Form.Group>
+
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">
                                         <Form.Label column sm="4" className='text-start'>
                                             Age : <span style={{ color: 'red' }}>*</span>
@@ -661,7 +764,6 @@ function Self_Declaration_form() {
                                         </Col>
                                     </Form.Group>
 
-
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
                                             Handwritten Document : <span style={{ color: 'red' }}>*</span>
@@ -675,13 +777,35 @@ function Self_Declaration_form() {
                                                 onChange={handleFileChange}
                                                 multiple
                                                 required />
+                                            {formData.handwritten_document && formData.handwritten_document.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.handwritten_document.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Col>
-                                    </Form.Group>
 
+
+                                    </Form.Group>
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
-                                            Signature : 
+                                            Signature :
                                         </Form.Label>
                                         <Col sm="8">
                                             <Form.Control
@@ -691,8 +815,30 @@ function Self_Declaration_form() {
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleFileChange}
                                                 multiple />
+                                            {formData.signature && formData.signature.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.signature.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Col>
                                     </Form.Group>
+
 
                                     <Form.Group as={Row} className="mb-3 mt-3">
                                         <Form.Label column sm="4" className='text-start'>
@@ -707,6 +853,27 @@ function Self_Declaration_form() {
                                                 onChange={handleFileChange}
                                                 multiple
                                                 required />
+                                            {formData.photo && formData.photo.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5 className='text-start'>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.photo.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Col>
                                     </Form.Group>
 
@@ -727,7 +894,6 @@ function Self_Declaration_form() {
                                     <div className="mt-3">
                                         <Button variant="success" className="m-1" type="submit">Submit</Button>
                                     </div>
-
                                 </Row>
                             </Form>
 
@@ -758,8 +924,8 @@ function Self_Declaration_form() {
                                 <Form.Control
                                     type="text"
                                     name="rescue_name"
-                                    value={formData.rescue_name}
-                                    onChange={handleInputChange}
+                                    value={refdata.rescue_name}
+                                    onChange={handleInputChange2}
                                     required />
                             </Col>
                         </Form.Group>
@@ -771,8 +937,8 @@ function Self_Declaration_form() {
                                 <Form.Control
                                     type="text"
                                     name="age"
-                                    value={formData.age}
-                                    onChange={handleInputChange}
+                                    value={refdata.age}
+                                    onChange={handleInputChange2}
                                     required />
                             </Col>
                         </Form.Group>
@@ -897,7 +1063,7 @@ function Self_Declaration_form() {
                                         textAlign: "justify"
                                     }}
                                 >
-                                    {formData.description}
+                                    {refdata.description}
                                 </div>
 
                             </Col>

@@ -12,6 +12,15 @@ import { Alert } from "react-bootstrap";
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import imageCompression from 'browser-image-compression';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    loadScanReportFromStorage,
+    saveScanReportToStorage,
+    resetMediaConsentData,
+    setMediaConsentField,
+    clearMediaConsentImages
+} from "../../../store/mediaConsentSlice";
+import { loadScanReport, clearScanReport } from "../../../store/photoStorage";
 
 function Media_consent_form() {
     const [admission_no, setAdmissionNumber] = useState('');
@@ -34,11 +43,45 @@ function Media_consent_form() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
-    const [formData, setFormData] = useState({
-        rescue_name: '',
-        social_media_consent: '',
-        description: '',
-    })
+    // const [formData, setFormData] = useState({
+    //     rescue_name: '',
+    //     social_media_consent: '',
+    //     description: '',
+    // })
+
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.media_consent);
+
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadScanReportFromStorage());
+    }, [dispatch]);
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionMediaConsentInfo');
+            if (stored) {
+                const { admission_no: storedAdm, name: storedName } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+                if (storedName) setRescueName(storedName);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionMediaConsentInfo',
+                JSON.stringify({ admission_no, rescue_name })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no, rescue_name]);
 
     const [editData, setEditData] = useState({
         rescue_name: '',
@@ -60,7 +103,8 @@ function Media_consent_form() {
     }
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setMediaConsentField({ field: name, value }));
     };
 
     const handleInputChange1 = (e) => {
@@ -90,7 +134,7 @@ function Media_consent_form() {
 
     const handleCheckChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        dispatch(setMediaConsentField({ field: name, value }));
     };
 
     const handleCheckChange1 = (e) => {
@@ -226,9 +270,16 @@ function Media_consent_form() {
         data.append('social_media_consent', formData.social_media_consent);
         data.append('description', formData.description);
 
-        if (files.scan_report && files.scan_report.length > 0) {
-            files.scan_report.forEach(file => {
-                data.append('scan_report', file); // ✅ no []
+        // if (files.scan_report && files.scan_report.length > 0) {
+        //     files.scan_report.forEach(file => {
+        //         data.append('scan_report', file); // ✅ no []
+        //     });
+        // }
+
+        const realFiles = await loadScanReport();
+        if (realFiles && realFiles.length > 0) {
+            realFiles.forEach(file => {
+                data.append("scan_report", file);
             });
         }
 
@@ -241,13 +292,11 @@ function Media_consent_form() {
 
             if (res.data.message === "Media Consent Form Created Successfully") {
                 alert("Media consent form Submitted Successfully");
-                setFormData({
-                    rescue_name: '',
-                    social_media_consent: '',
-                    description: '',
-                })
                 setAdmissionNumber("");
-                if (scan_reportRef.current) scan_reportRef.current.value = "";
+                setRescueName("");
+                // if (scan_reportRef.current) scan_reportRef.current.value = "";
+                dispatch(resetMediaConsentData());
+                await clearMediaConsentImages();
             } else {
                 setSubmissionMessage("Submission failed.");
                 setMessageType("danger");
@@ -289,32 +338,16 @@ function Media_consent_form() {
                 selectedFiles.map(async (file, idx) => {
                     const compressed = await imageCompression(file, options);
 
-                    // ✅ Log original vs compressed
-                    console.log(`File ${idx + 1} Original:`, {
-                        name: file.name,
-                        size: (file.size / 1024).toFixed(2) + " KB",
-                        type: file.type,
-                    });
-                    console.log(`File ${idx + 1} Compressed:`, {
-                        name: `essential_${Date.now()}_${idx}.jpeg`,
-                        size: (compressed.size / 1024).toFixed(2) + " KB",
-                        type: compressed.type,
-                    });
-
                     // Rename to avoid .blob
                     const ext = compressed.type.split("/")[1]; // e.g. jpeg
-                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                    return new File([compressed], `Media_Consent_${Date.now()}_${idx}.${ext}`, {
                         type: compressed.type,
                     });
                 })
             );
 
-            setFiles((prev) => ({
-                ...prev,
-                [event.target.name]: compressedFiles // ✅ store compressed files
-            }));
-
-            console.log("✅ Final compressed files array:", compressedFiles);
+            // ✅ Save all compressed files to Redux / storage
+            dispatch(saveScanReportToStorage(compressedFiles));
         } catch (e) {
             console.error("Compression error:", e);
         }
@@ -531,6 +564,13 @@ function Media_consent_form() {
         }
     }, [admission_no]);
 
+    const handleClearData = () => {
+        dispatch(resetMediaConsentData());
+        setAdmissionNumber("");
+        setRescueName("");
+        dispatch(clearMediaConsentImages());
+    }
+
     return (
         <>
             <Container fluid>
@@ -579,6 +619,9 @@ function Media_consent_form() {
                                 />
                             </InputGroup>
                         </Col>
+                        <div className="close_admission mx-2" onClick={handleClearData}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter admission number.");
@@ -696,7 +739,29 @@ function Media_consent_form() {
                                                 required
                                                 multiple
                                             />
+                                            {formData.scan_report.length > 0 && (
+                                                <div className="mt-2">
+                                                    <h5>Selected Photos :</h5>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        {formData.scan_report.map((file, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={file.preview}
+                                                                alt={file.name}
+                                                                style={{
+                                                                    width: "120px",
+                                                                    height: "120px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "8px",
+                                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Col>
+
                                     </Form.Group>
 
                                     <Form.Group as={Row} className="mb-1" controlId="formRescueName">

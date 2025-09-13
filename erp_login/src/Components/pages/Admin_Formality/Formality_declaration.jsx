@@ -11,6 +11,9 @@ import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { Link } from 'react-router-dom';
+import {
+    setHandOverField, resetHandOverField
+} from '../../../store/handOverSlice.js';
 
 function Formality_declaration() {
     const [show, setShow] = useState(false);
@@ -25,19 +28,23 @@ function Formality_declaration() {
 
     const handleClose = () => setShow(false);
 
-    const [formData, setFormData] = useState({
-        admission_no: '',
-        rescue_name: '',
-        age: '',
-        medicine_provided: '',
-        toiletries_provided: '',
-        dress_provided: '',
-        travel_expenses: '',
-        welfare_expenses: '',
-        medical_prescription: '',
-        discharge_summary: '',
-        travel_letter: ''
-    })
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.handOver);
+
+    // const [formData, setFormData] = useState({
+    //     admission_no: '',
+    //     rescue_name: '',
+    //     age: '',
+    //     medicine_provided: '',
+    //     toiletries_provided: '',
+    //     dress_provided: '',
+    //     travel_expenses: '',
+    //     welfare_expenses: '',
+    //     medical_prescription: '',
+    //     discharge_summary: '',
+    //     travel_letter: ''
+    // })
 
     const [editData, setEditData] = useState({
         admission_no: '',
@@ -58,7 +65,8 @@ function Formality_declaration() {
     });
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setHandOverField({ field: name, value }));
     };
 
     const handleInputChange1 = (e) => {
@@ -67,7 +75,7 @@ function Formality_declaration() {
 
     const handleCheckChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        dispatch(setHandOverField({ field: name, value }));
     };
 
     const handleCheckChange1 = (e) => {

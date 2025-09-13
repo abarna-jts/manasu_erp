@@ -167,3 +167,56 @@ export const clearResRationCard = async () => {
 export const clearGovtID = async () => {
   await localforage.removeItem("govt_id");
 };
+
+// -------------------- Self Declaration Form ------------------- //
+export const saveHandwritten_document = async (files) => {
+  await localforage.setItem("handwritten_document", files);
+};
+
+export const saveSignature = async (files) => {
+  await localforage.setItem("signature", files);
+};
+
+export const saveSelfphoto = async (files) => {
+  await localforage.setItem("photo", files);
+};
+
+export const loadHandwritten_document = async () => {
+  const files = await localforage.getItem("handwritten_document");
+  return files || [];
+};
+
+export const loadSignature = async () => {
+  const files = await localforage.getItem("signature");
+  return files || [];
+};
+
+export const loadSelfphoto = async () => {
+  const files = await localforage.getItem("photo");
+  return files || [];
+};
+
+export const clearHandwritten_document = async () => {
+  await localforage.removeItem("handwritten_document");
+};
+
+export const clearSignature = async () => {
+  await localforage.removeItem("signature");
+};
+
+export const clearSelfphoto = async () => {
+  await localforage.removeItem("photo");
+};
+
+// ----------------- Media Consent -------------------- //
+export const saveScanReport = async (files) => {
+  await localforage.setItem("scan_report", files);
+};
+
+export const loadScanReport = async () =>{
+  await localforage.removeItem("scan_report");
+};
+
+export const clearScanReport = async () => {
+  await localforage.removeItem("scan_report");
+};
