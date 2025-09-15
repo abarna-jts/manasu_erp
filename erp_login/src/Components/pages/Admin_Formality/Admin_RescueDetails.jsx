@@ -8,7 +8,11 @@ import html2canvas from "html2canvas";
 import { useRef } from "react";
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import {
+    setDischargeSummaryField, resetDischargeSummary
+} from '../../../store/dischargeSummarySlice.js';
 
 function Admin_RescueDetails() {
     const [show, setShow] = useState(false);
@@ -26,7 +30,24 @@ function Admin_RescueDetails() {
     const handleShow = () => setShow(true);
     const handleEditClose = () => setShow1(false);
 
-    const [formData, setFormData] = useState({
+    // const [formData, setFormData] = useState({
+    //     admission_no: '',
+    //     rescue_name: '',
+    //     referred_by: '',
+    //     escape: '',
+    //     death: '',
+    //     discharge: '',
+    //     transfer: '',
+    //     reunited: '',
+    //     state_venue: '',
+    //     state: ''
+    // });
+
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.discharge_summary);
+
+    const [formState, setFormData] = useState({
         admission_no: '',
         rescue_name: '',
         referred_by: '',
@@ -43,16 +64,22 @@ function Admin_RescueDetails() {
         baseURL: import.meta.env.VITE_API_BASE_URL,
     });
 
-    const handleInputChange = (e) => {
+    const handleInputChange1 = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        dispatch(setDischargeSummaryField({ field: name, value }));
 
         if (name === 'admission_no') {
             fetchRescueDetails(value); // Call fetch when admission_no changes
         }
     };
 
-    const handleCheckChange = (e) => {
+
+    const handleCheckChange1 = (e) => {
         const { name, value } = e.target;
 
         setFormData((prevData) => ({
@@ -63,6 +90,11 @@ function Admin_RescueDetails() {
         }));
     };
 
+    const handleCheckChange = (e) => {
+        const { name, value } = e.target;
+        dispatch(setDischargeSummaryField({ field: name, value }));
+    };
+
 
     const fetchRescueDetails = async (admissionNo) => {
         if (!admissionNo) return;
@@ -71,15 +103,13 @@ function Admin_RescueDetails() {
             const response = await apiRoute.get(`/formality/getRescueDetails/${admissionNo}`);
             const data = response.data;
 
-            setFormData(prev => ({
-                ...prev,
-                rescue_name: data.rescue_name || '',
-                referred_by: data.referred_by || ''
-            }));
+            dispatch(setDischargeSummaryField({ field: 'rescue_name', value: data.rescue_name || '' }));
+            dispatch(setDischargeSummaryField({ field: 'referred_by', value: data.referred_by || '' }));
         } catch (error) {
             console.error('Error fetching rescue details:', error);
         }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -89,6 +119,7 @@ function Admin_RescueDetails() {
                 headers: { 'Content-Type': 'application/json' },
             });
             alert('Rescue Discharge Summary Form Created successfully!');
+            dispatch(resetDischargeSummary());
             handleClose(true);
             setFormData({
                 admission_no: '',
@@ -245,7 +276,7 @@ function Admin_RescueDetails() {
     const handleUpdate = async (e, id) => {
         e.preventDefault();
         try {
-            const response = await apiRoute.put(`/formality/updateDischargeSummary/${id}`, formData);
+            const response = await apiRoute.put(`/formality/updateDischargeSummary/${id}`, formState);
             console.log(response.data);
             if (response.status === 200) {
                 alert('Form Updated successfully!');
@@ -295,6 +326,10 @@ function Admin_RescueDetails() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    const handleClearData = () => {
+        dispatch(resetDischargeSummary());
+    }
 
     return (
         <div>
@@ -431,6 +466,9 @@ function Admin_RescueDetails() {
                     <Modal.Title>Create Rescue Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div className="clear-btn d-flex align-items-end justify-content-end">
+                        <Button variant="secondary" onClick={handleClearData}>Clear All</Button>
+                    </div>
                     <Col md={12}>
                         <Form className='rescue_details' onSubmit={handleSubmit}>
                             <Row>
@@ -665,7 +703,7 @@ function Admin_RescueDetails() {
                                 <Form.Control
                                     type="text"
                                     name="admission_no"
-                                    value={formData.admission_no}
+                                    value={formState.admission_no}
                                     onChange={handleInputChange}
                                     required />
                             </Col>
@@ -679,7 +717,7 @@ function Admin_RescueDetails() {
                                 <Form.Control
                                     type="text"
                                     name="rescue_name"
-                                    value={formData.rescue_name}
+                                    value={formState.rescue_name}
                                     onChange={handleInputChange}
                                     required />
                             </Col>
@@ -693,7 +731,7 @@ function Admin_RescueDetails() {
                                 <Form.Control
                                     type="text"
                                     name="referred_by"
-                                    value={formData.referred_by}
+                                    value={formState.referred_by}
                                     onChange={handleInputChange}
                                     required />
                             </Col>
@@ -708,7 +746,7 @@ function Admin_RescueDetails() {
                                     label="Yes"
                                     name="escape"
                                     value="Yes"
-                                    checked={formData.escape === 'Yes'}
+                                    checked={formState.escape === 'Yes'}
                                     onChange={handleCheckChange}
                                 />
                                 <Form.Check
@@ -716,7 +754,7 @@ function Admin_RescueDetails() {
                                     label="No"
                                     name="escape"
                                     value="No"
-                                    checked={formData.escape === 'No'}
+                                    checked={formState.escape === 'No'}
                                     onChange={handleCheckChange}
                                 />
                             </Col>
@@ -732,7 +770,7 @@ function Admin_RescueDetails() {
                                     label="Yes"
                                     name="death"
                                     value="Yes"
-                                    checked={formData.death === 'Yes'}
+                                    checked={formState.death === 'Yes'}
                                     onChange={handleCheckChange}
                                 />
                                 <Form.Check
@@ -740,7 +778,7 @@ function Admin_RescueDetails() {
                                     label="No"
                                     name="death"
                                     value="No"
-                                    checked={formData.death === 'No'}
+                                    checked={formState.death === 'No'}
                                     onChange={handleCheckChange}
                                 />
                             </Col>
@@ -756,7 +794,7 @@ function Admin_RescueDetails() {
                                     label="Yes"
                                     name="discharge"
                                     value="Yes"
-                                    checked={formData.discharge === 'Yes'}
+                                    checked={formState.discharge === 'Yes'}
                                     onChange={handleCheckChange}
                                 />
                                 <Form.Check
@@ -764,7 +802,7 @@ function Admin_RescueDetails() {
                                     label="No"
                                     name="discharge"
                                     value="No"
-                                    checked={formData.discharge === 'No'}
+                                    checked={formState.discharge === 'No'}
                                     onChange={handleCheckChange}
                                 />
                             </Col>
@@ -780,7 +818,7 @@ function Admin_RescueDetails() {
                                     label="Yes"
                                     name="reunited"
                                     value="Yes"
-                                    checked={formData.reunited === 'Yes'}
+                                    checked={formState.reunited === 'Yes'}
                                     onChange={handleCheckChange}
                                 />
                                 <Form.Check
@@ -788,14 +826,14 @@ function Admin_RescueDetails() {
                                     label="No"
                                     name="reunited"
                                     value="No"
-                                    checked={formData.reunited === 'No'}
+                                    checked={formState.reunited === 'No'}
                                     onChange={handleCheckChange}
                                 />
                             </Col>
                         </Form.Group>
 
                         {/* Show the State / Venue field only if transfer is "Yes" */}
-                        {formData.reunited === 'Yes' && (
+                        {formState.reunited === 'Yes' && (
                             <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
                                 <Form.Label column sm="4" className="text-start">
                                     State :
@@ -804,10 +842,10 @@ function Admin_RescueDetails() {
                                     <Form.Control
                                         type="text"
                                         name="state"
-                                        value={formData.state || ''}
+                                        value={formState.state || ''}
                                         onChange={handleInputChange}
                                         placeholder="Enter State"
-                                        required={formData.reunited === 'Yes'}  // Required only if transfer is yes
+                                        required={formState.reunited === 'Yes'}  // Required only if transfer is yes
                                     />
                                 </Col>
                             </Form.Group>
@@ -823,7 +861,7 @@ function Admin_RescueDetails() {
                                     label="Yes"
                                     name="transfer"
                                     value="Yes"
-                                    checked={formData.transfer === 'Yes'}
+                                    checked={formState.transfer === 'Yes'}
                                     onChange={handleCheckChange}
                                 />
                                 <Form.Check
@@ -831,14 +869,14 @@ function Admin_RescueDetails() {
                                     label="No"
                                     name="transfer"
                                     value="No"
-                                    checked={formData.transfer === 'No'}
+                                    checked={formState.transfer === 'No'}
                                     onChange={handleCheckChange}
                                 />
                             </Col>
                         </Form.Group>
 
                         {/* Show the State / Venue field only if transfer is "Yes" */}
-                        {formData.transfer === 'Yes' && (
+                        {formState.transfer === 'Yes' && (
                             <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
                                 <Form.Label column sm="4" className="text-start">
                                     State / Venue :
@@ -847,10 +885,10 @@ function Admin_RescueDetails() {
                                     <Form.Control
                                         type="text"
                                         name="state_venue"
-                                        value={formData.state_venue || ''}
+                                        value={formState.state_venue || ''}
                                         onChange={handleInputChange}
                                         placeholder="Enter State or Venue"
-                                        required={formData.transfer === 'Yes'}  // Required only if transfer is yes
+                                        required={formState.transfer === 'Yes'}  // Required only if transfer is yes
                                     />
                                 </Col>
                             </Form.Group>
@@ -876,9 +914,9 @@ function Admin_RescueDetails() {
                                         <Form.Control
                                             type="text"
                                             name="rescue_name"
-                                            value={formData.rescue_name}
-                                            onChange={handleInputChange}
-                                            readOnly />
+                                            value={formState.rescue_name}
+                                            onChange={handleInputChange1}
+                                             />
                                     </Col>
                                 </Form.Group>
 
@@ -890,9 +928,9 @@ function Admin_RescueDetails() {
                                         <Form.Control
                                             type="text"
                                             name="referred_by"
-                                            value={formData.referred_by}
-                                            onChange={handleInputChange}
-                                            readOnly />
+                                            value={formState.referred_by}
+                                            onChange={handleInputChange1}
+                                             />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-1" controlId="formSocialMediaConsent">
@@ -905,16 +943,16 @@ function Admin_RescueDetails() {
                                             label="Yes"
                                             name="escape"
                                             value="Yes"
-                                            checked={formData.escape === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.escape === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="escape"
                                             value="No"
-                                            checked={formData.escape === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.escape === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -929,16 +967,16 @@ function Admin_RescueDetails() {
                                             label="Yes"
                                             name="death"
                                             value="Yes"
-                                            checked={formData.death === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.death === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="death"
                                             value="No"
-                                            checked={formData.death === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.death === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -953,16 +991,16 @@ function Admin_RescueDetails() {
                                             label="Yes"
                                             name="discharge"
                                             value="Yes"
-                                            checked={formData.discharge === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.discharge === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="discharge"
                                             value="No"
-                                            checked={formData.discharge === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.discharge === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
@@ -977,22 +1015,22 @@ function Admin_RescueDetails() {
                                             label="Yes"
                                             name="reunited"
                                             value="Yes"
-                                            checked={formData.reunited === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.reunited === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="reunited"
                                             value="No"
-                                            checked={formData.reunited === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.reunited === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
 
                                 {/* Show the State / Venue field only if transfer is "Yes" */}
-                                {formData.reunited === 'Yes' && (
+                                {formState.reunited === 'Yes' && (
                                     <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
                                         <Form.Label column sm="4" className="text-start">
                                             State :
@@ -1001,10 +1039,10 @@ function Admin_RescueDetails() {
                                             <Form.Control
                                                 type="text"
                                                 name="state"
-                                                value={formData.state || ''}
-                                                onChange={handleInputChange}
+                                                value={formState.state || ''}
+                                                onChange={handleInputChange1}
                                                 placeholder="Enter State"
-                                                required={formData.reunited === 'Yes'}  // Required only if transfer is yes
+                                                required={formState.reunited === 'Yes'}  // Required only if transfer is yes
                                             />
                                         </Col>
                                     </Form.Group>
@@ -1020,22 +1058,22 @@ function Admin_RescueDetails() {
                                             label="Yes"
                                             name="transfer"
                                             value="Yes"
-                                            checked={formData.transfer === 'Yes'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.transfer === 'Yes'}
+                                            onChange={handleCheckChange1}
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="No"
                                             name="transfer"
                                             value="No"
-                                            checked={formData.transfer === 'No'}
-                                            onChange={handleCheckChange}
+                                            checked={formState.transfer === 'No'}
+                                            onChange={handleCheckChange1}
                                         />
                                     </Col>
                                 </Form.Group>
 
                                 {/* Show the State / Venue field only if transfer is "Yes" */}
-                                {formData.transfer === 'Yes' && (
+                                {formState.transfer === 'Yes' && (
                                     <Form.Group as={Row} className="mb-3" controlId="formStateVenue">
                                         <Form.Label column sm="4" className="text-start">
                                             State :
@@ -1044,10 +1082,10 @@ function Admin_RescueDetails() {
                                             <Form.Control
                                                 type="text"
                                                 name="state_venue"
-                                                value={formData.state_venue || ''}
-                                                onChange={handleInputChange}
+                                                value={formState.state_venue || ''}
+                                                onChange={handleInputChange1}
                                                 placeholder="Enter State"
-                                                required={formData.transfer === 'Yes'}  // Required only if transfer is yes
+                                                required={formState.transfer === 'Yes'}  // Required only if transfer is yes
                                             />
                                         </Col>
                                     </Form.Group>

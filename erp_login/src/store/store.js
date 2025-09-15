@@ -14,6 +14,9 @@ import familyReqReducer from './familyReqSlice';
 import selfDeclarationReducer from './selfDeclarationSlice';
 import mediaConsentReducer from './mediaConsentSlice';
 import handOverReducer from './handOverSlice';
+import dischargeSummaryReducer from './dischargeSummarySlice';
+import internshipReducer from './internshipSlice';
+import dischargeChecklistReducer from './dischargeChecklistSlice'
 
 const STORAGE_KEYS = {
   admission: 'admissionState',
@@ -31,6 +34,10 @@ const STORAGE_KEYS = {
   self_declaration: 'self_declaration',
   media_consent: 'media_consent',
   handOver: 'handOver',
+  discharge_summary: 'discharge_summary',
+  internship: 'internship',
+  discharge_checklist: 'discharge_checklist',
+  
 };
 
 // Load from localStorage
@@ -61,6 +68,9 @@ const loadState = () => {
     const selfDeclarationRaw = localStorage.getItem(STORAGE_KEYS.self_declaration);
     const mediaConsentRaw = localStorage.getItem(STORAGE_KEYS.media_consent);
     const handOverRaw = localStorage.getItem(STORAGE_KEYS.handOver);
+    const dischargeSummaryRaw = localStorage.getItem(STORAGE_KEYS.discharge_summary);
+    const internshipRaw = localStorage.getItem(STORAGE_KEYS.internship);
+    const discharge_checklistRaw = localStorage.getItem(STORAGE_KEYS.discharge_checklist);
 
     const parse = raw => {
       if (!raw) return undefined;
@@ -90,7 +100,10 @@ const loadState = () => {
       family_request: parse(familyReqRaw),
       self_declaration: parse(selfDeclarationRaw),
       media_consent: parse(mediaConsentRaw),
-      handOver: parse(handOverRaw)
+      handOver: parse(handOverRaw),
+      discharge_summary: parse(dischargeSummaryRaw),
+      internship: parse(internshipRaw),
+      discharge_checklist: parse(discharge_checklistRaw)
     };
   } catch {
     return undefined;
@@ -190,6 +203,24 @@ const saveState = (state) => {
         JSON.stringify(makeStored(state.handOver))
       );
     }
+    if (state.discharge_summary !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.discharge_summary,
+        JSON.stringify(makeStored(state.discharge_summary))
+      );
+    }
+    if (state.internship !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.internship,
+        JSON.stringify(makeStored(state.internship))
+      );
+    }
+    if (state.discharge_checklist !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.discharge_checklist,
+        JSON.stringify(makeStored(state.discharge_checklist))
+      );
+    }
   } catch (error) {
     console.error('Error saving to localStorage:', error);
   }
@@ -213,7 +244,10 @@ const store = configureStore({
     family_request: familyReqReducer,
     self_declaration: selfDeclarationReducer,
     media_consent: mediaConsentReducer,
-    handOver: handOverReducer
+    handOver: handOverReducer, 
+    discharge_summary: dischargeSummaryReducer,
+    internship: internshipReducer,
+    discharge_checklist: dischargeChecklistReducer
   },
   preloadedState,
 });

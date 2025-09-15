@@ -11,8 +11,9 @@ import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
 import manasu_logo from '../Admission/Manasu-Logo.png';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import {
-    setHandOverField, resetHandOverField
+    setHandOverField, resetHandOver
 } from '../../../store/handOverSlice.js';
 
 function Formality_declaration() {
@@ -32,19 +33,20 @@ function Formality_declaration() {
 
     const formData = useSelector((state) => state.handOver);
 
-    // const [formData, setFormData] = useState({
-    //     admission_no: '',
-    //     rescue_name: '',
-    //     age: '',
-    //     medicine_provided: '',
-    //     toiletries_provided: '',
-    //     dress_provided: '',
-    //     travel_expenses: '',
-    //     welfare_expenses: '',
-    //     medical_prescription: '',
-    //     discharge_summary: '',
-    //     travel_letter: ''
-    // })
+
+    const [formState, setStateData] = useState({
+        admission_no: '',
+        rescue_name: '',
+        age: '',
+        medicine_provided: '',
+        toiletries_provided: '',
+        dress_provided: '',
+        travel_expenses: '',
+        welfare_expenses: '',
+        medical_prescription: '',
+        discharge_summary: '',
+        travel_letter: ''
+    })
 
     const [editData, setEditData] = useState({
         admission_no: '',
@@ -140,29 +142,31 @@ function Formality_declaration() {
 
     // Trigger when admission number changes
     useEffect(() => {
-        if (admission_no.trim() !== "") {
+        if ((admission_no || "").trim() !== "") {
             fetchRescueDetails(admission_no);
         } else {
             setRescueImage(null);
             setRescueName("");
             setError("");
         }
+
     }, [admission_no]);
 
 
     // Automatically fetch data when admission number is typed
     useEffect(() => {
-        if (admission_no.trim().length >= 12) { // Adjust minimum length as needed
+        if ((admission_no || "").trim().length >= 12) { // Adjust minimum length as needed
             fetchFormData();
         }
     }, [admission_no]);
+
 
     const fetchFormData = async () => {
         try {
             const response = await apiRoute.get(`/reunion/get_information/${admission_no}`);
             console.log("Fetched data:", response.data);
             if (response.data && response.data.data) {
-                setFormData(response.data.data);
+                setStateData(response.data.data);
             } else {
                 console.warn("Unexpected response structure:", response.data);
             }
@@ -239,22 +243,12 @@ function Formality_declaration() {
         try {
             const res = await apiRoute.post('/formality/createDeclaration', payload);
             alert('Document Handover Form submitted successfully!');
-            setFormData({
-                admission_no: '',
-                rescue_name: '',
-                age: '',
-                medicine_provided: '',
-                toiletries_provided: '',
-                dress_provided: '',
-                travel_expenses: '',
-                welfare_expenses: '',
-                medical_prescription: '',
-                discharge_summary: '',
-                travel_letter: ''
-            })
+            dispatch(resetHandOverField());
             setAdmissionNumber("");
             setRescueName("");
             setAge("");
+
+
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
                 alert(err.response.data.message);
@@ -313,7 +307,7 @@ function Formality_declaration() {
             const data = response.data;
 
             // Update form fields
-            setFormData((formData) => ({
+            setStateData((formData) => ({
                 ...formData,
                 rescue_name: data.rescue_name || '',
                 age: data.age || '',
@@ -341,7 +335,7 @@ function Formality_declaration() {
             setTimeout(() => {
                 generatePDF();
                 setPreviewRequested(false);
-                setFormData('');
+                setStateData('');
             }, 100); // 100ms delay is often enough
         }
     }, [previewRequested]);
@@ -423,6 +417,38 @@ function Formality_declaration() {
         }
     };
 
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('admissionHandOverInfo');
+            if (stored) {
+                const { admission_no: storedAdm, rescue_name: storedName, age: storedAge } = JSON.parse(stored);
+                if (storedAdm) setAdmissionNumber(storedAdm);
+                if (storedName) setRescueName(storedName);
+                if (storedAge) setAge(storedAge);
+            }
+        } catch (e) {
+            console.warn('Failed to parse stored admission info', e);
+        }
+    }, []);
+
+    // whenever admission_no or date changes, persist
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                'admissionHandOverInfo',
+                JSON.stringify({ admission_no, rescue_name, age })
+            );
+        } catch (e) {
+            console.warn('Failed to save admission info', e);
+        }
+    }, [admission_no, rescue_name, age]);
+
+    const handleClearData = () => {
+        dispatch(resetHandOver());
+        setAdmissionNumber();
+        setAge();
+    }
+
 
     return (
         <>
@@ -470,11 +496,14 @@ function Formality_declaration() {
                             <InputGroup className="input-group-merge search-bar">
                                 <Form.Control
                                     type="text"
-                                    value={admission_no}
+                                    value={admission_no || ""}
                                     onChange={(e) => setAdmissionNumber(e.target.value)}
                                 />
                             </InputGroup>
                         </Col>
+                        <div className="close_admission mx-2" onClick={handleClearData}>
+                            <i className="bi bi-x-circle" style={{ color: "red" }}></i>
+                        </div>
                         <button type="button" className="btn btn-secondary mx-1" onClick={() => {
                             if (!admission_no.trim()) {
                                 alert("Please enter admission number.");

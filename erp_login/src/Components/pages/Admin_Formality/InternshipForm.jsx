@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Breadcrumb, Container, Row, Table, Button } from 'react-bootstrap';
 import { Col, Form } from 'react-bootstrap';
 import { Alert } from "react-bootstrap";
@@ -7,8 +7,37 @@ import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import imageCompression from 'browser-image-compression';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    loadStudPhotosFromStorage,
+    saveStudPhotosToStorage,
+    resetInternship,
+    setIntershipField,
+    clearInternshipPhotos
+} from "../../../store/internshipSlice.js";
+import { loadStudPhotos, clearStudPhotos } from "../../../store/photoStorage";
+
+
 function InternshipForm() {
-    const [formData, setFormData] = useState({
+    // const [formData, setFormData] = useState({
+    //     stud_name: '',
+    //     stud_id: '',
+    //     department: '',
+    //     email: '',
+    //     phone: '',
+    //     secondary_phone: '',
+    //     field: '',
+    //     clg_name: '',
+    //     duration: '',
+    //     from_date: '',
+    //     to_date: '',
+    //     supervisor_name: '',
+    //     supervisor_email: '',
+    //     supervisor_phone: '',
+    //     choose_intern: '',
+    // });
+
+    const [formState, setFormData] = useState({
         stud_name: '',
         stud_id: '',
         department: '',
@@ -26,6 +55,15 @@ function InternshipForm() {
         choose_intern: '',
     });
 
+    const dispatch = useDispatch();
+
+    const formData = useSelector((state) => state.internship);
+
+    // Load photos from IndexedDB on mount
+    useEffect(() => {
+        dispatch(loadStudPhotosFromStorage());
+    }, [dispatch]);
+
     const [files, setFiles] = useState({
         stud_photo: null
     });
@@ -39,8 +77,13 @@ function InternshipForm() {
     });
 
 
+    // const handleInputChange = (e) => {
+    //     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // };
+
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        dispatch(setIntershipField({ field: name, value }));
     };
 
     // const handleFileChange = (e) => {
@@ -67,32 +110,16 @@ function InternshipForm() {
                 selectedFiles.map(async (file, idx) => {
                     const compressed = await imageCompression(file, options);
 
-                    // ✅ Log original vs compressed
-                    console.log(`File ${idx + 1} Original:`, {
-                        name: file.name,
-                        size: (file.size / 1024).toFixed(2) + " KB",
-                        type: file.type,
-                    });
-                    console.log(`File ${idx + 1} Compressed:`, {
-                        name: `essential_${Date.now()}_${idx}.jpeg`,
-                        size: (compressed.size / 1024).toFixed(2) + " KB",
-                        type: compressed.type,
-                    });
-
                     // Rename to avoid .blob
                     const ext = compressed.type.split("/")[1]; // e.g. jpeg
-                    return new File([compressed], `essential_${Date.now()}_${idx}.${ext}`, {
+                    return new File([compressed], `Internship_${Date.now()}_${idx}.${ext}`, {
                         type: compressed.type,
                     });
                 })
             );
 
-            setFiles((prev) => ({
-                ...prev,
-                [event.target.name]: compressedFiles // ✅ store compressed files
-            }));
-
-            console.log("✅ Final compressed files array:", compressedFiles);
+            // ✅ Save all compressed files to Redux / storage
+            dispatch(saveStudPhotosToStorage(compressedFiles));
         } catch (e) {
             console.error("Compression error:", e);
         }
@@ -149,9 +176,16 @@ function InternshipForm() {
             data.append("choose_intern", formData.choose_intern);
             // Add other fields as needed
 
-            if (files.stud_photo && files.stud_photo.length > 0) {
-                files.stud_photo.forEach(file => {
-                    data.append('stud_photo', file); // ✅ no []
+            // if (files.stud_photo && files.stud_photo.length > 0) {
+            //     files.stud_photo.forEach(file => {
+            //         data.append('stud_photo', file); // ✅ no []
+            //     });
+            // }
+
+            const realFiles = await loadStudPhotos();
+            if (realFiles && realFiles.length > 0) {
+                realFiles.forEach(file => {
+                    data.append("stud_photo", file);
                 });
             }
 
@@ -163,6 +197,7 @@ function InternshipForm() {
 
             if (response.data.message === "Internship Form Created successfully") {
                 alert("Student Internship Form Submitted successfully");
+                dispatch(resetInternship());
                 setFormData({
                     stud_name: '',
                     stud_id: '',
@@ -180,6 +215,7 @@ function InternshipForm() {
                     supervisor_phone: '',
                     choose_intern: '',
                 })
+                clearStudPhotos();
                 if (stud_photRef.current) stud_photRef.current.value = "";
             } else {
                 setSubmissionMessage("Submission failed.");
@@ -191,6 +227,11 @@ function InternshipForm() {
             setMessageType("danger");
         }
     };
+
+    const handleClearData = () => {
+        dispatch(resetInternship());
+        dispatch(clearInternshipPhotos());
+    }
 
     return (
         <>
@@ -222,6 +263,9 @@ function InternshipForm() {
             <Container>
                 <Row>
                     <Col md={10} className='d-flex align-items-center justify-content-end'>
+                        <div className="clear-btn d-flex align-items-end justify-content-end">
+                            <Button variant="secondary" onClick={handleClearData}>Clear All</Button>
+                        </div>
                         <div className="d-flex align-tems-center justify-content-end">
                             <Button variant="success" className="m-1" type="button" onClick={handleViewAll}>View All</Button>
                         </div>
@@ -270,13 +314,34 @@ function InternshipForm() {
                                         name="stud_photo"
                                         type="file"
                                         accept=".jpg,.jpeg,.png"
-                                        value={formData.stud_photo}
+                                        value={files.stud_photo}
                                         onChange={handleFileChange}
                                         ref={stud_photRef}
                                         required
                                         multiple
                                     />
                                 </Col>
+                                {formData.stud_photo && formData.stud_photo.length > 0 && (
+                                    <div className="mt-2">
+                                        <h5 className='text-start'>Selected Photos :</h5>
+                                        <div className="d-flex flex-wrap gap-3">
+                                            {formData.stud_photo.map((file, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={file.preview}
+                                                    alt={file.name}
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-1 text-start" controlId="formEmailID">

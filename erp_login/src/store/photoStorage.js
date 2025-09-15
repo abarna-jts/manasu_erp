@@ -220,3 +220,96 @@ export const loadScanReport = async () =>{
 export const clearScanReport = async () => {
   await localforage.removeItem("scan_report");
 };
+
+// -------------------- Event Report -----------------------//
+export const saveEventPhotos = async (files) => {
+  await localforage.setItem("event_photos", files);
+};
+export const saveAwarnessPhotos = async (files) => {
+  await localforage.setItem("awarness_photos", files);
+};
+export const saveOutingPhotos = async (files) => {
+  await localforage.setItem("outing_photos", files);
+};
+
+export const loadEventPhotos = async () =>{
+  await localforage.removeItem("event_photos");
+};
+export const loadAwarnessPhotos = async () =>{
+  await localforage.removeItem("awarness_photos");
+};
+export const loadOutingPhotos = async () =>{
+  await localforage.removeItem("outing_photos");
+};
+
+export const clearEventPhotos = async () => {
+  await localforage.removeItem("event_photos");
+};
+export const clearAwarnessPhotos = async () => {
+  await localforage.removeItem("awarness_photos");
+};
+export const clearOutingPhotos = async () => {
+  await localforage.removeItem("outing_photos");
+};
+
+// ----------------- internship ----------------- //
+export const saveStudPhotos = async (files) => {
+  await localforage.setItem("stud_photo", files);
+};
+
+export const loadStudPhotos = async () =>{
+  await localforage.removeItem("stud_photo");
+};
+
+export const clearStudPhotos = async () => {
+  await localforage.removeItem("stud_photo");
+};
+
+// ----------- FORM 2 --------------------- //
+export const saveOldPhotos = async (files) => {
+  await localforage.setItem("old_photo", files);
+};
+
+export const loadOldPhotos = async () =>{
+  await localforage.removeItem("old_photo");
+};
+
+export const clearOldPhotos = async () => {
+  await localforage.removeItem("old_photo");
+};
+
+export const saveNewPhotos = async (files) => {
+  await localforage.setItem("new_photo", files);
+};
+
+export const loadNewPhotos = async () =>{
+  await localforage.removeItem("new_photo");
+};
+
+export const clearNewPhotos = async () => {
+  await localforage.removeItem("new_photo");
+};
+
+export const saveForm2Signature = async (files) => {
+  await localforage.setItem("signature", files);
+};
+
+export const loadForm2Signature = async () =>{
+  await localforage.removeItem("signature");
+};
+
+export const clearForm2Signature = async () => {
+  await localforage.removeItem("signature");
+};
+
+export const saveSeal = async (files) => {
+  await localforage.setItem("seal", files);
+};
+
+export const loadSeal = async () =>{
+  await localforage.removeItem("seal");
+};
+
+export const clearSeal = async () => {
+  await localforage.removeItem("seal");
+};
